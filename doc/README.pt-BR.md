@@ -34,6 +34,9 @@ XuruVoip é uma suíte de comunicação de voz 3D (VoIP) de alta performance, se
 
 ## 📸 Capturas de Tela e Interface
 
+<details>
+<summary>📸 Clique para ver as capturas de tela</summary>
+
 ### 1. Janela Principal do Cliente
 ![Janela Principal do Cliente](/screenshots/main.png)
 
@@ -49,20 +52,25 @@ XuruVoip é uma suíte de comunicação de voz 3D (VoIP) de alta performance, se
 ### 5. Painel de Configurações de Atalhos de Teclado
 ![Painel de Configurações de Atalhos de Teclado](/screenshots/hotkeys.png)
 
-### 6. Página de Login do Portal Web Administrativo
+### 6. Painel de Configurações do Overlay (HUD Vulkan e DirectX)
+![Painel de Configurações do Overlay](/screenshots/overlay.png)
+
+### 7. Página de Login do Portal Web Administrativo
 ![Página de Login do Portal Web Administrativo](/screenshots/admin_login.png)
 
-### 7. Painel Geral (Dashboard) do Portal Web Administrativo
+### 8. Painel Geral (Dashboard) do Portal Web Administrativo
 ![Painel Geral do Portal Web Administrativo](/screenshots/admin_dashboard.png)
 
-### 8. Lista de Jogadores do Portal Web Administrativo
+### 9. Lista de Jogadores do Portal Web Administrativo
 ![Lista de Jogadores do Portal Web Administrativo](/screenshots/admin_players_list.png)
 
-### 9. Lista de Administradores do Portal Web Administrativo
+### 10. Lista de Administradores do Portal Web Administrativo
 ![Lista de Administradores do Portal Web Administrativo](/screenshots/admin_admin_list.png)
 
-### 10. Lista de Banimentos do Portal Web Administrativo
+### 11. Lista de Banimentos do Portal Web Administrativo
 ![Lista de Banimentos do Portal Web Administrativo](/screenshots/admin_ban_list.png)
+
+</details>
 
 ---
 

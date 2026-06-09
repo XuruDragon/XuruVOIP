@@ -118,6 +118,9 @@
     <sys:String x:Key="OptBottomLeft">Inferior Esquerdo</sys:String>
     <sys:String x:Key="OptBottomCenter">Inferior Centro</sys:String>
     <sys:String x:Key="OptBottomRight">Inferior Direito</sys:String>
+    <sys:String x:Key="LblEnableDiscordRpc">Ativar Discord Rich Presence</sys:String>
+    <sys:String x:Key="LblOverlayCapabilities">Capacidades do Overlay</sys:String>
+    <sys:String x:Key="LblOverlayCapabilitiesDesc">O overlay HUD é totalmente compatível com Vulkan e DirectX quando o Star Citizen é executado em modo "Janela sem Bordas". Exibe o estado da ligação VoIP no jogo, a frequência de rádio ativa e os indicadores de fala em tempo real sem injetar no código do jogo ou correr o risco de banimentos.</sys:String>
 
     <!-- Buttons General -->
     <sys:String x:Key="BtnSaveClose">Guardar e Fechar</sys:String>

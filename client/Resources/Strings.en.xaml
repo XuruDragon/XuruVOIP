@@ -118,6 +118,9 @@
     <sys:String x:Key="OptBottomLeft">Bottom-Left</sys:String>
     <sys:String x:Key="OptBottomCenter">Bottom-Center</sys:String>
     <sys:String x:Key="OptBottomRight">Bottom-Right</sys:String>
+    <sys:String x:Key="LblEnableDiscordRpc">Enable Discord Rich Presence</sys:String>
+    <sys:String x:Key="LblOverlayCapabilities">Overlay Capabilities</sys:String>
+    <sys:String x:Key="LblOverlayCapabilitiesDesc">The HUD overlay is fully Vulkan and DirectX compatible when Star Citizen is run in "Borderless Windowed" mode. It displays in-game VoIP connection status, the active radio frequency, and real-time talking indicators without injecting into game code or risking bans.</sys:String>
 
     <!-- Buttons General -->
     <sys:String x:Key="BtnSaveClose">Save &amp; Close</sys:String>

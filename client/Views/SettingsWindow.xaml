@@ -245,6 +245,11 @@
                                       IsChecked="{Binding Config.EnableGeneralLogs, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,0"/>
+
+                            <CheckBox Content="{DynamicResource LblEnableDiscordRpc}"
+                                      IsChecked="{Binding Config.EnableDiscordRpc, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"/>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
@@ -459,6 +464,12 @@
                             <TextBlock Text="{DynamicResource LblOverlayPosition}" Style="{StaticResource LabelStyle}"/>
                             <ComboBox x:Name="CbOverlayPosition" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
                                       SelectionChanged="CbOverlayPosition_SelectionChanged"/>
+
+                            <!-- Overlay Capabilities Info -->
+                            <TextBlock Text="{DynamicResource LblOverlayCapabilities}" Style="{StaticResource LabelStyle}" FontWeight="Bold" Margin="0,12,0,4"/>
+                            <Border Background="{StaticResource BgElevated}" CornerRadius="8" Padding="12" Margin="0,0,0,16">
+                                <TextBlock Text="{DynamicResource LblOverlayCapabilitiesDesc}" Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap"/>
+                            </Border>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
