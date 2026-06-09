@@ -919,12 +919,14 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg MsgJoin) {
 			}
 
 			if ok := hub.UpdatePosition(name, m.Pos); ok {
-				hub.BroadcastPosMessage(name, MsgPlayerPos{
+				posMsg := MsgPlayerPos{
 					Type:      "pos",
 					Name:      name,
 					Pos:       m.Pos,
 					TsCapture: m.TsCapture,
-				})
+				}
+				hub.BroadcastPosMessage(name, posMsg)
+				hub.BroadcastToAdmins(posMsg)
 			}
 
 		case "ping":

@@ -293,37 +293,54 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- ── TAB 2: OCR ── -->
+                <!-- ── TAB 2: POSITION TRACKING ── -->
                 <TabItem Header="{DynamicResource TabOcr}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="0,12,0,0">
 
-                            <TextBlock Text="{DynamicResource LblMonitor}" Style="{StaticResource LabelStyle}"/>
-                            <ComboBox x:Name="CbMonitor" Style="{StaticResource ComboStyle}"
-                                      SelectionChanged="CbMonitor_SelectionChanged"/>
+                            <TextBlock Text="{DynamicResource LblPosSource}" Style="{StaticResource LabelStyle}"/>
+                            <ComboBox x:Name="CbPosSource" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
+                                      SelectionChanged="CbPosSource_SelectionChanged"/>
 
-                            <TextBlock Text="{DynamicResource LblOcrInterval}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox Text="{Binding Config.OcrIntervalMs, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"/>
+                            <StackPanel x:Name="OcrControlsPanel">
+                                <TextBlock Text="{DynamicResource LblMonitor}" Style="{StaticResource LabelStyle}"/>
+                                <ComboBox x:Name="CbMonitor" Style="{StaticResource ComboStyle}"
+                                          SelectionChanged="CbMonitor_SelectionChanged"/>
 
-                            <Button Content="{DynamicResource BtnDefineRegion}"
-                                    Style="{StaticResource AccentButton}"
-                                    HorizontalAlignment="Left"
-                                    Click="PickRegion_Click"/>
+                                <TextBlock Text="{DynamicResource LblOcrInterval}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox Text="{Binding Config.OcrIntervalMs, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"/>
 
-                            <Border Background="{StaticResource BgElevated}" CornerRadius="8" Padding="10,8">
-                                <StackPanel>
-                                    <TextBlock Text="{DynamicResource LblLastOcrOutput}" Foreground="{StaticResource TextSecondary}"
-                                               FontSize="11" Margin="0,0,0,4"/>
-                                    <TextBlock x:Name="TbOcrPreview"
-                                               Foreground="{StaticResource Accent}"
-                                               FontSize="12" TextWrapping="Wrap"
-                                               Text="{DynamicResource OcrNoData}"/>
-                                </StackPanel>
-                            </Border>
+                                <Button Content="{DynamicResource BtnDefineRegion}"
+                                        Style="{StaticResource AccentButton}"
+                                        HorizontalAlignment="Left"
+                                        Click="PickRegion_Click"/>
 
-                            <TextBlock Text="{DynamicResource LblCurrentRegion}" Style="{StaticResource LabelStyle}"/>
-                            <TextBlock x:Name="TbRegion" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
+                                <Border Background="{StaticResource BgElevated}" CornerRadius="8" Padding="10,8">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource LblLastOcrOutput}" Foreground="{StaticResource TextSecondary}"
+                                                   FontSize="11" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="TbOcrPreview"
+                                                   Foreground="{StaticResource Accent}"
+                                                   FontSize="12" TextWrapping="Wrap"
+                                                   Text="{DynamicResource OcrNoData}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="{DynamicResource LblCurrentRegion}" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="TbRegion" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
+                            </StackPanel>
+
+                            <StackPanel x:Name="GrtprControlsPanel" Visibility="Collapsed">
+                                <Border Background="{StaticResource BgElevated}" CornerRadius="12" Padding="16,14" Margin="0,0,0,16">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource LblGrtprActive}" Foreground="{StaticResource Accent}" 
+                                                   FontWeight="SemiBold" FontSize="13" Margin="0,0,0,6"/>
+                                        <TextBlock Text="{DynamicResource LblGrtprDesc}" Foreground="{StaticResource TextSecondary}" 
+                                                   FontSize="11" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
@@ -336,6 +353,18 @@
                             <CheckBox Content="{DynamicResource LblEnableSpatialAudio}"
                                       IsChecked="{Binding Config.EnableSpatialAudio, UpdateSourceTrigger=PropertyChanged}"
                                       IsEnabled="{Binding ViewModel.IsSpatialAudioSupportedByServer, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
+                            <!-- Radio degradation toggle -->
+                            <CheckBox Content="{DynamicResource LblEnableRadioDegradation}"
+                                      IsChecked="{Binding Config.EnableRadioDegradation, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
+                            <!-- PTT chimes toggle -->
+                            <CheckBox Content="{DynamicResource LblEnablePttChimes}"
+                                      IsChecked="{Binding Config.EnablePttChimes, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,16"/>
 
@@ -406,6 +435,24 @@
                                                HorizontalAlignment="Right" Width="60"/>
                                 </StackPanel>
                             </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── TAB 4: OVERLAY ── -->
+                <TabItem Header="{DynamicResource TabOverlay}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,12,0,0">
+                            <!-- Overlay Toggle -->
+                            <CheckBox Content="{DynamicResource LblEnableOverlay}"
+                                      IsChecked="{Binding Config.EnableOverlay, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,16"/>
+
+                            <!-- Overlay Position -->
+                            <TextBlock Text="{DynamicResource LblOverlayPosition}" Style="{StaticResource LabelStyle}"/>
+                            <ComboBox x:Name="CbOverlayPosition" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
+                                      SelectionChanged="CbOverlayPosition_SelectionChanged"/>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>

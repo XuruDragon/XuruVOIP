@@ -14,6 +14,7 @@ public partial class MainWindow : Window
 {
     private readonly MainViewModel _vm;
     private readonly DispatcherTimer _vuTimer;
+    private readonly OverlayWindow _overlayWindow;
 
     // Cached brushes
     private static readonly SolidColorBrush BrushGreen = new(Color.FromRgb(0x3D, 0xDB, 0x85));
@@ -24,6 +25,10 @@ public partial class MainWindow : Window
         InitializeComponent();
         _vm = App.ViewModel;
         DataContext = _vm;
+
+        // Initialize Overlay HUD Window
+        _overlayWindow = new OverlayWindow(_vm);
+        _overlayWindow.Show();
 
         // Set window title with version
         var version = typeof(MainWindow).Assembly.GetName().Version;
@@ -97,6 +102,7 @@ public partial class MainWindow : Window
     private void Close_Click(object sender, RoutedEventArgs e)
     {
         _vuTimer.Stop();
+        _overlayWindow.CloseOverlay();
         Application.Current.Shutdown();
     }
 

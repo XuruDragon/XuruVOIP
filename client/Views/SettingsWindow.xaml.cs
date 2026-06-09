@@ -100,14 +100,56 @@ public partial class SettingsWindow : Window
         InputGainLabel.Text = $"{Cfg.InputGainDb:+0;-0;0} dB";
         OutputGainLabel.Text = $"{Cfg.OutputGainPercent:F0}%";
 
+        // Position Tracking Source
+        CbPosSource.Items.Clear();
+        CbPosSource.Items.Add(new { Code = false, Name = System.Windows.Application.Current.TryFindResource("OptOcr") as string ?? "OCR Screen Scanner" });
+        CbPosSource.Items.Add(new { Code = true, Name = System.Windows.Application.Current.TryFindResource("OptGrtpr") as string ?? "Game.log Reader (GRTPR)" });
+        CbPosSource.DisplayMemberPath = "Name";
+        CbPosSource.SelectedValuePath = "Code";
+        CbPosSource.SelectedValue = Cfg.UseGrtpr;
+        UpdateTrackingPanels(Cfg.UseGrtpr);
+
+        // Overlay Position
+        CbOverlayPosition.Items.Clear();
+        CbOverlayPosition.Items.Add(new { Code = "TopLeft", Name = System.Windows.Application.Current.TryFindResource("OptTopLeft") as string ?? "Top-Left" });
+        CbOverlayPosition.Items.Add(new { Code = "TopCenter", Name = System.Windows.Application.Current.TryFindResource("OptTopCenter") as string ?? "Top-Center" });
+        CbOverlayPosition.Items.Add(new { Code = "TopRight", Name = System.Windows.Application.Current.TryFindResource("OptTopRight") as string ?? "Top-Right" });
+        CbOverlayPosition.Items.Add(new { Code = "BottomLeft", Name = System.Windows.Application.Current.TryFindResource("OptBottomLeft") as string ?? "Bottom-Left" });
+        CbOverlayPosition.Items.Add(new { Code = "BottomCenter", Name = System.Windows.Application.Current.TryFindResource("OptBottomCenter") as string ?? "Bottom-Center" });
+        CbOverlayPosition.Items.Add(new { Code = "BottomRight", Name = System.Windows.Application.Current.TryFindResource("OptBottomRight") as string ?? "Bottom-Right" });
+        CbOverlayPosition.DisplayMemberPath = "Name";
+        CbOverlayPosition.SelectedValuePath = "Code";
+        CbOverlayPosition.SelectedValue = Cfg.OverlayPosition;
+
         // OCR region display
         UpdateRegionDisplay();
+    }
+
+    private void UpdateTrackingPanels(bool useGrtpr)
+    {
+        if (OcrControlsPanel != null) OcrControlsPanel.Visibility = useGrtpr ? Visibility.Collapsed : Visibility.Visible;
+        if (GrtprControlsPanel != null) GrtprControlsPanel.Visibility = useGrtpr ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void UpdateRegionDisplay()
     {
         var r = Cfg.OcrRegion;
-        TbRegion.Text = $"X={r.X:F0} Y={r.Y:F0} W={r.Width:F0} H={r.Height:F0}";
+        if (TbRegion != null)
+            TbRegion.Text = $"X={r.X:F0} Y={r.Y:F0} W={r.Width:F0} H={r.Height:F0}";
+    }
+
+    private void CbPosSource_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (Cfg == null || CbPosSource.SelectedValue == null) return;
+        bool useGrtpr = (bool)CbPosSource.SelectedValue;
+        Cfg.UseGrtpr = useGrtpr;
+        UpdateTrackingPanels(useGrtpr);
+    }
+
+    private void CbOverlayPosition_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (Cfg == null || CbOverlayPosition.SelectedValue == null) return;
+        Cfg.OverlayPosition = (string)CbOverlayPosition.SelectedValue;
     }
 
     // ─── Events ──────────────────────────────────────────────────────────────

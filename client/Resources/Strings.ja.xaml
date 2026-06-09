@@ -62,6 +62,11 @@
     <sys:String x:Key="LblGameLogPath">Star Citizen Game.log パス (オプションのオーバーライド)</sys:String>
 
     <!-- Settings: OCR -->
+    <sys:String x:Key="LblPosSource">位置追跡ソース</sys:String>
+    <sys:String x:Key="OptOcr">OCR 画面スキャナー</sys:String>
+    <sys:String x:Key="OptGrtpr">Game.log リーダー (GRTPR)</sys:String>
+    <sys:String x:Key="LblGrtprActive">Game.log リーダー (GRTPR) 有効</sys:String>
+    <sys:String x:Key="LblGrtprDesc">位置座標は Star Citizen の Game.log ファイルから直接読み込まれます。ゲーム内の座標ログ出力を有効にするために、user.cfg に "r_DisplaySessionInfo = 3" (または 1) が設定されていることを確認してください。システムリソースを節約するため、Tesseract OCR エンジンは完全に無効化されます。</sys:String>
     <sys:String x:Key="LblMonitor">モニター</sys:String>
     <sys:String x:Key="LblOcrInterval">OCR 間隔 (ms)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  スキャン範囲を定義</sys:String>
@@ -97,6 +102,21 @@
     <sys:String x:Key="LblMuteAudioProximity">オーディオ近接ミュートキー</sys:String>
     <sys:String x:Key="LblMuteAudioRadio">オーディオ無線ミュートキー</sys:String>
     <sys:String x:Key="LblMuteAudioProfile">オーディオグループミュートキー</sys:String>
+
+    <!-- 設定: オーディオ追加 -->
+    <sys:String x:Key="LblEnableRadioDegradation">距離に基づく無線音声劣化を有効化</sys:String>
+    <sys:String x:Key="LblEnablePttChimes">無線マイクのクリック音とスケルチテールを有効化</sys:String>
+
+    <!-- 設定: オーバーレイ -->
+    <sys:String x:Key="TabOverlay">オーバーレイ</sys:String>
+    <sys:String x:Key="LblEnableOverlay">HUDオーバーレイを有効化</sys:String>
+    <sys:String x:Key="LblOverlayPosition">オーバーレイ表示位置</sys:String>
+    <sys:String x:Key="OptTopLeft">左上</sys:String>
+    <sys:String x:Key="OptTopCenter">中央上</sys:String>
+    <sys:String x:Key="OptTopRight">右上</sys:String>
+    <sys:String x:Key="OptBottomLeft">左下</sys:String>
+    <sys:String x:Key="OptBottomCenter">中央下</sys:String>
+    <sys:String x:Key="OptBottomRight">右下</sys:String>
 
     <!-- Buttons General -->
     <sys:String x:Key="BtnSaveClose">保存して閉じる</sys:String>

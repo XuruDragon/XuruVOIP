@@ -198,9 +198,18 @@ public class AudioCaptureService : IDisposable
             txType = 0x00;
         }
 
+        bool wasTransmitting = IsTransmitting;
         IsTransmitting = shouldTransmit;
 
-        if (!shouldTransmit) return;
+        if (!shouldTransmit)
+        {
+            if (wasTransmitting)
+            {
+                // Send one final empty frame to signal end of transmission
+                EncodedFrameReady?.Invoke(new byte[0], txType);
+            }
+            return;
+        }
 
         // Encode with Opus
         var outBuf = new byte[4000];
