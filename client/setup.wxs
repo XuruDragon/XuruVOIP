@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?define Win64 = "yes" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+    <?define GuidExecutable = "b4a7818a-7e3e-4f11-9a74-d4b9b9c9d4b9" ?>
+    <?define GuidVad = "c3b8829b-8f4f-4e12-8b85-e5caba0aba0a" ?>
+
+    <Product Id="*" Name="XuruVoip Client" Language="1033" Version="$(var.Version)" Manufacturer="XuruDragon" UpgradeCode="a9f8f237-7756-4c4f-8321-7299a9b6c437">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <MediaTemplate EmbedCab="yes" />
+
+        <Feature Id="ProductFeature" Title="XuruVoip Client" Level="1">
+            <ComponentRef Id="ClientExecutable" />
+            <ComponentRef Id="WebRtcVadDll" />
+        </Feature>
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="$(var.PlatformProgramFilesFolder)">
+                <Directory Id="INSTALLFOLDER" Name="XuruVoip">
+                    <Directory Id="RuntimesFolder" Name="runtimes">
+                        <Directory Id="PlatformFolder" Name="win-x64">
+                            <Directory Id="NativeFolder" Name="native" />
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
+            <Directory Id="ProgramMenuFolder" />
+            <Directory Id="DesktopFolder" />
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <!-- Client Executable -->
+        <DirectoryRef Id="INSTALLFOLDER">
+            <Component Id="ClientExecutable" Guid="$(var.GuidExecutable)" Win64="$(var.Win64)">
+                <File Id="XuruVoipClient.exe" Source="$(var.SourceDir)\XuruVoipClient.exe" KeyPath="yes" />
+                <Shortcut Id="ApplicationStartMenuShortcut" Directory="ProgramMenuFolder" Name="XuruVoip Client" WorkingDirectory="INSTALLFOLDER" Icon="app.ico" Advertise="yes" />
+                <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="XuruVoip Client" WorkingDirectory="INSTALLFOLDER" Icon="app.ico" Advertise="yes" />
+            </Component>
+        </DirectoryRef>
+
+        <!-- Native VAD DLL -->
+        <DirectoryRef Id="NativeFolder">
+            <Component Id="WebRtcVadDll" Guid="$(var.GuidVad)" Win64="$(var.Win64)">
+                <File Id="WebRtcVad.dll" Source="$(var.SourceDir)\runtimes\win-x64\native\WebRtcVad.dll" KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+
+        <Icon Id="app.ico" SourceFile="client\Resources\app.ico"/>
+    </Fragment>
+</Wix>

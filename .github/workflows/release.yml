@@ -1,0 +1,122 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Release Assets
+    runs-on: windows-latest
+    steps:
+      - name: Add Build In-Progress Notice to Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          body: |
+            > [!IMPORTANT]
+            > Release pipeline in progress ([Run Link](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})), the binaries will be available when the pipeline has finished.
+
+            ${{ github.event.release.body }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+          architecture: x64
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v3
+        with:
+          msbuild-architecture: x64
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+          cache: true
+
+      - name: Determine Version
+        id: get_version
+        run: |
+          $version = "${{ github.event.release.tag_name }}" -replace '^v',''
+          if ($version -notmatch '^\d+\.\d+\.\d+\.\d+$') {
+              if ($version -match '^\d+\.\d+\.\d+$') {
+                  $version = "$version.0"
+              } else {
+                  $version = "1.0.0.0"
+              }
+          }
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Restore Solution
+        run: |
+          dotnet restore client/XuruVoipClient.sln
+        shell: pwsh
+
+      - name: Publish Client
+        run: |
+          dotnet publish client/XuruVoipClient.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=false -p:Version="${{ steps.get_version.outputs.VERSION }}" -o client/publish
+        shell: pwsh
+
+      - name: Package Portable Client (ZIP)
+        run: |
+          Compress-Archive -Path client/publish/* -DestinationPath client/XuruVoipClient-win-x64.zip
+        shell: pwsh
+
+      - name: Build MSI Installer
+        run: |
+          candle -dPlatform=x64 -dSourceDir="client/publish" -dVersion="${{ steps.get_version.outputs.VERSION }}" client/setup.wxs -out client/setup.wixobj
+          light client/setup.wixobj -out client/XuruVoipClient-win-x64.msi
+        shell: pwsh
+
+      - name: Organize Release Binaries
+        run: |
+          New-Item -ItemType Directory -Force -Path release-binaries
+          if (Test-Path "client/XuruVoipClient-win-x64.msi") {
+              Copy-Item "client/XuruVoipClient-win-x64.msi" -Destination release-binaries/XuruVoipClient-win-x64.msi
+          }
+          if (Test-Path "client/XuruVoipClient-win-x64.zip") {
+              Copy-Item "client/XuruVoipClient-win-x64.zip" -Destination release-binaries/XuruVoipClient-win-x64.zip
+          }
+        shell: pwsh
+
+      - name: Build Go Server (win-x64, linux-x64)
+        run: |
+          New-Item -ItemType Directory -Force -Path build-artifacts/server
+          cd server
+          
+          # Windows x64
+          $env:GOOS="windows"
+          $env:GOARCH="amd64"
+          go build -ldflags="-s -w -X 'main.ServerVersion=${{ steps.get_version.outputs.VERSION }}'" -o ../build-artifacts/server/xuruvoip-server-windows-x64.exe
+          
+          # Linux x64
+          $env:GOOS="linux"
+          $env:GOARCH="amd64"
+          go build -ldflags="-s -w -X 'main.ServerVersion=${{ steps.get_version.outputs.VERSION }}'" -o ../build-artifacts/server/xuruvoip-server-linux-x64
+        shell: pwsh
+
+      - name: Copy Server Binaries to release folder
+        run: |
+          Copy-Item build-artifacts/server/* release-binaries/
+        shell: pwsh
+
+      - name: Upload Release Assets and Finalize
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          body: ${{ github.event.release.body }}
+          files: |
+            release-binaries/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

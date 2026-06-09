@@ -1,0 +1,37 @@
+XuruVoip Source-Available License Agreement
+
+Copyright (c) 2026 @XuruDragon. All rights reserved.
+
+By accessing, viewing, modifying, or running the source code or binary releases of 
+XuruVoip, you agree to be bound by the following terms and conditions:
+
+1. GRANT OF LICENSE FOR PERSONAL USE
+Subject to the terms of this Agreement, the Licensor hereby grants you a personal, 
+non-exclusive, non-transferable, royalty-free license to run, inspect, and modify 
+the Software solely for personal, private, non-commercial, and educational purposes.
+
+2. COMMERCIAL USE RESTRICTIONS
+You may not use this Software, its source code, or any compiled binaries for any 
+commercial, business, or production purposes. Any commercial deployment, hosting, 
+or integration of the Software is strictly prohibited without the express written 
+prior permission of the copyright owner (@XuruDragon).
+
+3. REDISTRIBUTION RESTRICTIONS
+The distribution of pre-compiled release binaries, packages, installers (e.g., MSI, 
+MSIX, ZIP) or modified versions of the Software is strictly prohibited. You may not 
+redistribute or publish the Software in executable form without the express written 
+permission of @XuruDragon.
+
+4. MODIFICATIONS, FORKING, AND ATTRIBUTION
+You are permitted to fork this repository and modify the source code for personal use. 
+However:
+a) You must preserve all copyright and authorship notices in the source code.
+b) Any public fork of this repository must prominently credit @XuruDragon as the original 
+   creator on the fork's homepage (e.g., GitHub README page) and within any derived UI.
+c) You may not distribute your modified version of the software to others.
+
+5. NO WARRANTY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY.

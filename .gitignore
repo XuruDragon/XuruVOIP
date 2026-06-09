@@ -1,0 +1,15 @@
+#server data files
+*.db
+*.log
+*.pem
+*.exe
+.env
+
+
+*.code-workspace
+
+XuruVoipClient.Package/cert.pfx
+XuruVoipClient.Package/cert.ps1
+XuruVoipClient.Package/pfx-encoded-bytes2.txt
+
+.agents

@@ -1,0 +1,145 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Title Bar -->
+    <sys:String x:Key="TitleMain">XuruVoip</sys:String>
+    <sys:String x:Key="TooltipSettings">Configurações</sys:String>
+
+    <!-- Main Window Panels -->
+    <sys:String x:Key="PanelStatus">Status</sys:String>
+    <sys:String x:Key="PanelMicrophone">Microphone</sys:String>
+    <sys:String x:Key="PanelLocation">Localização (Star Citizen OCR)</sys:String>
+    <sys:String x:Key="PanelRadioChannel">Canal de Rádio Ativo</sys:String>
+    <sys:String x:Key="PanelHelmet">Status do Capacete</sys:String>
+    <sys:String x:Key="FooterText">Cliente XuruVoip · VOIP do Star Citizen</sys:String>
+
+    <!-- Status States -->
+    <sys:String x:Key="StatusDisconnected">Desconectado</sys:String>
+    <sys:String x:Key="StatusConnecting">Conectando...</sys:String>
+    <sys:String x:Key="StatusConnected">Conectado</sys:String>
+    <sys:String x:Key="StatusConnectionFailed">Falha na conexão: {0}</sys:String>
+    <sys:String x:Key="StatusMuted">MUTADO</sys:String>
+    <sys:String x:Key="StatusActive">ATIVO</sys:String>
+    <sys:String x:Key="PanelMuteStatus">Status do Mudo dos Canais</sys:String>
+    <sys:String x:Key="TableHeaderChannel">Canal</sys:String>
+    <sys:String x:Key="TableHeaderMicrophone">Microfone</sys:String>
+    <sys:String x:Key="TableHeaderAudio">Áudio</sys:String>
+    <sys:String x:Key="ChannelProximity">Proximidade</sys:String>
+    <sys:String x:Key="ChannelRadio">Rádio</sys:String>
+    <sys:String x:Key="ChannelProfile">Perfil</sys:String>
+    
+    <!-- Helmet States -->
+    <sys:String x:Key="HelmetEquipped">EQUIPADO</sys:String>
+    <sys:String x:Key="HelmetUnequipped">DESEQUIPADO</sys:String>
+
+    <!-- Main Buttons -->
+    <sys:String x:Key="BtnConnect">Conectar</sys:String>
+    <sys:String x:Key="BtnDisconnect">Desconectar</sys:String>
+    <sys:String x:Key="BtnDownload">Baixar</sys:String>
+    <sys:String x:Key="UpdateBannerText">Nova versão disponível</sys:String>
+
+    <!-- Settings Window -->
+    <sys:String x:Key="TitleSettings">⚙  Configurações</sys:String>
+    
+    <!-- Settings Tabs -->
+    <sys:String x:Key="TabGeneral">Geral</sys:String>
+    <sys:String x:Key="TabConnection">Conexão</sys:String>
+    <sys:String x:Key="TabOcr">OCR</sys:String>
+    <sys:String x:Key="TabAudio">Áudio</sys:String>
+    <sys:String x:Key="TabHotkeys">Atalhos</sys:String>
+
+    <!-- Settings: Connection -->
+    <sys:String x:Key="LblServerAddress">Endereço do Servidor</sys:String>
+    <sys:String x:Key="LblPosPort">Porta do Servidor de Posição</sys:String>
+    <sys:String x:Key="LblAudioPort">Porta do Servidor de Áudio</sys:String>
+    <sys:String x:Key="LblUsername">Nome de Usuário</sys:String>
+    <sys:String x:Key="LblUserPassword">Senha do Usuário</sys:String>
+    <sys:String x:Key="LblServerPassword">Senha do Servidor</sys:String>
+    <sys:String x:Key="LblHwid">ID de Hardware (HWID — gerado auto.)</sys:String>
+    <sys:String x:Key="LblEnableLogging">Habilitar Logs Gerais do Cliente</sys:String>
+    <sys:String x:Key="LblLanguage">Idioma do Cliente</sys:String>
+    <sys:String x:Key="LblGameLogPath">Caminho do Game.log do Star Citizen (Opcional)</sys:String>
+
+    <!-- Settings: OCR -->
+    <sys:String x:Key="LblMonitor">Monitor</sys:String>
+    <sys:String x:Key="LblOcrInterval">Intervalo do OCR (ms)</sys:String>
+    <sys:String x:Key="BtnDefineRegion">📐  Definir Região de Escaneamento</sys:String>
+    <sys:String x:Key="LblLastOcrOutput">Último texto do OCR:</sys:String>
+    <sys:String x:Key="LblCurrentRegion">Região atual:</sys:String>
+    <sys:String x:Key="OcrNoData">(sem dados ainda)</sys:String>
+    <sys:String x:Key="OcrWaiting">Aguardando SC...</sys:String>
+
+    <!-- Settings: Audio -->
+    <sys:String x:Key="LblEnableSpatialAudio">Ativar áudio espacial 3D</sys:String>
+    <sys:String x:Key="LblInputDevice">Dispositivo de Entrada (Microfone)</sys:String>
+    <sys:String x:Key="LblInputGain">Ganho de Entrada: </sys:String>
+    <sys:String x:Key="LblOutputDevice">Dispositivo de Saída</sys:String>
+    <sys:String x:Key="LblOutputVolume">Volume de Saída: </sys:String>
+    <sys:String x:Key="LblTransMode">Modo de Transmissão de Proximidade</sys:String>
+    <sys:String x:Key="RbPtt">PTT (Push-To-Talk / Pressione para Falar)</sys:String>
+    <sys:String x:Key="RbVad">VAD (Voice Detection / Detecção de Voz)</sys:String>
+    <sys:String x:Key="LblVadSens">Sensibilidade do VAD</sys:String>
+    <sys:String x:Key="LblSensLow">Baixa</sys:String>
+    <sys:String x:Key="LblSensHigh">Alta</sys:String>
+    <sys:String x:Key="LblRecordInstruction">Clique no campo e pressione qualquer tecla para gravar</sys:String>
+    <sys:String x:Key="LblRecordInstructionMulti">Clique em um campo e pressione qualquer tecla para gravar.</sys:String>
+
+    <!-- Settings: Hotkeys -->
+    <sys:String x:Key="LblPttProximity">Tecla PTT Proximidade</sys:String>
+    <sys:String x:Key="LblPttRadio">Tecla PTT Rádio</sys:String>
+    <sys:String x:Key="LblPttProfile">Tecla PTT Perfil</sys:String>
+    <sys:String x:Key="LblHelmetToggle">Tecla Alternar Capacete</sys:String>
+    <sys:String x:Key="LblRadioCycle">Tecla Ciclo de Canais de Rádio</sys:String>
+    <sys:String x:Key="LblMuteProximity">Tecla Mudo Microfone Proximidade</sys:String>
+    <sys:String x:Key="LblMuteRadio">Tecla Mudo Microfone Rádio</sys:String>
+    <sys:String x:Key="LblMuteProfile">Tecla Mudo Microfone Perfil</sys:String>
+    <sys:String x:Key="LblMuteAudioProximity">Tecla Mudo Áudio Proximidade</sys:String>
+    <sys:String x:Key="LblMuteAudioRadio">Tecla Mudo Áudio Rádio</sys:String>
+    <sys:String x:Key="LblMuteAudioProfile">Tecla Mudo Áudio Perfil</sys:String>
+
+    <!-- Buttons General -->
+    <sys:String x:Key="BtnSaveClose">Salvar e Fechar</sys:String>
+    <sys:String x:Key="BtnBrowse">Procurar...</sys:String>
+
+    <!-- Hotkey Mute Toggles Status -->
+    <sys:String x:Key="MsgMicProximityMuted">Microfone de Proximidade: MUTADO</sys:String>
+    <sys:String x:Key="MsgMicProximityUnmuted">Microfone de Proximidade: ATIVO</sys:String>
+    <sys:String x:Key="MsgMicRadioMuted">Microfone de Rádio: MUTADO</sys:String>
+    <sys:String x:Key="MsgMicRadioUnmuted">Microfone de Rádio: ATIVO</sys:String>
+    <sys:String x:Key="MsgMicProfileMuted">Microfone de Perfil: MUTADO</sys:String>
+    <sys:String x:Key="MsgMicProfileUnmuted">Microfone de Perfil: ATIVO</sys:String>
+    <sys:String x:Key="MsgAudioProximityMuted">Áudio de Proximidade: MUTADO</sys:String>
+    <sys:String x:Key="MsgAudioProximityUnmuted">Áudio de Proximidade: ATIVO</sys:String>
+    <sys:String x:Key="MsgAudioRadioMuted">Áudio de Rádio: MUTADO</sys:String>
+    <sys:String x:Key="MsgAudioRadioUnmuted">Áudio de Rádio: ATIVO</sys:String>
+    <sys:String x:Key="MsgAudioProfileMuted">Áudio de Perfil: MUTADO</sys:String>
+    <sys:String x:Key="MsgAudioProfileUnmuted">Áudio de Perfil: ATIVO</sys:String>
+
+    <!-- Informações dinâmicas de status do microfone -->
+    <sys:String x:Key="MicProximityPttOff">PTT Proximidade (Desativado)</sys:String>
+    <sys:String x:Key="MicProximityPttOn">PTT Proximidade (Ativado)</sys:String>
+    <sys:String x:Key="MicProximityVadOff">VAD Proximidade (Desativado)</sys:String>
+    <sys:String x:Key="MicProximityVadOn">VAD Proximidade (Ativado)</sys:String>
+    <sys:String x:Key="MicRadioPttOn">PTT Canal de Rádio (Ativado)</sys:String>
+    <sys:String x:Key="MicProfilePttOn">PTT Perfil (Ativado)</sys:String>
+    <sys:String x:Key="MicProximityPttMuted">PTT Proximidade (Mutado)</sys:String>
+    <sys:String x:Key="MicRadioPttMuted">PTT Canal de Rádio (Mutado)</sys:String>
+    <sys:String x:Key="MicProfilePttMuted">PTT Perfil (Mutado)</sys:String>
+    <sys:String x:Key="MicProximityVadMuted">VAD Proximidade (Mutado)</sys:String>
+
+    <!-- Connection Errors -->
+    <sys:String x:Key="ErrorInvalidToken">Senha do servidor incorreta (Server Token)</sys:String>
+    <sys:String x:Key="ErrorServerFull">Servidor está cheio</sys:String>
+    <sys:String x:Key="ErrorInvalidPassword">Senha da conta do jogador incorreta</sys:String>
+    <sys:String x:Key="ErrorPlayerBanned">Banido deste servidor (Conta, IP ou HWID)</sys:String>
+    <sys:String x:Key="ErrorDbError">Erro interno do banco de dados</sys:String>
+    <sys:String x:Key="ErrorUnknown">Erro de conexão desconhecido</sys:String>
+    <sys:String x:Key="ErrorNoTicket">O servidor não forneceu um ticket de áudio</sys:String>
+    
+    <!-- Settings Dialog Box -->
+    <sys:String x:Key="MsgSettingsSaved">Configurações salvas com sucesso.</sys:String>
+    <sys:String x:Key="TitleSettingsSaved">Sucesso</sys:String>
+    <sys:String x:Key="MsgInvalidServerAddress">O Endereço do Servidor deve ser um endereço IP válido (ex: 127.0.0.1).</sys:String>
+    <sys:String x:Key="TitleInvalidServerAddress">Endereço de Servidor Inválido</sys:String>
+</ResourceDictionary>

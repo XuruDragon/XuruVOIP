@@ -1,0 +1,16 @@
+[Unit]
+Description=XuruVoip Star Citizen Spatial VOIP Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/xuruvoip/server
+ExecStart=/opt/xuruvoip/server/server
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

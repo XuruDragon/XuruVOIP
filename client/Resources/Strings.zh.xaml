@@ -1,0 +1,145 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Title Bar -->
+    <sys:String x:Key="TitleMain">XuruVoip</sys:String>
+    <sys:String x:Key="TooltipSettings">设置</sys:String>
+
+    <!-- Main Window Panels -->
+    <sys:String x:Key="PanelStatus">状态</sys:String>
+    <sys:String x:Key="PanelMicrophone">麦克风</sys:String>
+    <sys:String x:Key="PanelLocation">位置 (星际公民 OCR)</sys:String>
+    <sys:String x:Key="PanelRadioChannel">当前电台频道</sys:String>
+    <sys:String x:Key="PanelHelmet">头盔状态</sys:String>
+    <sys:String x:Key="FooterText">XuruVoip 客户端 · 星际公民语音系统</sys:String>
+
+    <!-- Status States -->
+    <sys:String x:Key="StatusDisconnected">未连接</sys:String>
+    <sys:String x:Key="StatusConnecting">正在连接...</sys:String>
+    <sys:String x:Key="StatusConnected">已连接</sys:String>
+    <sys:String x:Key="StatusConnectionFailed">连接失败: {0}</sys:String>
+    <sys:String x:Key="StatusMuted">已静音</sys:String>
+    <sys:String x:Key="StatusActive">已开启</sys:String>
+    <sys:String x:Key="PanelMuteStatus">通道静音状态</sys:String>
+    <sys:String x:Key="TableHeaderChannel">通道</sys:String>
+    <sys:String x:Key="TableHeaderMicrophone">麦克风</sys:String>
+    <sys:String x:Key="TableHeaderAudio">音频</sys:String>
+    <sys:String x:Key="ChannelProximity">近空</sys:String>
+    <sys:String x:Key="ChannelRadio">电台</sys:String>
+    <sys:String x:Key="ChannelProfile">群组</sys:String>
+    
+    <!-- Helmet States -->
+    <sys:String x:Key="HelmetEquipped">已佩戴</sys:String>
+    <sys:String x:Key="HelmetUnequipped">未佩戴</sys:String>
+
+    <!-- Main Buttons -->
+    <sys:String x:Key="BtnConnect">连接</sys:String>
+    <sys:String x:Key="BtnDisconnect">断开</sys:String>
+    <sys:String x:Key="BtnDownload">下载</sys:String>
+    <sys:String x:Key="UpdateBannerText">新版本可用</sys:String>
+
+    <!-- Settings Window -->
+    <sys:String x:Key="TitleSettings">⚙  设置</sys:String>
+    
+    <!-- Settings Tabs -->
+    <sys:String x:Key="TabGeneral">常规</sys:String>
+    <sys:String x:Key="TabConnection">连接</sys:String>
+    <sys:String x:Key="TabOcr">OCR</sys:String>
+    <sys:String x:Key="TabAudio">音频</sys:String>
+    <sys:String x:Key="TabHotkeys">热键</sys:String>
+
+    <!-- Settings: Connection -->
+    <sys:String x:Key="LblServerAddress">服务器地址</sys:String>
+    <sys:String x:Key="LblPosPort">位置服务器端口</sys:String>
+    <sys:String x:Key="LblAudioPort">音频服务器端口</sys:String>
+    <sys:String x:Key="LblUsername">用户名</sys:String>
+    <sys:String x:Key="LblUserPassword">用户密码</sys:String>
+    <sys:String x:Key="LblServerPassword">服务器密码</sys:String>
+    <sys:String x:Key="LblHwid">硬件ID (HWID — 自动生成)</sys:String>
+    <sys:String x:Key="LblEnableLogging">启用客户端日志 (通用日志)</sys:String>
+    <sys:String x:Key="LblLanguage">客户端语言</sys:String>
+    <sys:String x:Key="LblGameLogPath">Star Citizen Game.log 路径 (可选覆盖)</sys:String>
+
+    <!-- Settings: OCR -->
+    <sys:String x:Key="LblMonitor">显示器</sys:String>
+    <sys:String x:Key="LblOcrInterval">OCR 扫描间隔 (毫秒)</sys:String>
+    <sys:String x:Key="BtnDefineRegion">📐  定义扫描区域</sys:String>
+    <sys:String x:Key="LblLastOcrOutput">最后一次 OCR 输出:</sys:String>
+    <sys:String x:Key="LblCurrentRegion">当前区域:</sys:String>
+    <sys:String x:Key="OcrNoData">(暂无数据)</sys:String>
+    <sys:String x:Key="OcrWaiting">正在等待星际公民...</sys:String>
+
+    <!-- Settings: Audio -->
+    <sys:String x:Key="LblEnableSpatialAudio">启用3D空间音频</sys:String>
+    <sys:String x:Key="LblInputDevice">输入设备 (麦克风)</sys:String>
+    <sys:String x:Key="LblInputGain">输入增益: </sys:String>
+    <sys:String x:Key="LblOutputDevice">输出设备</sys:String>
+    <sys:String x:Key="LblOutputVolume">输出音量: </sys:String>
+    <sys:String x:Key="LblTransMode">近空语音传输模式</sys:String>
+    <sys:String x:Key="RbPtt">PTT (按键说话)</sys:String>
+    <sys:String x:Key="RbVad">VAD (声控触发)</sys:String>
+    <sys:String x:Key="LblVadSens">VAD 灵敏度</sys:String>
+    <sys:String x:Key="LblSensLow">低</sys:String>
+    <sys:String x:Key="LblSensHigh">高</sys:String>
+    <sys:String x:Key="LblRecordInstruction">点击输入框，然后按下任意键以录制</sys:String>
+    <sys:String x:Key="LblRecordInstructionMulti">点击输入框，然后按下任意键以录制。</sys:String>
+
+    <!-- Settings: Hotkeys -->
+    <sys:String x:Key="LblPttProximity">近空 PTT 键</sys:String>
+    <sys:String x:Key="LblPttRadio">电台 PTT 键</sys:String>
+    <sys:String x:Key="LblPttProfile">群组 PTT 键</sys:String>
+    <sys:String x:Key="LblHelmetToggle">头盔开关键</sys:String>
+    <sys:String x:Key="LblRadioCycle">电台频道切换键</sys:String>
+    <sys:String x:Key="LblMuteProximity">麦克风近空静音键</sys:String>
+    <sys:String x:Key="LblMuteRadio">麦克风电台静音键</sys:String>
+    <sys:String x:Key="LblMuteProfile">麦克风群组静音键</sys:String>
+    <sys:String x:Key="LblMuteAudioProximity">音频近空静音键</sys:String>
+    <sys:String x:Key="LblMuteAudioRadio">音频电台静音键</sys:String>
+    <sys:String x:Key="LblMuteAudioProfile">音频群组静音键</sys:String>
+
+    <!-- Buttons General -->
+    <sys:String x:Key="BtnSaveClose">保存并关闭</sys:String>
+    <sys:String x:Key="BtnBrowse">浏览...</sys:String>
+
+    <!-- Hotkey Mute Toggles Status -->
+    <sys:String x:Key="MsgMicProximityMuted">麦克风近空: 已静音</sys:String>
+    <sys:String x:Key="MsgMicProximityUnmuted">麦克风近空: 已开启</sys:String>
+    <sys:String x:Key="MsgMicRadioMuted">麦克风电台: 已静音</sys:String>
+    <sys:String x:Key="MsgMicRadioUnmuted">麦克风电台: 已开启</sys:String>
+    <sys:String x:Key="MsgMicProfileMuted">麦克风群组: 已静音</sys:String>
+    <sys:String x:Key="MsgMicProfileUnmuted">麦克风群组: 已开启</sys:String>
+    <sys:String x:Key="MsgAudioProximityMuted">音频近空: 已静音</sys:String>
+    <sys:String x:Key="MsgAudioProximityUnmuted">音频近空: 已开启</sys:String>
+    <sys:String x:Key="MsgAudioRadioMuted">音频电台: 已静音</sys:String>
+    <sys:String x:Key="MsgAudioRadioUnmuted">音频电台: 已开启</sys:String>
+    <sys:String x:Key="MsgAudioProfileMuted">音频群组: 已静音</sys:String>
+    <sys:String x:Key="MsgAudioProfileUnmuted">音频群组: 已开启</sys:String>
+
+    <!-- 动态麦克风状态信息 -->
+    <sys:String x:Key="MicProximityPttOff">近空 PTT (关闭)</sys:String>
+    <sys:String x:Key="MicProximityPttOn">近空 PTT (开启)</sys:String>
+    <sys:String x:Key="MicProximityVadOff">近空 VAD (关闭)</sys:String>
+    <sys:String x:Key="MicProximityVadOn">近空 VAD (开启)</sys:String>
+    <sys:String x:Key="MicRadioPttOn">电台频道 PTT (开启)</sys:String>
+    <sys:String x:Key="MicProfilePttOn">群组 PTT (开启)</sys:String>
+    <sys:String x:Key="MicProximityPttMuted">近空 PTT (已静音)</sys:String>
+    <sys:String x:Key="MicRadioPttMuted">电台频道 PTT (已静音)</sys:String>
+    <sys:String x:Key="MicProfilePttMuted">群组 PTT (已静音)</sys:String>
+    <sys:String x:Key="MicProximityVadMuted">近空 VAD (已静音)</sys:String>
+
+    <!-- Connection Errors -->
+    <sys:String x:Key="ErrorInvalidToken">服务器密码错误 (Server Token)</sys:String>
+    <sys:String x:Key="ErrorServerFull">服务器已满</sys:String>
+    <sys:String x:Key="ErrorInvalidPassword">玩家账号密码错误</sys:String>
+    <sys:String x:Key="ErrorPlayerBanned">您已被此服务器封禁 (账号、IP 或硬件ID)</sys:String>
+    <sys:String x:Key="ErrorDbError">内部数据库错误</sys:String>
+    <sys:String x:Key="ErrorUnknown">未知连接错误</sys:String>
+    <sys:String x:Key="ErrorNoTicket">服务器未提供音频凭证</sys:String>
+    
+    <!-- Settings Dialog Box -->
+    <sys:String x:Key="MsgSettingsSaved">设置保存成功。</sys:String>
+    <sys:String x:Key="TitleSettingsSaved">成功</sys:String>
+    <sys:String x:Key="MsgInvalidServerAddress">服务器地址必须是有效的 IP 地址 (例如: 127.0.0.1)。</sys:String>
+    <sys:String x:Key="TitleInvalidServerAddress">无效的服务器地址</sys:String>
+</ResourceDictionary>

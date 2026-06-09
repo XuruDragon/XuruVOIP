@@ -1,0 +1,399 @@
+<Window x:Class="XuruVoipClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:XuruVoipClient"
+        Title="{DynamicResource TitleMain}"
+        Width="450" Height="545"
+        MinWidth="300" MinHeight="545"
+        ResizeMode="CanResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="False"
+        Icon="pack://application:,,,/XuruVoipClient;component/Resources/logo.png">
+
+    <Window.Resources>
+        <!-- Pulsing animation for the talking LED -->
+        <Storyboard x:Key="PulseAnim" RepeatBehavior="Forever" AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="TalkLed"
+                             Storyboard.TargetProperty="Opacity"
+                             From="1.0" To="0.3" Duration="0:0:0.6"/>
+        </Storyboard>
+        <Storyboard x:Key="StopPulse">
+            <DoubleAnimation Storyboard.TargetName="TalkLed"
+                             Storyboard.TargetProperty="Opacity"
+                             To="0.25" Duration="0:0:0.1"/>
+        </Storyboard>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+
+    <!-- Drop shadow outer border -->
+    <Border Margin="8" CornerRadius="16"
+            Background="{StaticResource BgSurface}"
+            BorderBrush="{StaticResource BorderSubtle}"
+            BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" BlurRadius="24" ShadowDepth="4" Opacity="0.6"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="34"/>
+                <!-- Title bar -->
+                <RowDefinition/>
+                <!-- Content -->
+                <RowDefinition Height="Auto"/>
+                <!-- Update banner -->
+                <RowDefinition Height="28"/>
+                <!-- Status bar -->
+            </Grid.RowDefinitions>
+
+            <!-- ═══ TITLE BAR ═══════════════════════════════════════ -->
+            <Border Grid.Row="0" CornerRadius="16,16,0,0"
+                    Background="{StaticResource BgDeep}"
+                    MouseLeftButtonDown="TitleBar_MouseDown">
+                <Grid Margin="16,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Logo dot -->
+                        <Ellipse Width="10" Height="10" Fill="{StaticResource Accent}"
+                                 Margin="0,0,8,0"/>
+                        <TextBlock x:Name="WindowTitleText" Text="XuruVoip" Foreground="{StaticResource TextPrimary}"
+                                   FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <!-- Window controls -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                        <Button Content="⚙" Width="28" Height="28" FontSize="14"
+                                Style="{StaticResource GhostButton}"
+                                Padding="0" Margin="0,0,4,0"
+                                Click="Settings_Click" ToolTip="{DynamicResource TooltipSettings}"/>
+                        <Button Content="─" Width="28" Height="28" FontSize="12"
+                                Style="{StaticResource GhostButton}" Padding="0" Margin="0,0,4,0"
+                                Click="Minimize_Click"/>
+                        <Button Content="✕" Width="28" Height="28" FontSize="12"
+                                Style="{StaticResource GhostButton}" Padding="0"
+                                Click="Close_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ═══ CONTENT ══════════════════════════════════════════ -->
+            <StackPanel Grid.Row="1" Margin="10,10,10,0" VerticalAlignment="Top" Height="451">
+
+                <!-- Connection Status -->
+                <Border Background="{StaticResource BgElevated}" CornerRadius="12"
+                        Padding="14,10" Margin="0,0,0,14">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{DynamicResource PanelStatus}" Foreground="{StaticResource TextSecondary}"
+                                       FontSize="11" Margin="0,0,0,2"/>
+                            <TextBlock x:Name="StatusText"
+                                       Text="{Binding StatusMessage}"
+                                       Foreground="{StaticResource TextPrimary}"
+                                       FontSize="13" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <!-- Dual LED indicators -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="POS" Foreground="{StaticResource TextSecondary}"
+                                           FontSize="9" HorizontalAlignment="Center"/>
+                                <Ellipse x:Name="PosLed" Width="10" Height="10"
+                                         Fill="{StaticResource Red}" Margin="0,2,0,0">
+                                    <Ellipse.Effect>
+                                        <BlurEffect Radius="4"/>
+                                    </Ellipse.Effect>
+                                </Ellipse>
+                            </StackPanel>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="AUDIO" Foreground="{StaticResource TextSecondary}"
+                                           FontSize="9" HorizontalAlignment="Center"/>
+                                <Ellipse x:Name="AudioLed" Width="10" Height="10"
+                                         Fill="{StaticResource Red}" Margin="0,2,0,0">
+                                    <Ellipse.Effect>
+                                        <BlurEffect Radius="4"/>
+                                    </Ellipse.Effect>
+                                </Ellipse>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Talking indicator -->
+                <Border x:Name="TalkBorder" Background="{StaticResource BgElevated}"
+                        CornerRadius="12" Padding="14,12" Margin="0,0,0,14">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="{DynamicResource PanelMicrophone}" Foreground="{StaticResource TextSecondary}"
+                                           FontSize="11"/>
+                                <TextBlock Text="  —  " Foreground="{StaticResource TextSecondary}"
+                                           FontSize="11"/>
+                                <TextBlock Text="{Binding MicModeText}" Foreground="{StaticResource Accent}"
+                                           FontSize="11" FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <!-- VU Meter bar -->
+                            <Border Height="6" Background="{StaticResource BgDeep}"
+                                    CornerRadius="3" Width="200" HorizontalAlignment="Left">
+                                <Border x:Name="VuBar" HorizontalAlignment="Left"
+                                        Height="6" CornerRadius="3" MinWidth="2"
+                                        Background="{StaticResource Green}"/>
+                            </Border>
+                        </StackPanel>
+                        <!-- Talking LED -->
+                        <Ellipse x:Name="TalkLed" Grid.Column="1" Width="16" Height="16"
+                                 Fill="{Binding TalkLedBrush}" Opacity="0.25"
+                                 VerticalAlignment="Center">
+                            <Ellipse.Effect>
+                                <BlurEffect Radius="6"/>
+                            </Ellipse.Effect>
+                        </Ellipse>
+                    </Grid>
+                </Border>
+
+                <!-- Position info -->
+                <Border Background="{StaticResource BgElevated}" CornerRadius="12"
+                        Padding="14,10" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource PanelLocation}"
+                                   Foreground="{StaticResource TextSecondary}"
+                                   FontSize="11" Margin="0,0,0,4"/>
+                        <TextBlock x:Name="ZoneText" Text="{Binding CurrentZone}"
+                                   Foreground="{StaticResource Accent}"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="PosText" Text="{Binding CurrentPos}"
+                                   Foreground="{StaticResource TextSecondary}"
+                                   FontSize="11" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Side-by-Side: Active Radio Channel and Helmet Status -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Active Radio Channel -->
+                    <Border Grid.Column="0" Background="{StaticResource BgElevated}" CornerRadius="12" Padding="14,10">
+                        <StackPanel>
+                            <TextBlock Text="{DynamicResource PanelRadioChannel}" Foreground="{StaticResource TextSecondary}"
+                                       FontSize="11" Margin="0,0,0,4" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding ActiveChannelName}"
+                                       Foreground="{StaticResource Accent}"
+                                       FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Helmet Status -->
+                    <Border Grid.Column="2" Background="{StaticResource BgElevated}" CornerRadius="12" Padding="14,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{DynamicResource PanelHelmet}" Foreground="{StaticResource TextSecondary}"
+                                           FontSize="11" Margin="0,0,0,4" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding HelmetStatusText}"
+                                           Foreground="{Binding HelmetStatusBrush}"
+                                           FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                            <Ellipse Grid.Column="1" Width="8" Height="8"
+                                     Fill="{Binding HelmetStatusBrush}"
+                                     VerticalAlignment="Center" Margin="6,0,0,0">
+                                <Ellipse.Effect>
+                                    <BlurEffect Radius="3"/>
+                                </Ellipse.Effect>
+                            </Ellipse>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Channel Mute Status Table -->
+                <Border Background="{StaticResource BgElevated}" CornerRadius="12" Padding="14,10" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource PanelMuteStatus}" Foreground="{StaticResource TextSecondary}"
+                                   FontSize="11" Margin="0,0,0,8"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="3*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Headers -->
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="{DynamicResource TableHeaderChannel}" Foreground="{StaticResource TextSecondary}" FontSize="10" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="1" Grid.Row="0" Text="{DynamicResource TableHeaderMicrophone}" Foreground="{StaticResource TextSecondary}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Grid.Row="0" Text="{DynamicResource TableHeaderAudio}" Foreground="{StaticResource TextSecondary}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
+
+                            <!-- Separator -->
+                            <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Background="{StaticResource BorderSubtle}" Height="1" Margin="0,4,0,6"/>
+
+                            <!-- Proximity Row -->
+                            <TextBlock Grid.Column="0" Grid.Row="2" Text="{DynamicResource ChannelProximity}" Foreground="{StaticResource TextPrimary}" FontSize="11" VerticalAlignment="Center" Margin="0,0,0,4"/>
+                            <ContentControl Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,4"
+                                            Content="{Binding MicProximityMuted}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{DynamicResource StatusMuted}" Foreground="{StaticResource Red}" FontSize="11" FontWeight="SemiBold" x:Name="Txt"/>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding}" Value="False">
+                                                <Setter TargetName="Txt" Property="Text" Value="{DynamicResource StatusActive}"/>
+                                                <Setter TargetName="Txt" Property="Foreground" Value="{StaticResource Green}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+                            <ContentControl Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,4"
+                                            Content="{Binding AudioProximityMuted}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{DynamicResource StatusMuted}" Foreground="{StaticResource Red}" FontSize="11" FontWeight="SemiBold" x:Name="Txt"/>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding}" Value="False">
+                                                <Setter TargetName="Txt" Property="Text" Value="{DynamicResource StatusActive}"/>
+                                                <Setter TargetName="Txt" Property="Foreground" Value="{StaticResource Green}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+
+                            <!-- Radio Row -->
+                            <TextBlock Grid.Column="0" Grid.Row="3" Text="{DynamicResource ChannelRadio}" Foreground="{StaticResource TextPrimary}" FontSize="11" VerticalAlignment="Center" Margin="0,0,0,4"/>
+                            <ContentControl Grid.Column="1" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,4"
+                                            Content="{Binding MicRadioMuted}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{DynamicResource StatusMuted}" Foreground="{StaticResource Red}" FontSize="11" FontWeight="SemiBold" x:Name="Txt"/>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding}" Value="False">
+                                                <Setter TargetName="Txt" Property="Text" Value="{DynamicResource StatusActive}"/>
+                                                <Setter TargetName="Txt" Property="Foreground" Value="{StaticResource Green}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+                            <ContentControl Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,4"
+                                            Content="{Binding AudioRadioMuted}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{DynamicResource StatusMuted}" Foreground="{StaticResource Red}" FontSize="11" FontWeight="SemiBold" x:Name="Txt"/>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding}" Value="False">
+                                                <Setter TargetName="Txt" Property="Text" Value="{DynamicResource StatusActive}"/>
+                                                <Setter TargetName="Txt" Property="Foreground" Value="{StaticResource Green}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+
+                            <!-- Profile Row -->
+                            <TextBlock Grid.Column="0" Grid.Row="4" Text="{DynamicResource ChannelProfile}" Foreground="{StaticResource TextPrimary}" FontSize="11" VerticalAlignment="Center"/>
+                            <ContentControl Grid.Column="1" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Content="{Binding MicProfileMuted}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{DynamicResource StatusMuted}" Foreground="{StaticResource Red}" FontSize="11" FontWeight="SemiBold" x:Name="Txt"/>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding}" Value="False">
+                                                <Setter TargetName="Txt" Property="Text" Value="{DynamicResource StatusActive}"/>
+                                                <Setter TargetName="Txt" Property="Foreground" Value="{StaticResource Green}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+                            <ContentControl Grid.Column="2" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Content="{Binding AudioProfileMuted}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{DynamicResource StatusMuted}" Foreground="{StaticResource Red}" FontSize="11" FontWeight="SemiBold" x:Name="Txt"/>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding}" Value="False">
+                                                <Setter TargetName="Txt" Property="Text" Value="{DynamicResource StatusActive}"/>
+                                                <Setter TargetName="Txt" Property="Foreground" Value="{StaticResource Green}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Connect / Disconnect buttons -->
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="ConnectBtn" Grid.Column="0" Content="{DynamicResource BtnConnect}"
+                            Style="{StaticResource AccentButton}"
+                            Click="Connect_Click"/>
+                    <Button x:Name="DisconnectBtn" Grid.Column="2" Content="{DynamicResource BtnDisconnect}"
+                            Style="{StaticResource GhostButton}"
+                            Click="Disconnect_Click"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- ═══ UPDATE BANNER ═══════════════════════════════════ -->
+            <Border Grid.Row="2" Background="{StaticResource BgElevated}" 
+                    BorderBrush="{StaticResource Accent}" BorderThickness="0,1,0,0"
+                    Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVis}}"
+                    Padding="16,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="✨" Margin="0,0,8,0" FontSize="12" VerticalAlignment="Center"/>
+                        <TextBlock Text="{DynamicResource UpdateBannerText}" Foreground="{StaticResource TextPrimary}" 
+                                   FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Text=" (" Foreground="{StaticResource TextSecondary}" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding LatestVersion}" Foreground="{StaticResource Accent}" 
+                                   FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Text=")" Foreground="{StaticResource TextSecondary}" FontSize="11" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="{DynamicResource BtnDownload}" 
+                            Style="{StaticResource AccentButton}" Padding="10,2" Height="22" FontSize="10"
+                            Click="DownloadUpdate_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- ═══ STATUS BAR ═══════════════════════════════════════ -->
+            <Border Grid.Row="3" CornerRadius="0,0,16,16"
+                    Background="{StaticResource BgDeep}"
+                    Padding="16,6" Margin="0,0,0,4">
+                <TextBlock Foreground="{StaticResource TextSecondary}"
+                           FontSize="10"
+                           Text="{DynamicResource FooterText}"/>
+            </Border>
+
+        </Grid>
+    </Border>
+</Window>

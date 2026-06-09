@@ -1,0 +1,50 @@
+<Window x:Class="XuruVoipClient.Views.OcrRegionPicker"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="#66000000"
+        Topmost="True"
+        Cursor="Cross">
+
+    <Canvas x:Name="MainCanvas">
+
+        <!-- Instruction overlay (top banner) -->
+        <Border x:Name="InstructionBanner"
+                Canvas.Left="0" Canvas.Top="0"
+                Background="#BB0D0F14"
+                Padding="16,10">
+            <TextBlock Foreground="#E8ECF4" FontSize="14" FontWeight="SemiBold">
+                Drag to define the OCR scan region · Press Escape to cancel · Release to confirm
+            </TextBlock>
+        </Border>
+
+        <!-- The green selection rectangle (resizable via drag) -->
+        <Rectangle x:Name="SelectionRect"
+                   Stroke="#3DDB85"
+                   StrokeThickness="2"
+                   Fill="#2A3DDB85"
+                   Visibility="Collapsed"
+                   IsHitTestVisible="False">
+            <Rectangle.Effect>
+                <DropShadowEffect Color="#3DDB85" BlurRadius="8" ShadowDepth="0" Opacity="0.6"/>
+            </Rectangle.Effect>
+        </Rectangle>
+
+        <!-- Corner handles (appear when selection is confirmed) -->
+        <Rectangle x:Name="HandleTL" Width="10" Height="10" Fill="#3DDB85"
+                   Visibility="Collapsed" IsHitTestVisible="False"/>
+        <Rectangle x:Name="HandleTR" Width="10" Height="10" Fill="#3DDB85"
+                   Visibility="Collapsed" IsHitTestVisible="False"/>
+        <Rectangle x:Name="HandleBL" Width="10" Height="10" Fill="#3DDB85"
+                   Visibility="Collapsed" IsHitTestVisible="False"/>
+        <Rectangle x:Name="HandleBR" Width="10" Height="10" Fill="#3DDB85"
+                   Visibility="Collapsed" IsHitTestVisible="False"/>
+
+        <!-- Coordinate label -->
+        <Border x:Name="CoordLabel" Background="#BB0D0F14" CornerRadius="4"
+                Padding="8,4" Visibility="Collapsed">
+            <TextBlock x:Name="CoordText" Foreground="#4E9EFF" FontSize="11"/>
+        </Border>
+    </Canvas>
+</Window>

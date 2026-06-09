@@ -1,0 +1,522 @@
+<Window x:Class="XuruVoipClient.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource TitleSettings}"
+        Width="520" Height="620"
+        MinHeight="620"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        Icon="pack://application:,,,/XuruVoipClient;component/Resources/logo.png">
+
+    <Window.Resources>
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+        </Style>
+        <Style x:Key="InputStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="CaretBrush" Value="{StaticResource Accent}"/>
+        </Style>
+        <Style x:Key="PwdStyle" TargetType="PasswordBox">
+            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style x:Key="ComboStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <!-- Toggle Button that covers the entire ComboBox area -->
+                            <ToggleButton x:Name="ToggleButton"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Focusable="false"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="Border"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="30" />
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Down Arrow Path -->
+                                                <Path x:Name="Arrow"
+                                                      Grid.Column="1"
+                                                      Fill="{StaticResource TextSecondary}"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      Data="M 0 0 L 4 4 L 8 0 Z" />
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Accent}" />
+                                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource Accent}" />
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="true">
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Accent}" />
+                                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource Accent}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <!-- Content Presenter for the selected item -->
+                            <ContentPresenter x:Name="ContentSite"
+                                              IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+
+                            <!-- Popup showing the dropdown items -->
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Grid x:Name="DropDown"
+                                      SnapsToDevicePixels="True"
+                                      MinWidth="{TemplateBinding ActualWidth}"
+                                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder"
+                                            Background="{StaticResource BgElevated}"
+                                            BorderBrush="{StaticResource BorderSubtle}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Margin="0,2,0,0">
+                                        <Border.Effect>
+                                            <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="2" Opacity="0.4"/>
+                                        </Border.Effect>
+                                        <ScrollViewer Margin="0" SnapsToDevicePixels="True" VerticalScrollBarVisibility="Auto">
+                                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource Accent}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentGlow}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Margin="8" CornerRadius="16"
+            Background="{StaticResource BgSurface}"
+            BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" BlurRadius="24" ShadowDepth="4" Opacity="0.6"/>
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="44"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="52"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title bar -->
+            <Border Grid.Row="0" CornerRadius="16,16,0,0"
+                    Background="{StaticResource BgDeep}"
+                    MouseLeftButtonDown="TitleBar_MouseDown">
+                <Grid Margin="16,0">
+                    <TextBlock Text="{DynamicResource TitleSettings}" Foreground="{StaticResource TextPrimary}"
+                               FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <Button Content="✕" Width="28" Height="28" FontSize="12"
+                            Style="{StaticResource GhostButton}" Padding="0"
+                            HorizontalAlignment="Right" Click="Close_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Tabs -->
+            <TabControl x:Name="SettingsTabControl" Grid.Row="1" Background="Transparent"
+                        BorderThickness="0" Margin="16,12,16,0">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Padding" Value="12,6"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border x:Name="Bd" CornerRadius="8" Padding="{TemplateBinding Padding}"
+                                            Background="Transparent" Margin="0,0,4,0">
+                                        <ContentPresenter ContentSource="Header"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource BgElevated}"/>
+                                            <Setter Property="Foreground" Value="{StaticResource Accent}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
+
+                <!-- ── TAB 0: GENERAL ── -->
+                <TabItem Header="{DynamicResource TabGeneral}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,12,0,0">
+
+                            <TextBlock Text="{DynamicResource LblLanguage}" Style="{StaticResource LabelStyle}" Margin="0,0,0,2"/>
+                            <ComboBox x:Name="CbLanguage" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
+                                      SelectionChanged="CbLanguage_SelectionChanged"/>
+
+                            <TextBlock Text="{DynamicResource LblGameLogPath}" Style="{StaticResource LabelStyle}" Margin="0,0,0,2"/>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="TxGameLogPath" Grid.Column="0" Text="{Binding Config.CustomGameLogPath, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"/>
+                                <Button Grid.Column="2" Content="{DynamicResource BtnBrowse}"
+                                        Style="{StaticResource GhostButton}" Padding="12,6"
+                                        Click="BrowseLogPath_Click"/>
+                            </Grid>
+
+                            <CheckBox Content="{DynamicResource LblEnableLogging}"
+                                      IsChecked="{Binding Config.EnableGeneralLogs, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── TAB 1: CONNECTION ── -->
+                <TabItem Header="{DynamicResource TabConnection}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,12,0,0">
+
+                            <TextBlock Text="{DynamicResource LblServerAddress}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxServer" Text="{Binding Config.ServerAddress, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}" Margin="0,0,0,10"/>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{DynamicResource LblPosPort}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxPosPort" Text="{Binding Config.PositionPort, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{DynamicResource LblAudioPort}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxAudioPort" Text="{Binding Config.AudioPort, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="{DynamicResource LblUsername}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxUsername" Text="{Binding Config.Username, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}" Margin="0,0,0,10"/>
+
+                            <TextBlock Text="{DynamicResource LblUserPassword}" Style="{StaticResource LabelStyle}"/>
+                            <PasswordBox x:Name="PbUserPassword" Style="{StaticResource PwdStyle}" Margin="0,0,0,10"/>
+
+                            <TextBlock Text="{DynamicResource LblServerPassword}" Style="{StaticResource LabelStyle}"/>
+                            <PasswordBox x:Name="PbPassword" Style="{StaticResource PwdStyle}" Margin="0,0,0,10"/>
+
+                            <TextBlock Text="{DynamicResource LblHwid}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox Text="{Binding Config.Hwid}" IsReadOnly="True"
+                                     Style="{StaticResource InputStyle}" Opacity="0.6" Margin="0,0,0,12"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── TAB 2: OCR ── -->
+                <TabItem Header="{DynamicResource TabOcr}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,12,0,0">
+
+                            <TextBlock Text="{DynamicResource LblMonitor}" Style="{StaticResource LabelStyle}"/>
+                            <ComboBox x:Name="CbMonitor" Style="{StaticResource ComboStyle}"
+                                      SelectionChanged="CbMonitor_SelectionChanged"/>
+
+                            <TextBlock Text="{DynamicResource LblOcrInterval}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox Text="{Binding Config.OcrIntervalMs, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"/>
+
+                            <Button Content="{DynamicResource BtnDefineRegion}"
+                                    Style="{StaticResource AccentButton}"
+                                    HorizontalAlignment="Left"
+                                    Click="PickRegion_Click"/>
+
+                            <Border Background="{StaticResource BgElevated}" CornerRadius="8" Padding="10,8">
+                                <StackPanel>
+                                    <TextBlock Text="{DynamicResource LblLastOcrOutput}" Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBlock x:Name="TbOcrPreview"
+                                               Foreground="{StaticResource Accent}"
+                                               FontSize="12" TextWrapping="Wrap"
+                                               Text="{DynamicResource OcrNoData}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="{DynamicResource LblCurrentRegion}" Style="{StaticResource LabelStyle}"/>
+                            <TextBlock x:Name="TbRegion" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── TAB 3: AUDIO ── -->
+                <TabItem Header="{DynamicResource TabAudio}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,12,0,0">
+                            <!-- Spatial audio toggle -->
+                            <CheckBox Content="{DynamicResource LblEnableSpatialAudio}"
+                                      IsChecked="{Binding Config.EnableSpatialAudio, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{Binding ViewModel.IsSpatialAudioSupportedByServer, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,16"/>
+
+                            <!-- Input device -->
+                            <TextBlock Text="{DynamicResource LblInputDevice}" Style="{StaticResource LabelStyle}"/>
+                            <ComboBox x:Name="CbInput" Style="{StaticResource ComboStyle}"
+                                      SelectionChanged="CbInput_SelectionChanged"/>
+
+                            <!-- Input gain -->
+                            <TextBlock Style="{StaticResource LabelStyle}">
+                                <Run Text="{DynamicResource LblInputGain}"/>
+                                <Run x:Name="InputGainLabel" Text="0 dB"/>
+                            </TextBlock>
+                            <Slider x:Name="SlInputGain" Minimum="-20" Maximum="20"
+                                    TickFrequency="5" IsSnapToTickEnabled="True"
+                                    Foreground="{StaticResource Accent}"
+                                    ValueChanged="SlInputGain_Changed"/>
+
+                            <!-- Output device -->
+                            <TextBlock Text="{DynamicResource LblOutputDevice}" Style="{StaticResource LabelStyle}"/>
+                            <ComboBox x:Name="CbOutput" Style="{StaticResource ComboStyle}"
+                                      SelectionChanged="CbOutput_SelectionChanged"/>
+
+                            <!-- Output gain -->
+                            <TextBlock Style="{StaticResource LabelStyle}">
+                                <Run Text="{DynamicResource LblOutputVolume}"/>
+                                <Run x:Name="OutputGainLabel" Text="100%"/>
+                            </TextBlock>
+                            <Slider x:Name="SlOutputGain" Minimum="0" Maximum="200"
+                                    Foreground="{StaticResource Accent}"
+                                    ValueChanged="SlOutputGain_Changed"/>
+
+                            <!-- Audio mode -->
+                            <TextBlock Text="{DynamicResource LblTransMode}" Style="{StaticResource LabelStyle}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <RadioButton x:Name="RbPtt" Content="{DynamicResource RbPtt}"
+                                             Foreground="{StaticResource TextPrimary}"
+                                             FontSize="13" Margin="0,0,12,0"
+                                             Checked="AudioMode_Changed"/>
+                                <RadioButton x:Name="RbVad" Content="{DynamicResource RbVad}"
+                                             Foreground="{StaticResource TextPrimary}"
+                                             FontSize="13"
+                                             Checked="AudioMode_Changed"/>
+                            </StackPanel>
+
+                            <!-- PTT key -->
+                            <StackPanel x:Name="PttPanel">
+                                <TextBlock Text="{DynamicResource LblPttProximity}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="TxPttKey"
+                                         Text="{Binding Config.PttProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"
+                                         KeyDown="Hotkey_KeyDown"/>
+                                <TextBlock Text="{DynamicResource LblRecordInstruction}"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           FontSize="10" Margin="0,4,0,0"/>
+                            </StackPanel>
+
+                            <!-- VAD sensitivity -->
+                            <StackPanel x:Name="VadPanel">
+                                <TextBlock Text="{DynamicResource LblVadSens}" Style="{StaticResource LabelStyle}"/>
+                                <Slider x:Name="SlVad" Minimum="0" Maximum="3"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Foreground="{StaticResource Accent}"
+                                        ValueChanged="SlVad_Changed"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                    <TextBlock Text="{DynamicResource LblSensLow}" Foreground="{StaticResource TextSecondary}" FontSize="10" Width="60"/>
+                                    <TextBlock Text="{DynamicResource LblSensHigh}" Foreground="{StaticResource TextSecondary}" FontSize="10"
+                                               HorizontalAlignment="Right" Width="60"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── TAB: HOTKEYS ── -->
+                <TabItem Header="{DynamicResource TabHotkeys}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,12,0,0">
+                            <!-- PTT Proximity -->
+                            <TextBlock Text="{DynamicResource LblPttProximity}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxPttProximity"
+                                     Text="{Binding Config.PttProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- PTT Radio -->
+                            <TextBlock Text="{DynamicResource LblPttRadio}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxPttRadio"
+                                     Text="{Binding Config.PttRadioKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- PTT Profile -->
+                            <TextBlock Text="{DynamicResource LblPttProfile}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxPttProfile"
+                                     Text="{Binding Config.PttProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Helmet Toggle -->
+                            <TextBlock Text="{DynamicResource LblHelmetToggle}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxHelmetToggle"
+                                     Text="{Binding Config.HelmetToggleKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Radio Cycle -->
+                            <TextBlock Text="{DynamicResource LblRadioCycle}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxRadioCycle"
+                                     Text="{Binding Config.RadioCycleKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Mute Proximity -->
+                            <TextBlock Text="{DynamicResource LblMuteProximity}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxMuteProximity"
+                                     Text="{Binding Config.MuteProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Mute Radio -->
+                            <TextBlock Text="{DynamicResource LblMuteRadio}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxMuteRadio"
+                                     Text="{Binding Config.MuteRadioKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Mute Profile -->
+                            <TextBlock Text="{DynamicResource LblMuteProfile}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxMuteProfile"
+                                     Text="{Binding Config.MuteProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Mute Audio Proximity -->
+                            <TextBlock Text="{DynamicResource LblMuteAudioProximity}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxMuteAudioProximity"
+                                     Text="{Binding Config.MuteAudioProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Mute Audio Radio -->
+                            <TextBlock Text="{DynamicResource LblMuteAudioRadio}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxMuteAudioRadio"
+                                     Text="{Binding Config.MuteAudioRadioKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Mute Audio Profile -->
+                            <TextBlock Text="{DynamicResource LblMuteAudioProfile}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxMuteAudioProfile"
+                                     Text="{Binding Config.MuteAudioProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <TextBlock Text="{DynamicResource LblRecordInstructionMulti}"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       FontSize="10" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+
+            <!-- Save button -->
+            <Border Grid.Row="2" Padding="16,8" Background="{StaticResource BgDeep}"
+                    CornerRadius="0,0,16,16">
+                <Button Content="{DynamicResource BtnSaveClose}" Style="{StaticResource AccentButton}"
+                        HorizontalAlignment="Right" Click="Save_Click"/>
+            </Border>
+        </Grid>
+    </Border>
+
+</Window>

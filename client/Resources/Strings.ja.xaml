@@ -1,0 +1,145 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Title Bar -->
+    <sys:String x:Key="TitleMain">XuruVoip</sys:String>
+    <sys:String x:Key="TooltipSettings">設定</sys:String>
+
+    <!-- Main Window Panels -->
+    <sys:String x:Key="PanelStatus">ステータス</sys:String>
+    <sys:String x:Key="PanelMicrophone">マイク</sys:String>
+    <sys:String x:Key="PanelLocation">位置 (Star Citizen OCR)</sys:String>
+    <sys:String x:Key="PanelRadioChannel">アクティブな無線チャンネル</sys:String>
+    <sys:String x:Key="PanelHelmet">ヘルメットの状態</sys:String>
+    <sys:String x:Key="FooterText">XuruVoip クライアント · Star Citizen VOIP</sys:String>
+
+    <!-- Status States -->
+    <sys:String x:Key="StatusDisconnected">切断</sys:String>
+    <sys:String x:Key="StatusConnecting">接続中...</sys:String>
+    <sys:String x:Key="StatusConnected">接続完了</sys:String>
+    <sys:String x:Key="StatusConnectionFailed">接続失敗: {0}</sys:String>
+    <sys:String x:Key="StatusMuted">ミュート</sys:String>
+    <sys:String x:Key="StatusActive">アクティブ</sys:String>
+    <sys:String x:Key="PanelMuteStatus">チャンネルミュート状態</sys:String>
+    <sys:String x:Key="TableHeaderChannel">チャンネル</sys:String>
+    <sys:String x:Key="TableHeaderMicrophone">マイク</sys:String>
+    <sys:String x:Key="TableHeaderAudio">オーディオ</sys:String>
+    <sys:String x:Key="ChannelProximity">近接</sys:String>
+    <sys:String x:Key="ChannelRadio">無線</sys:String>
+    <sys:String x:Key="ChannelProfile">プロファイル</sys:String>
+    
+    <!-- Helmet States -->
+    <sys:String x:Key="HelmetEquipped">装備</sys:String>
+    <sys:String x:Key="HelmetUnequipped">未装備</sys:String>
+
+    <!-- Main Buttons -->
+    <sys:String x:Key="BtnConnect">接続</sys:String>
+    <sys:String x:Key="BtnDisconnect">切断</sys:String>
+    <sys:String x:Key="BtnDownload">ダウンロード</sys:String>
+    <sys:String x:Key="UpdateBannerText">新しいバージョンがあります</sys:String>
+
+    <!-- Settings Window -->
+    <sys:String x:Key="TitleSettings">⚙  設定</sys:String>
+    
+    <!-- Settings Tabs -->
+    <sys:String x:Key="TabGeneral">全般</sys:String>
+    <sys:String x:Key="TabConnection">接続</sys:String>
+    <sys:String x:Key="TabOcr">OCR</sys:String>
+    <sys:String x:Key="TabAudio">オーディオ</sys:String>
+    <sys:String x:Key="TabHotkeys">ホットキー</sys:String>
+
+    <!-- Settings: Connection -->
+    <sys:String x:Key="LblServerAddress">サーバーアドレス</sys:String>
+    <sys:String x:Key="LblPosPort">位置サーバーポート</sys:String>
+    <sys:String x:Key="LblAudioPort">オーディオサーバーポート</sys:String>
+    <sys:String x:Key="LblUsername">ユーザー名</sys:String>
+    <sys:String x:Key="LblUserPassword">ユーザーパスワード</sys:String>
+    <sys:String x:Key="LblServerPassword">サーバーパスワード</sys:String>
+    <sys:String x:Key="LblHwid">ハードウェアID (HWID — 自動生成)</sys:String>
+    <sys:String x:Key="LblEnableLogging">クライアントログを有効にする (一般ログ)</sys:String>
+    <sys:String x:Key="LblLanguage">クライアントの言語</sys:String>
+    <sys:String x:Key="LblGameLogPath">Star Citizen Game.log パス (オプションのオーバーライド)</sys:String>
+
+    <!-- Settings: OCR -->
+    <sys:String x:Key="LblMonitor">モニター</sys:String>
+    <sys:String x:Key="LblOcrInterval">OCR 間隔 (ms)</sys:String>
+    <sys:String x:Key="BtnDefineRegion">📐  スキャン範囲を定義</sys:String>
+    <sys:String x:Key="LblLastOcrOutput">最後の OCR 出力:</sys:String>
+    <sys:String x:Key="LblCurrentRegion">現在の範囲:</sys:String>
+    <sys:String x:Key="OcrNoData">(データなし)</sys:String>
+    <sys:String x:Key="OcrWaiting">SCの起動を待機中...</sys:String>
+
+    <!-- Settings: Audio -->
+    <sys:String x:Key="LblEnableSpatialAudio">3D空間オーディオを有効にする</sys:String>
+    <sys:String x:Key="LblInputDevice">入力デバイス (マイク)</sys:String>
+    <sys:String x:Key="LblInputGain">入力ゲイン: </sys:String>
+    <sys:String x:Key="LblOutputDevice">出力デバイス</sys:String>
+    <sys:String x:Key="LblOutputVolume">出力音量: </sys:String>
+    <sys:String x:Key="LblTransMode">近接音声送信モード</sys:String>
+    <sys:String x:Key="RbPtt">PTT (プッシュ・トゥ・トーク)</sys:String>
+    <sys:String x:Key="RbVad">VAD (ボイス・アクティベーション)</sys:String>
+    <sys:String x:Key="LblVadSens">VAD 感度</sys:String>
+    <sys:String x:Key="LblSensLow">低</sys:String>
+    <sys:String x:Key="LblSensHigh">高</sys:String>
+    <sys:String x:Key="LblRecordInstruction">フィールドをクリックして任意のキーを押すと登録されます</sys:String>
+    <sys:String x:Key="LblRecordInstructionMulti">フィールドをクリックして任意のキーを押すと登録されます。</sys:String>
+
+    <!-- Settings: Hotkeys -->
+    <sys:String x:Key="LblPttProximity">近接 PTT キー</sys:String>
+    <sys:String x:Key="LblPttRadio">無線 PTT キー</sys:String>
+    <sys:String x:Key="LblPttProfile">グループ PTT キー</sys:String>
+    <sys:String x:Key="LblHelmetToggle">ヘルメット着脱キー</sys:String>
+    <sys:String x:Key="LblRadioCycle">無線チャンネル切替キー</sys:String>
+    <sys:String x:Key="LblMuteProximity">マイク近接ミュートキー</sys:String>
+    <sys:String x:Key="LblMuteRadio">マイク無線ミュートキー</sys:String>
+    <sys:String x:Key="LblMuteProfile">マイクグループミュートキー</sys:String>
+    <sys:String x:Key="LblMuteAudioProximity">オーディオ近接ミュートキー</sys:String>
+    <sys:String x:Key="LblMuteAudioRadio">オーディオ無線ミュートキー</sys:String>
+    <sys:String x:Key="LblMuteAudioProfile">オーディオグループミュートキー</sys:String>
+
+    <!-- Buttons General -->
+    <sys:String x:Key="BtnSaveClose">保存して閉じる</sys:String>
+    <sys:String x:Key="BtnBrowse">参照...</sys:String>
+
+    <!-- Hotkey Mute Toggles Status -->
+    <sys:String x:Key="MsgMicProximityMuted">近接マイク: ミュート</sys:String>
+    <sys:String x:Key="MsgMicProximityUnmuted">近接マイク: アクティブ</sys:String>
+    <sys:String x:Key="MsgMicRadioMuted">無線マイク: ミュート</sys:String>
+    <sys:String x:Key="MsgMicRadioUnmuted">無線マイク: アクティブ</sys:String>
+    <sys:String x:Key="MsgMicProfileMuted">グループマイク: ミュート</sys:String>
+    <sys:String x:Key="MsgMicProfileUnmuted">グループマイク: アクティブ</sys:String>
+    <sys:String x:Key="MsgAudioProximityMuted">近接オーディオ: ミュート</sys:String>
+    <sys:String x:Key="MsgAudioProximityUnmuted">近接オーディオ: アクティブ</sys:String>
+    <sys:String x:Key="MsgAudioRadioMuted">無線オーディオ: ミュート</sys:String>
+    <sys:String x:Key="MsgAudioRadioUnmuted">無線オーディオ: アクティブ</sys:String>
+    <sys:String x:Key="MsgAudioProfileMuted">グループオーディオ: ミュート</sys:String>
+    <sys:String x:Key="MsgAudioProfileUnmuted">グループオーディオ: アクティブ</sys:String>
+
+    <!-- ダイナミックマイク状態情報 -->
+    <sys:String x:Key="MicProximityPttOff">近接 PTT (オフ)</sys:String>
+    <sys:String x:Key="MicProximityPttOn">近接 PTT (オン)</sys:String>
+    <sys:String x:Key="MicProximityVadOff">近接 VAD (オフ)</sys:String>
+    <sys:String x:Key="MicProximityVadOn">近接 VAD (オン)</sys:String>
+    <sys:String x:Key="MicRadioPttOn">無線チャンネル PTT (オン)</sys:String>
+    <sys:String x:Key="MicProfilePttOn">プロファイル PTT (オン)</sys:String>
+    <sys:String x:Key="MicProximityPttMuted">近接 PTT (ミュート)</sys:String>
+    <sys:String x:Key="MicRadioPttMuted">無線チャンネル PTT (ミュート)</sys:String>
+    <sys:String x:Key="MicProfilePttMuted">プロファイル PTT (ミュート)</sys:String>
+    <sys:String x:Key="MicProximityVadMuted">近接 VAD (ミュート)</sys:String>
+
+    <!-- Connection Errors -->
+    <sys:String x:Key="ErrorInvalidToken">サーバーパスワードが正しくありません (Server Token)</sys:String>
+    <sys:String x:Key="ErrorServerFull">サーバーが満員です</sys:String>
+    <sys:String x:Key="ErrorInvalidPassword">プレイヤーアカウントのパスワードが正しくありません</sys:String>
+    <sys:String x:Key="ErrorPlayerBanned">このサーバーからBANされています (アカウント、IP、またはHWID)</sys:String>
+    <sys:String x:Key="ErrorDbError">内部データベースエラー</sys:String>
+    <sys:String x:Key="ErrorUnknown">不明な接続エラー</sys:String>
+    <sys:String x:Key="ErrorNoTicket">サーバーからオーディオチケットが提供されませんでした</sys:String>
+    
+    <!-- Settings Dialog Box -->
+    <sys:String x:Key="MsgSettingsSaved">設定が正常に保存されました。</sys:String>
+    <sys:String x:Key="TitleSettingsSaved">成功</sys:String>
+    <sys:String x:Key="MsgInvalidServerAddress">サーバーアドレスは有効なIPアドレスでなければなりません (例: 127.0.0.1)。</sys:String>
+    <sys:String x:Key="TitleInvalidServerAddress">無効なサーバーアドレス</sys:String>
+</ResourceDictionary>
