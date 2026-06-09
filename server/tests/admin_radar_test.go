@@ -1,4 +1,4 @@
-package main
+package tests
 
 import (
 	"crypto/tls"
@@ -10,6 +10,9 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+
+	"xuruvoip/server/voip/core"
+	"xuruvoip/server/voip/position"
 )
 
 func TestAdminRadarCoordinateBroadcast(t *testing.T) {
@@ -28,29 +31,29 @@ func TestAdminRadarCoordinateBroadcast(t *testing.T) {
 	t.Setenv("XURUVOIP_VERBOSE_LOGS", "0")
 
 	// Initialize database and logger
-	if err := LoadOrCreateConfig(); err != nil {
+	if err := core.LoadOrCreateConfig(); err != nil {
 		t.Fatalf("Failed to load or create config: %v", err)
 	}
-	InitSecurityManagers()
-	defer CloseLogger()
+	core.InitSecurityManagers()
+	defer core.CloseLogger()
 
 	// Ensure certs exist in temp directory
 	certPath := filepath.Join(tempDir, "cert.pem")
 	keyPath := filepath.Join(tempDir, "key.pem")
-	ok, _ := EnsureSelfSignedCert(certPath, keyPath, "xuruvoip-server", 365)
+	ok, _ := core.EnsureSelfSignedCert(certPath, keyPath, "xuruvoip-server", 365)
 	if !ok {
 		t.Fatal("Failed to generate test certificates")
 	}
 
 	// Create test administrator credentials
-	err = DBCreateAdmin("test_admin_user", "test_admin_pass")
+	err = core.DBCreateAdmin("test_admin_user", "test_admin_pass")
 	if err != nil {
 		t.Fatalf("Failed to create test admin user: %v", err)
 	}
 
 	// 2. Start positions server in background on test port
 	posPort := 19999
-	go StartPositionsServer(posPort, certPath, keyPath)
+	go position.StartPositionsServer(posPort, certPath, keyPath)
 
 	// Allow server time to spin up
 	time.Sleep(200 * time.Millisecond)
@@ -68,7 +71,7 @@ func TestAdminRadarCoordinateBroadcast(t *testing.T) {
 	defer adminConn.Close()
 
 	// Authenticate Admin
-	authMsg := MsgAuthAdmin{
+	authMsg := core.MsgAuthAdmin{
 		Type:           "auth_admin",
 		Username:       "test_admin_user",
 		Password:       "test_admin_pass",
@@ -98,7 +101,7 @@ func TestAdminRadarCoordinateBroadcast(t *testing.T) {
 	}
 	defer playerConn.Close()
 
-	joinMsg := MsgJoin{
+	joinMsg := core.MsgJoin{
 		Type:     "join",
 		Token:    "testsecret32characterlongtokenok",
 		Name:     "TestPlayer1",
@@ -114,7 +117,7 @@ func TestAdminRadarCoordinateBroadcast(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to read player welcome: %v", err)
 	}
-	var playerWelcome MsgWelcome
+	var playerWelcome core.MsgWelcome
 	if err := json.Unmarshal(playerWelcomePayload, &playerWelcome); err != nil {
 		t.Fatalf("Failed to unmarshal player welcome: %v", playerWelcome)
 	}
@@ -123,9 +126,9 @@ func TestAdminRadarCoordinateBroadcast(t *testing.T) {
 	}
 
 	// 5. Send player coordinate update
-	posMsg := MsgPos{
+	posMsg := core.MsgPos{
 		Type: "pos",
-		Pos: Position{
+		Pos: core.Position{
 			X:    123.45,
 			Y:    678.90,
 			Z:    -999.0,
@@ -138,7 +141,7 @@ func TestAdminRadarCoordinateBroadcast(t *testing.T) {
 	}
 
 	// 6. Admin should receive coordinate broadcast for radar map
-	var radarPos MsgPlayerPos
+	var radarPos core.MsgPlayerPos
 	foundPos := false
 
 	// Set a read deadline to prevent hanging forever

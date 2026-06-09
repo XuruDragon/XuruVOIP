@@ -1,4 +1,4 @@
-package main
+package core
 
 // Constants for audio frame types
 const (

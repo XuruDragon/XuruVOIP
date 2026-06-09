@@ -1,4 +1,4 @@
-package main
+package admin
 
 import (
 	"crypto/rand"
@@ -10,7 +10,16 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
+	"xuruvoip/server/voip/core"
 )
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Allow all origins for local gaming networks
+	},
+}
 
 //go:embed logo.png
 var logoFS embed.FS
@@ -129,7 +138,7 @@ func serveLogin(w http.ResponseWriter, r *http.Request, errMsg string) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	data := GetLoginTemplateData(r, errMsg, serverConfig.AdminServerToken != "")
+	data := GetLoginTemplateData(r, errMsg, core.ServerConfig.AdminServerToken != "")
 	_ = tmpl.Execute(w, data)
 }
 
@@ -161,8 +170,8 @@ func handleWebAdminLogin(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	ip := ExtractIP(r.RemoteAddr)
-	if posLockout.IsBanned(ip) {
+	ip := core.ExtractIP(r.RemoteAddr)
+	if core.PosLockout.IsBanned(ip) {
 		serveLogin(w, r, "Too many login attempts. IP temporarily banned.")
 		return
 	}
@@ -176,16 +185,16 @@ func handleWebAdminLogin(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	serverPassword := r.FormValue("server_password")
 
-	if serverConfig.AdminServerToken != "" && !ConstantTimeCompare(serverPassword, serverConfig.AdminServerToken) {
-		posLockout.RecordFailure(ip)
-		Log(fmt.Sprintf("REJECT Web Admin: Incorrect server password from %s", ip), ColorRed)
+	if core.ServerConfig.AdminServerToken != "" && !core.ConstantTimeCompare(serverPassword, core.ServerConfig.AdminServerToken) {
+		core.PosLockout.RecordFailure(ip)
+		core.Log(fmt.Sprintf("REJECT Web Admin: Incorrect server password from %s", ip), core.ColorRed)
 		serveLogin(w, r, "Incorrect server password.")
 		return
 	}
 
-	ok, err := AuthenticateAdmin(username, password)
+	ok, err := core.AuthenticateAdmin(username, password)
 	if err == nil && ok {
-		posLockout.RecordSuccess(ip)
+		core.PosLockout.RecordSuccess(ip)
 		sessToken := CreateSession()
 
 		// Determine if accessing over HTTPS to mark cookie secure
@@ -203,8 +212,8 @@ func handleWebAdminLogin(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 	} else {
-		posLockout.RecordFailure(ip)
-		Log(fmt.Sprintf("REJECT Web Admin: Failed login attempt for '%s' from %s", username, ip), ColorRed)
+		core.PosLockout.RecordFailure(ip)
+		core.Log(fmt.Sprintf("REJECT Web Admin: Failed login attempt for '%s' from %s", username, ip), core.ColorRed)
 		serveLogin(w, r, "Incorrect admin username or password.")
 	}
 }
@@ -249,23 +258,23 @@ func handleWebAdminWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ip := ExtractIP(r.RemoteAddr)
-	Log(fmt.Sprintf("WEB ADMIN connected from %s", ip), ColorGreen)
+	ip := core.ExtractIP(r.RemoteAddr)
+	core.Log(fmt.Sprintf("WEB ADMIN connected from %s", ip), core.ColorGreen)
 
 	// Send admin welcome state
-	welcome := MsgAdminWelcome{
+	welcome := core.MsgAdminWelcome{
 		Type:          "admin_welcome",
-		Channels:      serverConfig.ChannelsList,
-		Profiles:      serverConfig.ProfilesList,
-		Players:       hub.GetAllPlayerStates(),
-		AnonymousMode: hub.GetAnonymousMode(),
+		Channels:      core.ServerConfig.ChannelsList,
+		Profiles:      core.ServerConfig.ProfilesList,
+		Players:       core.ActiveHub.GetAllPlayerStates(),
+		AnonymousMode: core.ActiveHub.GetAnonymousMode(),
 	}
 	if err := conn.WriteJSON(welcome); err != nil {
 		return
 	}
 
-	hub.RegisterAdmin(conn)
-	defer hub.UnregisterAdmin(conn)
+	core.ActiveHub.RegisterAdmin(conn)
+	defer core.ActiveHub.UnregisterAdmin(conn)
 
 	// Admin websocket command loop
 	for {
@@ -274,14 +283,14 @@ func handleWebAdminWS(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		var cmd AdminCommand
+		var cmd core.AdminCommand
 		if err := json.Unmarshal(payload, &cmd); err != nil {
 			continue
 		}
 
-		ok, reason := executeAdminCommand(cmd)
-		val := executeAdminQuery(cmd)
-		response := MsgAdminResponse{
+		ok, reason := ExecuteAdminCommand(cmd)
+		val := ExecuteAdminQuery(cmd)
+		response := core.MsgAdminResponse{
 			Type:   "admin_response",
 			ReqID:  cmd.ReqID,
 			Cmd:    cmd.Cmd,
@@ -290,9 +299,9 @@ func handleWebAdminWS(w http.ResponseWriter, r *http.Request) {
 			Value:  val,
 		}
 		
-		hub.mu.RLock()
-		admin, hasAdmin := hub.admins[conn]
-		hub.mu.RUnlock()
+		core.ActiveHub.Mu.RLock()
+		admin, hasAdmin := core.ActiveHub.Admins[conn]
+		core.ActiveHub.Mu.RUnlock()
 		if hasAdmin {
 			_ = admin.SafeWriteJSON(response)
 		} else {
@@ -300,6 +309,6 @@ func handleWebAdminWS(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	Log("WEB ADMIN disconnected", ColorOrange)
+	core.Log("WEB ADMIN disconnected", core.ColorOrange)
 }
 

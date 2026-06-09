@@ -98,12 +98,12 @@ jobs:
           # Windows x64
           $env:GOOS="windows"
           $env:GOARCH="amd64"
-          go build -ldflags="-s -w -X 'main.ServerVersion=${{ steps.get_version.outputs.VERSION }}'" -o ../build-artifacts/server/xuruvoip-server-windows-x64.exe
+          go build -ldflags="-s -w -X 'xuruvoip/server/voip/core.ServerVersion=${{ steps.get_version.outputs.VERSION }}'" -o ../build-artifacts/server/xuruvoip-server-windows-x64.exe
           
           # Linux x64
           $env:GOOS="linux"
           $env:GOARCH="amd64"
-          go build -ldflags="-s -w -X 'main.ServerVersion=${{ steps.get_version.outputs.VERSION }}'" -o ../build-artifacts/server/xuruvoip-server-linux-x64
+          go build -ldflags="-s -w -X 'xuruvoip/server/voip/core.ServerVersion=${{ steps.get_version.outputs.VERSION }}'" -o ../build-artifacts/server/xuruvoip-server-linux-x64
         shell: pwsh
 
       - name: Copy Server Binaries to release folder
