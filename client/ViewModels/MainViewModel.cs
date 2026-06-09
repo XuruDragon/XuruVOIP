@@ -22,6 +22,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly AudioCaptureService _capture = new();
     private readonly AudioPlaybackService _playback = new();
     public AudioPlaybackService Playback => _playback;
+    private readonly DiscordRpcService _discordRpc = new();
     private readonly GlobalKeyHook _keyHook = new();
     public GlobalKeyHook KeyHook => _keyHook;
     private readonly DispatcherTimer _ocrTimer = new();
@@ -209,6 +210,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     private async void InitializeServicesAsync()
     {
+        _discordRpc.Start();
         // Initialize position tracking source
         ApplyTrackingSource();
 
@@ -349,6 +351,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             _availableChannels.AddRange(channels);
             _activeChannel = activeChan;
             ActiveChannelName = string.IsNullOrEmpty(activeChan) ? "General" : activeChan;
+            UpdateDiscordPresence();
 
             IsSpatialAudioSupportedByServer = _posWs.IsSpatialAudioSupportedByServer;
             if (!IsSpatialAudioSupportedByServer)
@@ -443,12 +446,14 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             AudioConnected = true;
             StatusMessage = Application.Current.TryFindResource("StatusConnected") as string ?? "Connected";
             StartAudio();
+            UpdateDiscordPresence();
         });
         _audioWs.Disconnected += msg => Application.Current.Dispatcher.Invoke(() =>
         {
             AudioConnected = false;
             string format = Application.Current.TryFindResource("StatusConnectionFailed") as string ?? "Connection failed: {0}";
             StatusMessage = string.Format(format, msg);
+            UpdateDiscordPresence();
         });
 
         _audioWs.AudioPacketReceived += (name, type, opus, metadata) =>
@@ -477,7 +482,14 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                 }
             }
 
-            _playback.ReceiveOpusFrame(name, opus, type, applyRadio, metadata, distance);
+            string speakerZone = "";
+            if (_remotePositions.TryGetValue(name, out var remotePos2))
+            {
+                speakerZone = remotePos2.Zone ?? "";
+            }
+            string listenerZone = _lastSentPos.Zone ?? "";
+
+            _playback.ReceiveOpusFrame(name, opus, type, applyRadio, metadata, distance, speakerZone, listenerZone);
         };
 
         _capture.EncodedFrameReady += async (frame, txType) =>
@@ -534,6 +546,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         if (IsHelmetOn == value) return;
         IsHelmetOn = value;
         await _posWs.SetHelmetAsync(value);
+        UpdateDiscordPresence();
     }
 
     public void StartHelmetScan()
@@ -582,6 +595,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         ActiveChannelName = _activeChannel;
 
         await _posWs.SetChannelAsync(_activeChannel);
+        UpdateDiscordPresence();
     }
 
     public async Task ConnectAsync()
@@ -644,6 +658,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableSpatialAudio = cfg.EnableSpatialAudio;
         _playback.EnableRadioDegradation = cfg.EnableRadioDegradation;
         _playback.EnablePttChimes = cfg.EnablePttChimes;
+        _playback.EnableEnvironmentalAcoustics = cfg.EnableEnvironmentalAcoustics;
         _playback.Start(cfg.OutputDeviceIndex, cfg.OutputGainPercent);
         
         // Synchronize mute states
@@ -718,8 +733,13 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
         if (changed && PosConnected)
         {
+            bool zoneChanged = pos.Zone != _lastSentPos.Zone || string.IsNullOrEmpty(_lastSentPos.Zone);
             await _posWs.SendPositionAsync(pos);
             _lastSentPos = pos;
+            if (zoneChanged)
+            {
+                UpdateDiscordPresence();
+            }
         }
     }
 
@@ -733,6 +753,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         PosConnected = false;
         AudioConnected = false;
         StatusMessage = Application.Current.TryFindResource("StatusDisconnected") as string ?? "Disconnected";
+        UpdateDiscordPresence();
     }
 
     public void SaveConfig() => Config.Save();
@@ -777,6 +798,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableSpatialAudio = Config.Config.EnableSpatialAudio; // Sync spatial audio setting
         _playback.EnableRadioDegradation = Config.Config.EnableRadioDegradation;
         _playback.EnablePttChimes = Config.Config.EnablePttChimes;
+        _playback.EnableEnvironmentalAcoustics = Config.Config.EnableEnvironmentalAcoustics;
 
         // Sync position tracking source
         ApplyTrackingSource();
@@ -908,7 +930,32 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _capture.Dispose();
         _playback.Dispose();
         _ocr.Dispose();
+        _discordRpc.Dispose();
         await _posWs.DisposeAsync();
         await _audioWs.DisposeAsync();
+    }
+
+    private void UpdateDiscordPresence()
+    {
+        if (!AudioConnected)
+        {
+            _discordRpc.UpdatePresence("Idle / Disconnected", "Disconnected");
+            return;
+        }
+
+        string details = $"At {CurrentZone}";
+        string state = "In Proximity";
+
+        if (!string.IsNullOrEmpty(_activeChannel))
+        {
+            state = $"On Radio: {_activeChannel}";
+        }
+
+        if (IsHelmetOn)
+        {
+            state += " (Helmet On)";
+        }
+
+        _discordRpc.UpdatePresence(details, state);
     }
 }

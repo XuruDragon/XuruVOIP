@@ -55,6 +55,7 @@ public class AppConfig
     public bool EnableSpatialAudio { get; set; } = true;
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
+    public bool EnableEnvironmentalAcoustics { get; set; } = true;
 
     // --- Borderless Overlay ---
     public bool EnableOverlay { get; set; } = false;

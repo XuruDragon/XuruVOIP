@@ -366,6 +366,12 @@
                             <CheckBox Content="{DynamicResource LblEnablePttChimes}"
                                       IsChecked="{Binding Config.EnablePttChimes, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
+                            <!-- Environmental acoustics toggle -->
+                            <CheckBox Content="{DynamicResource LblEnableEnvironmentalAcoustics}"
+                                      IsChecked="{Binding Config.EnableEnvironmentalAcoustics, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,16"/>
 
                             <!-- Input device -->

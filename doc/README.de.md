@@ -155,6 +155,20 @@ graph TD
 * **Win32-Durchklick-Integration**: Durch Win32-Window-Styles (`WS_EX_TRANSPARENT` und `WS_EX_NOACTIVATE`) stiehlt das Overlay keinen Fokus und lässt Mausereignisse direkt zum Spiel durch.
 * **API-unabhängiges Rendering**: Da transparente WPF-Fenster auf DWM-Komposition (Desktop Window Manager) basieren, greift das Overlay nicht in die Grafikpipeline ein. Das garantiert volle Kompatibilität mit **Vulkan** und **DirectX**, sofern Star Citizen im **"rahmenlosen Fenstermodus"** (Borderless Windowed) ausgeführt wird.
 
+### 7. Umgebungsakustik (Okklusion & Nachhall)
+* **Okklusionsfilter:** Wenn sich Sprecher und Hörer in unterschiedlichen Zonen oder Abteilen befinden, wendet der Client automatisch einen Tiefpassfilter (Grenzfrequenz 600Hz, Lautstärke 65%) an, um eine physische Blockade/Okklusion zu simulieren. Die Grenzfrequenz wird weich interpoliert, um Knackgeräusche zu vermeiden.
+* **Ortsabhängiger Nachhall:** Wenn sich der Hörer in einer bestimmten Umgebung (Höhle, Bunker oder Hangar) befindet, wendet ein Feedback-Delay-Comb-Filter spezifische Hallparameter an:
+  * *Höhlen / Tunnel:* 45% Wet-Mix, 100ms Verzögerung, 0.6 Feedback.
+  * *Bunker / Stationen:* 25% Wet-Mix, 50ms Verzögerung, 0.4 Feedback.
+  * *Hangars:* 35% Wet-Mix, 150ms Verzögerung, 0.5 Feedback.
+
+### 8. Discord Rich Presence ohne externe Abhängigkeiten (RPC)
+* **Named Pipe Verbindung:** Der Client verbindet sich ohne schwere externe NuGet-Bibliotheken über lokale Windows Named Pipes (`\\.\pipe\discord-ipc-0`) direkt mit Discord.
+* **Dynamische Status-Updates:** Aktualisiert die Discord-Aktivität in Echtzeit:
+  * **Details:** Aktuelle In-Game-Zone (z. B. `"In einer Höhle auf MicroTech"`).
+  * **Status:** Aktiver Funkkanal und Helm-Status (z. B. `"Auf Funkkanal: Bravo (Helm auf)"` oder `"In der Nähe"`).
+  * **Vergangene Zeit:** Zeigt die Dauer seit dem Verbindungsaufbau zum VoIP-Server an.
+
 ---
 
 ## 🖥️ XuruVoip Server (Go)
@@ -169,7 +183,7 @@ Der Server koordiniert die Positionen, authentifiziert Verbindungen und leitet A
 * **SQLite-Datenbank**: Speichert Kanäle und Profile dauerhaft.
 * **Sicherheitssystem**: Sperrt (bannt) Störenfriede nach Benutzername, IP-Adresse und Hardware-Fingerabdruck (HWID/MachineGuid).
 * **Webportal für Admins**: Sichere Weboberfläche (HTTPS/WebSockets) mit Echtzeit-Logs, Dashboard und Ban-Verwaltung.
-* **Server-Admin-Radarkarte**: Echtzeit-2D-Radarkarte über HTML5-Canvas im Admin-Dashboard zur Verfolgung von Spielerpositionen mit Zoom per Mausrad, Panning per Klick-und-Drag und Zonenfilterung.
+* **Server-Admin-Radarkarte**: Echtzeit-2D-Radarkarte über HTML5-Canvas im Admin-Dashboard zur Verfolgung von Spielerpositionen mit Zoom per Mausrad, Panning per Klick-und-Drag, Zonenfilterung, Verfolgung historischer Gehpfade (Breadcrumbs) und konzentrisch pulsierenden Schallwellenringen um aktive Sprecher.
 
 ### Server-Konfiguration (`.env`)
 Beim ersten Start wird eine Standard-`.env`-Datei generiert:

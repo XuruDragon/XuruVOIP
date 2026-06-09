@@ -154,6 +154,20 @@ graph TD
 * **Intégration Transparente Win32** : Grâce aux styles de fenêtre Win32 (`WS_EX_TRANSPARENT` et `WS_EX_NOACTIVATE`), l'incrustation ne vole pas le focus et laisse passer tous les clics de souris vers le jeu.
 * **Rendu Indépendant de l'API** : Étant donné que les fenêtres transparentes WPF s'appuient sur la composition du Desktop Window Manager (DWM) de Windows, l'overlay ne s'injecte pas dans le pipeline graphique du jeu. Cela garantit une compatibilité totale avec **Vulkan** comme **DirectX**, à condition de lancer le jeu en mode **"Fenêtré Sans Bordure"** (Borderless Windowed).
 
+### 7. Acoustique Environnementale (Occlusion & Réverbération)
+* **Filtre d'Occlusion :** Si le locuteur et l'auditeur sont dans des sous-zones ou compartiments différents, le client applique automatiquement un filtre passe-bas (coupure à 600 Hz, volume à 65 %) pour simuler l'obstruction physique. La transition se fait en douceur pour éviter les clics.
+* **Réverbération Intelligente :** Si l'auditeur est situé dans un environnement fermé (Grottes, Bunkers, Hangars), un filtre en peigne à ligne de retard applique des paramètres de réverbération spécifiques :
+  * *Grottes / Tunnels :* 45 % wet, 100 ms de délai, 0.6 de feedback.
+  * *Bunkers / Stations :* 25 % wet, 50 ms de délai, 0.4 de feedback.
+  * *Hangars :* 35 % wet, 150 ms de délai, 0.5 de feedback.
+
+### 8. Discord Rich Presence Sans Dépendance (RPC)
+* **Connexion par Pipe Nommé :** Le client se connecte à Discord via le protocole local des pipes nommés Windows (`\\.\pipe\discord-ipc-0`) sans nécessiter de bibliothèque NuGet lourde.
+* **Mise à Jour Dynamique de l'Activité :** Met à jour en temps réel votre présence Discord :
+  * **Détails :** Zone de position en jeu (ex. `"Dans une grotte sur MicroTech"`).
+  * **État :** Canal actif et état du casque (ex. `"Sur la radio : Canal Bravo (Casque équipé)"` ou `"En proximité"`).
+  * **Temps Écoulé :** Affiche le chronomètre depuis la connexion au serveur VoIP.
+
 ---
 
 ## 🖥️ Serveur XuruVoip (Go)
@@ -168,7 +182,7 @@ Le serveur gère la position des joueurs, l'authentification et route dynamiquem
 * **Persistance SQLite** : Conserve la configuration des canaux et des profils des joueurs.
 * **Sécurité Anti-Contournement** : Bannissement par nom d'utilisateur, adresse IP et empreinte matérielle (HWID/MachineGuid).
 * **Portail Web d'Administration** : Interface sécurisée en HTTPS/WebSockets avec journalisation en temps réel et gestion des bannissements.
-* **Carte Radar d'Administration** : Une carte radar 2D Canvas HTML5 en temps réel intégrée au tableau de bord pour suivre les positions des joueurs, avec défilement par clic-glissé, zoom à la molette et filtrage par zone.
+* **Carte Radar d'Administration** : Une carte radar 2D Canvas HTML5 en temps réel intégrée au tableau de bord pour suivre les positions des joueurs, avec défilement par clic-glissé, zoom à la molette, filtrage par zone, tracé des déplacements récents (breadcrumbs) et ondes sonores concentriques pulsées autour des joueurs qui parlent.
 
 ### Configuration du Serveur (`.env`)
 Au premier démarrage, le serveur génère un fichier `.env` avec ces valeurs :

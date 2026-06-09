@@ -106,6 +106,7 @@
     <!-- 设置: 额外音频 -->
     <sys:String x:Key="LblEnableRadioDegradation">启用基于距离的无线电信号衰减</sys:String>
     <sys:String x:Key="LblEnablePttChimes">启用无线电麦克风咔哒声和静噪尾音</sys:String>
+    <sys:String x:Key="LblEnableEnvironmentalAcoustics">启用环境音效 (遮挡 &amp; 混响)</sys:String>
 
     <!-- 设置: 覆盖层 -->
     <sys:String x:Key="TabOverlay">覆盖层</sys:String>

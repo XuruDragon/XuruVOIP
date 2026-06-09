@@ -1649,6 +1649,7 @@ const dashboardHTML = `<!DOCTYPE html>
         let channels = [];
         let profiles = [];
         let players = {};
+        let playerTrails = {};
         let anonymousMode = false;
         let activeTab = 'dashboard';
 
@@ -1805,6 +1806,7 @@ const dashboardHTML = `<!DOCTYPE html>
 
                 case 'leave':
                     delete players[msg.name];
+                    delete playerTrails[msg.name];
                     renderPlayers();
                     renderStats();
                     renderChannels();
@@ -1819,6 +1821,25 @@ const dashboardHTML = `<!DOCTYPE html>
                         if (msg.pos && msg.pos.zone !== oldZone) {
                             updateRadarZonesDropdown();
                         }
+                        if (msg.pos) {
+                            if (!playerTrails[msg.name]) {
+                                playerTrails[msg.name] = [];
+                            }
+                            const trail = playerTrails[msg.name];
+                            const lastPt = trail[trail.length - 1];
+                            if (!lastPt || lastPt.x !== msg.pos.x || lastPt.y !== msg.pos.y) {
+                                trail.push({ x: msg.pos.x, y: msg.pos.y, zone: msg.pos.zone });
+                                if (trail.length > 50) {
+                                    trail.shift();
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case 'talking':
+                    if (players[msg.name]) {
+                        players[msg.name].is_talking = msg.is_talking;
                     }
                     break;
 
@@ -2774,6 +2795,9 @@ const dashboardHTML = `<!DOCTYPE html>
             // Draw grid
             drawGrid(w / ratio, h / ratio);
             
+            // Draw trails
+            drawPlayerTrails();
+            
             // Draw players
             drawPlayerDots();
             
@@ -2825,6 +2849,38 @@ const dashboardHTML = `<!DOCTYPE html>
             radarCtx.stroke();
         }
 
+        function drawPlayerTrails() {
+            Object.keys(playerTrails).forEach(name => {
+                const trail = playerTrails[name];
+                if (!trail || trail.length < 2) return;
+                
+                const p = players[name];
+                if (!p || !p.pos) return;
+                if (selectedRadarZone && p.pos.zone !== selectedRadarZone) return;
+
+                radarCtx.beginPath();
+                let first = true;
+                trail.forEach(pt => {
+                    if (selectedRadarZone && pt.zone !== selectedRadarZone) return;
+                    
+                    const px = pt.x * radarZoom;
+                    const py = -pt.y * radarZoom;
+                    if (first) {
+                        radarCtx.moveTo(px, py);
+                        first = false;
+                    } else {
+                        radarCtx.lineTo(px, py);
+                    }
+                });
+                
+                if (!first) {
+                    radarCtx.strokeStyle = 'rgba(16, 185, 129, 0.25)'; // faint semi-transparent emerald line
+                    radarCtx.lineWidth = 1.5;
+                    radarCtx.stroke();
+                }
+            });
+        }
+
         function drawPlayerDots() {
             Object.values(players).forEach(p => {
                 if (!p.pos) return;
@@ -2834,6 +2890,21 @@ const dashboardHTML = `<!DOCTYPE html>
                 const px = p.pos.x * radarZoom;
                 const py = -p.pos.y * radarZoom; // Invert Y for standard 2D cartesian view in canvas
                 
+                // Draw live audio visualizer rings if talking
+                if (p.is_talking) {
+                    const timeSeed = (Date.now() / 1500) % 1.0;
+                    for (let r = 0; r < 3; r++) {
+                        const radius = 6 + (24 * ((timeSeed + r / 3.0) % 1.0));
+                        const alpha = 1.0 - ((timeSeed + r / 3.0) % 1.0);
+                        
+                        radarCtx.beginPath();
+                        radarCtx.arc(px, py, radius, 0, 2 * Math.PI);
+                        radarCtx.strokeStyle = 'rgba(16, 185, 129, ' + (alpha * 0.4) + ')';
+                        radarCtx.lineWidth = 1.5;
+                        radarCtx.stroke();
+                    }
+                }
+
                 // Draw dot
                 radarCtx.beginPath();
                 radarCtx.arc(px, py, 6, 0, 2 * Math.PI);
