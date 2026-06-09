@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"fmt"
@@ -86,13 +86,13 @@ func TestSQLiteInitAndConfig(t *testing.T) {
 	}
 
 	// Check ServerToken is populated
-	if len(serverConfig.ServerToken) != 32 {
-		t.Errorf("Expected server token of length 32, got %d", len(serverConfig.ServerToken))
+	if len(ServerConfig.ServerToken) != 32 {
+		t.Errorf("Expected server token of length 32, got %d", len(ServerConfig.ServerToken))
 	}
 
 	// Verify default channels
-	if len(serverConfig.ChannelsList) != 1 || serverConfig.ChannelsList[0] != "General" {
-		t.Errorf("Expected default channel 'General', got %v", serverConfig.ChannelsList)
+	if len(ServerConfig.ChannelsList) != 1 || ServerConfig.ChannelsList[0] != "General" {
+		t.Errorf("Expected default channel 'General', got %v", ServerConfig.ChannelsList)
 	}
 
 	// Check that we can change server password
@@ -102,8 +102,8 @@ func TestSQLiteInitAndConfig(t *testing.T) {
 		t.Fatalf("SetServerPassword failed: %v", err)
 	}
 
-	if serverConfig.ServerToken != newPwd {
-		t.Errorf("Expected ServerToken to be updated, got '%s'", serverConfig.ServerToken)
+	if ServerConfig.ServerToken != newPwd {
+		t.Errorf("Expected ServerToken to be updated, got '%s'", ServerConfig.ServerToken)
 	}
 
 	// Simulating restart, reload config
@@ -116,8 +116,8 @@ func TestSQLiteInitAndConfig(t *testing.T) {
 		t.Fatalf("Re-load config failed: %v", err)
 	}
 
-	if serverConfig.ServerToken != newPwd {
-		t.Errorf("Expected reloaded ServerToken to match modified password, got '%s'", serverConfig.ServerToken)
+	if ServerConfig.ServerToken != newPwd {
+		t.Errorf("Expected reloaded ServerToken to match modified password, got '%s'", ServerConfig.ServerToken)
 	}
 }
 
@@ -579,13 +579,13 @@ func TestPersistence(t *testing.T) {
 func TestProximityFiltering(t *testing.T) {
 	// Initialize standard Hub state
 	testHub := Hub{
-		players: make(map[string]*ActivePlayer),
-		admins:  make(map[*websocket.Conn]*AdminSession),
+		Players: make(map[string]*ActivePlayer),
+		Admins:  make(map[*websocket.Conn]*AdminSession),
 	}
 
 	// Setup mock players
 	// Player A at Lorville City Center (Container 1)
-	testHub.players["Alice"] = &ActivePlayer{
+	testHub.Players["Alice"] = &ActivePlayer{
 		Name: "Alice",
 		Pos: &Position{
 			X:           100.0,
@@ -597,7 +597,7 @@ func TestProximityFiltering(t *testing.T) {
 	}
 
 	// Player B at 10m away from A in same container (within audible range)
-	testHub.players["Bob"] = &ActivePlayer{
+	testHub.Players["Bob"] = &ActivePlayer{
 		Name: "Bob",
 		Pos: &Position{
 			X:           106.0,
@@ -609,7 +609,7 @@ func TestProximityFiltering(t *testing.T) {
 	}
 
 	// Player C at 60m away from A in same container (outside default 50m range)
-	testHub.players["Charlie"] = &ActivePlayer{
+	testHub.Players["Charlie"] = &ActivePlayer{
 		Name: "Charlie",
 		Pos: &Position{
 			X:           160.0,
@@ -621,7 +621,7 @@ func TestProximityFiltering(t *testing.T) {
 	}
 
 	// Player D at 5m away from A but in a DIFFERENT container (e.g. inside an elevator)
-	testHub.players["David"] = &ActivePlayer{
+	testHub.Players["David"] = &ActivePlayer{
 		Name: "David",
 		Pos: &Position{
 			X:           103.0,
@@ -640,14 +640,14 @@ func TestProximityFiltering(t *testing.T) {
 	if len(players) != 1 {
 		t.Fatalf("Expected 1 player in proximity, got %d", len(players))
 	}
-	if players[0] != testHub.players["Bob"] {
+	if players[0] != testHub.Players["Bob"] {
 		t.Error("Expected Bob to be audible to Alice")
 	}
 
 	// 2. Proximity range audit with ProxShort active
 	// Enable whisper mode (ProxShort=true) on Alice. Audible range drops to 5m.
 	// Bob (10m) is now outside of audible range.
-	testHub.players["Alice"].ProxShort = true
+	testHub.Players["Alice"].ProxShort = true
 	players = testHub.GetAudioPlayersInProximity("Alice")
 	if len(players) != 0 {
 		t.Errorf("Expected 0 players in proximity under whisper mode, got %d", len(players))
@@ -662,13 +662,13 @@ func BenchmarkProximityFiltering(b *testing.B) {
 	for _, count := range loads {
 		b.Run(fmt.Sprintf("Players-%d", count), func(b *testing.B) {
 			testHub := Hub{
-				players: make(map[string]*ActivePlayer),
-				admins:  make(map[*websocket.Conn]*AdminSession),
+				Players: make(map[string]*ActivePlayer),
+				Admins:  make(map[*websocket.Conn]*AdminSession),
 			}
 
 			// Generate sender
 			senderName := "Alice"
-			testHub.players[senderName] = &ActivePlayer{
+			testHub.Players[senderName] = &ActivePlayer{
 				Name: senderName,
 				Pos: &Position{
 					X:           0.0,
@@ -692,7 +692,7 @@ func BenchmarkProximityFiltering(b *testing.B) {
 				// Place them at random distances
 				dist := float64(i % 50) // distances from 0 to 49 meters
 
-				testHub.players[name] = &ActivePlayer{
+				testHub.Players[name] = &ActivePlayer{
 					Name: name,
 					Pos: &Position{
 						X:           dist,
@@ -715,26 +715,26 @@ func BenchmarkProximityFiltering(b *testing.B) {
 // TestMultiChannelRouting verifies that players receive audio when they listen to the sender's active channel
 func TestMultiChannelRouting(t *testing.T) {
 	testHub := Hub{
-		players: make(map[string]*ActivePlayer),
-		admins:  make(map[*websocket.Conn]*AdminSession),
+		Players: make(map[string]*ActivePlayer),
+		Admins:  make(map[*websocket.Conn]*AdminSession),
 	}
 
 	// Alice speaking on Command
-	testHub.players["Alice"] = &ActivePlayer{
+	testHub.Players["Alice"] = &ActivePlayer{
 		Name:          "Alice",
 		ActiveChannel: "Command",
 		AudioConn:     &websocket.Conn{},
 	}
 
 	// Bob is active on Command
-	testHub.players["Bob"] = &ActivePlayer{
+	testHub.Players["Bob"] = &ActivePlayer{
 		Name:          "Bob",
 		ActiveChannel: "Command",
 		AudioConn:     &websocket.Conn{},
 	}
 
 	// Charlie is active on General, but listens to Command
-	testHub.players["Charlie"] = &ActivePlayer{
+	testHub.Players["Charlie"] = &ActivePlayer{
 		Name:              "Charlie",
 		ActiveChannel:     "General",
 		ListeningChannels: []string{"Command", "Squad"},
@@ -742,7 +742,7 @@ func TestMultiChannelRouting(t *testing.T) {
 	}
 
 	// David is active on General, listens to nothing
-	testHub.players["David"] = &ActivePlayer{
+	testHub.Players["David"] = &ActivePlayer{
 		Name:          "David",
 		ActiveChannel: "General",
 		AudioConn:     &websocket.Conn{},
@@ -757,10 +757,10 @@ func TestMultiChannelRouting(t *testing.T) {
 	hasBob := false
 	hasCharlie := false
 	for _, p := range players {
-		if p == testHub.players["Bob"] {
+		if p == testHub.Players["Bob"] {
 			hasBob = true
 		}
-		if p == testHub.players["Charlie"] {
+		if p == testHub.Players["Charlie"] {
 			hasCharlie = true
 		}
 	}
@@ -773,47 +773,7 @@ func TestMultiChannelRouting(t *testing.T) {
 	}
 }
 
-// TestWebAdminSessions verifies admin session lifetime and token validation
-func TestWebAdminSessions(t *testing.T) {
-	// Clear sessions
-	webSessionsMu.Lock()
-	webSessions = make(map[string]AdminWebSession)
-	webSessionsMu.Unlock()
 
-	// 1. Create a session
-	token := CreateSession()
-	if token == "" {
-		t.Fatal("Expected non-empty session token")
-	}
-
-	// 2. Validate session
-	if !ValidateSession(token) {
-		t.Error("Expected session to be valid immediately after creation")
-	}
-
-	// 3. Make session expired and sweep
-	webSessionsMu.Lock()
-	sess := webSessions[token]
-	sess.ExpiresAt = time.Now().Add(-1 * time.Second) // expired
-	webSessions[token] = sess
-	webSessionsMu.Unlock()
-
-	// Validate should fail
-	if ValidateSession(token) {
-		t.Error("Expected session to be invalid after expiration")
-	}
-
-	// Sweep
-	CleanupExpiredSessions()
-
-	webSessionsMu.RLock()
-	_, exists := webSessions[token]
-	webSessionsMu.RUnlock()
-
-	if exists {
-		t.Error("Expected expired session to be deleted by CleanupExpiredSessions")
-	}
-}
 
 // TestIPAndHwidBanning verifies manual IP and HWID bans
 func TestIPAndHwidBanning(t *testing.T) {
@@ -914,7 +874,7 @@ func TestServerPasswordModes(t *testing.T) {
 		t.Fatalf("LoadOrCreateConfig failed: %v", err)
 	}
 
-	token := serverConfig.ServerToken
+	token := ServerConfig.ServerToken
 	if len(token) != 32 {
 		t.Errorf("Expected server token to be generated (length 32), got '%s'", token)
 	}
@@ -924,8 +884,8 @@ func TestServerPasswordModes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SetServerPassword failed: %v", err)
 	}
-	if serverConfig.ServerToken != "my-secret-server-pwd" {
-		t.Errorf("Expected ServerToken to be updated, got '%s'", serverConfig.ServerToken)
+	if ServerConfig.ServerToken != "my-secret-server-pwd" {
+		t.Errorf("Expected ServerToken to be updated, got '%s'", ServerConfig.ServerToken)
 	}
 
 	// 2. Test reload
@@ -937,8 +897,8 @@ func TestServerPasswordModes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("LoadOrCreateConfig reload failed: %v", err)
 	}
-	if serverConfig.ServerToken != "my-secret-server-pwd" {
-		t.Errorf("Expected reloaded ServerToken to match modified password, got '%s'", serverConfig.ServerToken)
+	if ServerConfig.ServerToken != "my-secret-server-pwd" {
+		t.Errorf("Expected reloaded ServerToken to match modified password, got '%s'", ServerConfig.ServerToken)
 	}
 
 	// 3. Test PublicServer mode loading

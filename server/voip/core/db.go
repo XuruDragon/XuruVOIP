@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"database/sql"
@@ -16,6 +16,7 @@ import (
 
 var (
 	db *sql.DB
+	DB *sql.DB
 )
 
 // InitDB initializes the SQLite database, runs migrations, and imports old JSON configurations
@@ -25,6 +26,7 @@ func InitDB() error {
 
 	var err error
 	db, err = sql.Open("sqlite", dbPath)
+	DB = db
 	if err != nil {
 		return fmt.Errorf("failed to open database: %w", err)
 	}

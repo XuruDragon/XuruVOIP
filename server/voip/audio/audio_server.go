@@ -1,4 +1,4 @@
-package main
+package audio
 
 import (
 	"encoding/binary"
@@ -12,13 +12,14 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"xuruvoip/server/voip/core"
 )
 
-// Security managers for audio server
-var (
-	audioLockout *AuthLockout
-	audioLimit   *RateLimiterHub
-)
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Allow all origins for local gaming networks
+	},
+}
 
 // Statistics counters (using atomic operations)
 var (
@@ -38,11 +39,11 @@ func StartAudioServer(port int, certFile, keyFile string) {
 	mux.HandleFunc("/", handleAudioWS)
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", BindIP, port),
+		Addr:    fmt.Sprintf("%s:%d", core.BindIP, port),
 		Handler: mux,
 	}
 
-	Log(fmt.Sprintf("Starting audio server on %s:%d (WSS)...", BindIP, port), ColorBlue)
+	core.Log(fmt.Sprintf("Starting audio server on %s:%d (WSS)...", core.BindIP, port), core.ColorBlue)
 	go reportStatsLoop()
 
 	var err error
@@ -53,14 +54,14 @@ func StartAudioServer(port int, certFile, keyFile string) {
 	}
 
 	if err != nil {
-		Log(fmt.Sprintf("Audio server error: %v", err), ColorRed)
+		core.Log(fmt.Sprintf("Audio server error: %v", err), core.ColorRed)
 	}
 }
 
 func reportStatsLoop() {
 	for {
 		time.Sleep(5 * time.Second)
-		if VerboseLogs == 0 {
+		if core.VerboseLogs == 0 {
 			atomic.SwapUint64(&audioTotalBytes, 0)
 			atomic.SwapUint64(&audioTotalFrames, 0)
 			atomic.SwapUint64(&proxFramesTotal, 0)
@@ -79,25 +80,25 @@ func reportStatsLoop() {
 		kbs := float64(bytes) / 5.0 / 1024.0
 		fps := float64(frames) / 5.0
 
-		hub.mu.RLock()
+		core.ActiveHub.Mu.RLock()
 		clientCount := 0
-		for _, p := range hub.players {
-			p.audioMu.Lock()
+		for _, p := range core.ActiveHub.Players {
+			p.AudioMu.Lock()
 			hasAudio := (p.AudioConn != nil)
-			p.audioMu.Unlock()
+			p.AudioMu.Unlock()
 			if hasAudio {
 				clientCount++
 			}
 		}
-		hub.mu.RUnlock()
+		core.ActiveHub.Mu.RUnlock()
 
 		if clientCount == 0 && kbs == 0 {
 			continue
 		}
 
-		if VerboseLogs == 1 {
-			Log(fmt.Sprintf("[STATS] %d audio client(s) | %.1f frames/s | %.1f kB/s", clientCount, fps, kbs), ColorPurple)
-		} else if VerboseLogs == 2 {
+		if core.VerboseLogs == 1 {
+			core.Log(fmt.Sprintf("[STATS] %d audio client(s) | %.1f frames/s | %.1f kB/s", clientCount, fps, kbs), core.ColorPurple)
+		} else if core.VerboseLogs == 2 {
 			prox := atomic.SwapUint64(&proxFramesTotal, 0)
 			rad := atomic.SwapUint64(&radioFramesTotal, 0)
 			prof := atomic.SwapUint64(&profileFramesTotal, 0)
@@ -106,9 +107,9 @@ func reportStatsLoop() {
 			radFps := float64(rad) / 5.0
 			profFps := float64(prof) / 5.0
 
-			Log(fmt.Sprintf("[STATS] %d audio client(s) | Proximity: %.1f frames/s | Radio (all): %.1f frames/s | Profile (all): %.1f frames/s | %.1f kB/s",
-				clientCount, proxFps, radFps, profFps, kbs), ColorPurple)
-		} else if VerboseLogs >= 3 {
+			core.Log(fmt.Sprintf("[STATS] %d audio client(s) | Proximity: %.1f frames/s | Radio (all): %.1f frames/s | Profile (all): %.1f frames/s | %.1f kB/s",
+				clientCount, proxFps, radFps, profFps, kbs), core.ColorPurple)
+		} else if core.VerboseLogs >= 3 {
 			prox := atomic.SwapUint64(&proxFramesTotal, 0)
 			atomic.SwapUint64(&radioFramesTotal, 0)
 			atomic.SwapUint64(&profileFramesTotal, 0)
@@ -145,8 +146,8 @@ func reportStatsLoop() {
 				details = append(details, "Profile: 0.0 frames/s")
 			}
 
-			Log(fmt.Sprintf("[STATS] %d audio client(s) | %s | %.1f kB/s",
-				clientCount, strings.Join(details, " | "), kbs), ColorPurple)
+			core.Log(fmt.Sprintf("[STATS] %d audio client(s) | %s | %.1f kB/s",
+				clientCount, strings.Join(details, " | "), kbs), core.ColorPurple)
 		}
 	}
 }
@@ -158,11 +159,11 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	ip := ExtractIP(r.RemoteAddr)
+	ip := core.ExtractIP(r.RemoteAddr)
 
 	// Check brute force lockout
-	if audioLockout.IsBanned(ip) {
-		Log(fmt.Sprintf("REJECT Audio: IP %s temporarily banned", ip), ColorRed)
+	if core.AudioLockout.IsBanned(ip) {
+		core.Log(fmt.Sprintf("REJECT Audio: IP %s temporarily banned", ip), core.ColorRed)
 		_ = conn.WriteControl(
 			websocket.CloseMessage,
 			websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "banned"),
@@ -177,7 +178,7 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var base MessageBase
+	var base core.MessageBase
 	if err := json.Unmarshal(payload, &base); err != nil {
 		return
 	}
@@ -191,16 +192,16 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var msg MsgJoin
+	var msg core.MsgJoin
 	if err := json.Unmarshal(payload, &msg); err != nil {
 		return
 	}
 
 	// Validate token
-	if !PublicServer && serverConfig.ServerToken != "" && !ConstantTimeCompare(msg.Token, serverConfig.ServerToken) {
-		audioLockout.RecordFailure(ip)
-		Log(fmt.Sprintf("REJECT Audio: Invalid token from %s (client: %s)", ip, msg.Name), ColorRed)
-		_ = conn.WriteJSON(MsgError{
+	if !core.PublicServer && core.ServerConfig.ServerToken != "" && !core.ConstantTimeCompare(msg.Token, core.ServerConfig.ServerToken) {
+		core.AudioLockout.RecordFailure(ip)
+		core.Log(fmt.Sprintf("REJECT Audio: Invalid token from %s (client: %s)", ip, msg.Name), core.ColorRed)
+		_ = conn.WriteJSON(core.MsgError{
 			Type:    "error",
 			Reason:  "invalid_token",
 			Message: "Invalid server token",
@@ -210,10 +211,10 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 
 	// Validate ticket and bind audio socket
 	name := strings.TrimSpace(msg.Name)
-	if ok := hub.BindAudioConn(name, msg.AudioTicket, conn); !ok {
-		audioLockout.RecordFailure(ip)
-		Log(fmt.Sprintf("REJECT Audio: Invalid or expired ticket from %s (client: %s)", ip, name), ColorRed)
-		_ = conn.WriteJSON(MsgError{
+	if ok := core.ActiveHub.BindAudioConn(name, msg.AudioTicket, conn); !ok {
+		core.AudioLockout.RecordFailure(ip)
+		core.Log(fmt.Sprintf("REJECT Audio: Invalid or expired ticket from %s (client: %s)", ip, name), core.ColorRed)
+		_ = conn.WriteJSON(core.MsgError{
 			Type:    "error",
 			Reason:  "invalid_ticket",
 			Message: "Invalid or expired ticket. Connect to the position server first.",
@@ -221,8 +222,8 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	audioLockout.RecordSuccess(ip)
-	Log(fmt.Sprintf("JOIN Audio: %s (%s)", name, ip), ColorGreen)
+	core.AudioLockout.RecordSuccess(ip)
+	core.Log(fmt.Sprintf("JOIN Audio: %s (%s)", name, ip), core.ColorGreen)
 
 	// Binary packet header buffer preparation
 	nameBytes := []byte(name)
@@ -240,7 +241,7 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Rate Limiting
-		if !audioLimit.Allow(conn) {
+		if !core.AudioLimit.Allow(conn) {
 			continue
 		}
 
@@ -257,45 +258,45 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 			atomic.AddUint64(&audioTotalFrames, 1)
 
 			// Resolve recipient audio sockets based on transmission type
-			var targets []*ActivePlayer
+			var targets []*core.ActivePlayer
 			switch audioType {
-			case AudioTypeProximity:
-				targets = hub.GetAudioPlayersInProximity(name)
-				if VerboseLogs >= 2 {
+			case core.AudioTypeProximity:
+				targets = core.ActiveHub.GetAudioPlayersInProximity(name)
+				if core.VerboseLogs >= 2 {
 					atomic.AddUint64(&proxFramesTotal, 1)
 				}
-			case AudioTypeRadio:
-				targets = hub.GetAudioPlayersInRadioChannel(name)
-				if VerboseLogs >= 2 {
+			case core.AudioTypeRadio:
+				targets = core.ActiveHub.GetAudioPlayersInRadioChannel(name)
+				if core.VerboseLogs >= 2 {
 					atomic.AddUint64(&radioFramesTotal, 1)
 				}
-				if VerboseLogs >= 3 {
-					hub.mu.RLock()
-					p, ok := hub.players[name]
+				if core.VerboseLogs >= 3 {
+					core.ActiveHub.Mu.RLock()
+					p, ok := core.ActiveHub.Players[name]
 					ch := ""
 					if ok {
 						ch = p.ActiveChannel
 					}
-					hub.mu.RUnlock()
+					core.ActiveHub.Mu.RUnlock()
 					if ch != "" {
 						statsMu.Lock()
 						radioChannelFrames[ch]++
 						statsMu.Unlock()
 					}
 				}
-			case AudioTypeProfile:
-				targets = hub.GetAudioPlayersInProfile(name)
-				if VerboseLogs >= 2 {
+			case core.AudioTypeProfile:
+				targets = core.ActiveHub.GetAudioPlayersInProfile(name)
+				if core.VerboseLogs >= 2 {
 					atomic.AddUint64(&profileFramesTotal, 1)
 				}
-				if VerboseLogs >= 3 {
-					hub.mu.RLock()
-					p, ok := hub.players[name]
+				if core.VerboseLogs >= 3 {
+					core.ActiveHub.Mu.RLock()
+					p, ok := core.ActiveHub.Players[name]
 					prof := ""
 					if ok {
 						prof = p.Profile
 					}
-					hub.mu.RUnlock()
+					core.ActiveHub.Mu.RUnlock()
 					if prof != "" {
 						statsMu.Lock()
 						profileFrames[prof]++
@@ -308,18 +309,18 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 
-			if audioType == AudioTypeProximity {
+			if audioType == core.AudioTypeProximity {
 				// Proximity audio: send custom packet to each target with distance/maxRange/position metadata
-				hub.mu.RLock()
-				sender, senderExists := hub.players[name]
-				hub.mu.RUnlock()
+				core.ActiveHub.Mu.RLock()
+				sender, senderExists := core.ActiveHub.Players[name]
+				core.ActiveHub.Mu.RUnlock()
 				if !senderExists || sender.Pos == nil {
 					continue
 				}
 
 				// Metadata size: SpatialEnabled (1), Distance (4), MaxRange (4)
 				metaSize := 1 + 4 + 4
-				if SpatialAudioEnabled {
+				if core.SpatialAudioEnabled {
 					metaSize += 12 // SpeakerX, SpeakerY, SpeakerZ (float32)
 				}
 
@@ -340,12 +341,12 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 
 					// Build custom packet
 					packet := make([]byte, 2+nameLen+metaSize+len(audioData))
-					packet[0] = AudioTypeProximity
+					packet[0] = core.AudioTypeProximity
 					packet[1] = byte(nameLen)
 					copy(packet[2:], nameBytes)
 
 					offset := 2 + nameLen
-					if SpatialAudioEnabled {
+					if core.SpatialAudioEnabled {
 						packet[offset] = 1
 					} else {
 						packet[offset] = 0
@@ -354,7 +355,7 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 					binary.LittleEndian.PutUint32(packet[offset+1:], math.Float32bits(float32(dist)))
 					binary.LittleEndian.PutUint32(packet[offset+5:], math.Float32bits(float32(maxRange)))
 
-					if SpatialAudioEnabled {
+					if core.SpatialAudioEnabled {
 						binary.LittleEndian.PutUint32(packet[offset+9:], math.Float32bits(float32(sender.Pos.X)))
 						binary.LittleEndian.PutUint32(packet[offset+13:], math.Float32bits(float32(sender.Pos.Y)))
 						binary.LittleEndian.PutUint32(packet[offset+17:], math.Float32bits(float32(sender.Pos.Z)))
@@ -379,24 +380,24 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 			}
 
 		} else if mt == websocket.TextMessage {
-			var m MessageBase
+			var m core.MessageBase
 			if err := json.Unmarshal(payload, &m); err == nil && m.Type == "ping" {
-				hub.mu.RLock()
-				p, ok := hub.players[name]
-				hub.mu.RUnlock()
+				core.ActiveHub.Mu.RLock()
+				p, ok := core.ActiveHub.Players[name]
+				core.ActiveHub.Mu.RUnlock()
 				if ok {
-					_ = p.SafeWriteAudioJSON(MsgPong{Type: "pong"})
+					_ = p.SafeWriteAudioJSON(core.MsgPong{Type: "pong"})
 				}
 			}
 		}
 	}
 
 	// Disconnection cleanup
-	if leftName, fullyLeft := hub.UnregisterAudioConn(conn); leftName != "" {
-		audioLimit.Forget(conn)
+	if leftName, fullyLeft := core.ActiveHub.UnregisterAudioConn(conn); leftName != "" {
+		core.AudioLimit.Forget(conn)
 		if fullyLeft {
-			Log(fmt.Sprintf("LEAVE: %s (disconnected)", leftName), ColorOrange)
-			hub.BroadcastPosMessageToAll(MsgPlayerLeave{
+			core.Log(fmt.Sprintf("LEAVE: %s (disconnected)", leftName), core.ColorOrange)
+			core.ActiveHub.BroadcastPosMessageToAll(core.MsgPlayerLeave{
 				Type: "leave",
 				Name: leftName,
 			})
