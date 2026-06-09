@@ -79,52 +79,60 @@ O cliente C# WPF corre em paralelo com o Star Citizen para capturar áudio, proc
 
 ```mermaid
 graph TD
-    subgraph Captura e Transmissão
-        Mic[Entrada de Microfone] -->|Áudio PCM| VAD[Detecção de Actividade de Voz WebRTC]
+    subgraph Captura & Transmissão
+        Mic[Entrada de Microfone] -->|Áudio PCM| VAD[Detecção de Actividade de Voz VAD]
         VAD -->|Voz Activa| OpusEnc[Codificador Opus]
         OpusEnc -->|Pacotes Opus| AudioWS[Cliente WebSocket de Áudio]
         AudioWS -->|Porta WebSocket 8889| Server[Servidor Go]
     end
 
-    subgraph Rastreamento e Sincronização do Capacete
-        SC[Processo do Star Citizen] -->|r_DisplaySessionInfo| Screen[Captura de Ecrã]
-        Screen -->|Pré-processamento| Tess[Motor Tesseract OCR]
-        Tess -->|Análise Multilinha| Zone[Filtro Hierárquico de Zonas]
-        Zone -->|Coordenadas e Zonas do Ouvinte| PosWS[Cliente WebSocket de Posição]
+    subgraph Posicionamento & Detecção de Capacete
+        SC[Processo Star Citizen] -->|r_DisplaySessionInfo| Screen[Captura de Ecrã]
+        Screen -->|Pré-processamento| Tess[Motor OCR Tesseract]
+        
+        SC -->|Log em Tempo Real| GameLog[Ficheiro Game.log]
+        GameLog -->|Analisador de logs| LogParser[Analisador de logs]
+        
+        Tess -->|Coordenadas| PosSelector{Alternador de Fonte}
+        LogParser -->|Coordenadas| PosSelector
+        
+        PosSelector -->|Coordenadas Seleccionadas| Zone[Filtro Hierárquico de Zonas]
+        Zone -->|Coordenadas & Zonas do Ouvinte| PosWS[Cliente WebSocket de Posição]
         PosWS -->|Porta WebSocket 8888| Server
 
-        SC -->|Log em Tempo Real| GameLog[Ficheiro Game.log]
-        GameLog -->|Tail Scanner| LogParser[Serviço Analisador de Logs]
-        LogParser -->|Eventos Equipar/Retirar| Helmet[Sincronização de Capacete]
-        Helmet -->|Pacote de Status do Capacete| PosWS
+        LogParser -->|Equipar/Retirar capacete| Helmet[Sincronização de Capacete]
+        Helmet -->|Pacote de Estado do Capacete| PosWS
     end
 
-    subgraph Reprodução e Mixagem Espacial
+    subgraph Mixagem e Processamento Espacial 3D & DSP
         Server -->|Áudio de Proximidade + Metadados| AudioWS
-        AudioWS -->|Frame Opus + Metadados de Proximidade| Decoder[Decodificador Opus]
-        Decoder -->|PCM Mono Float| DSP[Filtro DSP de Rádio]
+        AudioWS -->|Frame Opus + Metadatos| Decoder[Decodificador Opus]
+        Decoder -->|Mono Float PCM| DSP[Filtro DSP de Rádio & Degradação]
         DSP -->|Mono| Panner[PanningSampleProvider]
         Panner -->|Estéreo| Volume[VolumeSampleProvider]
         
-        LogParser -.->|status do capacete local| DSP
-        Zone -.->|Posição e Direcção do ouvinte| MixerMath[Cálculo de Spatialização 3D]
+        LogParser -.->|Estado local do capacete| DSP
+        Zone -.->|Posição & direcção do ouvinte| MixerMath[Matemática de Espacialização & Degradação]
         
-        MixerMath -->|Parâmetro de Pan| Panner
-        MixerMath -->|Atenuação por Distância e Traseira| Volume
+        MixerMath -->|Parâmetro Pan Estéreo| Panner
+        MixerMath -->|Atenuação por Distância & Traseira| Volume
+        MixerMath -->|Fator de Degradação| DSP
         
-        Volume -->|Estéreo Esquerda/Direita| Mixer[MixingSampleProvider]
-        Mixer -->|Reprodução| Speakers[Dispositivo de Saída de Som]
+        Volume -->|Estéreo Esquerdo/Direito| Mixer[MixingSampleProvider]
+        Mixer -->|Reprodução de Áudio| Speakers[Dispositivo de Saída de Som]
     end
 ```
 
 ### 1. Captura de Som, VAD e Compressão
 * **Captura de Som:** O microfone é capturado pela biblioteca **NAudio** em 48.000 Hz, 16-bit mono.
 * **Detecção de Actividade de Voz (VAD):** O wrapper nativo do **WebRtcVad** analisa o áudio em tempo real. Se o som cair abaixo do limite definido, a transmissão cessa para evitar a difusão de ruídos do teclado ou ventoinha.
-* **Compressão:** O áudio é codificado no formato **Opus** (através da biblioteca C# **Concentus**) e transmitido via WebSockets para o servidor.
+* **Compression:** O áudio é codificado no formato **Opus** (através da biblioteca C# **Concentus**) e transmitido via WebSockets para o servidor.
 
 ### 2. Localização e Orientação 3D
-* **Captura de Ecrã e OCR:** O cliente captura a região do ecrã onde o Star Citizen imprime a localização (`/showlocations` ou `r_DisplaySessionInfo`). O texto da imagem é filtrado e processado pelo **Tesseract OCR**.
-* **Filtro Hierárquico de Zonas:** O texto detectado contém localizações em árvore (planetas, naves, cabinas). O sistema remove ruídos (como cabinas de elevador ou assentos) para que jogadores próximos em diferentes divisões continuem a conversar de forma contínua.
+* **Alternador de Fonte de Posição:** Os utilizadores podem escolher entre dois métodos de posicionamento nas definições do cliente:
+  * **Scanner de Ecrã OCR:** Captura periodicamente a região configurada do ecrã (onde as coordenadas são exibidas via `/showlocations` ou `r_DisplaySessionInfo`), pré-processa a imagem e envia-a para o motor **Tesseract OCR**.
+  * **Leitor de Game.log (GRTPR):** Monitoriza diretamente o ficheiro `Game.log` do Star Citizen para ler as coordenadas registadas pelo jogo. Para habilitar isso, o utilizador deve adicionar `r_DisplaySessionInfo = 3` (ou `1`) ao seu ficheiro `user.cfg`. A seleção do GRTPR desativa e descarta completamente o motor Tesseract OCR, poupando recursos significativos de CPU e RAM no computador do utilizador.
+* **Filtro Hierárquico de Zonas:** O texto detectado contém localizações em árvore (planetas, naves, cabinas). O sistema remove ruídos (como cabinas de elevador ou assentos) para que utilizadores próximos em diferentes divisões continuem a conversar de forma contínua.
 * **Estimativa de Orientação:** A direcção do jogador é estimada a partir da variação espacial consecutiva ($Posição_{atual} - Posição_{anterior}$). Quando parado, a última orientação é mantida.
 
 ### 3. Leitura e Monitorização de Capacete em Tempo Real
@@ -137,7 +145,14 @@ graph TD
   * **Pan Estéreo:** Controla o balanço de volume esquerdo/direito de `-1.0` a `+1.0`.
   * **Atenuação Traseira:** Sons vindos de trás sofrem uma redução de até 25% no volume para auxiliar na percepção física da direcção do som.
   * **Atenuação por Distância:** O volume diminui linearmente até zerar no raio máximo definido para a conversa (50 metros).
-* **Reprodução:** Os dados Opus decodificados passam por um **filtro DSP de rádio** (caso o emissor ou o receptor estejam com capacete ou a usar um canal de rádio), recebem o balanço espacial e são mixados com as demais fontes no `MixingSampleProvider` do NAudio.
+* **Reprodução & Filtro DSP de Rádio:** Os dados Opus descodificados passam por um **filtro DSP de rádio** (caso o emissor ou o receptor estejam com capacete ou a usar um canal de rádio), recebem o balanço espacial e são mixados com as demais fontes.
+  * **Degradação de Rádio Dinâmica:** Se ativada, o filtro DSP estreita dinamicamente as frequências de corte passa-alta e passa-baixa e mistura ruído branco filtrado à medida que a distância entre os utilizadores se aproxima do alcance máximo de comunicação, simulando perda de sinal e interferência de rádio.
+  * **Chimes de PTT & Rádio Realistas:** A biblioteca NAudio sintetiza chimes de rádio para o início e fim da transmissão. O início da transmissão toca um chirp de 50ms (varrimento de frequência de 900Hz a 700Hz). O fim da transmissão aciona uma cauda de squelch (ruído estático de 180ms) ao receber um frame Opus vazio (0 bytes). Um retorno de áudio local opcional permite que o utilizador ouça os seus próprios bipes de PTT.
+
+### 6. HUD Overlay Sem Bordas Compatível com Vulkan e DirectX
+* **HUD Overlay**: O cliente fornece uma janela de overlay WPF transparente e sempre visível que exibe o status do VoIP, a frequência do canal ativo e a lista de interlocutores a falar em tempo real com indicadores de sinal.
+* **Integração Transparente Win32**: Utilizando estilos de janela Win32 (`WS_EX_TRANSPARENT` e `WS_EX_NOACTIVATE`), o overlay não rouba o foco do ecrã e permite que os cliques do rato passem direto para o jogo.
+* **Renderização Independente de API**: Como as janelas transparentes do WPF dependem da composição DWM (Desktop Window Manager) do Windows, o overlay não se injeta na pipeline de renderização do jogo. Isso garante compatibilidade total com **Vulkan** e **DirectX**, contanto que o Star Citizen seja executado em modo **"Janela sem Bordas"** (Borderless Windowed).
 
 ---
 
@@ -153,6 +168,7 @@ Garante o encaminhamento dinâmico de áudio com base na distância de proximida
 * **Persistência SQLite**: Grava todos os canais e atribuições dos jogadores de forma nativa.
 * **Sistema de Segurança e Banimento**: Bloqueia utilizadores por Username, IP e assinatura física de hardware (HWID/MachineGuid).
 * **Painel Administrativo Web**: Interface segura (HTTPS/WebSockets) com acompanhamento de logs ao vivo e painel de banimentos.
+* **Mapa de Radar de Administração**: Mapa de radar 2D em HTML5 Canvas integrado no painel web para monitorar as coordenadas dos utilizadores em tempo real, com rolagem por arrastar, zoom pela roda do rato e filtros de zona.
 
 ### Configuração do Servidor (`.env`)
 No primeiro arranque, o servidor gera automaticamente um ficheiro de configurações padrão:
@@ -326,12 +342,13 @@ Start-Service -Name XuruVoipServer
 
 ## 🎮 Visão Geral das Definições do Cliente
 
-A janela de definições está dividida em 5 secções principais:
+A janela de definições está dividida em 6 secções principais:
 1. **General**: Defina o idioma, informe o caminho do ficheiro `Game.log` do Star Citizen e ative gravações locais de log do cliente.
 2. **Connection**: Configura IP do servidor, portas de áudio/posição, utilizador, palavras-passe da conta e do servidor.
-3. **OCR**: Selecciona monitor, frequência de varrimento (ms), delimita a região de leitura e visualiza a última extração de texto.
-4. **Audio**: Escolhe os dispositivos de áudio, ganhos, modo de ativação de voz (PTT / VAD), limiar de ruído e ativação de **3D Spatial Audio**.
+3. **Position**: Escolha a fonte de posição ("Scanner de Ecrã OCR" vs. "Leitor de Game.log (GRTPR)"), selecciona monitor, frequência de varrimento (ms), delimita a região de leitura e visualiza a última extração de texto (opções de OCR são ocultadas se o GRTPR estiver activo).
+4. **Audio**: Escolhe os dispositivos de áudio, ganhos, modo de ativação de voz (PTT / VAD), limiar de ruído, ativação de **3D Spatial Audio**, bem como configurações avançadas de degradação de rádio e chimes de microfone PTT.
 5. **Hotkeys**: Regista as teclas físicas para falar no PTT, alternar capacete, mudar canal activo de rádio e as teclas de mute.
+6. **Overlay (Incrustação)**: Ativação do HUD overlay transparente e configuração do canto do ecrã para posicionamento (ex. Superior esquerdo, Superior direito).
 
 ### Compilar e Executar o Cliente
 
