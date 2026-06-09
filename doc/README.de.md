@@ -80,40 +80,46 @@ Der C# WPF-Client läuft parallel zu Star Citizen und führt Audioerfassung, Spr
 ```mermaid
 graph TD
     subgraph Audioerfassung & Übertragung
-        Mic[Mikrofoneingang] -->|PCM Audio| VAD[WebRTC Sprachaktivierungserkennung]
-        VAD -->|Aktive Sprache| OpusEnc[Opus Encoder]
-        OpusEnc -->|Opus Pakete| AudioWS[Audio WebSocket Client]
-        AudioWS -->|WebSocket Port 8889| Server[Go Server]
+        Mic[Mikrofoneingang] -->|PCM-Audio| VAD[WebRTC Sprachaktivierung]
+        VAD -->|Aktive Sprache| OpusEnc[Opus-Codierer]
+        OpusEnc -->|Opus-Pakete| AudioWS[Audio-WebSocket-Client]
+        AudioWS -->|WebSocket-Port 8889| Server[Go-Server]
     end
 
-    subgraph Positions- & Helmstatus-Erkennung
-        SC[Star Citizen Prozess] -->|r_DisplaySessionInfo| Screen[Bildschirmaufnahme]
-        Screen -->|Vorverarbeitung| Tess[Tesseract OCR Engine]
-        Tess -->|Multi-Zeilen-Parsing| Zone[Hierarchischer Zonenfilter]
-        Zone -->|Listener-Koordinaten & Zone| PosWS[Positions-WebSocket-Client]
-        PosWS -->|WebSocket Port 8888| Server
+    subgraph Positionsbestimmung & Helmerkennung
+        SC[Star Citizen-Prozess] -->|r_DisplaySessionInfo| Screen[Bildschirmaufnahme]
+        Screen -->|Vorverarbeitung| Tess[Tesseract OCR-Engine]
+        
+        SC -->|Echtzeit-Logfile| GameLog[Game.log-Datei]
+        GameLog -->|Logfile-Reader| LogParser[Log-Service-Parser]
+        
+        Tess -->|Koordinaten| PosSelector{Positionsquellen-Wahl}
+        LogParser -->|Koordinaten| PosSelector
+        
+        PosSelector -->|Gewählte Koordinaten| Zone[Hierarchischer Zonenfilter]
+        Zone -->|Empfängerkoordinaten & Zone| PosWS[Position-WebSocket-Client]
+        PosWS -->|WebSocket-Port 8888| Server
 
-        SC -->|Echtzeit-Logdatei| GameLog[Game.log Datei]
-        GameLog -->|Tail Scanner| LogParser[Logfile Parser Dienst]
-        LogParser -->|Helm Ausgerüstet/Abgelegt Events| Helmet[Helmstatur-Sync]
-        Helmet -->|Helmstatuspaket| PosWS
+        LogParser -->|Auf-/Absetz-Ereignisse| Helmet[Helmmodus-Synchronisation]
+        Helmet -->|Helmstatus-Paket| PosWS
     end
 
-    subgraph Wiedergabe & Raumklang-Mischung
-        Server -->|Ziel-Proximity-Audio + Metadaten| AudioWS
-        AudioWS -->|Opus Frame + ProximityMetadaten| Decoder[Opus Decoder]
-        Decoder -->|Mono Float PCM| DSP[Radio DSP Filter]
+    subgraph Stereo-3D-Raumklang-Mischung & DSP
+        Server -->|Proximity-Audio + Metadaten| AudioWS
+        AudioWS -->|Opus-Frame + ProximityMetadata| Decoder[Opus-Decodierer]
+        Decoder -->|Mono-Float-PCM| DSP[Radio-DSP-Filter & Signalverschlechterung]
         DSP -->|Mono| Panner[PanningSampleProvider]
         Panner -->|Stereo| Volume[VolumeSampleProvider]
         
-        LogParser -.->|lokaler Helmstatus| DSP
-        Zone -.->|Listener Position & Blickrichtung| MixerMath[Spatial Panning Berechnungen]
+        LogParser -.->|Lokaler Helmstatus| DSP
+        Zone -.->|Hörerposition & Blickrichtung| MixerMath[Raumklang- & Verschlechterungsmathematik]
         
         MixerMath -->|Pan-Parameter| Panner
-        MixerMath -->|Entfernungsdämpfung & Dämpfung Hinten| Volume
+        MixerMath -->|Entfernungs- & Rückdämpfung| Volume
+        MixerMath -->|Verschlechterungsfaktor| DSP
         
         Volume -->|Links/Rechts Stereo| Mixer[MixingSampleProvider]
-        Mixer -->|Wiedergabe| Speakers[Audio-Ausgabegerät]
+        Mixer -->|Audiowiedergabe| Speakers[Audiowiedergabegerät]
     end
 ```
 
@@ -123,9 +129,11 @@ graph TD
 * **Komprimierung:** Aktive Audiodaten werden in hochkomprimierte **Opus**-Frames codiert (über **Concentus** C#) und direkt als binäre WebSocket-Frames an den Server gesendet.
 
 ### 2. Positionsverfolgung und Richtungsbestimmung
-* **Bildschirmaufnahme & OCR:** Der Client fotografiert den Bildschirmbereich mit den Sitzungskoordinaten (`/showlocations` oder `r_DisplaySessionInfo`). Das Bild wird skaliert und die Kontraste erhöht, bevor es von **Tesseract OCR** ausgelesen wird.
+* **Positionsquellen-Umschalter:** Spieler können in den Client-Einstellungen zwischen zwei Methoden wählen:
+  * **OCR-Bildschirmscanner:** Erstellt regelmäßig ein Foto des konfigurierten Bildschirmbereichs (auf dem die Koordinaten per `/showlocations` oder `r_DisplaySessionInfo` angezeigt werden), verarbeitet das Bild vor und leitet es an die **Tesseract OCR**-Engine weiter.
+  * **Game.log-Leser (GRTPR):** Scannt die Star Citizen `Game.log`-Datei direkt nach vom Spiel ausgegebenen Koordinaten. Hierfür muss `r_DisplaySessionInfo = 3` (oder `1`) in der Datei `user.cfg` eingetragen sein. Die Auswahl von GRTPR stoppt und deinitialisiert die Tesseract OCR-Engine vollständig, um wertvolle CPU- und RAM-Ressourcen des Hostsystems freizusetzen.
 * **Hierarchischer Zonenfilter:** Die Koordinaten enthalten hierarchische Zonen (z.B. Planeten, Raumschiffe). Der Client filtert Zonenunterschiede (wie Aufzüge, Sitze) heraus, damit sich Spieler in angrenzenden Zonen unterbrechungsfrei hören.
-* **Richtungsbestimmung:** Da Star Citizen die Blickrichtung nicht ausgibt, errechnet der Client die Bewegungsrichtung aus der Positionsänderung ($Position_{aktuell} - Position_{vorherig}$). Im Stillstand bleibt der letzte Wert erhalten.
+* **Richtungsbestimmung:** Da Star Citizen die Blickrichtung nicht ausgibt, errechnet der Client die Bewegungsrichtung aus der Positionsänderung ($Position_{aktuell} - Position_{vorherig$). Im Stillstand bleibt der letzte Wert erhalten.
 
 ### 3. Helm-Erkennung in Echtzeit (Logfile-Scanner)
 * **Tail Scanner:** Ein Hintergrundprozess liest die Star Citizen `Game.log`-Datei in Echtzeit.
@@ -138,7 +146,14 @@ graph TD
   * **Stereo Panning (Pan):** Regelt die Links-Rechts-Balance von `-1.0` (voll links) bis `+1.0` (voll rechts).
   * **Hintergrunddämpfung:** Schallquellen von hinten werden um bis zu 25% gedämpft, um die Vorne-Hinten-Verortung im Kopfhörer zu unterstützen.
   * **Entfernungsdämpfung:** Die Lautstärke sinkt linear und erreicht bei maximaler Reichweite (Standard: 50m) null.
-* **Wiedergabe:** Die Opus-Frames werden decodiert, laufen durch einen **Radio-DSP-Filter** (falls Sprecher oder Hörer den Helm aufhaben oder auf einem Funkkanal sprechen), werden räumlich verteilt, gedämpft und über den `MixingSampleProvider` von NAudio wiedergegeben.
+* **Wiedergabe & Radio-DSP:** Die decodierten Opus-Frames laufen durch einen **Radio-DSP-Filter** (falls Sprecher oder Hörer den Helm aufhaben oder auf einem Funkkanal sprechen), werden räumlich verteilt, gedämpft und gemischt.
+  * **Dynamische Funkverschlechterung:** Falls aktiviert, verengt der DSP-Filter die Hoch- und Tiefpass-Grenzfrequenzen und mischt bandpassgefiltertes weißes Rauschen hinzu, wenn sich Spieler der maximalen Funkreichweite nähern, um Funksignalschwankungen zu simulieren.
+  * **Authentische PTT- & Funktöne:** NAudio erzeugt Synthesizer-Töne für Sendeaktivierungen. Der Sendestart spielt einen 50ms pitch-sweep **Mic Key Chirp** (900Hz bis 700Hz). Das Sendeende löst ein 180ms **Squelch-Rauschen** (Squelch Tail) aus, sobald ein leeres 0-Byte-Opus-Frame empfangen wird. Ein lokaler Loopback-Ton ermöglicht das Hören der eigenen Funktöne.
+
+### 6. Vulkan-kompatibles rahmenloses HUD-Overlay
+* **HUD-Overlay-Fenster**: Der Client bietet ein optionales, transparentes WPF-Overlay, das im Vordergrund läuft. Es zeigt den VoIP-Status, die aktive Funkfrequenz und eine Echtzeitliste der aktiven Sprecher mit Funksignalsymbolen.
+* **Win32-Durchklick-Integration**: Durch Win32-Window-Styles (`WS_EX_TRANSPARENT` und `WS_EX_NOACTIVATE`) stiehlt das Overlay keinen Fokus und lässt Mausereignisse direkt zum Spiel durch.
+* **API-unabhängiges Rendering**: Da transparente WPF-Fenster auf DWM-Komposition (Desktop Window Manager) basieren, greift das Overlay nicht in die Grafikpipeline ein. Das garantiert volle Kompatibilität mit **Vulkan** und **DirectX**, sofern Star Citizen im **"rahmenlosen Fenstermodus"** (Borderless Windowed) ausgeführt wird.
 
 ---
 
@@ -154,6 +169,7 @@ Der Server koordiniert die Positionen, authentifiziert Verbindungen und leitet A
 * **SQLite-Datenbank**: Speichert Kanäle und Profile dauerhaft.
 * **Sicherheitssystem**: Sperrt (bannt) Störenfriede nach Benutzername, IP-Adresse und Hardware-Fingerabdruck (HWID/MachineGuid).
 * **Webportal für Admins**: Sichere Weboberfläche (HTTPS/WebSockets) mit Echtzeit-Logs, Dashboard und Ban-Verwaltung.
+* **Server-Admin-Radarkarte**: Echtzeit-2D-Radarkarte über HTML5-Canvas im Admin-Dashboard zur Verfolgung von Spielerpositionen mit Zoom per Mausrad, Panning per Klick-und-Drag und Zonenfilterung.
 
 ### Server-Konfiguration (`.env`)
 Beim ersten Start wird eine Standard-`.env`-Datei generiert:
@@ -326,12 +342,13 @@ Start-Service -Name XuruVoipServer
 
 ## 🎮 Übersicht der XuruVoip-Client-Einstellungen
 
-Das Einstellungsfenster bietet fünf Abschnitte:
+Das Einstellungsfenster bietet sechs Abschnitte:
 1. **General**: Sprachauswahl, Pfad der Star Citizen `Game.log`-Datei und Umschalter für das lokale Logging.
 2. **Connection**: Serveradresse, Audio- und Positionsports, Benutzername, Passwort und Serverpasswort/-token.
-3. **OCR**: Monitorauswahl, Scanintervall (ms), Scanbereich festlegen und Vorschau der letzten Texterkennung.
-4. **Audio**: Audiogeräte auswählen, Lautstärke anpassen, Sendemodus (PTT / VAD) festlegen, VAD-Empfindlichkeit einstellen und **3D Spatial Audio** aktivieren (sofern serverseitig erlaubt).
+3. **Position**: Wahl der Positionsquelle ("OCR Screen Scanner" vs. "Game.log Reader (GRTPR)"), Monitorauswahl, Scanintervall (ms), Scanbereich festlegen und Vorschau der letzten Texterkennung (OCR-Optionen werden ausgeblendet, wenn GRTPR aktiv ist).
+4. **Audio**: Audiogeräte auswählen, Lautstärke anpassen, Sendemodus (PTT / VAD) festlegen, VAD-Empfindlichkeit einstellen, **3D Spatial Audio** aktivieren sowie erweiterte Einstellungen für Funkverschlechterung und Funktöne.
 5. **Hotkeys**: Belegung von Tasten für PTT (Nähe, Funk, Profil), Helm ein/aus, Funkkanal-Umschaltung sowie Mute-Tasten für Ausgang (Mikrofon) und Eingang (Wiedergabe).
+6. **Overlay**: Aktivierung des transparenten HUD-Overlays und Einstellung der Bildschirmecke für die Platzierung (z. B. Oben links, Oben rechts).
 
 ### Client kompilieren und ausführen
 

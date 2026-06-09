@@ -79,41 +79,47 @@ O cliente C# WPF roda em paralelo com o Star Citizen para capturar áudio, proce
 
 ```mermaid
 graph TD
-    subgraph Captura e Transmissão
-        Mic[Entrada de Microfone] -->|Áudio PCM| VAD[Detecção de Atividade de Voz WebRTC]
+    subgraph Captura & Transmissão
+        Mic[Entrada de Microfone] -->|Áudio PCM| VAD[Detecção de Atividade de Voz VAD]
         VAD -->|Voz Ativa| OpusEnc[Codificador Opus]
         OpusEnc -->|Pacotes Opus| AudioWS[Cliente WebSocket de Áudio]
         AudioWS -->|Porta WebSocket 8889| Server[Servidor Go]
     end
 
-    subgraph Rastreamento e Sincronização do Capacete
-        SC[Processo do Star Citizen] -->|r_DisplaySessionInfo| Screen[Captura de Tela]
-        Screen -->|Pré-processamento| Tess[Motor Tesseract OCR]
-        Tess -->|Análise Multilinha| Zone[Filtro Hierárquico de Zonas]
-        Zone -->|Coordenadas e Zonas do Ouvinte| PosWS[Cliente WebSocket de Posição]
+    subgraph Posicionamento & Detecção de Capacete
+        SC[Processo Star Citizen] -->|r_DisplaySessionInfo| Screen[Captura de Tela]
+        Screen -->|Pré-processamento| Tess[Motor OCR Tesseract]
+        
+        SC -->|Log em Tempo Real| GameLog[Arquivo Game.log]
+        GameLog -->|Analisador de logs| LogParser[Analisador de logs]
+        
+        Tess -->|Coordenadas| PosSelector{Alternador de Fonte}
+        LogParser -->|Coordenadas| PosSelector
+        
+        PosSelector -->|Coordenadas Selecionadas| Zone[Filtro Hierárquico de Zona]
+        Zone -->|Coordenadas & Zona do Ouvinte| PosWS[Cliente WebSocket de Posição]
         PosWS -->|Porta WebSocket 8888| Server
 
-        SC -->|Log em Tempo Real| GameLog[Arquivo Game.log]
-        GameLog -->|Tail Scanner| LogParser[Serviço Analisador de Logs]
-        LogParser -->|Eventos Equipar/Retirar| Helmet[Sincronização de Capacete]
-        Helmet -->|Pacote de Status do Capacete| PosWS
+        LogParser -->|Equipar/Remover capacete| Helmet[Sincronização de Capacete]
+        Helmet -->|Pacote de Estado do Capacete| PosWS
     end
 
-    subgraph Reprodução e Mixagem Espacial
+    subgraph Mixagem e Processamento Espacial 3D & DSP
         Server -->|Áudio de Proximidade + Metadados| AudioWS
-        AudioWS -->|Frame Opus + Metadados de Proximidade| Decoder[Decodificador Opus]
-        Decoder -->|PCM Mono Float| DSP[Filtro DSP de Rádio]
+        AudioWS -->|Frame Opus + Metadatos| Decoder[Decodificador Opus]
+        Decoder -->|Mono Float PCM| DSP[Filtro DSP de Rádio & Degradação]
         DSP -->|Mono| Panner[PanningSampleProvider]
         Panner -->|Estéreo| Volume[VolumeSampleProvider]
         
-        LogParser -.->|status do capacete local| DSP
-        Zone -.->|Posição e Direção do ouvinte| MixerMath[Cálculo de Spatialização 3D]
+        LogParser -.->|Estado local do capacete| DSP
+        Zone -.->|Posição & orientação do ouvinte| MixerMath[Matemática de Espacialização & Degradação]
         
-        MixerMath -->|Parâmetro de Pan| Panner
-        MixerMath -->|Atenuação por Distância e Traseira| Volume
+        MixerMath -->|Parâmetro Pan Estéreo| Panner
+        MixerMath -->|Atenuação por Distância & Traseira| Volume
+        MixerMath -->|Fator de Degradação| DSP
         
-        Volume -->|Estéreo Esquerda/Direita| Mixer[MixingSampleProvider]
-        Mixer -->|Reprodução| Speakers[Dispositivo de Saída de Som]
+        Volume -->|Estéreo Esquerdo/Direito| Mixer[MixingSampleProvider]
+        Mixer -->|Reprodução de Áudio| Speakers[Dispositivo de Saída de Áudio]
     end
 ```
 
@@ -123,7 +129,9 @@ graph TD
 * **Compressão:** O áudio é codificado no formato **Opus** (através da biblioteca C# **Concentus**) e transmitido via WebSockets para o servidor.
 
 ### 2. Localização e Orientação 3D
-* **Captura de Tela e OCR:** O cliente captura a região da tela onde o Star Citizen imprime a localização (`/showlocations` ou `r_DisplaySessionInfo`). O texto da imagem é filtrado e processado pelo **Tesseract OCR**.
+* **Alternador de Fonte de Posição:** Os jogadores podem escolher entre dois métodos de posicionamento nas configurações do cliente:
+  * **Scanner de Tela OCR:** Captura periodicamente a região configurada da tela (onde as coordenadas são exibidas via `/showlocations` ou `r_DisplaySessionInfo`), pré-processa a imagem e a envia ao motor **Tesseract OCR**.
+  * **Leitor de Game.log (GRTPR):** Monitora diretamente o arquivo `Game.log` do Star Citizen para ler as coordenadas registradas pelo jogo. Para habilitar isso, o jogador deve adicionar `r_DisplaySessionInfo = 3` (ou `1`) ao seu arquivo `user.cfg`. A seleção do GRTPR desativa e descarta completamente o motor Tesseract OCR, economizando recursos significativos de CPU e RAM no computador do jogador.
 * **Filtro Hierárquico de Zonas:** O texto detectado contém localizações em árvore (planetas, naves, cabines). O sistema remove ruídos (como cabines de elevador ou assentos) para que jogadores próximos em diferentes cômodos continuem conversando de forma contínua.
 * **Estimativa de Orientação:** A direção do jogador é estimada a partir da variação espacial consecutiva ($Posição_{atual} - Posição_{anterior}$). Quando parado, a última orientação é mantida.
 
@@ -137,7 +145,14 @@ graph TD
   * **Pan Estéreo:** Controla o balanço de volume esquerdo/direito de `-1.0` a `+1.0`.
   * **Atenuação Traseira:** Sons vindos de trás sofrem uma redução de até 25% no volume para auxiliar na percepção física da direção do som.
   * **Atenuação por Distância:** O volume diminui linearmente até zerar no raio máximo definido para a conversa (50 metros).
-* **Reprodução:** Os dados Opus decodificados passam por um **filtro DSP de rádio** (caso o emissor ou o receptor estejam com capacete ou usando um canal de rádio), recebem o balanço espacial e são mixados com as demais fontes no `MixingSampleProvider` do NAudio.
+* **Reprodução & Filtro DSP de Rádio:** Os dados Opus decodificados passam por um **filtro DSP de rádio** (caso o emissor ou o receptor estejam com capacete ou usando um canal de rádio), recebem o balanço espacial e são mixados com as demais fontes.
+  * **Degradação de Rádio Dinâmica:** Se ativada, o filtro DSP estreita dinamicamente as frequências de corte passa-alta e passa-baixa e mistura ruído branco filtrado à medida que a distância entre os jogadores se aproxima do alcance máximo de comunicação, simulando perda de sinal e interferência de rádio.
+  * **Chimes de PTT & Rádio Realistas:** A biblioteca NAudio sintetiza chimes de rádio para o início e fim da transmissão. O início da transmissão toca um chirp de 50ms (varredura de frequência de 900Hz a 700Hz). O fim da transmissão aciona uma cauda de squelch (ruído estático de 180ms) ao receber um frame Opus vazio (0 bytes). Um retorno de áudio local opcional permite que o jogador ouça seus próprios bipes de PTT.
+
+### 6. HUD Overlay Sem Bordas Compatível com Vulkan e DirectX
+* **HUD Overlay**: O cliente fornece uma janela de overlay WPF transparente e sempre visível que exibe o status do VoIP, a frequência do canal ativo e a lista de interlocutores falando em tempo real com indicadores de sinal.
+* **Integração Transparente Win32**: Utilizando estilos de janela Win32 (`WS_EX_TRANSPARENT` e `WS_EX_NOACTIVATE`), o overlay não rouba o foco da tela e permite que os cliques do mouse passem direto para o jogo.
+* **Renderização Independente de API**: Como as janelas transparentes do WPF dependem da composição DWM (Desktop Window Manager) do Windows, o overlay não se injeta na pipeline de renderização do jogo. Isso garante compatibilidade total com **Vulkan** e **DirectX**, contanto que o Star Citizen seja executado em modo **"Janela sem Bordas"** (Borderless Windowed).
 
 ---
 
@@ -153,6 +168,7 @@ Garante o roteamento dinâmico de áudio com base na distância de proximidade e
 * **Persistência SQLite**: Salva todos os canais e atribuições dos jogadores de forma nativa.
 * **Sistema de Segurança e Banimento**: Bloqueia trapaceiros ou arruaceiros por Username, IP e assinatura física de hardware (HWID/MachineGuid).
 * **Painel Administrativo Web**: Interface segura (HTTPS/WebSockets) com acompanhamento de logs ao vivo e painel de banimentos.
+* **Mapa de Radar de Administração**: Mapa de radar 2D em HTML5 Canvas integrado no painel web para monitorar as coordenadas dos jogadores em tempo real, com rolagem por arrastar, zoom pela roda do mouse e filtros de zona.
 
 ### Configuração do Servidor (`.env`)
 No primeiro início, o servidor gera automaticamente um arquivo de configurações padrão:
@@ -326,12 +342,13 @@ Start-Service -Name XuruVoipServer
 
 ## 🎮 Visão Geral das Configurações do Cliente
 
-A janela de configurações está dividida em 5 seções principais:
+A janela de configurações está dividida em 6 seções principais:
 1. **General**: Defina a linguagem, informe o caminho do arquivo `Game.log` do Star Citizen e habilite gravações locais de log do cliente.
 2. **Connection**: Configura IP do servidor, portas de áudio/posição, usuário, senhas da conta e do servidor.
-3. **OCR**: Seleciona monitor, frequência de varredura (ms), delimita a região de leitura e visualiza a última extração de texto.
-4. **Audio**: Escolhe os dispositivos de áudio, ganhos, modo de ativação de voz (PTT / VAD), limiar de ruído e ativação de **3D Spatial Audio**.
+3. **Position**: Escolhe a fonte de posição ("Scanner de Tela OCR" vs. "Leitor de Game.log (GRTPR)"), seleciona monitor, frequência de varredura (ms), delimita a região de leitura e visualiza a última extração de texto (opções de OCR são ocultadas se o GRTPR estiver ativo).
+4. **Audio**: Escolhe os dispositivos de áudio, ganhos, modo de ativação de voz (PTT / VAD), limiar de ruído, ativação de **3D Spatial Audio**, bem como configurações avançadas de degradação de rádio e chimes de microfone PTT.
 5. **Hotkeys**: Registra as teclas físicas para falar no PTT, alternar capacete, mudar canal ativo de rádio e as teclas de mute.
+6. **Overlay (Incrustação)**: Ativação do HUD overlay transparente e configuração do canto da tela para posicionamento (ex. Superior esquerdo, Superior direito).
 
 ### Compilando e Executando o Cliente
 

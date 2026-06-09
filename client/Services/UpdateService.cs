@@ -29,13 +29,8 @@ public class UpdateService
             if (doc.RootElement.TryGetProperty("tag_name", out var tagProp))
             {
                 string latestTag = tagProp.GetString() ?? "";
-                string latestClean = latestTag.TrimStart('v');
-                string currentClean = currentVersionStr.TrimStart('v');
-
-                if (Version.TryParse(latestClean, out var latestVer) && Version.TryParse(currentClean, out var currentVer))
-                {
-                    return (latestVer > currentVer, latestTag);
-                }
+                bool updateAvailable = IsUpdateAvailable(latestTag, currentVersionStr);
+                return (updateAvailable, latestTag);
             }
         }
         catch (Exception ex)
@@ -44,5 +39,20 @@ public class UpdateService
         }
 
         return (false, string.Empty);
+    }
+
+    internal static bool IsUpdateAvailable(string latestTag, string currentVersionStr)
+    {
+        if (string.IsNullOrEmpty(latestTag) || string.IsNullOrEmpty(currentVersionStr))
+            return false;
+
+        string latestClean = latestTag.TrimStart('v').Trim();
+        string currentClean = currentVersionStr.TrimStart('v').Trim();
+
+        if (Version.TryParse(latestClean, out var latestVer) && Version.TryParse(currentClean, out var currentVer))
+        {
+            return latestVer > currentVer;
+        }
+        return false;
     }
 }
