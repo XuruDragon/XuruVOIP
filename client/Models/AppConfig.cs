@@ -60,4 +60,8 @@ public class AppConfig
     // --- Borderless Overlay ---
     public bool EnableOverlay { get; set; } = false;
     public string OverlayPosition { get; set; } = "TopLeft";
+
+    // --- Discord RPC ---
+    public bool EnableDiscordRpc { get; set; } = true;
 }
+

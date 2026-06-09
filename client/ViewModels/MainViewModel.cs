@@ -210,6 +210,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     private async void InitializeServicesAsync()
     {
+        _discordRpc.Enabled = Config.Config.EnableDiscordRpc;
         _discordRpc.Start();
         // Initialize position tracking source
         ApplyTrackingSource();
@@ -799,6 +800,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableRadioDegradation = Config.Config.EnableRadioDegradation;
         _playback.EnablePttChimes = Config.Config.EnablePttChimes;
         _playback.EnableEnvironmentalAcoustics = Config.Config.EnableEnvironmentalAcoustics;
+        _discordRpc.Enabled = Config.Config.EnableDiscordRpc;
 
         // Sync position tracking source
         ApplyTrackingSource();

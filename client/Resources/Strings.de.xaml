@@ -118,6 +118,9 @@
     <sys:String x:Key="OptBottomLeft">Unten-Links</sys:String>
     <sys:String x:Key="OptBottomCenter">Unten-Mitte</sys:String>
     <sys:String x:Key="OptBottomRight">Unten-Rechts</sys:String>
+    <sys:String x:Key="LblEnableDiscordRpc">Discord Rich Presence aktivieren</sys:String>
+    <sys:String x:Key="LblOverlayCapabilities">Overlay-Funktionen</sys:String>
+    <sys:String x:Key="LblOverlayCapabilitiesDesc">Das HUD-Overlay ist vollständig kompatibel mit Vulkan und DirectX, wenn Star Citizen im Modus "Rahmenloses Fenster" ausgeführt wird. Es zeigt den VoIP-Verbindungsstatus im Spiel, die aktive Funkfrequenz und Echtzeit-Sprechanzeigen an, ohne in den Spielcode einzugreifen oder ein Ban-Risiko darzustellen.</sys:String>
 
     <!-- Schaltflächen Allgemein -->
     <sys:String x:Key="BtnSaveClose">Speichern &amp; Schließen</sys:String>
