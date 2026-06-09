@@ -1,0 +1,90 @@
+<Window x:Class="XuruVoipClient.Views.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="XuruVoip HUD Overlay"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize">
+
+    <Grid>
+        <!-- The HUD card container positioned in a specific corner -->
+        <Border x:Name="HudPanel"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="20"
+                Padding="16,12"
+                CornerRadius="12"
+                Background="#B80E1116"
+                BorderThickness="1"
+                BorderBrush="#30FFFFFF"
+                MinWidth="180">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="15" ShadowDepth="3" Opacity="0.5"/>
+            </Border.Effect>
+
+            <StackPanel Orientation="Vertical">
+                <!-- Header: Connection status -->
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Status dot -->
+                    <Ellipse x:Name="StatusDot" Grid.Column="0" Width="8" Height="8"
+                             Fill="#FF4E6A" Margin="0,0,8,0" VerticalAlignment="Center">
+                        <Ellipse.Effect>
+                            <BlurEffect Radius="3"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
+
+                    <!-- Connection text / Channel Name -->
+                    <TextBlock x:Name="TxtStatus" Grid.Column="1"
+                               Text="Disconnected"
+                               Foreground="#FFB0B3B8"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                </Grid>
+
+                <Separator Background="#20FFFFFF" Margin="0,0,0,8" Height="1"/>
+
+                <!-- Active Speakers List -->
+                <TextBlock x:Name="TxtSpeakersHeader" 
+                           Text="ACTIVE SPEAKERS" 
+                           Foreground="#80FFFFFF" 
+                           FontSize="9" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,6"/>
+
+                <ItemsControl x:Name="LstSpeakers" Margin="0,0,0,2">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,4">
+                                <!-- Audio transmitting soundwave indicator / icon -->
+                                <Path Fill="#FF3DDB85" 
+                                      VerticalAlignment="Center" 
+                                      Margin="0,0,8,0"
+                                      Data="M 2 5 L 2 11 L 4 11 L 7 14 L 7 2 L 4 5 Z M 9 5.5 A 4 4 0 0 1 9 10.5 M 11 3.5 A 7 7 0 0 1 11 12.5"/>
+                                <TextBlock Text="{Binding}" 
+                                           Foreground="#FFFFFFFF" 
+                                           FontSize="12" 
+                                           FontWeight="SemiBold" 
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock x:Name="TxtNoSpeakers" 
+                           Text="No Transmissions" 
+                           Foreground="#50FFFFFF" 
+                           FontSize="11" 
+                           FontStyle="Italic"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

@@ -54,23 +54,53 @@ public class RadioDspFilter
     private readonly BiquadFilter lpOut = new();
 
     private int ringPhase = 0;
+    private double _lastDegradation = -1.0;
+    private readonly Random _random = new();
 
     private readonly float[] reverbBuf = new float[1440];
     private int reverbIdx = 0;
 
+    public double DegradationFactor { get; set; } = 0.0; // 0.0 (clean) to 1.0 (very noisy)
+
     public RadioDspFilter()
     {
-        hpIn.SetHpCoefficients(350, SampleRate);
-        lpIn.SetLpCoefficients(5000, SampleRate);
-        hpOut.SetHpCoefficients(320, SampleRate);
-        lpOut.SetLpCoefficients(5500, SampleRate);
+        UpdateCoefficients(0.0);
+    }
+
+    private void UpdateCoefficients(double degradation)
+    {
+        double fcHp = 350 + degradation * 550;   // 350Hz to 900Hz
+        double fcLp = 5000 - degradation * 3500; // 5000Hz down to 1500Hz
+        
+        hpIn.SetHpCoefficients(fcHp, SampleRate);
+        lpIn.SetLpCoefficients(fcLp, SampleRate);
+        hpOut.SetHpCoefficients(Math.Max(100, fcHp - 30), SampleRate);
+        lpOut.SetLpCoefficients(Math.Min(20000, fcLp + 500), SampleRate);
     }
 
     public void Process(float[] buffer, int count)
     {
+        // Update coefficients if degradation changed significantly
+        if (Math.Abs(DegradationFactor - _lastDegradation) > 0.01)
+        {
+            _lastDegradation = DegradationFactor;
+            UpdateCoefficients(_lastDegradation);
+        }
+
+        float noiseIntensity = (float)(DegradationFactor * 0.35);
+        double ringMix = 0.17 + DegradationFactor * 0.28;
+        double drive = 2.0 + DegradationFactor * 4.0;
+
         for (int i = 0; i < count; i++)
         {
             float sample = buffer[i];
+
+            // 0. Mix white noise at the input
+            if (noiseIntensity > 0f)
+            {
+                float noise = (float)(_random.NextDouble() * 2.0 - 1.0) * noiseIntensity;
+                sample += noise;
+            }
 
             // 1. Passe-bande IN
             sample = hpIn.Process(sample);
@@ -79,11 +109,11 @@ public class RadioDspFilter
             // 2. Ring Modulator
             double carrier = Math.Sin(2.0 * Math.PI * 2700.0 * ringPhase / SampleRate);
             float modulated = (float)(sample * carrier);
-            sample = (float)((1.0 - 0.17) * sample + 0.17 * modulated);
+            sample = (float)((1.0 - ringMix) * sample + ringMix * modulated);
             ringPhase = (ringPhase + 1) % SampleRate;
 
-            // 3. Saturation (drive 2.0, soft-clip tanh)
-            sample = (float)(Math.Tanh(sample * 2.0) * 0.85);
+            // 3. Saturation (soft-clip tanh)
+            sample = (float)(Math.Tanh(sample * drive) * 0.85);
 
             // 4. Passe-bande OUT
             sample = hpOut.Process(sample);

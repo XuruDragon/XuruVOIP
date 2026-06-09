@@ -95,6 +95,7 @@ var translations = map[string]map[string]string{
 		"Optional":                  "Optional",
 		"Login":                     "Login",
 		"Dashboard":                 "Dashboard",
+		"RadarMap":                  "Radar Map",
 		"PlayerAccounts":            "Player Accounts",
 		"Administrators":            "Administrators",
 		"ActiveBans":                "Active Bans",
@@ -231,6 +232,7 @@ var translations = map[string]map[string]string{
 		"Optional":                  "Optionnel",
 		"Login":                     "Connexion",
 		"Dashboard":                 "Tableau de bord",
+		"RadarMap":                  "Carte Radar",
 		"PlayerAccounts":            "Comptes Joueurs",
 		"Administrators":            "Administrateurs",
 		"ActiveBans":                "Bannissements Actifs",
@@ -367,6 +369,7 @@ var translations = map[string]map[string]string{
 		"Optional":                  "Optional",
 		"Login":                     "Einloggen",
 		"Dashboard":                 "Dashboard",
+		"RadarMap":                  "Radarkarte",
 		"PlayerAccounts":            "Spielerkonten",
 		"Administrators":            "Administratoren",
 		"ActiveBans":                "Aktive Sperren",
@@ -503,6 +506,7 @@ var translations = map[string]map[string]string{
 		"Optional":                  "Opcional",
 		"Login":                     "Iniciar sesión",
 		"Dashboard":                 "Panel de control",
+		"RadarMap":                  "Mapa de Radar",
 		"PlayerAccounts":            "Cuentas de Jugadores",
 		"Administrators":            "Administradores",
 		"ActiveBans":                "Baneos Activos",
@@ -639,6 +643,7 @@ var translations = map[string]map[string]string{
 		"Optional":                  "Opcional",
 		"Login":                     "Entrar",
 		"Dashboard":                 "Painel de Controle",
+		"RadarMap":                  "Mapa do Radar",
 		"PlayerAccounts":            "Contas de Jogadores",
 		"Administrators":            "Administradores",
 		"ActiveBans":                "Banimentos Ativos",
@@ -775,6 +780,7 @@ var translations = map[string]map[string]string{
 		"Optional":                  "Opcional",
 		"Login":                     "Entrar",
 		"Dashboard":                 "Painel de Controlo",
+		"RadarMap":                  "Mapa do Radar",
 		"PlayerAccounts":            "Contas de Jogadores",
 		"Administrators":            "Administradores",
 		"ActiveBans":                "Banimentos Ativos",
@@ -911,6 +917,7 @@ var translations = map[string]map[string]string{
 		"Optional":                  "可选",
 		"Login":                     "登录",
 		"Dashboard":                 "仪表板",
+		"RadarMap":                  "雷达地图",
 		"PlayerAccounts":            "玩家账号",
 		"Administrators":            "管理员账号",
 		"ActiveBans":                "封禁列表",
@@ -1047,6 +1054,7 @@ var translations = map[string]map[string]string{
 		"Optional":                  "任意",
 		"Login":                     "ログイン",
 		"Dashboard":                 "ダッシュボード",
+		"RadarMap":                  "レーダーマップ",
 		"PlayerAccounts":            "プレイヤーアカウント",
 		"Administrators":            "管理者アカウント",
 		"ActiveBans":                "アクティブなBAN",
@@ -1333,6 +1341,7 @@ const dashboardHTML = `<!DOCTYPE html>
     <!-- Tab Selection Bar -->
     <div class="flex border-b border-slate-800 bg-slate-950 px-6 gap-2">
         <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="px-5 py-3.5 text-sm font-semibold border-b-2 border-emerald-500 text-white transition">{{index .T "Dashboard"}}</button>
+        <button onclick="switchTab('radar')" id="tab-btn-radar" class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition">{{index .T "RadarMap"}}</button>
         <button onclick="switchTab('accounts')" id="tab-btn-accounts" class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition">{{index .T "PlayerAccounts"}}</button>
         <button onclick="switchTab('admins')" id="tab-btn-admins" class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition">{{index .T "Administrators"}}</button>
         <button onclick="switchTab('bans')" id="tab-btn-bans" class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition">{{index .T "ActiveBans"}}</button>
@@ -1441,6 +1450,34 @@ const dashboardHTML = `<!DOCTYPE html>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Tab: Radar Map -->
+    <div id="tab-content-radar" class="hidden flex-1 min-h-0 flex flex-col p-6 max-w-[1800px] w-full mx-auto space-y-6">
+        <div class="glass-panel p-6 rounded-2xl flex-1 flex flex-col min-h-[600px] relative">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-white">{{index .T "RadarMap"}}</h3>
+                    <p class="text-xs text-slate-400">Real-time player coordinates map grouped by Zone</p>
+                </div>
+                <!-- Controls -->
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-semibold text-slate-400">Zone Filter:</span>
+                    <select id="radar-zone-select" class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-emerald-500" onchange="onRadarZoneChange()">
+                        <option value="">All Zones</option>
+                    </select>
+                    
+                    <button onclick="zoomRadar(1.2)" class="px-3 py-1.5 text-xs bg-slate-800 text-white rounded border border-slate-700 hover:bg-slate-700 transition">Zoom +</button>
+                    <button onclick="zoomRadar(0.8)" class="px-3 py-1.5 text-xs bg-slate-800 text-white rounded border border-slate-700 hover:bg-slate-700 transition">Zoom -</button>
+                    <button onclick="resetRadar()" class="px-3 py-1.5 text-xs bg-slate-800 text-white rounded border border-slate-700 hover:bg-slate-700 transition">Reset View</button>
+                </div>
+            </div>
+            
+            <!-- Canvas container -->
+            <div class="flex-1 min-h-0 bg-slate-950/50 rounded-xl border border-slate-900 overflow-hidden relative flex items-center justify-center">
+                <canvas id="radar-canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+            </div>
+        </div>
     </div>
 
     <!-- Tab 2: User Accounts Panel -->
@@ -1620,11 +1657,13 @@ const dashboardHTML = `<!DOCTYPE html>
 
         function switchTab(tabId) {
             document.getElementById('tab-content-dashboard').classList.add('hidden');
+            document.getElementById('tab-content-radar').classList.add('hidden');
             document.getElementById('tab-content-accounts').classList.add('hidden');
             document.getElementById('tab-content-admins').classList.add('hidden');
             document.getElementById('tab-content-bans').classList.add('hidden');
 
             document.getElementById('tab-btn-dashboard').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
+            document.getElementById('tab-btn-radar').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
             document.getElementById('tab-btn-accounts').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
             document.getElementById('tab-btn-admins').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
             document.getElementById('tab-btn-bans').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
@@ -1640,6 +1679,13 @@ const dashboardHTML = `<!DOCTYPE html>
             } else if (tabId === 'bans') {
                 sendAdminCommand({ cmd: 'get_banned_ips_list' });
                 sendAdminCommand({ cmd: 'get_banned_hwids_list' });
+            } else if (tabId === 'radar') {
+                // Resize and draw radar map immediately
+                if (radarCanvas) {
+                    radarCanvas.width = radarCanvas.parentElement.clientWidth * window.devicePixelRatio;
+                    radarCanvas.height = radarCanvas.parentElement.clientHeight * window.devicePixelRatio;
+                    drawRadar();
+                }
             }
         }
 
@@ -1717,6 +1763,7 @@ const dashboardHTML = `<!DOCTYPE html>
                     renderChannels();
                     renderProfiles();
                     renderPlayers();
+                    updateRadarZonesDropdown();
                     break;
 
                 case 'channels_list':
@@ -1753,6 +1800,7 @@ const dashboardHTML = `<!DOCTYPE html>
                     renderStats();
                     renderChannels();
                     renderProfiles();
+                    updateRadarZonesDropdown();
                     break;
 
                 case 'leave':
@@ -1761,11 +1809,16 @@ const dashboardHTML = `<!DOCTYPE html>
                     renderStats();
                     renderChannels();
                     renderProfiles();
+                    updateRadarZonesDropdown();
                     break;
 
                 case 'pos':
                     if (players[msg.name]) {
+                        const oldZone = players[msg.name].pos ? players[msg.name].pos.zone : "";
                         players[msg.name].pos = msg.pos;
+                        if (msg.pos && msg.pos.zone !== oldZone) {
+                            updateRadarZonesDropdown();
+                        }
                     }
                     break;
 
@@ -2585,8 +2638,259 @@ const dashboardHTML = `<!DOCTYPE html>
             }, 3000);
         }
 
+        // Radar Map Variables
+        let radarCanvas = null;
+        let radarCtx = null;
+        let radarZoom = 1.0;
+        let radarPanX = 0;
+        let radarPanY = 0;
+        let isRadarDragging = false;
+        let radarDragStartX = 0;
+        let radarDragStartY = 0;
+        let selectedRadarZone = "";
+
+        // Init Radar
+        function initRadar() {
+            radarCanvas = document.getElementById('radar-canvas');
+            if (!radarCanvas) return;
+            radarCtx = radarCanvas.getContext('2d');
+            
+            // Handle resizing
+            const resizeObserver = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    const width = entry.contentRect.width;
+                    const height = entry.contentRect.height;
+                    radarCanvas.width = width * window.devicePixelRatio;
+                    radarCanvas.height = height * window.devicePixelRatio;
+                    drawRadar();
+                }
+            });
+            resizeObserver.observe(radarCanvas.parentElement);
+
+            // Drag to pan
+            radarCanvas.addEventListener('mousedown', (e) => {
+                isRadarDragging = true;
+                const rect = radarCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                radarDragStartX = x - radarPanX;
+                radarDragStartY = y - radarPanY;
+            });
+            window.addEventListener('mouseup', () => {
+                isRadarDragging = false;
+            });
+            radarCanvas.addEventListener('mousemove', (e) => {
+                if (!isRadarDragging) return;
+                const rect = radarCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                radarPanX = x - radarDragStartX;
+                radarPanY = y - radarDragStartY;
+                drawRadar();
+            });
+
+            // Wheel to zoom
+            radarCanvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+                const rect = radarCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                zoomRadar(zoomFactor, x, y);
+            });
+            
+            // Loop for rendering
+            setInterval(drawRadar, 100);
+        }
+
+        function zoomRadar(factor, mouseX, mouseY) {
+            const oldZoom = radarZoom;
+            radarZoom = Math.min(Math.max(radarZoom * factor, 0.05), 50.0);
+            
+            if (mouseX !== undefined && mouseY !== undefined) {
+                // Zoom towards mouse pointer
+                const dZoom = radarZoom - oldZoom;
+                const centerX = radarCanvas.width / (2 * window.devicePixelRatio);
+                const centerY = radarCanvas.height / (2 * window.devicePixelRatio);
+                radarPanX -= (mouseX - centerX) * (dZoom / oldZoom);
+                radarPanY -= (mouseY - centerY) * (dZoom / oldZoom);
+            }
+            drawRadar();
+        }
+
+        function resetRadar() {
+            radarZoom = 1.0;
+            radarPanX = 0;
+            radarPanY = 0;
+            drawRadar();
+        }
+
+        function onRadarZoneChange() {
+            selectedRadarZone = document.getElementById('radar-zone-select').value;
+            drawRadar();
+        }
+
+        function updateRadarZonesDropdown() {
+            const select = document.getElementById('radar-zone-select');
+            if (!select) return;
+            
+            // Get unique zones
+            const zones = new Set();
+            Object.values(players).forEach(p => {
+                if (p.pos && p.pos.zone) {
+                    zones.add(p.pos.zone);
+                }
+            });
+
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">All Zones</option>';
+            zones.forEach(zone => {
+                const opt = document.createElement('option');
+                opt.value = zone;
+                opt.innerText = zone;
+                if (zone === currentVal) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function drawRadar() {
+            if (!radarCanvas || !radarCtx || activeTab !== 'radar') return;
+            
+            const w = radarCanvas.width;
+            const h = radarCanvas.height;
+            const ratio = window.devicePixelRatio;
+            
+            radarCtx.clearRect(0, 0, w, h);
+            
+            const centerX = w / 2;
+            const centerY = h / 2;
+            
+            radarCtx.save();
+            // Scale and Translate context
+            radarCtx.translate(centerX, centerY);
+            radarCtx.scale(ratio, ratio);
+            radarCtx.translate(radarPanX, radarPanY);
+            
+            // Draw grid
+            drawGrid(w / ratio, h / ratio);
+            
+            // Draw players
+            drawPlayerDots();
+            
+            radarCtx.restore();
+
+            // Draw HUD Info (like Scale Legend) outside the panning context
+            drawRadarHUD(w / ratio, h / ratio);
+        }
+
+        function drawGrid(viewWidth, viewHeight) {
+            const step = 200 * radarZoom; // base step size
+            const minX = -viewWidth / 2 - radarPanX;
+            const maxX = viewWidth / 2 - radarPanX;
+            const minY = -viewHeight / 2 - radarPanY;
+            const maxY = viewHeight / 2 - radarPanY;
+            
+            // Grid lines
+            radarCtx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+            radarCtx.lineWidth = 1;
+            
+            const startX = Math.floor(minX / step) * step;
+            for (let x = startX; x <= maxX; x += step) {
+                radarCtx.beginPath();
+                radarCtx.moveTo(x, minY);
+                radarCtx.lineTo(x, maxY);
+                radarCtx.stroke();
+            }
+            
+            const startY = Math.floor(minY / step) * step;
+            for (let y = startY; y <= maxY; y += step) {
+                radarCtx.beginPath();
+                radarCtx.moveTo(minX, y);
+                radarCtx.lineTo(maxX, y);
+                radarCtx.stroke();
+            }
+            
+            // Center Axes
+            radarCtx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            radarCtx.lineWidth = 1.5;
+            
+            radarCtx.beginPath();
+            radarCtx.moveTo(0, minY);
+            radarCtx.lineTo(0, maxY);
+            radarCtx.stroke();
+            
+            radarCtx.beginPath();
+            radarCtx.moveTo(minX, 0);
+            radarCtx.lineTo(maxX, 0);
+            radarCtx.stroke();
+        }
+
+        function drawPlayerDots() {
+            Object.values(players).forEach(p => {
+                if (!p.pos) return;
+                if (selectedRadarZone && p.pos.zone !== selectedRadarZone) return;
+                
+                // Coordinates in Star Citizen (we'll project X and Y)
+                const px = p.pos.x * radarZoom;
+                const py = -p.pos.y * radarZoom; // Invert Y for standard 2D cartesian view in canvas
+                
+                // Draw dot
+                radarCtx.beginPath();
+                radarCtx.arc(px, py, 6, 0, 2 * Math.PI);
+                
+                // Dot color: active channel coloring
+                let color = '#38bdf8'; // light blue default
+                if (p.active_channel) {
+                    color = '#10b981'; // emerald green if on a channel
+                }
+                
+                radarCtx.fillStyle = color;
+                radarCtx.fill();
+                
+                // Subtle white ring
+                radarCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                radarCtx.lineWidth = 1.5;
+                radarCtx.stroke();
+                
+                // Name label
+                radarCtx.fillStyle = '#ffffff';
+                radarCtx.font = '11px sans-serif';
+                radarCtx.textAlign = 'center';
+                radarCtx.fillText(p.name, px, py - 12);
+                
+                // Coordinates/Zone label
+                radarCtx.fillStyle = '#94a3b8';
+                radarCtx.font = '8px sans-serif';
+                radarCtx.fillText(p.pos.x.toFixed(0) + ', ' + p.pos.y.toFixed(0) + ' (' + p.pos.zone + ')', px, py + 16);
+            });
+        }
+
+        function drawRadarHUD(w, h) {
+            // Draw scale indicator in bottom-left corner
+            const scaleLen = 100 * radarZoom; // 100m in pixels
+            const legendX = 20;
+            const legendY = h - 20;
+            
+            radarCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            radarCtx.lineWidth = 2;
+            
+            radarCtx.beginPath();
+            radarCtx.moveTo(legendX, legendY - 5);
+            radarCtx.lineTo(legendX, legendY);
+            radarCtx.lineTo(legendX + 100, legendY);
+            radarCtx.lineTo(legendX + 100, legendY - 5);
+            radarCtx.stroke();
+            
+            radarCtx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            radarCtx.font = '10px sans-serif';
+            radarCtx.textAlign = 'left';
+            const scaleDistance = (100 / radarZoom).toFixed(0);
+            radarCtx.fillText(scaleDistance + 'm', legendX + 5, legendY - 8);
+        }
+
         // Initialize connection
         connectWS();
+        initRadar();
     </script>
 </body>
 </html>`

@@ -22,6 +22,7 @@ public class AppConfig
     public string CustomGameLogPath { get; set; } = "";
 
     // --- OCR ---
+    public bool UseGrtpr { get; set; } = false;
     public int OcrMonitorIndex { get; set; } = 0;
     public Rect OcrRegion { get; set; } = new Rect(0, 0, 900, 200);
     public int OcrIntervalMs { get; set; } = 500;
@@ -50,6 +51,12 @@ public class AppConfig
     // --- Audio Channel ---
     public byte AudioType { get; set; } = 0x00; // 0=Proximity, 1=Radio, 2=Profile
 
-    // --- Spatial Audio ---
+    // --- Spatial & Radio Effects ---
     public bool EnableSpatialAudio { get; set; } = true;
+    public bool EnableRadioDegradation { get; set; } = true;
+    public bool EnablePttChimes { get; set; } = true;
+
+    // --- Borderless Overlay ---
+    public bool EnableOverlay { get; set; } = false;
+    public string OverlayPosition { get; set; } = "TopLeft";
 }

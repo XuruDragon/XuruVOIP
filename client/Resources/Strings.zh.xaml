@@ -62,6 +62,11 @@
     <sys:String x:Key="LblGameLogPath">Star Citizen Game.log 路径 (可选覆盖)</sys:String>
 
     <!-- Settings: OCR -->
+    <sys:String x:Key="LblPosSource">位置追踪源</sys:String>
+    <sys:String x:Key="OptOcr">OCR 屏幕扫描器</sys:String>
+    <sys:String x:Key="OptGrtpr">Game.log 日志读取器 (GRTPR)</sys:String>
+    <sys:String x:Key="LblGrtprActive">Game.log 读取器 (GRTPR) 已激活</sys:String>
+    <sys:String x:Key="LblGrtprDesc">位置坐标将直接从星际公民 (Star Citizen) 的 Game.log 文件中读取。请确保在您的 user.cfg 中设置了 "r_DisplaySessionInfo = 3" (或 1) 以在游戏内启用坐标日志输出。此时 Tesseract OCR 引擎已被完全禁用以节省系统资源。</sys:String>
     <sys:String x:Key="LblMonitor">显示器</sys:String>
     <sys:String x:Key="LblOcrInterval">OCR 扫描间隔 (毫秒)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  定义扫描区域</sys:String>
@@ -97,6 +102,21 @@
     <sys:String x:Key="LblMuteAudioProximity">音频近空静音键</sys:String>
     <sys:String x:Key="LblMuteAudioRadio">音频电台静音键</sys:String>
     <sys:String x:Key="LblMuteAudioProfile">音频群组静音键</sys:String>
+
+    <!-- 设置: 额外音频 -->
+    <sys:String x:Key="LblEnableRadioDegradation">启用基于距离的无线电信号衰减</sys:String>
+    <sys:String x:Key="LblEnablePttChimes">启用无线电麦克风咔哒声和静噪尾音</sys:String>
+
+    <!-- 设置: 覆盖层 -->
+    <sys:String x:Key="TabOverlay">覆盖层</sys:String>
+    <sys:String x:Key="LblEnableOverlay">启用 HUD 覆盖层</sys:String>
+    <sys:String x:Key="LblOverlayPosition">覆盖层显示位置</sys:String>
+    <sys:String x:Key="OptTopLeft">左上</sys:String>
+    <sys:String x:Key="OptTopCenter">中上</sys:String>
+    <sys:String x:Key="OptTopRight">右上</sys:String>
+    <sys:String x:Key="OptBottomLeft">左下</sys:String>
+    <sys:String x:Key="OptBottomCenter">中下</sys:String>
+    <sys:String x:Key="OptBottomRight">右下</sys:String>
 
     <!-- Buttons General -->
     <sys:String x:Key="BtnSaveClose">保存并关闭</sys:String>

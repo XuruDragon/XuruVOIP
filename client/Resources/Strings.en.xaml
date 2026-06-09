@@ -62,6 +62,11 @@
     <sys:String x:Key="LblGameLogPath">Star Citizen Game.log Path (Optional override)</sys:String>
 
     <!-- Settings: OCR -->
+    <sys:String x:Key="LblPosSource">Position Tracking Source</sys:String>
+    <sys:String x:Key="OptOcr">OCR Screen Scanner</sys:String>
+    <sys:String x:Key="OptGrtpr">Game.log Reader (GRTPR)</sys:String>
+    <sys:String x:Key="LblGrtprActive">Game.log Reader (GRTPR) Active</sys:String>
+    <sys:String x:Key="LblGrtprDesc">Positional coordinates will be read directly from Star Citizen's Game.log file. Ensure "r_DisplaySessionInfo = 3" (or 1) is set in your user.cfg to enable coordinate logging in-game. Tesseract OCR is completely disabled to save system resources.</sys:String>
     <sys:String x:Key="LblMonitor">Monitor</sys:String>
     <sys:String x:Key="LblOcrInterval">OCR Interval (ms)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  Define Scan Region</sys:String>
@@ -97,6 +102,21 @@
     <sys:String x:Key="LblMuteAudioProximity">Mute Audio Proximity Key</sys:String>
     <sys:String x:Key="LblMuteAudioRadio">Mute Audio Radio Key</sys:String>
     <sys:String x:Key="LblMuteAudioProfile">Mute Audio Profile Key</sys:String>
+
+    <!-- Settings: Audio Extra -->
+    <sys:String x:Key="LblEnableRadioDegradation">Enable Distance-Based Radio Degradation</sys:String>
+    <sys:String x:Key="LblEnablePttChimes">Enable Radio Mic Clicks &amp; Squelch Tails</sys:String>
+
+    <!-- Settings: Overlay -->
+    <sys:String x:Key="TabOverlay">Overlay</sys:String>
+    <sys:String x:Key="LblEnableOverlay">Enable HUD Overlay</sys:String>
+    <sys:String x:Key="LblOverlayPosition">Overlay Screen Corner</sys:String>
+    <sys:String x:Key="OptTopLeft">Top-Left</sys:String>
+    <sys:String x:Key="OptTopCenter">Top-Center</sys:String>
+    <sys:String x:Key="OptTopRight">Top-Right</sys:String>
+    <sys:String x:Key="OptBottomLeft">Bottom-Left</sys:String>
+    <sys:String x:Key="OptBottomCenter">Bottom-Center</sys:String>
+    <sys:String x:Key="OptBottomRight">Bottom-Right</sys:String>
 
     <!-- Buttons General -->
     <sys:String x:Key="BtnSaveClose">Save &amp; Close</sys:String>

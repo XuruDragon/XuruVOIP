@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using XuruVoipClient.Models;
 
 namespace XuruVoipClient.Services;
 
@@ -84,7 +85,12 @@ public class GameDetectionService : IDisposable
         @"<AttachmentReceived>\s+Player\[(?<player>[^\]]+)\]\s+Attachment\[(?<att>[^\]]+)\]\s+Status\[(?<status>[^\]]+)\]\s+Port\[(?<port>[^\]]+)\]",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+    private static readonly Regex PosRegex = new(
+        @"Zone:\s+(.+?)\s+Pos:\s+([-\d.]+)([a-zA-Z]*)\s+([-\d.]+)([a-zA-Z]*)\s+([-\d.]+)([a-zA-Z]*)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
     public event Action<bool>? HelmetStateChanged; // (helmetOn)
+    public event Action<PlayerPosition>? PositionReceived;
     public event Action<bool>? GameFocusChanged; // (isFocused)
     public event Action<bool>? GameRunningChanged; // (isRunning)
 
@@ -284,6 +290,35 @@ public class GameDetectionService : IDisposable
 
     private void ProcessLogLine(string line)
     {
+        // 1. Check for position log line (GRTPR)
+        var posMatch = PosRegex.Match(line);
+        if (posMatch.Success)
+        {
+            static double ConvertUnit(string val, string unit)
+            {
+                if (!double.TryParse(val, System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out double d)) return 0;
+                return unit.ToLower() switch
+                {
+                    "km" => d * 1000.0,
+                    _ => d,
+                };
+            }
+
+            var pos = new PlayerPosition
+            {
+                Zone = posMatch.Groups[1].Value.Trim(),
+                X = ConvertUnit(posMatch.Groups[2].Value, posMatch.Groups[3].Value),
+                Y = ConvertUnit(posMatch.Groups[4].Value, posMatch.Groups[5].Value),
+                Z = ConvertUnit(posMatch.Groups[6].Value, posMatch.Groups[7].Value),
+                TsCapture = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000.0
+            };
+
+            PositionReceived?.Invoke(pos);
+            return;
+        }
+
+        // 2. Check for helmet attachment log line
         var match = HelmetRegex.Match(line);
         if (!match.Success) return;
 

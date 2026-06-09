@@ -62,6 +62,11 @@
     <sys:String x:Key="LblGameLogPath">Chemin du fichier Game.log de Star Citizen (Optionnel)</sys:String>
 
     <!-- Paramètres : OCR -->
+    <sys:String x:Key="LblPosSource">Source de Suivi de Position</sys:String>
+    <sys:String x:Key="OptOcr">Scanner d'Écran OCR</sys:String>
+    <sys:String x:Key="OptGrtpr">Lecteur Game.log (GRTPR)</sys:String>
+    <sys:String x:Key="LblGrtprActive">Lecteur Game.log (GRTPR) Actif</sys:String>
+    <sys:String x:Key="LblGrtprDesc">Les coordonnées de position seront lues directement dans le fichier Game.log de Star Citizen. Assurez-vous que "r_DisplaySessionInfo = 3" (ou 1) est défini dans votre fichier user.cfg pour activer la journalisation des coordonnées en jeu. L'OCR Tesseract est complètement désactivé pour économiser les ressources système.</sys:String>
     <sys:String x:Key="LblMonitor">Écran</sys:String>
     <sys:String x:Key="LblOcrInterval">Intervalle OCR (ms)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  Définir la zone de scan</sys:String>
@@ -97,6 +102,21 @@
     <sys:String x:Key="LblMuteAudioProximity">Touche Sourdine Proximité</sys:String>
     <sys:String x:Key="LblMuteAudioRadio">Touche Sourdine Radio</sys:String>
     <sys:String x:Key="LblMuteAudioProfile">Touche Sourdine Profil</sys:String>
+
+    <!-- Paramètres : Audio Extra -->
+    <sys:String x:Key="LblEnableRadioDegradation">Activer la dégradation radio basée sur la distance</sys:String>
+    <sys:String x:Key="LblEnablePttChimes">Activer les clics micro radio &amp; queues de squelch</sys:String>
+
+    <!-- Paramètres : Overlay -->
+    <sys:String x:Key="TabOverlay">Overlay</sys:String>
+    <sys:String x:Key="LblEnableOverlay">Activer l'Overlay HUD</sys:String>
+    <sys:String x:Key="LblOverlayPosition">Coin de l'Overlay</sys:String>
+    <sys:String x:Key="OptTopLeft">Haut-Gauche</sys:String>
+    <sys:String x:Key="OptTopCenter">Haut-Milieu</sys:String>
+    <sys:String x:Key="OptTopRight">Haut-Droite</sys:String>
+    <sys:String x:Key="OptBottomLeft">Bas-Gauche</sys:String>
+    <sys:String x:Key="OptBottomCenter">Bas-Milieu</sys:String>
+    <sys:String x:Key="OptBottomRight">Bas-Droite</sys:String>
 
     <!-- Boutons Généraux -->
     <sys:String x:Key="BtnSaveClose">Sauvegarder &amp; Fermer</sys:String>
