@@ -154,6 +154,20 @@ graph TD
 * **Integración Transparente Win32**: Utilizando estilos de ventana Win32 (`WS_EX_TRANSPARENT` y `WS_EX_NOACTIVATE`), la superposición no captura el enfoque y permite que los clics del mouse pasen directamente al juego.
 * **Renderizado Independiente de la API**: Debido a que las ventanas transparentes de WPF dependen del compositor DWM (Desktop Window Manager) de Windows, el overlay no se inyecta en el pipeline gráfico del juego. Esto garantiza compatibilidad absoluta con **Vulkan** y **DirectX**, siempre que el juego se ejecute en modo **"Ventana sin Bordes"** (Borderless Windowed).
 
+### 7. Acústica Ambiental (Oclusión y Reverberación)
+* **Filtro de oclusión:** Si el emisor y el receptor están en diferentes zonas o compartimentos, el cliente aplica automáticamente un filtro de paso bajo (frecuencia de corte de 600 Hz, volumen al 65%) para simular la obstrucción física. La frecuencia de corte realiza una transición suave para evitar chasquidos.
+* **Reverberación inteligente:** Si el receptor se encuentra en un entorno específico (cuevas, búnkeres o hangares), un filtro de peine de línea de retardo con retroalimentación aplica parámetros de reverberación específicos:
+  * *Cuevas / Túneles:* 45% wet, 100 ms de retardo, 0.6 de retroalimentación.
+  * *Búnkeres / Estaciones:* 25% wet, 50 ms de retardo, 0.4 de retroalimentación.
+  * *Hangares:* 35% wet, 150 ms de retardo, 0.5 de retroalimentación.
+
+### 8. Discord Rich Presence sin Dependencias (RPC)
+* **Conexión por tubería con nombre:** El cliente se conecta directamente a Discord a través de tuberías con nombre de Windows (`\\.\pipe\discord-ipc-0`) sin requerir bibliotecas NuGet externas pesadas.
+* **Actualización dinámica de actividad:** Actualiza tu presencia en Discord en tiempo real con:
+  * **Detalles:** Zona de ubicación actual en el juego (ej. `"En una cueva en MicroTech"`).
+  * **Estado:** Canal activo y estado del casco (ej. `"En radio: Canal Bravo (Casco equipado)"` o `"En proximidad"`).
+  * **Tiempo transcurrido:** Muestra el tiempo transcurrido desde que se conectó al servidor VoIP.
+
 ---
 
 ## 🖥️ Servidor XuruVoip (Go)
@@ -168,7 +182,7 @@ El servidor gestiona la posición de los jugadores, la autenticación y enruta p
 * **Persistencia SQLite**: Guarda los canales y perfiles de los jugadores permanentemente.
 * **Seguridad Avanzada**: Bloquea y banea usuarios por Username, IP y huella de hardware (HWID/MachineGuid).
 * **Portal de Administración Web**: Interfaz web segura bajo HTTPS/WebSockets para monitoreo en tiempo real y administración.
-* **Mapa de Radar para Administradores**: Un mapa de radar 2D Canvas HTML5 integrado en el panel de control web, con soporte para arrastrar, zoom con rueda del mouse y filtros de zona.
+* **Mapa de Radar para Administradores**: Un mapa de radar 2D Canvas HTML5 integrado en el panel de control web, con soporte para arrastrar, zoom con rueda del mouse, filtros de zona, trazado de rutas históricas (breadcrumbs) y anillos concéntricos de ondas sonoras pulsantes alrededor de los jugadores activos.
 
 ### Configuración del Servidor (`.env`)
 En su primera ejecución, el servidor autogenera un archivo `.env`:

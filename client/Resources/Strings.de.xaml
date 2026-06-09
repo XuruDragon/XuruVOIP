@@ -106,6 +106,7 @@
     <!-- Einstellungen: Audio Extra -->
     <sys:String x:Key="LblEnableRadioDegradation">Entfernungsbasierte Funkverschlechterung aktivieren</sys:String>
     <sys:String x:Key="LblEnablePttChimes">Funkmikrofon-Klicks &amp; Rauschsperren-Ende aktivieren</sys:String>
+    <sys:String x:Key="LblEnableEnvironmentalAcoustics">Umgebungsakustik aktivieren (Okklusion &amp; Nachhall)</sys:String>
 
     <!-- Einstellungen: Overlay -->
     <sys:String x:Key="TabOverlay">Overlay</sys:String>

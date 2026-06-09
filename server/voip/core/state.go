@@ -28,6 +28,8 @@ type ActivePlayer struct {
 	TicketExpires     time.Time
 	IP                string
 	Hwid              string
+	IsTalking         bool
+	LastTalkTime      time.Time
 }
 
 // SafeWritePosJSON writes a JSON message to PosConn in a thread-safe manner
@@ -469,6 +471,7 @@ func (h *Hub) GetPlayerStateList(excludeName string) []PlayerState {
 			Profile:           p.Profile,
 			ProxShort:         p.ProxShort,
 			ScOnline:          p.ScOnline,
+			IsTalking:         p.IsTalking,
 		})
 	}
 	return states
@@ -490,6 +493,7 @@ func (h *Hub) GetAllPlayerStates() []PlayerState {
 			Profile:           p.Profile,
 			ProxShort:         p.ProxShort,
 			ScOnline:          p.ScOnline,
+			IsTalking:         p.IsTalking,
 		})
 	}
 	return states

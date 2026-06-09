@@ -47,6 +47,7 @@ public class AudioPlaybackService : IDisposable
     public bool EnableSpatialAudio { get; set; } = true;
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
+    public bool EnableEnvironmentalAcoustics { get; set; } = true;
 
     public double ListenerX { get; set; }
     public double ListenerY { get; set; }
@@ -179,7 +180,7 @@ public class AudioPlaybackService : IDisposable
     }
 
     /// <summary>Called from AudioWebSocketService when a binary packet arrives.</summary>
-    public void ReceiveOpusFrame(string playerName, byte[] opusData, byte audioType, bool applyRadioEffect, ProximityMetadata? metadata, double distance = -1.0)
+    public void ReceiveOpusFrame(string playerName, byte[] opusData, byte audioType, bool applyRadioEffect, ProximityMetadata? metadata, double distance = -1.0, string speakerZone = "", string listenerZone = "")
     {
         if (_mixer == null) return;
 
@@ -268,6 +269,13 @@ public class AudioPlaybackService : IDisposable
             floatBuf[i] = pcm[i] / 32768f;
         }
 
+        // Apply Environmental Acoustics (Occlusion & Reverb) if enabled
+        if (EnableEnvironmentalAcoustics)
+        {
+            track.AcousticFilter.UpdateZoneInfo(speakerZone, listenerZone);
+            track.AcousticFilter.Process(floatBuf, decoded);
+        }
+ 
         // Apply Radio DSP Effect if helmet or channel dictates it
         if (applyRadioEffect)
         {
@@ -387,6 +395,7 @@ public class AudioPlaybackService : IDisposable
         public VolumeSampleProvider Volume { get; } = volume;
         public float VolumeLinear { get; set; } = 1.0f;
         public RadioDspFilter DspFilter { get; } = new();
+        public EnvironmentalAcousticFilter AcousticFilter { get; } = new();
         public bool IsTransmitting { get; set; } = false;
         public DateTime LastReceivedTime { get; set; } = DateTime.MinValue;
     }

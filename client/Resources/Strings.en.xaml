@@ -106,6 +106,7 @@
     <!-- Settings: Audio Extra -->
     <sys:String x:Key="LblEnableRadioDegradation">Enable Distance-Based Radio Degradation</sys:String>
     <sys:String x:Key="LblEnablePttChimes">Enable Radio Mic Clicks &amp; Squelch Tails</sys:String>
+    <sys:String x:Key="LblEnableEnvironmentalAcoustics">Enable Environmental Acoustics (Occlusion &amp; Reverb)</sys:String>
 
     <!-- Settings: Overlay -->
     <sys:String x:Key="TabOverlay">Overlay</sys:String>
