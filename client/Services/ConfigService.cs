@@ -11,7 +11,7 @@ public class ConfigService
     private static readonly string ConfigDir =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "XuruVoip");
 
-    private static readonly string ConfigPath = Path.Combine(ConfigDir, "config.json");
+    internal static string ConfigPath = Path.Combine(ConfigDir, "config.json");
 
     private static readonly JsonSerializerOptions JsonOpts = new()
     {

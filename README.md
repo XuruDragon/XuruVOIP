@@ -87,12 +87,17 @@ graph TD
     subgraph Positioning & Helmet Scanning
         SC[Star Citizen Process] -->|r_DisplaySessionInfo| Screen[Screen Capture]
         Screen -->|Preprocessing| Tess[Tesseract OCR Engine]
-        Tess -->|Multi-line Parsing| Zone[Hierarchical Zone Filter]
+        
+        SC -->|Real-time Log| GameLog[Game.log File]
+        GameLog -->|Tail Scanner| LogParser[Log Service Parser]
+        
+        Tess -->|Parsed Coordinates| PosSelector{Position Source Toggle}
+        LogParser -->|Parsed Coordinates| PosSelector
+        
+        PosSelector -->|Selected Coordinates| Zone[Hierarchical Zone Filter]
         Zone -->|Listener Coordinates & Zone| PosWS[Position WebSocket client]
         PosWS -->|WebSocket Port 8888| Server
 
-        SC -->|Real-time Log| GameLog[Game.log File]
-        GameLog -->|Tail Scanner| LogParser[Log Service Parser]
         LogParser -->|Equip/Unequip events| Helmet[Helmet Mode Sync]
         Helmet -->|Helmet status packet| PosWS
     end
@@ -100,15 +105,16 @@ graph TD
     subgraph Playback & Spatial Mixing
         Server -->|Target Proximity Audio + Metadata| AudioWS
         AudioWS -->|Opus Frame + ProximityMetadata| Decoder[Opus Decoder]
-        Decoder -->|Mono Float PCM| DSP[Radio DSP Filter]
+        Decoder -->|Mono Float PCM| DSP[Radio DSP Filter & Degradation]
         DSP -->|Mono| Panner[PanningSampleProvider]
         Panner -->|Stereo| Volume[VolumeSampleProvider]
         
         LogParser -.->|local Helmet status| DSP
-        Zone -.->|Listener position & heading| MixerMath[Spatial Panning Math]
+        Zone -.->|Listener position & heading| MixerMath[Spatial Panning & Degradation Math]
         
         MixerMath -->|Pan parameter| Panner
         MixerMath -->|Distance & Behind Attenuation| Volume
+        MixerMath -->|Degradation Factor| DSP
         
         Volume -->|Left/Right Stereo| Mixer[MixingSampleProvider]
         Mixer -->|Play back| Speakers[Audio Output Device]
@@ -121,8 +127,10 @@ graph TD
 * **Compression:** Active speech buffers are encoded into highly compressed **Opus** frames (using the **Concentus** C# wrapper) and transmitted immediately as binary WebSocket frames to the Go Audio Server.
 
 ### 2. Location Tracking and Heading Estimation
-* **Screen Capturing & OCR:** The client periodically takes a screenshot of the configured screen region (where `/showlocations` or `r_DisplaySessionInfo` renders coordinate text). The cropped image is resized and contrast-stretched to improve readability, then processed by the **Tesseract OCR** engine.
-* **Hierarchical Zone Filtering:** The OCR text contains multiple hierarchical lines of player positions (e.g. planetary coordinates, ship compartments, elevators). The client parses these lines and dynamically filters out sub-zones (like `elevator`, `transit`, `seat`) and system-wide zones (like `solarsystem`, `Stanton`). This ensures players inside a ship compartment can hear players in the adjacent corridor without audio cutting off due to minor sub-zone differences.
+* **Position Source Toggle:** Players can choose between two positioning methodologies in the client settings:
+  * **OCR Screen Scanner:** Periodically takes a screenshot of the configured screen region (where `/showlocations` or `r_DisplaySessionInfo` renders coordinate text), preprocesses the image, and feeds it to the **Tesseract OCR** engine.
+  * **Game.log Reader (GRTPR):** Tail-scans the Star Citizen `Game.log` file directly for coordinates logged by the game. To enable this, players must add `r_DisplaySessionInfo = 3` (or `1`) to their `user.cfg` file. Selecting GRTPR completely shuts down and disposes the Tesseract OCR engine, saving substantial CPU and RAM resources on the host machine.
+* **Hierarchical Zone Filtering:** The parsed position text contains multiple hierarchical lines of player coordinates (e.g. planetary coordinates, ship compartments, elevators). The client parses these lines and dynamically filters out sub-zones (like `elevator`, `transit`, `seat`) and system-wide zones (like `solarsystem`, `Stanton`). This ensures players inside a ship compartment can hear players in the adjacent corridor without audio cutting off due to minor sub-zone differences.
 * **Heading Estimation:** Since Star Citizen does not output player orientation, the client tracks coordinate displacement ($Position_{current} - Position_{previous}$). If the player moves more than 0.5 meters, the client calculates the movement direction vector as the estimated look heading. When the player is stationary, the last calculated heading is preserved.
 
 ### 3. Real-time Helmet Detection (Log Tail-Scanning)
@@ -136,7 +144,10 @@ graph TD
   * **Stereo Panning:** The projection on the Right vector controls the left/right speaker balance (from `-1.0` full left to `+1.0` full right) using NAudio's constant-power `PanningSampleProvider`.
   * **Front-Back Ambiguity Resolution:** If the Forward projection is negative (the speaker is behind the listener), a psychoacoustic volume attenuation (up to 25% drop) is applied.
   * **Distance Attenuation:** Audio volume fades out linearly based on the speaker's distance, reaching zero at the proximity range (50m default, or 5m whisper).
-* **Audio Playback**: The Opus frames are decoded, passed through a **Radio DSP filter** (if either speaker or listener has their helmet on, or on radio channels), panned, volume-attenuated, and mixed into a stereo stream using NAudio's `MixingSampleProvider` for final playback.
+* **Audio Playback**: The Opus frames are decoded, panned, volume-attenuated, and mixed into a stereo stream.
+* **Radio DSP & Degradation**: Audio is processed through a **Radio DSP filter** (if either speaker or listener has their helmet on, or on radio channels).
+  * **Dynamic Radio Degradation:** If enabled, the DSP filter dynamically narrows the high/low bandpass cutoff frequencies and mixes in bandpass-filtered white noise as the distance between players approaches the maximum communication range, simulating low-fi radio signal degradation.
+  * **Authentic PTT & Radio Chimes:** When keying or unkeying the transmitter, NAudio synthesizes radio effects. Starting a transmission plays a 50ms pitch-sweeping **Mic Key Chirp** (900Hz to 700Hz). Ending a transmission triggers a 180ms bandpass-filtered static noise **Squelch Tail** when the playback service receives a final 0-byte Opus frame. An option for local PTT chime feedback allows players to hear their own transmitter chimes.
 
 ### 5. Dynamic Mic States & Muting Controls
 * **Dynamic Microphone Display:** The main window's microphone status label dynamically updates in real-time to show the exact state of your transmitter:
@@ -149,6 +160,11 @@ graph TD
 * **Separated Microphone & Audio Mute Hotkeys:**
   * **Microphone Mute (Outgoing):** Toggles microphone transmission muting for each channel. Defaults: Proximity (`M`), Radio (`,`), Profile (`.`). When muted, PTT presses and VAD speech will not transmit audio to the server, and the main window LED remains orange.
   * **Audio Mute (Incoming):** Toggles playback muting for other players' voice on each channel. Defaults are unassigned (`None`) and can be fully customized in the settings window.
+
+### 6. Vulkan-Compatible Borderless HUD Overlay
+* **HUD Overlay Window**: The client provides an optional, lightweight WPF overlay window that renders topmost. It displays client VoIP status, current communication frequency, and an active speaker list with visual radio signal indicators.
+* **Win32 Click-Through Integration**: By using Win32 API window styles (`WS_EX_TRANSPARENT` and `WS_EX_NOACTIVATE`), the overlay does not steal focus and allows mouse clicks to pass directly through to the game.
+* **API Agnostic Rendering**: Since standard transparent WPF windows rely on Windows Desktop Window Manager (DWM) composition, the overlay does not hook the graphics pipeline. This guarantees full rendering compatibility with both **Vulkan** and **DirectX**, provided the game is run in **"Borderless Windowed"** mode.
 
 ---
 
@@ -165,6 +181,7 @@ The server coordinates player positions, handles secure authentication, and dyna
 * **SQLite Persistence**: Stores player channel preferences and profile mappings across server restarts.
 * **Anti-Bypass Security**: Bans troublemakers by Username, IP, and hardware fingerprint (HWID/MachineGuid) to prevent ban-dodging.
 * **Web Administration Portal**: Secure web interface (HTTPS/WebSockets) for real-time dashboards, log streaming, channel/profile configuration, and ban management.
+* **Server Admin Radar Map**: 2D HTML5 Canvas real-time player radar integrated into the admin dashboard, supporting click-and-drag panning, mouse-wheel zoom, and active zone filtering.
 
 ### Server Configuration (`.env`)
 
@@ -378,12 +395,13 @@ Start-Service -Name XuruVoipServer
 
 ## 🎮 XuruVoip Client Settings Tab Breakdown
 
-The settings window is divided into five specialized tabs:
+The settings window is divided into six specialized tabs:
 1. **General**: Select client language, configure the custom Star Citizen `Game.log` file path, and toggle general log file writing.
 2. **Connection**: Configure the Server IP address, Position & Audio ports, Username, User Password, and Server Token/Password.
-3. **OCR**: Configure monitor selection, scan interval (ms), scan bounding box region, and preview last captured OCR output.
-4. **Audio**: Choose input/output devices, adjust gains, select transmission mode (PTT / VAD), configure VAD threshold, and toggle **Enable 3D Spatial Audio** (only interactable if supported by the server).
+3. **Position**: Toggle the coordinates source ("OCR Screen Scanner" vs "Game.log Reader (GRTPR)"), select monitor, scan interval (ms), crop region bounding box, and preview real-time OCR results (OCR settings are hidden when GRTPR is active).
+4. **Audio**: Choose input/output devices, adjust gains, select transmission mode (PTT / VAD), configure VAD threshold, toggle **Enable 3D Spatial Audio**, and configure advanced options like distance-based radio degradation and synthesized PTT mic chimes.
 5. **Hotkeys**: Record keys for Proximity PTT, Radio PTT, Profile PTT, Helmet toggle, Radio channel cycle, muting outgoing microphone channels, and muting incoming audio channels.
+6. **Overlay**: Toggle the borderless HUD overlay window and configure the screen corner placement (e.g., Top-Left, Top-Right).
 
 ### Building & Running the Client
 

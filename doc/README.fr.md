@@ -89,31 +89,37 @@ graph TD
     subgraph Positionnement & Détection de Casque
         SC[Processus Star Citizen] -->|r_DisplaySessionInfo| Screen[Capture d'Écran]
         Screen -->|Prétraitement| Tess[Moteur OCR Tesseract]
-        Tess -->|Analyse Multi-ligne| Zone[Filtre de Zone Hiérarchique]
+        
+        SC -->|Journal en Temps Réel| GameLog[Fichier Game.log]
+        GameLog -->|Lecteur en Continu| LogParser[Analyseur de Service Log]
+        
+        Tess -->|Coordonnées| PosSelector{Sélecteur de Source}
+        LogParser -->|Coordonnées| PosSelector
+        
+        PosSelector -->|Coordonnées sélectionnées| Zone[Filtre de Zone Hiérarchique]
         Zone -->|Coordonnées & Zone de l'auditeur| PosWS[Client WebSocket Position]
         PosWS -->|Port WebSocket 8888| Server
 
-        SC -->|Journal en Temps Réel| GameLog[Fichier Game.log]
-        GameLog -->|Lecteur en Continu| LogParser[Analyseur de Service Log]
         LogParser -->|Événements Équiper/Retirer| Helmet[Synchro Mode Casque]
         Helmet -->|Paquet d'état du Casque| PosWS
     end
 
-    subgraph Lecture & Mixage Spatial
-        Server -->|Audio Proximité Cible + Métadonnées| AudioWS
-        AudioWS -->|Frame Opus + Métadonnées Proximité| Decoder[Décodeur Opus]
-        Decoder -->|PCM Mono Float| DSP[Filtre DSP Radio]
+    subgraph Mixage Spatial Stéréo 3D & DSP
+        Server -->|Target Proximity Audio + Metadata| AudioWS
+        AudioWS -->|Opus Frame + ProximityMetadata| Decoder[Opus Decoder]
+        Decoder -->|Mono Float PCM| DSP[Radio DSP Filter & Dégradation]
         DSP -->|Mono| Panner[PanningSampleProvider]
-        Panner -->|Stéréo| Volume[VolumeSampleProvider]
+        Panner -->|Stereo| Volume[VolumeSampleProvider]
         
-        LogParser -.->|état local Casque| DSP
-        Zone -.->|Position & Orientation auditeur| MixerMath[Calculs de Spatialisation]
+        LogParser -.->|local Helmet status| DSP
+        Zone -.->|Listener position & heading| MixerMath[Spatial Panning & Degradation Math]
         
-        MixerMath -->|Paramètre Balance| Panner
-        MixerMath -->|Atténuation Distance & Arrière| Volume
+        MixerMath -->|Pan parameter| Panner
+        MixerMath -->|Distance & Behind Attenuation| Volume
+        MixerMath -->|Facteur de dégradation| DSP
         
-        Volume -->|Stéréo Gauche/Droite| Mixer[MixingSampleProvider]
-        Mixer -->|Lecture| Speakers[Périphérique de Sortie Audio]
+        Volume -->|Left/Right Stereo| Mixer[MixingSampleProvider]
+        Mixer -->|Play back| Speakers[Audio Output Device]
     end
 ```
 
@@ -123,7 +129,9 @@ graph TD
 * **Compression :** Les voix actives sont encodées en paquets **Opus** compressés (via le wrapper C# **Concentus**) et transmises directement via WebSocket au serveur audio.
 
 ### 2. Suivi de Localisation et Orientation
-* **Capture d'Écran & OCR :** Le client capture périodiquement la zone de l'écran affichant les coordonnées de session (`/showlocations` ou `r_DisplaySessionInfo`). L'image est prétraitée puis lue par le moteur **Tesseract OCR**.
+* **Sélecteur de Source de Position :** Les joueurs peuvent choisir entre deux méthodes de positionnement dans les paramètres :
+  * **Scanner d'Écran OCR :** Capture régulièrement la zone configurée de l'écran (affichant les coordonnées de session `/showlocations` ou `r_DisplaySessionInfo`), prétraite l'image et la transmet au moteur **Tesseract OCR**.
+  * **Lecteur Game.log (GRTPR) :** Analyse en continu le fichier `Game.log` de Star Citizen pour y lire les coordonnées. Pour activer cette méthode, les joueurs doivent ajouter `r_DisplaySessionInfo = 3` (ou `1`) à leur fichier `user.cfg`. Choisir GRTPR désactive et libère complètement le moteur Tesseract OCR, économisant les ressources CPU et RAM de la machine hôte.
 * **Filtrage de Zone Hiérarchique :** Les lignes de coordonnées contiennent des zones (compartiments de vaisseaux, ascenseurs, planètes). Le client filtre dynamiquement les sous-zones (comme `elevator`, `transit`, `seat`) et les zones globales (`solarsystem`, `Stanton`) pour éviter les coupures de voix intempestives entre joueurs proches.
 * **Estimation de l'Orientation :** Comme Star Citizen ne fournit pas l'orientation, le client calcule le vecteur de déplacement. Si le joueur bouge de plus de 0,5 mètre, l'orientation estimée est mise à jour.
 
@@ -137,7 +145,14 @@ graph TD
   * **Balance Stéréo (Pan) :** Gérée de `-1.0` (gauche) à `+1.0` (droite).
   * **Atténuation Arrière :** Une baisse de volume allant jusqu'à 25% est appliquée si l'émetteur est derrière pour résoudre l'ambiguïté avant-arrière.
   * **Atténuation de Distance :** Le volume s'atténue linéairement jusqu'à atteindre zéro à la portée maximale.
-* **Lecture :** Les frames Opus décodées passent par un **filtre DSP Radio** (si l'un des joueurs porte un casque ou si le canal actif est une radio), sont spatialisées, ajustées en volume et mixées via le `MixingSampleProvider` de NAudio.
+* **Lecture & DSP Radio :** Les frames Opus décodées passent par un **filtre DSP Radio** (si l'un des joueurs porte un casque ou si le canal actif est une radio), sont spatialisées, ajustées en volume et mixées via le `MixingSampleProvider` de NAudio.
+  * **Dégradation Radio Dynamique :** Si elle est activée, le filtre DSP rétrécit dynamiquement les fréquences de coupure passe-haut et passe-bas et mélange du bruit blanc filtré lorsque la distance entre les joueurs approche de la portée maximale, simulant la perte de signal radio.
+  * **Bruits de Micro PTT Réalistes :** NAudio synthétise des bruits de micro lors de l'activation/désactivation de la transmission. L'activation joue un chirp de 50 ms (balayage de fréquence 900 Hz à 700 Hz). La désactivation déclenche un bruit de squelch (bruit blanc filtré de 180 ms) lors de la réception d'une frame Opus vide de 0 octet. Une option de retour local permet d'entendre ses propres bruitages.
+
+### 6. Incrustation HUD (Overlay) Compatible Vulkan et DirectX
+* **Fenêtre d'Incrustation HUD** : Le client fournit un overlay WPF optionnel et léger qui s'affiche au premier plan. Il indique le statut de la VoIP, la fréquence active et la liste des interlocuteurs qui parlent avec des indicateurs de signal radio.
+* **Intégration Transparente Win32** : Grâce aux styles de fenêtre Win32 (`WS_EX_TRANSPARENT` et `WS_EX_NOACTIVATE`), l'incrustation ne vole pas le focus et laisse passer tous les clics de souris vers le jeu.
+* **Rendu Indépendant de l'API** : Étant donné que les fenêtres transparentes WPF s'appuient sur la composition du Desktop Window Manager (DWM) de Windows, l'overlay ne s'injecte pas dans le pipeline graphique du jeu. Cela garantit une compatibilité totale avec **Vulkan** comme **DirectX**, à condition de lancer le jeu en mode **"Fenêtré Sans Bordure"** (Borderless Windowed).
 
 ---
 
@@ -153,6 +168,7 @@ Le serveur gère la position des joueurs, l'authentification et route dynamiquem
 * **Persistance SQLite** : Conserve la configuration des canaux et des profils des joueurs.
 * **Sécurité Anti-Contournement** : Bannissement par nom d'utilisateur, adresse IP et empreinte matérielle (HWID/MachineGuid).
 * **Portail Web d'Administration** : Interface sécurisée en HTTPS/WebSockets avec journalisation en temps réel et gestion des bannissements.
+* **Carte Radar d'Administration** : Une carte radar 2D Canvas HTML5 en temps réel intégrée au tableau de bord pour suivre les positions des joueurs, avec défilement par clic-glissé, zoom à la molette et filtrage par zone.
 
 ### Configuration du Serveur (`.env`)
 Au premier démarrage, le serveur génère un fichier `.env` avec ces valeurs :
@@ -321,12 +337,13 @@ Start-Service -Name XuruVoipServer
 
 ## 🎮 Détail des paramètres du Client
 
-La fenêtre des paramètres comporte cinq onglets :
+La fenêtre des paramètres comporte six onglets :
 1. **Général** : Choix de la langue, chemin du fichier `Game.log` et activation de la journalisation locale.
 2. **Connexion** : Adresse IP du serveur, ports audio et position, nom d'utilisateur, mot de passe de compte et mot de passe serveur.
-3. **OCR** : Sélection du moniteur, intervalle de capture (ms), définition de la région de scan et prévisualisation du texte capturé.
-4. **Audio** : Sélection des périphériques, réglage des gains de volume, mode de transmission (PTT / VAD), réglage du seuil de détection et activation de l'audio spatial 3D.
+3. **Position** : Choix de la source de position ("Scanner d'Écran OCR" vs "Lecteur Game.log (GRTPR)"), sélection du moniteur, intervalle de capture (ms), définition de la région de scan et prévisualisation du texte capturé (les options OCR sont masquées si GRTPR est actif).
+4. **Audio** : Sélection des périphériques, réglage des gains de volume, mode de transmission (PTT / VAD), réglage du seuil de détection, activation de l'audio spatial 3D, ainsi que les options avancées de dégradation radio et de bruitages micro PTT.
 5. **Raccourcis** : Enregistrement des touches de raccourci clavier pour le PTT, le casque, le changement de canal et les fonctions de coupure audio (muet).
+6. **Incrustation (Overlay)** : Activation de l'overlay HUD transparent et configuration de son emplacement à l'écran (ex. En haut à gauche, En haut à droite).
 
 ### Compilation & Lancement du Client
 
