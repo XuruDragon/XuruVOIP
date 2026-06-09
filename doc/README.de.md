@@ -34,6 +34,9 @@ XuruVoip ist eine hochleistungsfähige, sichere und dynamisch spatialisierte **3
 
 ## 📸 Screenshots & Benutzeroberfläche
 
+<details>
+<summary>📸 Klicken, um Screenshots anzuzeigen</summary>
+
 ### 1. Client-Hauptfenster
 ![Client-Hauptfenster](/screenshots/main.png)
 
@@ -49,20 +52,25 @@ XuruVoip ist eine hochleistungsfähige, sichere und dynamisch spatialisierte **3
 ### 5. Hotkeys-Einstellungen
 ![Hotkeys-Einstellungen](/screenshots/hotkeys.png)
 
-### 6. Admin-Webportal Login-Seite
+### 6. Overlay-Einstellungen (Vulkan & DirectX HUD)
+![Overlay-Einstellungen](/screenshots/overlay.png)
+
+### 7. Admin-Webportal Login-Seite
 ![Admin-Webportal Login-Seite](/screenshots/admin_login.png)
 
-### 7. Admin-Webportal Dashboard
+### 8. Admin-Webportal Dashboard
 ![Admin-Webportal Dashboard](/screenshots/admin_dashboard.png)
 
-### 8. Admin-Webportal Spielerliste
+### 9. Admin-Webportal Spielerliste
 ![Admin-Webportal Spielerliste](/screenshots/admin_players_list.png)
 
-### 9. Admin-Webportal Administrator-Liste
+### 10. Admin-Webportal Administrator-Liste
 ![Admin-Webportal Administrator-Liste](/screenshots/admin_admin_list.png)
 
-### 10. Admin-Webportal Sperrliste
+### 11. Admin-Webportal Sperrliste
 ![Admin-Webportal Sperrliste](/screenshots/admin_ban_list.png)
+
+</details>
 
 ---
 

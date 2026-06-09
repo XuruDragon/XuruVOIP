@@ -22,9 +22,32 @@ public class DiscordRpcService : IDisposable
     private readonly object _lock = new();
     private bool _isConnected;
     private long _startTimestamp;
+    private bool _enabled = true;
     
     private string? _currentState;
     private string? _currentDetails;
+
+    public bool Enabled
+    {
+        get
+        {
+            lock (_lock) return _enabled;
+        }
+        set
+        {
+            lock (_lock)
+            {
+                if (_enabled == value) return;
+                _enabled = value;
+                if (!_enabled)
+                {
+                    _isConnected = false;
+                    _pipeStream?.Dispose();
+                    _pipeStream = null;
+                }
+            }
+        }
+    }
 
     public void Start()
     {
@@ -38,6 +61,7 @@ public class DiscordRpcService : IDisposable
         {
             _currentDetails = details;
             _currentState = state;
+            if (!_enabled) return;
         }
         
         if (_isConnected)
@@ -52,22 +76,40 @@ public class DiscordRpcService : IDisposable
         {
             try
             {
-                if (_pipeStream == null || !_pipeStream.IsConnected)
+                bool isEnabled;
+                lock (_lock)
                 {
-                    _isConnected = false;
-                    _pipeStream?.Dispose();
-                    
-                    _pipeStream = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
-                    await _pipeStream.ConnectAsync(2000, _cts.Token);
-                    
-                    if (SendHandshake())
+                    isEnabled = _enabled;
+                }
+
+                if (isEnabled)
+                {
+                    if (_pipeStream == null || !_pipeStream.IsConnected)
                     {
-                        byte[] response = await ReadFrameAsync(_cts.Token);
-                        if (response.Length > 0)
+                        _isConnected = false;
+                        _pipeStream?.Dispose();
+                        
+                        _pipeStream = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+                        await _pipeStream.ConnectAsync(2000, _cts.Token);
+                        
+                        if (SendHandshake())
                         {
-                            _isConnected = true;
-                            SendPresence();
+                            byte[] response = await ReadFrameAsync(_cts.Token);
+                            if (response.Length > 0)
+                            {
+                                _isConnected = true;
+                                SendPresence();
+                            }
                         }
+                    }
+                }
+                else
+                {
+                    if (_pipeStream != null)
+                    {
+                        _isConnected = false;
+                        _pipeStream.Dispose();
+                        _pipeStream = null;
                     }
                 }
 
