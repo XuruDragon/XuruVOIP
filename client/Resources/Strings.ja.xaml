@@ -106,6 +106,7 @@
     <!-- 設定: オーディオ追加 -->
     <sys:String x:Key="LblEnableRadioDegradation">距離に基づく無線音声劣化を有効化</sys:String>
     <sys:String x:Key="LblEnablePttChimes">無線マイクのクリック音とスケルチテールを有効化</sys:String>
+    <sys:String x:Key="LblEnableEnvironmentalAcoustics">環境音響を有効にする (遮蔽 &amp; 残響)</sys:String>
 
     <!-- 設定: オーバーレイ -->
     <sys:String x:Key="TabOverlay">オーバーレイ</sys:String>

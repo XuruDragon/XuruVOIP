@@ -166,6 +166,20 @@ graph TD
 * **Win32 Click-Through Integration**: By using Win32 API window styles (`WS_EX_TRANSPARENT` and `WS_EX_NOACTIVATE`), the overlay does not steal focus and allows mouse clicks to pass directly through to the game.
 * **API Agnostic Rendering**: Since standard transparent WPF windows rely on Windows Desktop Window Manager (DWM) composition, the overlay does not hook the graphics pipeline. This guarantees full rendering compatibility with both **Vulkan** and **DirectX**, provided the game is run in **"Borderless Windowed"** mode.
 
+### 7. Environmental Acoustics (Occlusion & Reverb)
+* **Occlusion Filter:** If the speaker and listener are in different zones or compartments, the client automatically applies a low-pass filter (cutoff 600Hz, volume 65%) to simulate physical obstruction/occlusion. The cutoff frequency transitions smoothly to prevent clicks.
+* **Location-Aware Reverb:** If the listener is located in a specific environment (Caves, Bunkers, or Hangars), a feedback delay-line comb filter applies environment-specific wet mix, delay, and feedback parameters:
+  * *Caves / Tunnels:* 45% wet, 100ms delay, 0.6 feedback.
+  * *Bunkers / Stations:* 25% wet, 50ms delay, 0.4 feedback.
+  * *Hangars:* 35% wet, 150ms delay, 0.5 feedback.
+
+### 8. Zero-Dependency Discord Rich Presence (RPC)
+* **Named Pipe Connection:** The client integrates with Discord via local Windows named pipes (`\\.\pipe\discord-ipc-0`) without requiring heavy external dependencies.
+* **Dynamic Activity Updates:** Instantly updates your Discord presence with:
+  * **Details:** Current in-game location zone (e.g. `"At MicroTech Cave"`).
+  * **State:** Connected channel and state (e.g. `"On Radio: Bravo Channel (Helmet On)"` or `"In Proximity"`).
+  * **Time Elapsed:** Displays elapsed time since the server connection was established.
+
 ---
 
 ## 🖥️ XuruVoip Server (Go)
@@ -181,7 +195,7 @@ The server coordinates player positions, handles secure authentication, and dyna
 * **SQLite Persistence**: Stores player channel preferences and profile mappings across server restarts.
 * **Anti-Bypass Security**: Bans troublemakers by Username, IP, and hardware fingerprint (HWID/MachineGuid) to prevent ban-dodging.
 * **Web Administration Portal**: Secure web interface (HTTPS/WebSockets) for real-time dashboards, log streaming, channel/profile configuration, and ban management.
-* **Server Admin Radar Map**: 2D HTML5 Canvas real-time player radar integrated into the admin dashboard, supporting click-and-drag panning, mouse-wheel zoom, and active zone filtering.
+* **Server Admin Radar Map**: 2D HTML5 Canvas real-time player radar integrated into the admin dashboard, supporting click-and-drag panning, mouse-wheel zoom, active zone filtering, historical player walking trails (breadcrumbs), and live pulsating concentric soundwave rings around talking players.
 
 ### Server Configuration (`.env`)
 

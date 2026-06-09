@@ -96,6 +96,13 @@ type PlayerState struct {
 	Profile           string    `json:"profile"`
 	ProxShort         bool      `json:"prox_short"`
 	ScOnline          bool      `json:"sc_online"`
+	IsTalking         bool      `json:"is_talking"`
+}
+
+type MsgPlayerTalking struct {
+	Type      string `json:"type"`
+	Name      string `json:"name"`
+	IsTalking bool   `json:"is_talking"`
 }
 
 // MsgWelcome is sent immediately after a successful authentication

@@ -45,6 +45,7 @@ func StartAudioServer(port int, certFile, keyFile string) {
 
 	core.Log(fmt.Sprintf("Starting audio server on %s:%d (WSS)...", core.BindIP, port), core.ColorBlue)
 	go reportStatsLoop()
+	go sweepTalkingLoop()
 
 	var err error
 	if certFile != "" && keyFile != "" {
@@ -254,6 +255,37 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 			audioType := payload[0]
 			audioData := payload[1:]
 
+			// Update player talking state
+			core.ActiveHub.Mu.Lock()
+			player, ok := core.ActiveHub.Players[name]
+			var broadcastTalkingMsg bool
+			var isTalkingVal bool
+			if ok {
+				if len(audioData) > 0 {
+					if !player.IsTalking {
+						player.IsTalking = true
+						broadcastTalkingMsg = true
+						isTalkingVal = true
+					}
+					player.LastTalkTime = time.Now()
+				} else {
+					if player.IsTalking {
+						player.IsTalking = false
+						broadcastTalkingMsg = true
+						isTalkingVal = false
+					}
+				}
+			}
+			core.ActiveHub.Mu.Unlock()
+
+			if broadcastTalkingMsg {
+				core.ActiveHub.BroadcastToAdmins(core.MsgPlayerTalking{
+					Type:      "talking",
+					Name:      name,
+					IsTalking: isTalkingVal,
+				})
+			}
+
 			atomic.AddUint64(&audioTotalBytes, uint64(len(payload)))
 			atomic.AddUint64(&audioTotalFrames, 1)
 
@@ -400,6 +432,31 @@ func handleAudioWS(w http.ResponseWriter, r *http.Request) {
 			core.ActiveHub.BroadcastPosMessageToAll(core.MsgPlayerLeave{
 				Type: "leave",
 				Name: leftName,
+			})
+		}
+	}
+}
+
+func sweepTalkingLoop() {
+	for {
+		time.Sleep(200 * time.Millisecond)
+		var timedOutPlayers []string
+
+		core.ActiveHub.Mu.Lock()
+		now := time.Now()
+		for _, player := range core.ActiveHub.Players {
+			if player.IsTalking && now.Sub(player.LastTalkTime) > 400*time.Millisecond {
+				player.IsTalking = false
+				timedOutPlayers = append(timedOutPlayers, player.Name)
+			}
+		}
+		core.ActiveHub.Mu.Unlock()
+
+		for _, name := range timedOutPlayers {
+			core.ActiveHub.BroadcastToAdmins(core.MsgPlayerTalking{
+				Type:      "talking",
+				Name:      name,
+				IsTalking: false,
 			})
 		}
 	}

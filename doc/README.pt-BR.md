@@ -154,6 +154,20 @@ graph TD
 * **Integração Transparente Win32**: Utilizando estilos de janela Win32 (`WS_EX_TRANSPARENT` e `WS_EX_NOACTIVATE`), o overlay não rouba o foco da tela e permite que os cliques do mouse passem direto para o jogo.
 * **Renderização Independente de API**: Como as janelas transparentes do WPF dependem da composição DWM (Desktop Window Manager) do Windows, o overlay não se injeta na pipeline de renderização do jogo. Isso garante compatibilidade total com **Vulkan** e **DirectX**, contanto que o Star Citizen seja executado em modo **"Janela sem Bordas"** (Borderless Windowed).
 
+### 7. Acústica Ambiental (Oclusão e Reverberação)
+* **Filtro de Oclusão:** Se o locutor e o ouvinte estiverem em zonas ou compartimentos diferentes, o cliente aplica automaticamente um filtro passa-baixa (corte de 600Hz, volume de 65%) para simular obstrução física/oclusão. A frequência de corte faz uma transição suave para evitar estalos.
+* **Reverberação Baseada em Localização:** Se o ouvinte estiver em um ambiente específico (Cavernas, Bunkers ou Hangares), um filtro de linha de atraso de feedback (comb filter) aplica parâmetros de mistura (wet mix), atraso (delay) e feedback específicos do ambiente:
+  * *Cavernas / Túneis:* 45% wet, 100ms delay, 0.6 feedback.
+  * *Bunkers / Estações:* 25% wet, 50ms delay, 0.4 feedback.
+  * *Hangares:* 35% wet, 150ms delay, 0.5 feedback.
+
+### 8. Discord Rich Presence Sem Dependências (RPC)
+* **Conexão por Named Pipe:** O cliente se integra ao Discord através de named pipes locais do Windows (`\\.\pipe\discord-ipc-0`) sem a necessidade de dependências externas pesadas.
+* **Atualizações Dinâmicas de Atividade:** Atualiza instantaneamente sua presença no Discord com:
+  * **Detalhes:** Zona de localização atual no jogo (ex: `"Na Caverna de MicroTech"`).
+  * **Estado:** Canal conectado e estado (ex: `"Na Rádio: Canal Bravo (Capacete Equipado)"` ou `"Em Proximidade"`).
+  * **Tempo Decorrido:** Mostra o tempo decorrido desde que a conexão com o servidor foi estabelecida.
+
 ---
 
 ## 🖥️ Servidor XuruVoip (Go)
@@ -168,7 +182,7 @@ Garante o roteamento dinâmico de áudio com base na distância de proximidade e
 * **Persistência SQLite**: Salva todos os canais e atribuições dos jogadores de forma nativa.
 * **Sistema de Segurança e Banimento**: Bloqueia trapaceiros ou arruaceiros por Username, IP e assinatura física de hardware (HWID/MachineGuid).
 * **Painel Administrativo Web**: Interface segura (HTTPS/WebSockets) com acompanhamento de logs ao vivo e painel de banimentos.
-* **Mapa de Radar de Administração**: Mapa de radar 2D em HTML5 Canvas integrado no painel web para monitorar as coordenadas dos jogadores em tempo real, com rolagem por arrastar, zoom pela roda do mouse e filtros de zona.
+* **Mapa de Radar de Administração**: Mapa de radar 2D em HTML5 Canvas integrado no painel web para monitorar as coordenadas dos jogadores em tempo real, com rolagem por arrastar, zoom pela roda do mouse, filtros de zona, trilhas históricas de caminhada (breadcrumbs) e ondas sonoras concêntricas pulsantes ao redor de jogadores falando.
 
 ### Configuração do Servidor (`.env`)
 No primeiro início, o servidor gera automaticamente um arquivo de configurações padrão:
