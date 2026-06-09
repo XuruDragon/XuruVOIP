@@ -21,13 +21,17 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly AudioWebSocketService _audioWs = new();
     private readonly AudioCaptureService _capture = new();
     private readonly AudioPlaybackService _playback = new();
+    public AudioPlaybackService Playback => _playback;
     private readonly GlobalKeyHook _keyHook = new();
     public GlobalKeyHook KeyHook => _keyHook;
     private readonly DispatcherTimer _ocrTimer = new();
     private readonly GameDetectionService _gameDetector = new();
+    public GameDetectionService GameDetector => _gameDetector;
 
     // ─── Observable state ────────────────────────────────────────────────────
     private readonly Dictionary<string, bool> _remoteHelmets = [];
+    private readonly Dictionary<string, PlayerPosition> _remotePositions = [];
+    private bool _wasRadioTransmitting = false;
     private readonly List<string> _availableChannels = [];
     private string _activeChannel = "";
 
@@ -205,19 +209,8 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     private async void InitializeServicesAsync()
     {
-        // Extract tessdata and initialize OCR
-        try
-        {
-            LogService.Info("Initializing OCR Service...");
-            var tessDir = ConfigService.EnsureTessdata();
-            _ocr.Initialize(tessDir);
-            LogService.Info("OCR Service initialized successfully.");
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"OCR init failed: {ex.Message}";
-            LogService.Error("OCR initialization failed", ex);
-        }
+        // Initialize position tracking source
+        ApplyTrackingSource();
 
         // Hotkeys configuration
         _keyHook.KeyEvent += (key, isDown) =>
@@ -307,13 +300,13 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                 }
             }
         };
+        _gameDetector.PositionReceived += OnGrtprPositionReceived;
         _gameDetector.CustomGameLogPath = Config.Config.CustomGameLogPath;
         _gameDetector.Start();
 
-        // OCR timer
-        _ocrTimer.Interval = TimeSpan.FromMilliseconds(Config.Config.OcrIntervalMs);
+        // Position tracking setup
         _ocrTimer.Tick += OnOcrTick;
-        _ocrTimer.Start();
+        ApplyTrackingSource();
 
         // VU meter and transmitting indicator refresh
         var vuTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
@@ -384,12 +377,26 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                         _remoteHelmets[remoteName] = remoteHelmet;
                     }
                 }
+                else if (type == "pos")
+                {
+                    if (doc.RootElement.TryGetProperty("name", out var nameEl) &&
+                        doc.RootElement.TryGetProperty("pos", out var posEl))
+                    {
+                        string remoteName = nameEl.GetString() ?? "";
+                        double x = posEl.GetProperty("x").GetDouble();
+                        double y = posEl.GetProperty("y").GetDouble();
+                        double z = posEl.GetProperty("z").GetDouble();
+                        string zone = posEl.GetProperty("zone").GetString() ?? "";
+                        _remotePositions[remoteName] = new PlayerPosition { X = x, Y = y, Z = z, Zone = zone };
+                    }
+                }
                 else if (type == "leave")
                 {
                     if (doc.RootElement.TryGetProperty("name", out var nameEl))
                     {
                         string remoteName = nameEl.GetString() ?? "";
                         _remoteHelmets.Remove(remoteName);
+                        _remotePositions.Remove(remoteName);
                         _playback.RemovePlayer(remoteName);
                     }
                 }
@@ -449,7 +456,28 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             bool localHelmet = IsHelmetOn;
             _remoteHelmets.TryGetValue(name, out bool remoteHelmet);
             bool applyRadio = (type == 0x01 || type == 0x02) || (type == 0x00 && (localHelmet || remoteHelmet));
-            _playback.ReceiveOpusFrame(name, opus, type, applyRadio, metadata);
+
+            // Calculate distance for radio degradation if it is a Radio packet (type 0x01)
+            double distance = -1.0;
+            if (type == 0x01)
+            {
+                if (_remotePositions.TryGetValue(name, out var remotePos))
+                {
+                    if (remotePos.Zone != _lastSentPos.Zone)
+                    {
+                        distance = 99999.0; // Out of range (different zones)
+                    }
+                    else
+                    {
+                        double dx = remotePos.X - _lastSentPos.X;
+                        double dy = remotePos.Y - _lastSentPos.Y;
+                        double dz = remotePos.Z - _lastSentPos.Z;
+                        distance = Math.Sqrt(dx * dx + dy * dy + dz * dz);
+                    }
+                }
+            }
+
+            _playback.ReceiveOpusFrame(name, opus, type, applyRadio, metadata, distance);
         };
 
         _capture.EncodedFrameReady += async (frame, txType) =>
@@ -462,6 +490,13 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     private void UpdatePttState()
     {
+        bool isRadioTransmitting = _isPttRadioDown && !MicRadioMuted;
+        if (isRadioTransmitting != _wasRadioTransmitting)
+        {
+            _playback.PlayLocalPttChime(isRadioTransmitting);
+            _wasRadioTransmitting = isRadioTransmitting;
+        }
+
         if (_isPttProfileDown)
         {
             _capture.SetPttState(true, 0x02);
@@ -607,6 +642,8 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         var cfg = Config.Config;
         LogService.Info($"StartAudio: Starting playback and capture devices. Mode={cfg.AudioMode}");
         _playback.EnableSpatialAudio = cfg.EnableSpatialAudio;
+        _playback.EnableRadioDegradation = cfg.EnableRadioDegradation;
+        _playback.EnablePttChimes = cfg.EnablePttChimes;
         _playback.Start(cfg.OutputDeviceIndex, cfg.OutputGainPercent);
         
         // Synchronize mute states
@@ -622,8 +659,18 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _capture.Start(cfg.InputDeviceIndex, cfg.InputGainDb, cfg.VadSensitivity, cfg.AudioMode);
     }
 
+    private void OnGrtprPositionReceived(PlayerPosition pos)
+    {
+        if (!Config.Config.UseGrtpr) return;
+        Application.Current.Dispatcher.Invoke(async () =>
+        {
+            await ProcessNewPositionAsync(pos);
+        });
+    }
+
     private async void OnOcrTick(object? sender, EventArgs e)
     {
+        if (Config.Config.UseGrtpr) return;
         if (!_gameDetector.CheckIfGameFocused()) return;
 
         var cfg = Config.Config;
@@ -633,6 +680,11 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
         if (pos == null) return;
 
+        await ProcessNewPositionAsync(pos);
+    }
+
+    private async Task ProcessNewPositionAsync(PlayerPosition pos)
+    {
         CurrentZone = pos.Zone;
         CurrentPos = $"{pos.X:F1}m  {pos.Y:F1}m  {pos.Z:F1}m";
 
@@ -685,6 +737,37 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     public void SaveConfig() => Config.Save();
 
+    private void ApplyTrackingSource()
+    {
+        var cfg = Config.Config;
+        if (cfg.UseGrtpr)
+        {
+            LogService.Info("Position Tracking: Using Game.log Reader (GRTPR). Disabling OCR Engine.");
+            _ocrTimer.Stop();
+            _ocr.Dispose();
+        }
+        else
+        {
+            LogService.Info("Position Tracking: Using OCR Screen Scanner. Initializing Tesseract Engine.");
+            try
+            {
+                var tessDir = ConfigService.EnsureTessdata();
+                _ocr.Initialize(tessDir);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"OCR init failed: {ex.Message}";
+                LogService.Error("OCR initialization failed", ex);
+            }
+
+            _ocrTimer.Interval = TimeSpan.FromMilliseconds(cfg.OcrIntervalMs);
+            if (!_ocrTimer.IsEnabled)
+            {
+                _ocrTimer.Start();
+            }
+        }
+    }
+
     public void ApplySettings()
     {
         LogService.Info("ApplySettings: Applying settings update...");
@@ -692,6 +775,11 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         LogService.EnableGeneralLogs = Config.Config.EnableGeneralLogs;
         _gameDetector.CustomGameLogPath = Config.Config.CustomGameLogPath;
         _playback.EnableSpatialAudio = Config.Config.EnableSpatialAudio; // Sync spatial audio setting
+        _playback.EnableRadioDegradation = Config.Config.EnableRadioDegradation;
+        _playback.EnablePttChimes = Config.Config.EnablePttChimes;
+
+        // Sync position tracking source
+        ApplyTrackingSource();
 
         if (AudioConnected)
         {

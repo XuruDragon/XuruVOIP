@@ -62,6 +62,11 @@
     <sys:String x:Key="LblGameLogPath">Star Citizen Game.log Pfad (Optionaler Override)</sys:String>
 
     <!-- Einstellungen: OCR -->
+    <sys:String x:Key="LblPosSource">Positionsverfolgungsquelle</sys:String>
+    <sys:String x:Key="OptOcr">OCR-Bildschirmscanner</sys:String>
+    <sys:String x:Key="OptGrtpr">Game.log-Reader (GRTPR)</sys:String>
+    <sys:String x:Key="LblGrtprActive">Game.log-Reader (GRTPR) Aktiv</sys:String>
+    <sys:String x:Key="LblGrtprDesc">Positionskoordinaten werden direkt aus der Game.log-Datei von Star Citizen ausgelesen. Stellen Sie sicher, dass "r_DisplaySessionInfo = 3" (oder 1) in Ihrer user.cfg gesetzt ist, um die Koordinatenprotokollierung im Spiel zu aktivieren. Tesseract-OCR wird vollständig deaktiviert, um Systemressourcen zu sparen.</sys:String>
     <sys:String x:Key="LblMonitor">Bildschirm</sys:String>
     <sys:String x:Key="LblOcrInterval">OCR-Intervall (ms)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  Scanbereich definieren</sys:String>
@@ -97,6 +102,21 @@
     <sys:String x:Key="LblMuteAudioProximity">Taste Audio (Nähe) stummschalten</sys:String>
     <sys:String x:Key="LblMuteAudioRadio">Taste Audio (Funk) stummschalten</sys:String>
     <sys:String x:Key="LblMuteAudioProfile">Taste Audio (Profil) stummschalten</sys:String>
+
+    <!-- Einstellungen: Audio Extra -->
+    <sys:String x:Key="LblEnableRadioDegradation">Entfernungsbasierte Funkverschlechterung aktivieren</sys:String>
+    <sys:String x:Key="LblEnablePttChimes">Funkmikrofon-Klicks &amp; Rauschsperren-Ende aktivieren</sys:String>
+
+    <!-- Einstellungen: Overlay -->
+    <sys:String x:Key="TabOverlay">Overlay</sys:String>
+    <sys:String x:Key="LblEnableOverlay">HUD-Overlay aktivieren</sys:String>
+    <sys:String x:Key="LblOverlayPosition">Overlay-Bildschirmecke</sys:String>
+    <sys:String x:Key="OptTopLeft">Oben-Links</sys:String>
+    <sys:String x:Key="OptTopCenter">Oben-Mitte</sys:String>
+    <sys:String x:Key="OptTopRight">Oben-Rechts</sys:String>
+    <sys:String x:Key="OptBottomLeft">Unten-Links</sys:String>
+    <sys:String x:Key="OptBottomCenter">Unten-Mitte</sys:String>
+    <sys:String x:Key="OptBottomRight">Unten-Rechts</sys:String>
 
     <!-- Schaltflächen Allgemein -->
     <sys:String x:Key="BtnSaveClose">Speichern &amp; Schließen</sys:String>

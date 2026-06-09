@@ -62,6 +62,11 @@
     <sys:String x:Key="LblGameLogPath">Caminho do Game.log do Star Citizen (Opcional)</sys:String>
 
     <!-- Settings: OCR -->
+    <sys:String x:Key="LblPosSource">Fonte de Rastreamento de Posição</sys:String>
+    <sys:String x:Key="OptOcr">Leitor de Ecrã OCR</sys:String>
+    <sys:String x:Key="OptGrtpr">Leitor de Game.log (GRTPR)</sys:String>
+    <sys:String x:Key="LblGrtprActive">Leitor de Game.log (GRTPR) Ativo</sys:String>
+    <sys:String x:Key="LblGrtprDesc">As coordenadas de posição serão lidas diretamente do ficheiro Game.log do Star Citizen. Certifique-se de que "r_DisplaySessionInfo = 3" (ou 1) está definido no seu ficheiro user.cfg para ativar o registo de coordenadas no jogo. O OCR Tesseract será desativado completamente para economizar recursos do sistema.</sys:String>
     <sys:String x:Key="LblMonitor">Monitor</sys:String>
     <sys:String x:Key="LblOcrInterval">Intervalo do OCR (ms)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  Definir Região de Escaneamento</sys:String>
@@ -97,6 +102,21 @@
     <sys:String x:Key="LblMuteAudioProximity">Tecla Sem Som Áudio Proximidade</sys:String>
     <sys:String x:Key="LblMuteAudioRadio">Tecla Sem Som Áudio Rádio</sys:String>
     <sys:String x:Key="LblMuteAudioProfile">Tecla Sem Som Áudio Perfil</sys:String>
+
+    <!-- Configurações: Audio Extra -->
+    <sys:String x:Key="LblEnableRadioDegradation">Ativar degradação de rádio baseada na distância</sys:String>
+    <sys:String x:Key="LblEnablePttChimes">Ativar cliques de microfone e caudas de silenciamento</sys:String>
+
+    <!-- Configurações: Overlay -->
+    <sys:String x:Key="TabOverlay">Overlay</sys:String>
+    <sys:String x:Key="LblEnableOverlay">Ativar HUD de Overlay</sys:String>
+    <sys:String x:Key="LblOverlayPosition">Canto do Overlay</sys:String>
+    <sys:String x:Key="OptTopLeft">Superior Esquerdo</sys:String>
+    <sys:String x:Key="OptTopCenter">Superior Centro</sys:String>
+    <sys:String x:Key="OptTopRight">Superior Direito</sys:String>
+    <sys:String x:Key="OptBottomLeft">Inferior Esquerdo</sys:String>
+    <sys:String x:Key="OptBottomCenter">Inferior Centro</sys:String>
+    <sys:String x:Key="OptBottomRight">Inferior Direito</sys:String>
 
     <!-- Buttons General -->
     <sys:String x:Key="BtnSaveClose">Guardar e Fechar</sys:String>
