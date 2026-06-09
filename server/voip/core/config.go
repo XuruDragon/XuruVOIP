@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"crypto/rand"
@@ -50,7 +50,7 @@ type Config struct {
 }
 
 // Global configuration instance
-var serverConfig Config
+var ServerConfig Config
 
 var PublicServer bool
 var VerboseLogs int = 1
@@ -85,7 +85,7 @@ func GenerateRandomString(length int) string {
 func LoadOrCreateConfig() error {
 	LoadEnv()
 	dataDir := ResolveDataDir()
-	serverConfig.DataDir = dataDir
+	ServerConfig.DataDir = dataDir
 
 	// 1. Initialize SQLite Database (and run migrations / import old files)
 	if err := InitDB(); err != nil {
@@ -101,7 +101,7 @@ func LoadOrCreateConfig() error {
 		_ = os.Setenv("XURUVOIP_SERVER_PASSWORD", envServerPassword)
 		UpdateEnvFile("XURUVOIP_SERVER_PASSWORD", envServerPassword)
 	}
-	serverConfig.ServerToken = envServerPassword
+	ServerConfig.ServerToken = envServerPassword
 
 	envAdminServerPassword := os.Getenv("XURUVOIP_ADMIN_SERVER_PASSWORD")
 	if envAdminServerPassword == "" {
@@ -109,7 +109,7 @@ func LoadOrCreateConfig() error {
 		_ = os.Setenv("XURUVOIP_ADMIN_SERVER_PASSWORD", envAdminServerPassword)
 		UpdateEnvFile("XURUVOIP_ADMIN_SERVER_PASSWORD", envAdminServerPassword)
 	}
-	serverConfig.AdminServerToken = envAdminServerPassword
+	ServerConfig.AdminServerToken = envAdminServerPassword
 
 	publicServerStr := os.Getenv("XURUVOIP_PUBLIC_SERVER")
 	if publicServerStr == "" {
@@ -149,14 +149,14 @@ func LoadOrCreateConfig() error {
 		chList = []string{"General"}
 		_ = DBSaveChannel("General")
 	}
-	serverConfig.ChannelsList = chList
+	ServerConfig.ChannelsList = chList
 
 	// 4. Load Profiles
 	prList, err := DBGetProfiles()
 	if err != nil {
 		return err
 	}
-	serverConfig.ProfilesList = prList
+	ServerConfig.ProfilesList = prList
 
 	return nil
 }
@@ -164,7 +164,7 @@ func LoadOrCreateConfig() error {
 // SetServerPassword changes the server player password
 func SetServerPassword(pwd string) error {
 	pwd = strings.TrimSpace(pwd)
-	serverConfig.ServerToken = pwd
+	ServerConfig.ServerToken = pwd
 	_ = os.Setenv("XURUVOIP_SERVER_PASSWORD", pwd)
 	UpdateEnvFile("XURUVOIP_SERVER_PASSWORD", pwd)
 	return nil
@@ -191,7 +191,7 @@ func SaveChannels(channels []string) error {
 			return err
 		}
 	}
-	serverConfig.ChannelsList = channels
+	ServerConfig.ChannelsList = channels
 	return nil
 }
 
@@ -207,7 +207,7 @@ func SaveProfiles(profiles []string) error {
 			return err
 		}
 	}
-	serverConfig.ProfilesList = profiles
+	ServerConfig.ProfilesList = profiles
 	return nil
 }
 

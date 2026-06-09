@@ -35,6 +35,11 @@ jobs:
           cd server
           go test -v ./...
 
+      - name: Build Go Server
+        run: |
+          cd server
+          go build -v -o xuruvoip-server
+
   test-client:
     name: Test .NET Client
     runs-on: windows-latest

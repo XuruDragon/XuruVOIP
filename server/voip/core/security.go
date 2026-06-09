@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"crypto/rand"
@@ -8,10 +8,38 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"math/big"
+	"net"
 	"os"
 	"sync"
 	"time"
 )
+
+// Global security managers
+var (
+	PosLockout   *AuthLockout
+	AudioLockout *AuthLockout
+	PosLimit     *RateLimiterHub
+	AudioLimit   *RateLimiterHub
+)
+
+// InitSecurityManagers dynamically instantiates rate limiters and auth lockout policies from config/env
+func InitSecurityManagers() {
+	maxFailures := ParseEnvInt("XURUVOIP_LOCKOUT_ATTEMPTS", 5)
+	windowSec := int64(ParseEnvInt("XURUVOIP_LOCKOUT_WINDOW", 60))
+	banSec := int64(ParseEnvInt("XURUVOIP_LOCKOUT_DURATION", 600))
+
+	posRate := ParseEnvFloat("XURUVOIP_LIMIT_RATE_POS", 50.0)
+	posBurst := ParseEnvFloat("XURUVOIP_LIMIT_BURST_POS", 100.0)
+
+	audioRate := ParseEnvFloat("XURUVOIP_LIMIT_RATE_AUDIO", 60.0)
+	audioBurst := ParseEnvFloat("XURUVOIP_LIMIT_BURST_AUDIO", 120.0)
+
+	PosLockout = NewAuthLockout(maxFailures, windowSec, banSec)
+	AudioLockout = NewAuthLockout(maxFailures, windowSec, banSec)
+
+	PosLimit = NewRateLimiterHub(posRate, posBurst)
+	AudioLimit = NewRateLimiterHub(audioRate, audioBurst)
+}
 
 // ConstantTimeCompare compares two strings in constant time to prevent timing attacks
 func ConstantTimeCompare(a, b string) bool {
@@ -230,4 +258,13 @@ func EnsureSelfSignedCert(certPath, keyPath, commonName string, daysValid int) (
 	}
 
 	return true, "generated"
+}
+
+// ExtractIP extracts the client IP address from a remote address string
+func ExtractIP(remoteAddr string) string {
+	ip, _, err := net.SplitHostPort(remoteAddr)
+	if err != nil {
+		return remoteAddr
+	}
+	return ip
 }

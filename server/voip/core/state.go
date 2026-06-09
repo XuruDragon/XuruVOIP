@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"math"
@@ -13,9 +13,9 @@ import (
 type ActivePlayer struct {
 	Name              string
 	PosConn           *websocket.Conn
-	posMu             sync.Mutex
+	PosMu             sync.Mutex
 	AudioConn         *websocket.Conn
-	audioMu           sync.Mutex
+	AudioMu           sync.Mutex
 	Pos               *Position
 	HelmetOn          bool
 	ActiveChannel     string
@@ -32,8 +32,8 @@ type ActivePlayer struct {
 
 // SafeWritePosJSON writes a JSON message to PosConn in a thread-safe manner
 func (p *ActivePlayer) SafeWritePosJSON(msg interface{}) error {
-	p.posMu.Lock()
-	defer p.posMu.Unlock()
+	p.PosMu.Lock()
+	defer p.PosMu.Unlock()
 	if p.PosConn == nil {
 		return websocket.ErrCloseSent
 	}
@@ -42,8 +42,8 @@ func (p *ActivePlayer) SafeWritePosJSON(msg interface{}) error {
 
 // SafeWriteAudioJSON writes a JSON message to AudioConn in a thread-safe manner
 func (p *ActivePlayer) SafeWriteAudioJSON(msg interface{}) error {
-	p.audioMu.Lock()
-	defer p.audioMu.Unlock()
+	p.AudioMu.Lock()
+	defer p.AudioMu.Unlock()
 	if p.AudioConn == nil {
 		return websocket.ErrCloseSent
 	}
@@ -52,8 +52,8 @@ func (p *ActivePlayer) SafeWriteAudioJSON(msg interface{}) error {
 
 // SafeWriteAudioMessage writes a binary/text message to AudioConn in a thread-safe manner
 func (p *ActivePlayer) SafeWriteAudioMessage(messageType int, data []byte) error {
-	p.audioMu.Lock()
-	defer p.audioMu.Unlock()
+	p.AudioMu.Lock()
+	defer p.AudioMu.Unlock()
 	if p.AudioConn == nil {
 		return websocket.ErrCloseSent
 	}
@@ -79,25 +79,25 @@ func (a *AdminSession) SafeWriteJSON(msg interface{}) error {
 
 // Hub manages all connected clients (players & admins) and global server state
 type Hub struct {
-	players       map[string]*ActivePlayer
-	admins        map[*websocket.Conn]*AdminSession
-	anonymousMode bool
-	mu            sync.RWMutex
+	Players       map[string]*ActivePlayer
+	Admins        map[*websocket.Conn]*AdminSession
+	AnonymousMode bool
+	Mu            sync.RWMutex
 }
 
 // Global Hub instance
-var hub = Hub{
-	players: make(map[string]*ActivePlayer),
-	admins:  make(map[*websocket.Conn]*AdminSession),
+var ActiveHub = Hub{
+	Players: make(map[string]*ActivePlayer),
+	Admins:  make(map[*websocket.Conn]*AdminSession),
 }
 
 // RegisterPlayer registers or updates a player upon joining the positions server
 func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel string, ip string, hwid string) string {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
 	// If player already exists, preserve their existing fields (like position and profile)
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	ticket := GenerateRandomString(32)
 	expires := time.Now().Add(120 * time.Second)
 
@@ -118,12 +118,12 @@ func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel s
 
 	if exists {
 		// Close previous position socket if it exists to avoid leakage
-		p.posMu.Lock()
+		p.PosMu.Lock()
 		if p.PosConn != nil && p.PosConn != conn {
 			_ = p.PosConn.Close()
 		}
 		p.PosConn = conn
-		p.posMu.Unlock()
+		p.PosMu.Unlock()
 		// Keep current runtime active channel, listening channels, and profile if they are already set
 		// But if they are empty, we can use the persistent/initial ones.
 		if p.ActiveChannel == "" {
@@ -142,7 +142,7 @@ func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel s
 		p.IP = ip
 		p.Hwid = hwid
 	} else {
-		h.players[name] = &ActivePlayer{
+		h.Players[name] = &ActivePlayer{
 			Name:              name,
 			PosConn:           conn,
 			ActiveChannel:     activeChan,
@@ -157,7 +157,7 @@ func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel s
 		}
 	}
 
-	pRef := h.players[name]
+	pRef := h.Players[name]
 	_ = DBSavePlayerState(name, pRef.Profile, pRef.ActiveChannel, pRef.ListeningChannels)
 
 	return ticket
@@ -165,10 +165,10 @@ func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel s
 
 // BindAudioConn validates an audio ticket and binds the audio socket to the player
 func (h *Hub) BindAudioConn(name string, ticket string, conn *websocket.Conn) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
@@ -183,35 +183,35 @@ func (h *Hub) BindAudioConn(name string, ticket string, conn *websocket.Conn) bo
 	}
 
 	// Ticket is valid, bind connection and revoke ticket (one-time use)
-	p.audioMu.Lock()
+	p.AudioMu.Lock()
 	if p.AudioConn != nil && p.AudioConn != conn {
 		_ = p.AudioConn.Close()
 	}
 	p.AudioConn = conn
-	p.audioMu.Unlock()
+	p.AudioMu.Unlock()
 	p.AudioTicket = "" // Revoke
 	return true
 }
 
 // UnregisterPosConn unregisters a player's position socket and cleans up if both sockets are gone
 func (h *Hub) UnregisterPosConn(conn *websocket.Conn) (string, bool) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	for name, p := range h.players {
-		p.posMu.Lock()
+	for name, p := range h.Players {
+		p.PosMu.Lock()
 		isMatch := (p.PosConn == conn)
 		if isMatch {
 			p.PosConn = nil
 		}
-		p.posMu.Unlock()
+		p.PosMu.Unlock()
 		if isMatch {
 			// If both sockets are gone, or if they haven't bound audio yet and pos is gone, cleanup
-			p.audioMu.Lock()
+			p.AudioMu.Lock()
 			hasAudio := (p.AudioConn != nil)
-			p.audioMu.Unlock()
+			p.AudioMu.Unlock()
 			if !hasAudio {
-				delete(h.players, name)
+				delete(h.Players, name)
 				return name, true // Fully left
 			}
 			return name, false // Only position socket disconnected
@@ -222,22 +222,22 @@ func (h *Hub) UnregisterPosConn(conn *websocket.Conn) (string, bool) {
 
 // UnregisterAudioConn unregisters a player's audio socket
 func (h *Hub) UnregisterAudioConn(conn *websocket.Conn) (string, bool) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	for name, p := range h.players {
-		p.audioMu.Lock()
+	for name, p := range h.Players {
+		p.AudioMu.Lock()
 		isMatch := (p.AudioConn == conn)
 		if isMatch {
 			p.AudioConn = nil
 		}
-		p.audioMu.Unlock()
+		p.AudioMu.Unlock()
 		if isMatch {
-			p.posMu.Lock()
+			p.PosMu.Lock()
 			hasPos := (p.PosConn != nil)
-			p.posMu.Unlock()
+			p.PosMu.Unlock()
 			if !hasPos {
-				delete(h.players, name)
+				delete(h.Players, name)
 				return name, true // Fully left
 			}
 			return name, false // Only audio socket disconnected
@@ -248,94 +248,94 @@ func (h *Hub) UnregisterAudioConn(conn *websocket.Conn) (string, bool) {
 
 // KickPlayer forcibly disconnects a player by closing their sockets
 func (h *Hub) KickPlayer(name string) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
 
-	p.posMu.Lock()
+	p.PosMu.Lock()
 	if p.PosConn != nil {
 		_ = p.PosConn.Close()
 		p.PosConn = nil
 	}
-	p.posMu.Unlock()
+	p.PosMu.Unlock()
 
-	p.audioMu.Lock()
+	p.AudioMu.Lock()
 	if p.AudioConn != nil {
 		_ = p.AudioConn.Close()
 		p.AudioConn = nil
 	}
-	p.audioMu.Unlock()
+	p.AudioMu.Unlock()
 
-	delete(h.players, name)
+	delete(h.Players, name)
 	return true
 }
 
 // KickIP forcibly disconnects any player connecting from the specified IP address
 func (h *Hub) KickIP(ip string) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 	ipClean := cleanIP(ip)
 	if ipClean == "" {
 		return
 	}
-	for name, p := range h.players {
+	for name, p := range h.Players {
 		if cleanIP(p.IP) == ipClean {
-			p.posMu.Lock()
+			p.PosMu.Lock()
 			if p.PosConn != nil {
 				_ = p.PosConn.Close()
 				p.PosConn = nil
 			}
-			p.posMu.Unlock()
+			p.PosMu.Unlock()
 
-			p.audioMu.Lock()
+			p.AudioMu.Lock()
 			if p.AudioConn != nil {
 				_ = p.AudioConn.Close()
 				p.AudioConn = nil
 			}
-			p.audioMu.Unlock()
-			delete(h.players, name)
+			p.AudioMu.Unlock()
+			delete(h.Players, name)
 		}
 	}
 }
 
 // KickHwid forcibly disconnects any player sharing the specified hardware ID
 func (h *Hub) KickHwid(hwid string) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 	hwid = strings.TrimSpace(hwid)
 	if hwid == "" {
 		return
 	}
-	for name, p := range h.players {
+	for name, p := range h.Players {
 		if strings.EqualFold(p.Hwid, hwid) {
-			p.posMu.Lock()
+			p.PosMu.Lock()
 			if p.PosConn != nil {
 				_ = p.PosConn.Close()
 				p.PosConn = nil
 			}
-			p.posMu.Unlock()
+			p.PosMu.Unlock()
 
-			p.audioMu.Lock()
+			p.AudioMu.Lock()
 			if p.AudioConn != nil {
 				_ = p.AudioConn.Close()
 				p.AudioConn = nil
 			}
-			p.audioMu.Unlock()
-			delete(h.players, name)
+			p.AudioMu.Unlock()
+			delete(h.Players, name)
 		}
 	}
 }
 
 // UpdatePosition updates a player's coordinate state
 func (h *Hub) UpdatePosition(name string, pos Position) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
@@ -347,10 +347,10 @@ func (h *Hub) UpdatePosition(name string, pos Position) bool {
 
 // UpdateActivity updates a player's last seen timestamp to prevent timeouts
 func (h *Hub) UpdateActivity(name string) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
@@ -360,10 +360,10 @@ func (h *Hub) UpdateActivity(name string) bool {
 
 // UpdateHelmet updates a player's helmet state
 func (h *Hub) UpdateHelmet(name string, helmetOn bool) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
@@ -375,10 +375,10 @@ func (h *Hub) UpdateHelmet(name string, helmetOn bool) bool {
 
 // UpdateChannel updates a player's radio channel
 func (h *Hub) UpdateChannel(name string, channel string) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
@@ -391,10 +391,10 @@ func (h *Hub) UpdateChannel(name string, channel string) bool {
 
 // UpdateListeningChannels updates a player's listening radio channels
 func (h *Hub) UpdateListeningChannels(name string, channels []string) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
@@ -407,10 +407,10 @@ func (h *Hub) UpdateListeningChannels(name string, channels []string) bool {
 
 // UpdateProxShort updates a player's proximity short status
 func (h *Hub) UpdateProxShort(name string, active bool) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
@@ -422,10 +422,10 @@ func (h *Hub) UpdateProxShort(name string, active bool) bool {
 
 // UpdateScOnline updates a player's Star Citizen online status
 func (h *Hub) UpdateScOnline(name string, online bool) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
@@ -437,10 +437,10 @@ func (h *Hub) UpdateScOnline(name string, online bool) bool {
 
 // AssignProfile sets a player's profile (role)
 func (h *Hub) AssignProfile(name string, profile string) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
-	p, exists := h.players[name]
+	p, exists := h.Players[name]
 	if !exists {
 		return false
 	}
@@ -452,11 +452,11 @@ func (h *Hub) AssignProfile(name string, profile string) bool {
 
 // GetPlayerStateList returns the states of all players except the sender
 func (h *Hub) GetPlayerStateList(excludeName string) []PlayerState {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
 
 	var states []PlayerState
-	for name, p := range h.players {
+	for name, p := range h.Players {
 		if name == excludeName {
 			continue
 		}
@@ -476,11 +476,11 @@ func (h *Hub) GetPlayerStateList(excludeName string) []PlayerState {
 
 // GetAllPlayerStates returns the states of all registered players
 func (h *Hub) GetAllPlayerStates() []PlayerState {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
 
 	var states []PlayerState
-	for _, p := range h.players {
+	for _, p := range h.Players {
 		states = append(states, PlayerState{
 			Name:              p.Name,
 			Pos:               p.Pos,
@@ -497,16 +497,16 @@ func (h *Hub) GetAllPlayerStates() []PlayerState {
 
 // GetAudioPlayersInProximity returns the players within proximity of sender
 func (h *Hub) GetAudioPlayersInProximity(senderName string) []*ActivePlayer {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
 
-	sender, exists := h.players[senderName]
+	sender, exists := h.Players[senderName]
 	if !exists || sender.Pos == nil {
 		return nil
 	}
 
 	var players []*ActivePlayer
-	for name, p := range h.players {
+	for name, p := range h.Players {
 		if name == senderName || p.AudioConn == nil || p.Pos == nil {
 			continue
 		}
@@ -537,16 +537,16 @@ func (h *Hub) GetAudioPlayersInProximity(senderName string) []*ActivePlayer {
 
 // GetAudioPlayersInRadioChannel returns the players listening to the sender's active channel
 func (h *Hub) GetAudioPlayersInRadioChannel(senderName string) []*ActivePlayer {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
 
-	sender, exists := h.players[senderName]
+	sender, exists := h.Players[senderName]
 	if !exists || sender.ActiveChannel == "" {
 		return nil
 	}
 
 	var players []*ActivePlayer
-	for name, p := range h.players {
+	for name, p := range h.Players {
 		if name == senderName || p.AudioConn == nil {
 			continue
 		}
@@ -570,16 +570,16 @@ func (h *Hub) GetAudioPlayersInRadioChannel(senderName string) []*ActivePlayer {
 
 // GetAudioPlayersInProfile returns the players sharing the sender's profile
 func (h *Hub) GetAudioPlayersInProfile(senderName string) []*ActivePlayer {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
 
-	sender, exists := h.players[senderName]
+	sender, exists := h.Players[senderName]
 	if !exists || sender.Profile == "" {
 		return nil
 	}
 
 	var players []*ActivePlayer
-	for name, p := range h.players {
+	for name, p := range h.Players {
 		if name == senderName || p.AudioConn == nil {
 			continue
 		}
@@ -592,10 +592,10 @@ func (h *Hub) GetAudioPlayersInProfile(senderName string) []*ActivePlayer {
 
 // BroadcastPosMessage sends a JSON message to all position clients except sender
 func (h *Hub) BroadcastPosMessage(senderName string, msg interface{}) {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
 
-	for name, p := range h.players {
+	for name, p := range h.Players {
 		if name == senderName || p.PosConn == nil {
 			continue
 		}
@@ -605,15 +605,15 @@ func (h *Hub) BroadcastPosMessage(senderName string, msg interface{}) {
 
 // BroadcastPosMessageToAll sends a JSON message to all position clients and all admins
 func (h *Hub) BroadcastPosMessageToAll(msg interface{}) {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
 
-	for _, p := range h.players {
+	for _, p := range h.Players {
 		if p.PosConn != nil {
 			_ = p.SafeWritePosJSON(msg)
 		}
 	}
-	for _, admin := range h.admins {
+	for _, admin := range h.Admins {
 		if admin.Conn != nil {
 			_ = admin.SafeWriteJSON(msg)
 		}
@@ -622,28 +622,28 @@ func (h *Hub) BroadcastPosMessageToAll(msg interface{}) {
 
 // CleanupTimeouts checks for players who haven't sent coordinates/pings within timeout window
 func (h *Hub) CleanupTimeouts(timeout time.Duration) []string {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
 
 	var timedOut []string
 	now := time.Now()
-	for name, p := range h.players {
+	for name, p := range h.Players {
 		if now.Sub(p.LastSeen) > timeout {
 			timedOut = append(timedOut, name)
-			p.posMu.Lock()
+			p.PosMu.Lock()
 			if p.PosConn != nil {
 				_ = p.PosConn.Close()
 				p.PosConn = nil
 			}
-			p.posMu.Unlock()
+			p.PosMu.Unlock()
 
-			p.audioMu.Lock()
+			p.AudioMu.Lock()
 			if p.AudioConn != nil {
 				_ = p.AudioConn.Close()
 				p.AudioConn = nil
 			}
-			p.audioMu.Unlock()
-			delete(h.players, name)
+			p.AudioMu.Unlock()
+			delete(h.Players, name)
 		}
 	}
 	return timedOut
@@ -653,9 +653,9 @@ func (h *Hub) CleanupTimeouts(timeout time.Duration) []string {
 
 // RegisterAdmin registers a new admin session
 func (h *Hub) RegisterAdmin(conn *websocket.Conn) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	h.admins[conn] = &AdminSession{
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
+	h.Admins[conn] = &AdminSession{
 		Conn:        conn,
 		ConnectedAt: time.Now(),
 	}
@@ -663,17 +663,17 @@ func (h *Hub) RegisterAdmin(conn *websocket.Conn) {
 
 // UnregisterAdmin unregisters an admin session
 func (h *Hub) UnregisterAdmin(conn *websocket.Conn) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	delete(h.admins, conn)
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
+	delete(h.Admins, conn)
 }
 
 // BroadcastLog sends a push log message to all active admin clients
 func (h *Hub) BroadcastLog(msg string, color string) {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
 
-	if len(h.admins) == 0 {
+	if len(h.Admins) == 0 {
 		return
 	}
 
@@ -684,23 +684,23 @@ func (h *Hub) BroadcastLog(msg string, color string) {
 		TS:    time.Now().Format("15:04:05.000"),
 	}
 
-	for _, admin := range h.admins {
+	for _, admin := range h.Admins {
 		_ = admin.SafeWriteJSON(payload)
 	}
 }
 
 // GetAnonymousMode returns current anonymous mode state
 func (h *Hub) GetAnonymousMode() bool {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
-	return h.anonymousMode
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
+	return h.AnonymousMode
 }
 
 // SetAnonymousMode sets global anonymous mode and broadcasts to all clients
 func (h *Hub) SetAnonymousMode(active bool) {
-	h.mu.Lock()
-	h.anonymousMode = active
-	h.mu.Unlock()
+	h.Mu.Lock()
+	h.AnonymousMode = active
+	h.Mu.Unlock()
 
 	h.BroadcastPosMessageToAll(MsgAnonymousMode{
 		Type:   "anonymous_mode",
@@ -710,12 +710,36 @@ func (h *Hub) SetAnonymousMode(active bool) {
 
 // BroadcastToAdmins sends a JSON message to all active admin clients
 func (h *Hub) BroadcastToAdmins(msg interface{}) {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
+	h.Mu.RLock()
+	defer h.Mu.RUnlock()
 
-	for _, admin := range h.admins {
+	for _, admin := range h.Admins {
 		if admin.Conn != nil {
 			_ = admin.SafeWriteJSON(msg)
 		}
+	}
+}
+
+// Shutdown closes all active player connections and admin WebSocket connections cleanly
+func (h *Hub) Shutdown() {
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
+	for _, p := range h.Players {
+		p.PosMu.Lock()
+		if p.PosConn != nil {
+			_ = p.PosConn.Close()
+			p.PosConn = nil
+		}
+		p.PosMu.Unlock()
+
+		p.AudioMu.Lock()
+		if p.AudioConn != nil {
+			_ = p.AudioConn.Close()
+			p.AudioConn = nil
+		}
+		p.AudioMu.Unlock()
+	}
+	for conn := range h.Admins {
+		_ = conn.Close()
 	}
 }

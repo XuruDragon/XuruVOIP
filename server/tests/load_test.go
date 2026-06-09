@@ -1,4 +1,4 @@
-package main
+package tests
 
 import (
 	"crypto/tls"
@@ -13,6 +13,10 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+
+	"xuruvoip/server/voip/audio"
+	"xuruvoip/server/voip/core"
+	"xuruvoip/server/voip/position"
 )
 
 func TestServerLoadSimulation(t *testing.T) {
@@ -37,16 +41,16 @@ func TestServerLoadSimulation(t *testing.T) {
 	t.Setenv("XURUVOIP_LIMIT_BURST_AUDIO", "2000")
 
 	// Initialize database and logger
-	if err := LoadOrCreateConfig(); err != nil {
+	if err := core.LoadOrCreateConfig(); err != nil {
 		t.Fatalf("Failed to load or create config: %v", err)
 	}
-	InitSecurityManagers()
-	defer CloseLogger()
+	core.InitSecurityManagers()
+	defer core.CloseLogger()
 
 	// Ensure certificates exist in temp directory
 	certPath := filepath.Join(tempDir, "cert.pem")
 	keyPath := filepath.Join(tempDir, "key.pem")
-	ok, _ := EnsureSelfSignedCert(certPath, keyPath, "xuruvoip-server", 365)
+	ok, _ := core.EnsureSelfSignedCert(certPath, keyPath, "xuruvoip-server", 365)
 	if !ok {
 		t.Fatal("Failed to generate test certificates")
 	}
@@ -55,8 +59,8 @@ func TestServerLoadSimulation(t *testing.T) {
 	posPort := 18888
 	audioPort := 18889
 
-	go StartPositionsServer(posPort, certPath, keyPath)
-	go StartAudioServer(audioPort, certPath, keyPath)
+	go position.StartPositionsServer(posPort, certPath, keyPath)
+	go audio.StartAudioServer(audioPort, certPath, keyPath)
 
 	// Allow servers time to spin up
 	time.Sleep(300 * time.Millisecond)
@@ -97,7 +101,7 @@ func TestServerLoadSimulation(t *testing.T) {
 			atomic.AddInt64(&connectedPos, 1)
 
 			// Authenticate on Position Server
-			joinMsg := MsgJoin{
+			joinMsg := core.MsgJoin{
 				Type:     "join",
 				Token:    "testsecret32characterlongtokenok",
 				Name:     clientName,
@@ -110,7 +114,7 @@ func TestServerLoadSimulation(t *testing.T) {
 			}
 
 			// Read Welcome response
-			var welcome MsgWelcome
+			var welcome core.MsgWelcome
 			_, welcomePayload, err := posConn.ReadMessage()
 			if err != nil {
 				t.Logf("[%s] Failed to read MsgWelcome: %v", clientName, err)
@@ -134,7 +138,7 @@ func TestServerLoadSimulation(t *testing.T) {
 			atomic.AddInt64(&connectedAudio, 1)
 
 			// Authenticate on Audio Server using the ticket
-			audioJoinMsg := MsgJoin{
+			audioJoinMsg := core.MsgJoin{
 				Type:        "join",
 				Token:       "testsecret32characterlongtokenok",
 				Name:        clientName,
@@ -184,9 +188,9 @@ func TestServerLoadSimulation(t *testing.T) {
 				y := 100.0 + 10.0*math.Sin(step+float64(id))
 				z := 0.0
 
-				posMsg := MsgPos{
+				posMsg := core.MsgPos{
 					Type: "pos",
-					Pos: Position{
+					Pos: core.Position{
 						X:    x,
 						Y:    y,
 						Z:    z,
@@ -199,7 +203,7 @@ func TestServerLoadSimulation(t *testing.T) {
 				// 2. Send simulated talking audio frame (25% chance of talking each tick)
 				if id%4 == 0 {
 					audioFrame := make([]byte, 21) // [Type (1)] + [Dummy voice data (20)]
-					audioFrame[0] = AudioTypeProximity
+					audioFrame[0] = core.AudioTypeProximity
 					for idx := 1; idx < len(audioFrame); idx++ {
 						audioFrame[idx] = byte(id + idx)
 					}

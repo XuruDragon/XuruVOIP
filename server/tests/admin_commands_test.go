@@ -1,4 +1,4 @@
-package main
+package tests
 
 import (
 	"crypto/tls"
@@ -10,6 +10,9 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+
+	"xuruvoip/server/voip/core"
+	"xuruvoip/server/voip/position"
 )
 
 func TestAdminCommandsWorkflow(t *testing.T) {
@@ -28,29 +31,29 @@ func TestAdminCommandsWorkflow(t *testing.T) {
 	t.Setenv("XURUVOIP_VERBOSE_LOGS", "0")
 
 	// Initialize database and logger
-	if err := LoadOrCreateConfig(); err != nil {
+	if err := core.LoadOrCreateConfig(); err != nil {
 		t.Fatalf("Failed to load or create config: %v", err)
 	}
-	InitSecurityManagers()
-	defer CloseLogger()
+	core.InitSecurityManagers()
+	defer core.CloseLogger()
 
 	// Ensure certs exist in temp directory
 	certPath := filepath.Join(tempDir, "cert.pem")
 	keyPath := filepath.Join(tempDir, "key.pem")
-	ok, _ := EnsureSelfSignedCert(certPath, keyPath, "xuruvoip-server", 365)
+	ok, _ := core.EnsureSelfSignedCert(certPath, keyPath, "xuruvoip-server", 365)
 	if !ok {
 		t.Fatal("Failed to generate test certificates")
 	}
 
 	// Create test administrator credentials
-	err = DBCreateAdmin("admin_cmd_user", "admin_cmd_pass")
+	err = core.DBCreateAdmin("admin_cmd_user", "admin_cmd_pass")
 	if err != nil {
 		t.Fatalf("Failed to create test admin user: %v", err)
 	}
 
 	// 2. Start positions server in background on test port
 	posPort := 19998
-	go StartPositionsServer(posPort, certPath, keyPath)
+	go position.StartPositionsServer(posPort, certPath, keyPath)
 
 	// Allow server time to spin up
 	time.Sleep(200 * time.Millisecond)
@@ -68,7 +71,7 @@ func TestAdminCommandsWorkflow(t *testing.T) {
 	defer adminConn.Close()
 
 	// Authenticate Admin
-	authMsg := MsgAuthAdmin{
+	authMsg := core.MsgAuthAdmin{
 		Type:           "auth_admin",
 		Username:       "admin_cmd_user",
 		Password:       "admin_cmd_pass",
@@ -92,8 +95,8 @@ func TestAdminCommandsWorkflow(t *testing.T) {
 	}
 
 	// Start background reader to demux responses
-	respChan := make(chan MsgAdminResponse, 20)
-	chanListChan := make(chan MsgChannelsList, 20)
+	respChan := make(chan core.MsgAdminResponse, 20)
+	chanListChan := make(chan core.MsgChannelsList, 20)
 
 	go func() {
 		for {
@@ -109,12 +112,12 @@ func TestAdminCommandsWorkflow(t *testing.T) {
 			}
 			switch base.Type {
 			case "admin_response":
-				var resp MsgAdminResponse
+				var resp core.MsgAdminResponse
 				if err := json.Unmarshal(payload, &resp); err == nil {
 					respChan <- resp
 				}
 			case "channels_list":
-				var list MsgChannelsList
+				var list core.MsgChannelsList
 				if err := json.Unmarshal(payload, &list); err == nil {
 					chanListChan <- list
 				}
@@ -123,7 +126,7 @@ func TestAdminCommandsWorkflow(t *testing.T) {
 	}()
 
 	// Helper to get next response with timeout
-	waitForResponse := func(reqID string) MsgAdminResponse {
+	waitForResponse := func(reqID string) core.MsgAdminResponse {
 		timeout := time.After(2 * time.Second)
 		for {
 			select {
@@ -133,24 +136,24 @@ func TestAdminCommandsWorkflow(t *testing.T) {
 				}
 			case <-timeout:
 				t.Fatalf("Timeout waiting for admin_response for reqID %s", reqID)
-				return MsgAdminResponse{}
+				return core.MsgAdminResponse{}
 			}
 		}
 	}
 
 	// Helper to get next channels list with timeout
-	waitForChannelsList := func() MsgChannelsList {
+	waitForChannelsList := func() core.MsgChannelsList {
 		select {
 		case list := <-chanListChan:
 			return list
 		case <-time.After(2 * time.Second):
 			t.Fatalf("Timeout waiting for channels_list")
-			return MsgChannelsList{}
+			return core.MsgChannelsList{}
 		}
 	}
 
 	// 4. Command: Add Channel
-	addCmd := AdminCommand{
+	addCmd := core.AdminCommand{
 		Cmd:   "add_channel",
 		ReqID: "req-add-1",
 		Name:  "Tactical",
@@ -177,7 +180,7 @@ func TestAdminCommandsWorkflow(t *testing.T) {
 	}
 
 	// 5. Command: Rename Channel
-	renameCmd := AdminCommand{
+	renameCmd := core.AdminCommand{
 		Cmd:   "rename_channel",
 		ReqID: "req-rename-1",
 		Old:   "Tactical",
@@ -208,7 +211,7 @@ func TestAdminCommandsWorkflow(t *testing.T) {
 	}
 
 	// 6. Command: Remove Channel
-	removeCmd := AdminCommand{
+	removeCmd := core.AdminCommand{
 		Cmd:   "remove_channel",
 		ReqID: "req-remove-1",
 		Name:  "Ops",
@@ -235,7 +238,7 @@ func TestAdminCommandsWorkflow(t *testing.T) {
 	}
 
 	// 7. Command Validation: Cannot delete default 'General' channel
-	removeGeneralCmd := AdminCommand{
+	removeGeneralCmd := core.AdminCommand{
 		Cmd:   "remove_channel",
 		ReqID: "req-remove-general",
 		Name:  "General",
