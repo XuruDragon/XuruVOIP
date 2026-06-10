@@ -36,6 +36,7 @@ El objetivo de XuruVoip es proporcionar eventos de juegos de Star Citizen, organ
 
 | Sección | Descripción |
 | :--- | :--- |
+| [📖 Guías de usuario no técnicas](#-guías-de-usuario-no-técnicas) | Guías paso a paso fáciles de entender para Cliente, Servidor y Stream Deck. |
 | [📸 Capturas de pantalla y interfaz de usuario](#-capturas-de-pantalla-y-interfaz-de-usuario) | Muestra visual de las pantallas de los clientes, el portal de administración y la configuración. |
 | [🗂️ Estructura del proyecto](#️-project-structure) | Diseño del repositorio y desglose de carpetas. |
 | [⚙️ Arquitectura del sistema](#️-system-architecture) | El diagrama de flujo de trabajo real completo del cliente WPF, el servidor Go y los dispositivos externos. |
@@ -44,6 +45,16 @@ El objetivo de XuruVoip es proporcionar eventos de juegos de Star Citizen, organ
 | [🎛️ Puente de voz de Discord](#️-discord-voice-bridge-setup-guide) | Conexión de canales de radio del servidor Go a un canal de voz de Discord. |
 | [📱 Aplicación complementaria y plataforma de transmisión](#-integración-de-aplicación-complementaria-y-plataforma-de-transmisión) | Control remoto de dispositivos y configuración de teclas físicas de Stream Deck. |
 | [🛠️ Cliente WPF (C#)](#-building--running-the-client) | Requisitos del cliente, compilación y guías de instalación de MSI/portátil. |
+
+---
+
+## 📖 Guías de usuario no técnicas
+
+Si no tiene experiencia en informática, hemos escrito guías sencillas paso a paso para ayudarle a configurar todo y ejecutarlo fácilmente:
+
+* 🎮 **[Guía del usuario del cliente](doc/client_guide.md)**: Guía sencilla sobre cómo elegir micrófonos/altavoces, configurar Push-to-Talk, usar cascos de trajes espaciales y activar efectos de voz de esfuerzo.
+* 🖥️ **[Guía de configuración del servidor](doc/server_guide.md)**: Explica cómo alojar un servidor, ajustar contraseñas/configuraciones en el archivo de configuración `.env` y configurar Discord Voice Bridge.
+* 🎛️ **[Guía del complemento Stream Deck](doc/streamdeck_guide.md)**: Tutorial sobre la instalación de botones físicos para silenciar, alternar la visera y mostrar canales de radio activos.
 
 ---
 
@@ -75,6 +86,7 @@ El objetivo de XuruVoip es proporcionar eventos de juegos de Star Citizen, organ
 
 ### 8. Página de inicio de sesión del portal web de administración
 ![Página de inicio de sesión del portal web de administración](/screenshots/admin_login.png)
+
 ### 9. Panel de control del portal web de administración
 ![Panel del portal web de administración](/screenshots/admin_dashboard.png)
 
