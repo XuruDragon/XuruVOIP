@@ -46,4 +46,12 @@
     <Page Remove="XuruVoipClient.Tests\**" />
   </ItemGroup>
 
+  <!-- Copy Tesseract native DLLs to publish directory for MSI installer packaging -->
+  <Target Name="CopyTesseractNativeDllsToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <TesseractNativeFiles Include="$(OutputPath)x64\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(TesseractNativeFiles)" DestinationFolder="$(PublishDir)x64\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>

@@ -14,6 +14,7 @@
         <Feature Id="ProductFeature" Title="XuruVoip Client" Level="1">
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="WebRtcVadDll" />
+            <ComponentRef Id="TesseractDlls" />
         </Feature>
     </Product>
 
@@ -26,6 +27,7 @@
                             <Directory Id="NativeFolder" Name="native" />
                         </Directory>
                     </Directory>
+                    <Directory Id="X64Folder" Name="x64" />
                 </Directory>
             </Directory>
             <Directory Id="ProgramMenuFolder" />
@@ -47,6 +49,14 @@
         <DirectoryRef Id="NativeFolder">
             <Component Id="WebRtcVadDll" Guid="$(var.GuidVad)" Win64="$(var.Win64)">
                 <File Id="WebRtcVad.dll" Source="$(var.SourceDir)\runtimes\win-x64\native\WebRtcVad.dll" KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+
+        <!-- Native Tesseract DLLs -->
+        <DirectoryRef Id="X64Folder">
+            <Component Id="TesseractDlls" Guid="d4c9839b-9f4f-4e12-8b85-e5caba0aba0b" Win64="$(var.Win64)">
+                <File Id="tesseract50.dll" Source="$(var.SourceDir)\x64\tesseract50.dll" KeyPath="yes" />
+                <File Id="leptonica.dll" Source="$(var.SourceDir)\x64\leptonica-1.82.0.dll" />
             </Component>
         </DirectoryRef>
 
