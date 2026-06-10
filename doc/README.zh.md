@@ -210,6 +210,24 @@ graph TD
   * *自定义音高移位 (Custom Pitch Shift)*：手动可调的音高系数（0.5x 至 2.0x）。
 * **头盔/太空服通讯调制器 (Helmet/Suit Comms Modulator)**：启用后，在传输开始/结束时叠加逼真的呼吸器呼吸嘶嘶声和按键提示音（嘶嘶声和提示音完全可以单独切换）。
 
+### 11. 💨 头盔与 EVA 太空舱外环境模拟
+* **EVA/真空静音：** 当玩家处于太空或真空区域（EVA）时，近距离（Proximity）语音通信将自动禁用/静音，以模拟缺乏空气介质的环境。此时玩家只能通过无线电频道进行沟通。
+* **面罩呼吸声与宇航服蜂鸣音：** 当装备并启用头盔面罩时，系统会在麦克风录音中混合逼真的呼吸器呼吸声以及宇航服排气蜂鸣声（50Hz/100Hz振荡器）。该功能可在客户端设置中开启或关闭。
+
+### 12. 💬 动态飞船内联通（对讲）与飞行员优先降音
+* **自动内联频道：** 当玩家进入飞船时，服务器会自动创建一个专属的内联对讲频道（`Intercom_<ContainerID>`），并自动让飞船内的所有玩家收听该频道。
+* **内联频道冷却清理：** 当飞船内的最后一名玩家离开时，服务器会启动一个 5 分钟的倒计时，倒计时结束后才会删除该对讲频道，以避免频繁进出造成的服务器性能损耗。
+* **飞行员优先降音（Ducking）：** 当处于驾驶员或飞行员席位的玩家在对讲频道说话时，飞船内其他所有玩家的近距离语音音量会自动降低 85%，以确保飞行员的指令能被清晰听到。
+
+### 13. 📱 伴侣应用程序与 Web 控制面板 (Companion App)
+* **本地 HTTP 服务器：** 客户端会在本地的 `8891` 端口运行一个轻量级的 Web 服务器（如果在设置中启用）。
+* **磨砂玻璃风格 Web UI：** 可通过本地的任何设备（包括手机或平板电脑）访问 `http://localhost:8891/`，查看极具现代感的霓虹灯特效磨砂玻璃控制面板。
+* **API 控制接口：** 提供实时状态获取接口（GET `/api/status`）以及控制端点（POST `/api/action`），用于切换静音状态、开闭头盔面罩、更改活动频道及切换变声器配置文件（完美兼容 Stream Deck）。
+
+### 14. 🎛️ Discord 语音网桥 (Discord Voice Bridge)
+* **双向音频中继：** 服务器端的语音网桥可实时中继指定的 Go 服务器无线电频道与 Discord 语音频道之间的语音通话。
+* **SSRC 成员映射：** 自动将 Discord 用户 ID 映射为他们在服务器中的昵称，并将传入的 Discord 语音以 `“<昵称> (Discord)”` 的形式进行展示与播放。
+
 ---
 
 ## 🖥️ XuruVoip 服务端 (Go)
@@ -247,6 +265,17 @@ XURUVOIP_LIMIT_BURST_AUDIO=120
 XURUVOIP_LOCKOUT_ATTEMPTS=5
 XURUVOIP_LOCKOUT_WINDOW=60
 XURUVOIP_LOCKOUT_DURATION=600
+
+# 飞船内联通与 EVA 设置 (1 = 启用, 0 = 禁用)
+XURUVOIP_ENABLE_INTERCOM=1
+XURUVOIP_ENABLE_EVA_MUTING=1
+
+# Discord 语音网桥设置 (1 = 启用, 0 = 禁用)
+XURUVOIP_ENABLE_DISCORD_BRIDGE=1
+XURUVOIP_DISCORD_TOKEN=your_discord_bot_token
+XURUVOIP_DISCORD_GUILD_ID=your_discord_guild_id
+XURUVOIP_DISCORD_CHANNEL_ID=your_discord_channel_id
+XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
 ### 从源码编译

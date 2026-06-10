@@ -232,6 +232,24 @@ graph TD
   * *Custom Pitch Shift*: Manually adjustable pitch factor (0.5x to 2.0x).
 * **Helmet/Suit Comms Modulator**: When enabled, overlays an authentic respirator breathing hiss and key chime tones on transmission start/end (hiss and chimes are fully toggleable).
 
+### 11. 💨 Helmet & EVA Atmospheric Simulation
+* **EVA/Vacuum Muting:** When players are in vacuum or space zones (EVA), proximity voice communications are automatically disabled/muted to simulate the lack of atmospheric medium. Communication is only possible over radio channels.
+* **Visor Breathing & Vent hum:** When the helmet visor is equipped and active, a realistic respirator breathing sound effect and suit vent hum (50Hz/100Hz oscillators) are overlayed on the microphone capture. This can be toggled via the client settings.
+
+### 12. 💬 Dynamic Ship Intercom & Pilot Priority Ducking
+* **Automatic Intercom Channels:** When players enter a ship, the server automatically creates a dedicated intercom channel (`Intercom_<ContainerID>`) and auto-subscribes all players inside that vehicle. 
+* **Intercom Cooldown Clean Up:** When the last player leaves the ship, the server starts a 5-minute countdown before deleting the intercom channel, preventing performance overhead from frequent transitions.
+* **Pilot Priority Ducking:** When a player in a pilot/driver seat speaks on the intercom channel, proximity audio of all other players in the ship is automatically ducked by 85% to ensure the pilot's commands are clearly heard.
+
+### 13. 📱 Companion App & Web Dashboard
+* **Local HTTP Server:** The client hosts a lightweight web server on port `8891` (if enabled in settings).
+* **Glassmorphic Web UI:** Access `http://localhost:8891/` from any local device (including mobile phones or tablets) to view a sleek, glowing neon dashboard.
+* **API Controls:** Provides real-time status updates (GET `/api/status`) and control endpoints (POST `/api/action`) to toggle mute states, helmet visor, active channels, and voice changer profiles (compatible with Stream Deck).
+
+### 14. 🎛️ Discord Voice Bridge
+* **Bidirectional Audio Relay:** A server-side voice bridge that relays voice communications between a designated Go server radio channel and a Discord voice channel in real-time.
+* **SSRC Member Mapping:** Automatically maps Discord user IDs to their server nicknames, showing incoming Discord speech under the `"<Nickname> (Discord)"` tag.
+
 ---
 
 ## 🎮 XuruVoip Client Settings Tab Breakdown
@@ -301,6 +319,17 @@ XURUVOIP_LIMIT_BURST_AUDIO=120
 XURUVOIP_LOCKOUT_ATTEMPTS=5
 XURUVOIP_LOCKOUT_WINDOW=60
 XURUVOIP_LOCKOUT_DURATION=600
+
+# Dynamic Intercom and Immersion features (1 = enabled, 0 = disabled)
+XURUVOIP_ENABLE_INTERCOM=1
+XURUVOIP_ENABLE_EVA_MUTING=1
+
+# Discord Voice Bridge Settings (1 = enabled, 0 = disabled)
+XURUVOIP_ENABLE_DISCORD_BRIDGE=1
+XURUVOIP_DISCORD_TOKEN=your_discord_bot_token
+XURUVOIP_DISCORD_GUILD_ID=your_discord_guild_id
+XURUVOIP_DISCORD_CHANNEL_ID=your_discord_channel_id
+XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
 ### Building the Server from source
@@ -471,16 +500,6 @@ Start-Service -Name XuruVoipServer
 ```
 
 ---
-
-## 🎮 XuruVoip Client Settings Tab Breakdown
-
-The settings window is divided into six specialized tabs:
-1. **General**: Select client language, configure the custom Star Citizen `Game.log` file path, and toggle general log file writing.
-2. **Connection**: Configure the Server IP address, Position & Audio ports, Username, User Password, and Server Token/Password.
-3. **Position**: Toggle the coordinates source ("OCR Screen Scanner" vs "Game.log Reader (GRTPR)"), select monitor, scan interval (ms), crop region bounding box, and preview real-time OCR results (OCR settings are hidden when GRTPR is active).
-4. **Audio**: Choose input/output devices, adjust gains, select transmission mode (PTT / VAD), configure VAD threshold, toggle **Enable 3D Spatial Audio**, and configure advanced options like distance-based radio degradation and synthesized PTT mic chimes.
-5. **Hotkeys**: Record keys for Proximity PTT, Radio PTT, Profile PTT, Helmet toggle, Radio channel cycle, muting outgoing microphone channels, and muting incoming audio channels.
-6. **Overlay**: Toggle the borderless HUD overlay window and configure the screen corner placement (e.g., Top-Left, Top-Right).
 
 ### Building & Running the Client
 

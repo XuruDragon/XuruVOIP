@@ -230,6 +230,24 @@ graph TD
   * *Desplazamiento de Tono Personalizado*: Ajuste manual del factor de tono de 0.5x a 2.0x.
 * **Modulador de Casco y Traje**: Superpone un sonido de respiración de respirador realista y tonos de timbre al activar/desactivar la transmisión (totalmente configurables de forma independiente).
 
+### 11. 💨 Simulación de Atmósfera en Casco y EVA
+* **Silenciamiento en EVA/Vacío:** Cuando los jugadores se encuentran en zonas de vacío o en el espacio (EVA), las comunicaciones de voz por proximidad se desactivan/silencian automáticamente para simular la falta de un medio atmosférico. La comunicación solo es posible a través de canales de radio.
+* **Respiración en Visor y Zumbido de Traje:** Cuando el visor del casco está equipado y activo, se superpone un efecto de sonido realista de respiración y un zumbido de ventilación del traje (osciladores de 50Hz/100Hz) en la captura del micrófono. Esto se puede activar o desactivar a través de la configuración del cliente.
+
+### 12. 💬 Intercomunicador de Nave Dinámico y Atenuación de Prioridad de Piloto
+* **Canales de Intercomunicador Automáticos:** Cuando los jugadores entran a una nave, el servidor crea automáticamente un canal de intercomunicador dedicado (`Intercom_<ContainerID>`) y suscribe de forma automática a todos los jugadores dentro de ese vehículo.
+* **Limpieza Temporizada del Intercomunicador:** Cuando el último jugador sale de la nave, el servidor inicia una cuenta atrás de 5 minutos antes de eliminar el canal del intercomunicador, evitando la sobrecarga de rendimiento por transiciones frecuentes.
+* **Atenuación de Prioridad de Piloto:** Cuando un jugador en un asiento de piloto/conductor habla en el canal del intercomunicador, el audio de proximidad de todos los demás jugadores en la nave se atenúa automáticamente en un 85% para garantizar que los comandos del piloto se escuchen con claridad.
+
+### 13. 📱 Aplicación Compañera y Panel Web (Companion App)
+* **Servidor HTTP Local:** El cliente aloja un servidor web ligero en el puerto `8891` (si está habilitado en la configuración).
+* **Interfaz Web Glassmorphic:** Acceda a `http://localhost:8891/` desde cualquier dispositivo local (incluidos teléfonos móviles o tabletas) para ver un panel elegante con estilo de neón brillante.
+* **Controles de la API:** Proporciona actualizaciones de estado en tiempo real (GET `/api/status`) y puntos finales de control (POST `/api/action`) para alternar estados de silencio, el visor del casco, los canales activos y los perfiles del modulador de voz (compatible con Stream Deck).
+
+### 14. 🎛️ Puente de Voz con Discord (Discord Voice Bridge)
+* **Transmisión de Audio Bidireccional:** Puente de voz en el lado del servidor que retransmite las comunicaciones de voz entre un canal de radio designado del servidor Go y un canal de voz de Discord en tiempo real.
+* **Mapeo de Miembros SSRC:** Asocia automáticamente las ID de usuario de Discord con sus apodos del servidor, mostrando el habla entrante de Discord bajo la etiqueta `"<Apodo> (Discord)"`.
+
 ---
 
 ## 🎮 Pestañas de Ajustes de XuruVoip Client
@@ -284,6 +302,17 @@ XURUVOIP_LIMIT_BURST_AUDIO=120
 XURUVOIP_LOCKOUT_ATTEMPTS=5
 XURUVOIP_LOCKOUT_WINDOW=60
 XURUVOIP_LOCKOUT_DURATION=600
+
+# Ajustes de Intercomunicador y EVA (1 = habilitado, 0 = desactivado)
+XURUVOIP_ENABLE_INTERCOM=1
+XURUVOIP_ENABLE_EVA_MUTING=1
+
+# Ajustes del Puente de Voz de Discord (1 = habilitado, 0 = desactivado)
+XURUVOIP_ENABLE_DISCORD_BRIDGE=1
+XURUVOIP_DISCORD_TOKEN=tu_token_de_bot_de_discord
+XURUVOIP_DISCORD_GUILD_ID=tu_id_de_servidor_de_discord
+XURUVOIP_DISCORD_CHANNEL_ID=tu_id_de_canal_de_voz_de_discord
+XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
 ### Compilación desde las fuentes
@@ -432,16 +461,6 @@ Start-Service -Name XuruVoipServer
 ```
 
 ---
-
-## 🎮 Pestañas de Ajustes de XuruVoip Client
-
-El panel de configuración incluye seis secciones:
-1. **General**: Selección de idioma, ruta del archivo `Game.log` de Star Citizen y activación del registro local.
-2. **Connection**: Dirección IP del servidor, puertos de audio y posición, nombre de usuario, contraseña del perfil y contraseña del servidor.
-3. **Position**: Elección de la fuente de posición ("Escáner de Pantalla OCR" vs. "Lector Game.log (GRTPR)"), selección del monitor, frecuencia de escaneo (ms), definición del área de escaneo de pantalla y vista previa del texto parseado (las opciones OCR se ocultan cuando GRTPR está activo).
-4. **Audio**: Dispositivos de audio, ajuste de ganancias de volumen, modo de transmisión (PTT / VAD), sensibilidad del VAD, activación de **3D Spatial Audio**, así como opciones avanzadas de degradación de radio y tonos PTT de micro.
-5. **Hotkeys**: Registro de las teclas de atajo de teclado para el PTT, silenciar canales de transmisión y silenciar canales de audio recibidos.
-6. **Overlay**: Activación de la superposición HUD transparente y configuración de la ubicación en pantalla (ej. Arriba a la izquierda, Arriba a la derecha).
 
 ### Compilación y Ejecución del Cliente
 

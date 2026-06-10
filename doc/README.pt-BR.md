@@ -231,6 +231,24 @@ graph TD
   * *Ajuste de Tom Personalizado*: Fator de tom ajustável manualmente de 0.5x a 2.0x.
 * **Modulador de Capacete e Traje**: Superpõe um som realista de respiração e chimes nas bordas de transmissão (a respiração e os chimes são totalmente desativáveis).
 
+### 11. 💨 Simulação Atmosférica de Capacete e EVA
+* **Silenciamento em EVA/Vácuo:** Quando os jogadores estão no vácuo ou em zonas espaciais (EVA), as comunicações de voz por proximidade são desativadas/mutadas automaticamente para simular a ausência de meio atmosférico. A comunicação só é possível através de canais de rádio.
+* **Respiração no Visor e Ruído do Traje:** Quando o visor do capacete está equipado e ativo, um efeito sonoro realista de respiração e um zumbido de ventilação do traje (osciladores de 50Hz/100Hz) são sobrepostos na captação do microfone. Isso pode ser ativado ou desativado nas configurações do cliente.
+
+### 12. 💬 Interfone Dinâmico de Nave e Atenuação de Prioridade do Piloto
+* **Canais de Interfone Automáticos:** Quando os jogadores entram em uma nave, o servidor cria automaticamente um canal de interfone dedicado (`Intercom_<ContainerID>`) e inscreve automaticamente todos os jogadores dentro do veículo.
+* **Limpeza Temporizada do Interfone:** Quando o último jogador sai da nave, o servidor inicia uma contagem regressiva de 5 minutos antes de deletar o canal do interfone, evitando sobrecarga de desempenho devido a transições frequentes.
+* **Atenuação de Prioridade do Piloto:** Quando um jogador no assento do piloto/condutor fala no canal do interfone, o áudio de proximidade de todos os outros jogadores na nave é atenuado automaticamente em 85% para garantir que os comandos do piloto sejam ouvidos com clareza.
+
+### 13. 📱 Aplicativo Companheiro e Painel Web (Companion App)
+* **Servidor HTTP Local:** O cliente hospeda um servidor web leve na porta `8891` (se ativado nas configurações).
+* **Interface Web Glassmorphic:** Acesse `http://localhost:8891/` de qualquer dispositivo local (incluindo celulares ou tablets) para visualizar um painel elegante com estilo neon brilhante.
+* **Controles de API:** Fornece atualizações de status em tempo real (GET `/api/status`) e endpoints de controle (POST `/api/action`) para alternar estados de mudo, visor do capacete, canais ativos e perfis do modulador de voz (compatível com Stream Deck).
+
+### 14. 🎛️ Ponte de Voz do Discord (Discord Voice Bridge)
+* **Retransmissão de Áudio Bidirecional:** Uma ponte de voz no lado do servidor que retransmite as comunicações de voz entre um canal de rádio designado del servidor Go e um canal de voz do Discord em tempo real.
+* **Mapeamento de Membros SSRC:** Mapeia automaticamente as IDs de usuários do Discord para seus apelidos no servidor, exibindo as falas vindas do Discord sob a tag `"<Apelido> (Discord)"`.
+
 ---
 
 ## 🖥️ Servidor XuruVoip (Go)
@@ -268,6 +286,17 @@ XURUVOIP_LIMIT_BURST_AUDIO=120
 XURUVOIP_LOCKOUT_ATTEMPTS=5
 XURUVOIP_LOCKOUT_WINDOW=60
 XURUVOIP_LOCKOUT_DURATION=600
+
+# Configurações de Interfone e EVA (1 = habilitado, 0 = desativado)
+XURUVOIP_ENABLE_INTERCOM=1
+XURUVOIP_ENABLE_EVA_MUTING=1
+
+# Configurações da Ponte de Voz do Discord (1 = habilitado, 0 = desativado)
+XURUVOIP_ENABLE_DISCORD_BRIDGE=1
+XURUVOIP_DISCORD_TOKEN=seu_token_de_bot_do_discord
+XURUVOIP_DISCORD_GUILD_ID=seu_id_do_servidor_do_discord
+XURUVOIP_DISCORD_CHANNEL_ID=seu_id_do_canal_de_voz_do_discord
+XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
 ### Compilando o Servidor a partir das fontes

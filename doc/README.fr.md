@@ -230,6 +230,24 @@ graph TD
   * *Pitch Shift personnalisé* : Hauteur réglable manuellement de 0.5x à 2.0x.
 * **Modulateur de casque/combinaison** : Lorsque cette option est activée, elle superpose un sifflement de respiration réaliste et des tonalités de fin de transmission (le sifflement et les tonalités sont entièrement désactivables).
 
+### 11. 💨 Simulation d'atmosphère de casque et d'EVA
+* **Sourdine EVA/Vide spatial :** Lorsque les joueurs se trouvent dans des zones de vide ou d'espace (EVA), les communications vocales de proximité sont automatiquement désactivées/coupées pour simuler l'absence de milieu atmosphérique. La communication n'est possible que via les canaux radio.
+* **Respiration et bourdonnement du casque :** Lorsque la visière du casque est équipée et active, un effet sonore réaliste de respiration (respirateur) et un bourdonnement de combinaison (oscillateurs 50Hz/100Hz) sont superposés à la capture du microphone. Cela peut être activé ou désactivé dans les paramètres du client.
+
+### 12. 💬 Intercom de vaisseau dynamique et atténuation prioritaire du pilote
+* **Canaux d'intercom automatiques :** Lorsque des joueurs entrent dans un vaisseau, le serveur crée automatiquement un canal d'intercom dédié (`Intercom_<ContainerID>`) et y abonne automatiquement tous les joueurs présents dans ce véhicule.
+* **Nettoyage temporisé de l'intercom :** Lorsque le dernier joueur quitte le vaisseau, le serveur lance un compte à rebours de 5 minutes avant de supprimer le canal d'intercom, évitant ainsi les surcharges de performances dues à des transitions fréquentes.
+* **Atténuation prioritaire du pilote :** Lorsqu'un joueur installé sur un siège de pilote ou de conducteur parle sur le canal d'intercom, l'audio de proximité de tous les autres joueurs du vaisseau est automatiquement atténué de 85% pour garantir que les commandes du pilote soient clairement entendues.
+
+### 13. 📱 Application compagnon et tableau de bord Web
+* **Serveur HTTP local :** Le client héberge un serveur Web léger sur le port `8891` (si activé dans les paramètres).
+* **Interface Web glassmorphe :** Accédez à `http://localhost:8891/` depuis n'importe quel appareil local (y compris les téléphones portables ou tablettes) pour afficher un tableau de bord élégant au style néon lumineux.
+* **Contrôles API :** Fournit des mises à jour de statut en temps réel (GET `/api/status`) et des points d'accès de contrôle (POST `/api/action`) pour basculer les états muets, la visière du casque, les canaux actifs et les profils de changeur de voix (compatible avec Stream Deck).
+
+### 14. 🎛️ Pont vocal Discord (Discord Voice Bridge)
+* **Relais audio bidirectionnel :** Un pont vocal côté serveur qui relie en temps réel les communications vocales entre un canal radio désigné du serveur Go et un canal vocal Discord.
+* **Mise en correspondance des membres SSRC :** Associe automatiquement les identifiants d'utilisateurs Discord à leurs pseudonymes sur le serveur, affichant les voix Discord entrantes sous le format `"<Pseudo> (Discord)"`.
+
 ---
 
 ## 🎮 Détail des paramètres du Client
@@ -289,6 +307,17 @@ XURUVOIP_LIMIT_BURST_AUDIO=120
 XURUVOIP_LOCKOUT_ATTEMPTS=5
 XURUVOIP_LOCKOUT_WINDOW=60
 XURUVOIP_LOCKOUT_DURATION=600
+
+# Paramètres d'intercom et d'EVA (1 = activé, 0 = désactivé)
+XURUVOIP_ENABLE_INTERCOM=1
+XURUVOIP_ENABLE_EVA_MUTING=1
+
+# Paramètres du pont vocal Discord (1 = activé, 0 = désactivé)
+XURUVOIP_ENABLE_DISCORD_BRIDGE=1
+XURUVOIP_DISCORD_TOKEN=votre_jeton_de_bot_discord
+XURUVOIP_DISCORD_GUILD_ID=votre_id_de_serveur_discord
+XURUVOIP_DISCORD_CHANNEL_ID=votre_id_de_canal_vocal_discord
+XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
 ### Compilation du Serveur depuis les sources
@@ -433,16 +462,6 @@ Start-Service -Name XuruVoipServer
 ```
 
 ---
-
-## 🎮 Détail des paramètres du Client
-
-La fenêtre des paramètres comporte six onglets :
-1. **Général** : Choix de la langue, chemin du fichier `Game.log` et activation de la journalisation locale.
-2. **Connexion** : Adresse IP du serveur, ports audio et position, nom d'utilisateur, mot de passe de compte et mot de passe serveur.
-3. **Position** : Choix de la source de position ("Scanner d'Écran OCR" vs "Lecteur Game.log (GRTPR)"), sélection du moniteur, intervalle de capture (ms), définition de la région de scan et prévisualisation du texte capturé (les options OCR sont masquées si GRTPR est actif).
-4. **Audio** : Sélection des périphériques, réglage des gains de volume, mode de transmission (PTT / VAD), réglage du seuil de détection, activation de l'audio spatial 3D, ainsi que les options avancées de dégradation radio et de bruitages micro PTT.
-5. **Raccourcis** : Enregistrement des touches de raccourci clavier pour le PTT, le casque, le changement de canal et les fonctions de coupure audio (muet).
-6. **Incrustation (Overlay)** : Activation de l'overlay HUD transparent et configuration de son emplacement à l'écran (ex. En haut à gauche, En haut à droite).
 
 ### Compilation & Lancement du Client
 

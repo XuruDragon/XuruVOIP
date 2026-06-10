@@ -231,6 +231,24 @@ graph TD
   * *Eigene Tonhöhenverschiebung*: Manuell einstellbarer Pitch-Faktor von 0.5x to 2.0x.
 * **Helm-/Anzugmodulator**: Nach der Aktivierung wird ein authentisches Atemgeräusch und Sendebestätigungstöne bei Sendestart/-ende überlagert (beide Optionen sind separat ausschaltbar).
 
+### 11. 💨 Helm- und EVA-Atmosphärensimulation
+* **EVA/Vakuum-Stummschaltung:** Wenn sich Spieler in Vakuum- oder Weltraumzonen (EVA) befinden, wird die Proximity-Sprachkommunikation automatisch deaktiviert/stummgeschaltet, um das Fehlen eines atmosphärischen Mediums zu simulieren. Die Kommunikation ist dann nur noch über Funkkanäle möglich.
+* **Visieratmung & Anzugbrummen:** Wenn das Helmvisier ausgerüstet und aktiv ist, wird die Mikrofonaufnahme mit einem realistischen Atemschutz-Atemgeräusch und einem Anzuglüfter-Brummen (50-Hz-/100-Hz-Oszillatoren) überlagert. Dies kann in den Client-Einstellungen ein- oder ausgeschaltet werden.
+
+### 12. 💬 Dynamischer Schiffs-Intercom & Pilotenprioritäts-Dämpfung
+* **Automatische Intercom-Kanäle:** Wenn Spieler ein Raumschiff betreten, erstellt der Server automatisch einen dedizierten Intercom-Kanal (`Intercom_<ContainerID>`) und abonniert automatisch alle Spieler in diesem Fahrzeug.
+* **Intercom-Bereinigung mit Cooldown:** Wenn der letzte Spieler das Schiff verlässt, startet der Server einen 5-minütigen Countdown, bevor der Intercom-Kanal gelöscht wird, um Performance-Einbußen durch häufige Zonenwechsel zu vermeiden.
+* **Pilotenprioritäts-Dämpfung:** Wenn ein Spieler auf einem Piloten- oder Fahrersitz über den Intercom-Kanal spricht, wird das Proximity-Audio aller anderen Spieler im Schiff automatisch um 85 % gedämpft, um sicherzustellen, dass die Befehle des Piloten klar verständlich sind.
+
+### 13. 📱 Begleit-App & Web-Dashboard (Companion App)
+* **Lokaler HTTP-Server:** Der Client hostet einen leichtgewichtigen Webserver auf Port `8891` (falls in den Einstellungen aktiviert).
+* **Glassmorphic Web-UI:** Rufen Sie `http://localhost:8891/` von einem beliebigen lokalen Gerät (einschließlich Smartphones oder Tablets) auf, um ein elegantes, neonfarben leuchtendes Dashboard anzuzeigen.
+* **API-Steuerung:** Bietet Echtzeit-Statusaktualisierungen (GET `/api/status`) und Steuerungs-Endpunkte (POST `/api/action`) zum Umschalten von Stummschaltungszuständen, Helmvisier, aktiven Kanälen und Stimmenverzerrer-Profilen (kompatibel mit Stream Deck).
+
+### 14. 🎛️ Discord-Sprachbrücke (Discord Voice Bridge)
+* **Bidirektionales Audio-Relay:** Eine serverseitige Sprachbrücke, die Sprachübertragungen zwischen einem festgelegten Go-Server-Funkkanal und einem Discord-Sprachkanal in Echtzeit weiterleitet.
+* **SSRC-Mitgliederzuordnung:** Ordnet Discord-Benutzer-IDs automatisch ihren Server-Spitznamen zu und zeigt eingehende Discord-Sprache mit dem Tag `"<Spitzname> (Discord)"` an.
+
 ---
 
 ## 🎮 Übersicht der XuruVoip-Client-Einstellungen
@@ -285,6 +303,17 @@ XURUVOIP_LIMIT_BURST_AUDIO=120
 XURUVOIP_LOCKOUT_ATTEMPTS=5
 XURUVOIP_LOCKOUT_WINDOW=60
 XURUVOIP_LOCKOUT_DURATION=600
+
+# Intercom- & EVA-Einstellungen (1 = aktiviert, 0 = deaktiviert)
+XURUVOIP_ENABLE_INTERCOM=1
+XURUVOIP_ENABLE_EVA_MUTING=1
+
+# Discord-Sprachbrücken-Einstellungen (1 = aktiviert, 0 = deaktiviert)
+XURUVOIP_ENABLE_DISCORD_BRIDGE=1
+XURUVOIP_DISCORD_TOKEN=ihr_discord_bot_token
+XURUVOIP_DISCORD_GUILD_ID=ihr_discord_guild_id
+XURUVOIP_DISCORD_CHANNEL_ID=ihr_discord_channel_id
+XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
 ### Server kompilieren
@@ -433,16 +462,6 @@ Start-Service -Name XuruVoipServer
 ```
 
 ---
-
-## 🎮 Übersicht der XuruVoip-Client-Einstellungen
-
-Das Einstellungsfenster bietet sechs Abschnitte:
-1. **General**: Sprachauswahl, Pfad der Star Citizen `Game.log`-Datei und Umschalter für das lokale Logging.
-2. **Connection**: Serveradresse, Audio- und Positionsports, Benutzername, Passwort und Serverpasswort/-token.
-3. **Position**: Wahl der Positionsquelle ("OCR Screen Scanner" vs. "Game.log Reader (GRTPR)"), Monitorauswahl, Scanintervall (ms), Scanbereich festlegen und Vorschau der letzten Texterkennung (OCR-Optionen werden ausgeblendet, wenn GRTPR aktiv ist).
-4. **Audio**: Audiogeräte auswählen, Lautstärke anpassen, Sendemodus (PTT / VAD) festlegen, VAD-Empfindlichkeit einstellen, **3D Spatial Audio** aktivieren sowie erweiterte Einstellungen für Funkverschlechterung und Funktöne.
-5. **Hotkeys**: Belegung von Tasten für PTT (Nähe, Funk, Profil), Helm ein/aus, Funkkanal-Umschaltung sowie Mute-Tasten für Ausgang (Mikrofon) und Eingang (Wiedergabe).
-6. **Overlay**: Aktivierung des transparenten HUD-Overlays und Einstellung der Bildschirmecke für die Platzierung (z. B. Oben links, Oben rechts).
 
 ### Client kompilieren und ausführen
 
