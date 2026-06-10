@@ -157,4 +157,53 @@ public class AudioCaptureServiceTests
         // InputLevel = 2000 / 32768f = 0.061035f
         Assert.Equal(2000f / 32768f, capture.InputLevel, 4);
     }
+
+    [StaFact]
+    public async Task AudioCaptureService_ExertionDistortion_ShouldApplyTremoloAndPitchShifting()
+    {
+        // GIVEN
+        await using var vm = new MainViewModel();
+        
+        var viewModelProp = typeof(App).GetProperty("ViewModel", BindingFlags.Public | BindingFlags.Static);
+        viewModelProp!.SetValue(null, vm);
+
+        using var capture = new AudioCaptureService();
+        var encoder = Concentus.OpusCodecFactory.CreateEncoder(48000, 1, Concentus.Enums.OpusApplication.OPUS_APPLICATION_VOIP);
+        var encoderField = typeof(AudioCaptureService).GetField("_encoder", BindingFlags.NonPublic | BindingFlags.Instance);
+        encoderField!.SetValue(capture, encoder);
+
+        // Enable exertion distortion and set mock values
+        vm.Config.Config.EnableExertionDistortion = true;
+        vm.GForce = 0.8;
+        vm.Exertion = 0.5;
+        capture.Mode = AudioMode.PTT;
+        capture.SetPttState(true, 0x00);
+
+        var processFrameMethod = typeof(AudioCaptureService).GetMethod("ProcessFrame", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Create a non-silent PCM frame to test distortion on voice
+        var pcm = new short[960];
+        for (int i = 0; i < pcm.Length; i++)
+        {
+            pcm[i] = (short)(10000 * Math.Sin(2 * Math.PI * 1000.0 * i / 48000.0)); // 1kHz sine wave
+        }
+        
+        var originalPcm = new short[960];
+        Array.Copy(pcm, originalPcm, pcm.Length);
+
+        // WHEN
+        processFrameMethod!.Invoke(capture, new object[] { pcm });
+
+        // THEN: Audio should be modified
+        bool isModified = false;
+        for (int i = 0; i < pcm.Length; i++)
+        {
+            if (pcm[i] != originalPcm[i])
+            {
+                isModified = true;
+                break;
+            }
+        }
+        Assert.True(isModified);
+    }
 }

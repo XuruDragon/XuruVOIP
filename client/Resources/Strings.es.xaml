@@ -123,6 +123,11 @@
     <sys:String x:Key="LblEnableDiscordRpc">Activar Discord Rich Presence</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Activar servidor HTTP Companion</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Puerto del servidor Companion</sys:String>
+    <sys:String x:Key="LblEnableExertionDistortion">Activar distorsión de voz por fuerza G y esfuerzo</sys:String>
+    <sys:String x:Key="LblEnableRadioRepeaters">Activar repetidores de radio (enrutamiento multisalto)</sys:String>
+    <sys:String x:Key="LblIsRadioRepeater">Actuar como baliza repetidora de radio</sys:String>
+    <sys:String x:Key="LblEnableShipPa">Activar sistema de megafonía (PA) de la nave</sys:String>
+    <sys:String x:Key="LblPttPaKey">Tecla de transmisión de megafonía (PA)</sys:String>
     <sys:String x:Key="LblOverlayCapabilities">Capacidades de la Superposición</sys:String>
     <sys:String x:Key="LblOverlayCapabilitiesDesc">La superposición de HUD es totalmente compatible con Vulkan y DirectX cuando Star Citizen se ejecuta en modo "Ventana sin bordes". Muestra el estado de la conexión VoIP en el juego, la frecuencia de radio activa y los indicadores de habla en tiempo real sin inyectarse en el código del juego ni arriesgarse a baneos.</sys:String>
 

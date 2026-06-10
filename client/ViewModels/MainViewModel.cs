@@ -92,6 +92,20 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private float _inputLevel;
     public float InputLevel { get => _inputLevel; set => Set(ref _inputLevel, value); }
 
+    private double _gforce = 0.0;
+    public double GForce
+    {
+        get => _gforce;
+        set => Set(ref _gforce, Math.Clamp(value, 0.0, 1.0));
+    }
+
+    private double _exertion = 0.0;
+    public double Exertion
+    {
+        get => _exertion;
+        set => Set(ref _exertion, Math.Clamp(value, 0.0, 1.0));
+    }
+
     private bool _isHelmetOn;
     public bool IsHelmetOn
     {
@@ -317,6 +331,20 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             }
         };
         _gameDetector.PositionReceived += OnGrtprPositionReceived;
+        _gameDetector.GForceReceived += gforce => Application.Current?.Dispatcher.Invoke(() =>
+        {
+            if (Config.Config.EnableExertionDistortion)
+            {
+                GForce = gforce;
+            }
+        });
+        _gameDetector.ExertionReceived += exertion => Application.Current?.Dispatcher.Invoke(() =>
+        {
+            if (Config.Config.EnableExertionDistortion)
+            {
+                Exertion = exertion;
+            }
+        });
         _gameDetector.CustomGameLogPath = Config.Config.CustomGameLogPath;
         _gameDetector.Start();
 

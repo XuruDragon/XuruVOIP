@@ -264,6 +264,36 @@
                                          Text="{Binding Config.CompanionAppPort, UpdateSourceTrigger=PropertyChanged}"
                                          Style="{StaticResource InputStyle}"/>
                             </StackPanel>
+
+                            <!-- Immersive Features -->
+                            <CheckBox Content="{DynamicResource LblEnableExertionDistortion}"
+                                      IsChecked="{Binding Config.EnableExertionDistortion, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"/>
+
+                            <CheckBox Content="{DynamicResource LblEnableRadioRepeaters}"
+                                      IsChecked="{Binding Config.EnableRadioRepeaters, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"/>
+
+                            <CheckBox Content="{DynamicResource LblIsRadioRepeater}"
+                                      IsChecked="{Binding Config.IsRadioRepeater, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"/>
+
+                            <CheckBox x:Name="CbEnableShipPa"
+                                      Content="{DynamicResource LblEnableShipPa}"
+                                      IsChecked="{Binding Config.EnableShipPa, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
+                                      Checked="ShipPa_ToggleChanged" Unchecked="ShipPa_ToggleChanged"/>
+
+                            <StackPanel x:Name="ShipPaPanel" Margin="16,4,0,0">
+                                <TextBlock Text="{DynamicResource LblPttPaKey}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="TxPttPaKey"
+                                         Text="{Binding Config.PttPaKey, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
