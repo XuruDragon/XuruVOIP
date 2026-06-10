@@ -31,6 +31,22 @@ type ActivePlayer struct {
 	Hwid              string
 	IsTalking         bool
 	LastTalkTime      time.Time
+	IsRadioRepeater   bool
+	repeaterMu        sync.RWMutex
+}
+
+// GetIsRadioRepeater returns whether the player acts as a radio repeater
+func (p *ActivePlayer) GetIsRadioRepeater() bool {
+	p.repeaterMu.RLock()
+	defer p.repeaterMu.RUnlock()
+	return p.IsRadioRepeater
+}
+
+// SetIsRadioRepeater sets whether the player acts as a radio repeater
+func (p *ActivePlayer) SetIsRadioRepeater(active bool) {
+	p.repeaterMu.Lock()
+	defer p.repeaterMu.Unlock()
+	p.IsRadioRepeater = active
 }
 
 // SafeGetUDPAddr returns the player's UDP address in a thread-safe manner
@@ -350,6 +366,21 @@ func (h *Hub) UpdateProxShort(name string, active bool) bool {
 	return true
 }
 
+// UpdateRadioRepeater updates a player's radio repeater status
+func (h *Hub) UpdateRadioRepeater(name string, active bool) bool {
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
+
+	p, exists := h.Players[name]
+	if !exists {
+		return false
+	}
+
+	p.SetIsRadioRepeater(active)
+	p.LastSeen = time.Now()
+	return true
+}
+
 // UpdateScOnline updates a player's Star Citizen online status
 func (h *Hub) UpdateScOnline(name string, online bool) bool {
 	h.Mu.Lock()
@@ -400,6 +431,7 @@ func (h *Hub) GetPlayerStateList(excludeName string) []PlayerState {
 			ProxShort:         p.ProxShort,
 			ScOnline:          p.ScOnline,
 			IsTalking:         p.IsTalking,
+			IsRadioRepeater:   p.GetIsRadioRepeater(),
 		})
 	}
 	return states
@@ -422,6 +454,7 @@ func (h *Hub) GetAllPlayerStates() []PlayerState {
 			ProxShort:         p.ProxShort,
 			ScOnline:          p.ScOnline,
 			IsTalking:         p.IsTalking,
+			IsRadioRepeater:   p.GetIsRadioRepeater(),
 		})
 	}
 	return states

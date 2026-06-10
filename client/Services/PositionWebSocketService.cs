@@ -146,6 +146,13 @@ public class PositionWebSocketService : IAsyncDisposable
         await SendJsonAsync(new { type = online ? "sc_online" : "sc_offline" });
     }
 
+    public async Task SendToggleRepeaterAsync(bool active)
+    {
+        if (!IsConnected) return;
+        LogService.Info($"Sending toggle repeater status: active={active}");
+        await SendJsonAsync(new { type = "toggle_repeater", active = active });
+    }
+
     public void Disconnect()
     {
         if (_ws != null)
@@ -198,6 +205,7 @@ public class PositionWebSocketService : IAsyncDisposable
                 IsSpatialAudioSupportedByServer = spatialSupported;
 
                 WelcomeReceived?.Invoke(channelsList, activeChan);
+                ServerMessage?.Invoke(json);
 
                 if (doc.RootElement.TryGetProperty("audio_ticket", out var ticketEl))
                     return ticketEl.GetString();

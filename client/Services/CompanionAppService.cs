@@ -137,7 +137,9 @@ public class CompanionAppService : IDisposable
                     audioConnected = _viewModel.AudioConnected,
                     gforce = _viewModel.GForce,
                     exertion = _viewModel.Exertion,
-                    enableExertionDistortion = _viewModel.Config.Config.EnableExertionDistortion
+                    enableExertionDistortion = _viewModel.Config.Config.EnableExertionDistortion,
+                    isRadioRepeater = _viewModel.Config.Config.IsRadioRepeater,
+                    enableRadioRepeaters = _viewModel.Config.Config.EnableRadioRepeaters
                 };
 
                 string json = JsonSerializer.Serialize(status);
@@ -238,6 +240,11 @@ public class CompanionAppService : IDisposable
             case "toggle_exertion_distortion":
                 _viewModel.Config.Config.EnableExertionDistortion = !_viewModel.Config.Config.EnableExertionDistortion;
                 _viewModel.SaveConfig();
+                break;
+            case "toggle_repeater":
+                _viewModel.Config.Config.IsRadioRepeater = !_viewModel.Config.Config.IsRadioRepeater;
+                _viewModel.SaveConfig();
+                _viewModel.ApplySettings();
                 break;
         }
     }
@@ -543,6 +550,13 @@ public class CompanionAppService : IDisposable
                     </div>
                 </div>
             </div>
+            <div class="control-row" style="margin-top:12px;">
+                <div class="section-title">Tactical Radio Relay</div>
+                <button class="btn" id="btn-repeater-mode" onclick="postAction('toggle_repeater')" style="width:100%; flex-direction:row; padding:12px;">
+                    <span class="icon">📡</span>
+                    <span>Beacon Mode (Repeater)</span>
+                </button>
+            </div>
         </div>
 
         <div class="section-title">Active Speakers</div>
@@ -607,6 +621,21 @@ public class CompanionAppService : IDisposable
                     btnEx.classList.add('active');
                 } else {
                     btnEx.classList.remove('active');
+                }
+
+                // Update repeater mode
+                const btnRep = document.getElementById('btn-repeater-mode');
+                if (btnRep) {
+                    if (data.isRadioRepeater) {
+                        btnRep.classList.add('active');
+                    } else {
+                        btnRep.classList.remove('active');
+                    }
+                    if (data.enableRadioRepeaters) {
+                        btnRep.parentElement.style.display = 'block';
+                    } else {
+                        btnRep.parentElement.style.display = 'none';
+                    }
                 }
                 
                 // If not actively dragging, update mock sliders from status
