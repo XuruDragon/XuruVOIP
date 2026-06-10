@@ -41,9 +41,14 @@ You can customize how your server behaves by editing a simple settings file name
 
 ### Key Settings Explained:
 
-* **`PORT`** (default: `8888`): The main port number players will enter in their clients to connect.
-* **`AUDIO_PORT`** (default: `8889`): The port used specifically for transmitting voice data.
-* **`SERVER_PASSWORD`**: If you want to make your server private, write a password here. Anyone trying to connect will need to enter this password in their client app.
+* **`XURUVOIP_PORT`** (default: `8888`): The main port number players will enter in their clients to connect.
+* **`XURUVOIP_AUDIO_PORT`** (default: `8889`): The port used specifically for transmitting voice data.
+* **`XURUVOIP_SERVER_PASSWORD`**: If you want to make your server private, write a password here. Anyone trying to connect will need to enter this password in their client app. /!\ You will also have to set the `XURUVOIP_PUBLIC_SERVER` variable to `0` to make the server private and the `XURUVOIP_SERVER_PASSWORD` variable usable.
+* **`XURUVOIP_ADMIN_SERVER_PASSWORD`**: A separate password used exclusively to log in to the administrator web dashboard.
+* **`XURUVOIP_SPATIAL_AUDIO`** (`1` = On, `0` = Off): Enables 3D audio. When on, voices are automatically panned left/right and sound quieter the further away players are from you in-game.
+* **`XURUVOIP_ENABLE_INTERCOM`** (`1` = On, `0` = Off): Enables deck intercoms. When on, crew members inside the same spaceship can hear each other clearly even if they are in different rooms or lack line-of-sight.
+* **`XURUVOIP_ENABLE_EVA_MUTING`** (`1` = On, `0` = Off): Vacuum muting. When on, if a player goes out into the vacuum of space (EVA) without putting their space suit helmet on, their microphone will be automatically muted to simulate lack of air for sound transmission.
+* **`XURUVOIP_ENABLE_DISCORD_BRIDGE`** (`1` = On, `0` = Off): Toggles the Discord voice connection gateway.
 * **`XURUVOIP_ENABLE_RADIO_REPEATERS`** (`1` = On, `0` = Off): Enables or disables the multi-hop radio repeater beacon system.
 * **`XURUVOIP_ENABLE_SHIP_PA`** (`1` = On, `0` = Off): Enables or disables the ship-wide Public Address (PA) broadcast system.
 
@@ -75,6 +80,43 @@ The server includes an optional feature called the **Discord Voice Bridge**. Whe
      * *Example format:* `General:123456789012345678,SquadA:876543210987654321` (where the numbers are the Discord Voice Channel IDs).
 4. **Save and Restart:**
    * Save the `.env` file and restart the server program. The bot should now appear online in your Discord server and join voice channels automatically!
+
+---
+
+## 👑 Step 4: Accessing and Using the Admin Web Portal
+
+The server hosts a web-based **Admin Portal** that allows administrators to manage channels, players, and enforce rules through a web browser.
+
+### How to access the Admin page:
+1. Open any web browser (Chrome, Edge, Firefox, etc.) on your PC.
+2. In the address bar, type:
+   * **`http://localhost:8888/admin`** (if you are on the same computer hosting the server).
+   * **`http://[Your-Server-IP]:8888/admin`** (if you are accessing it from another computer).
+   * *(Replace `8888` with the custom port number you specified in the `.env` file under `XURUVOIP_PORT` if you changed it)*.
+3. **Log in:**
+   * **Username & Password:** Enter your admin credentials. *(A default administrator account is created the first time the server is run. The credentials will be displayed in the server console window. to reset the admin password, you will have to edit or remove the server's database file `xuruvoip.db`.)*.
+   * **Server Password:** Enter the token matching the **`XURUVOIP_ADMIN_SERVER_PASSWORD`** in your `.env` settings file.
+
+### Admin Portal Capabilities:
+
+Once logged in, the dashboard gives you complete control over your voice server:
+
+* **Channel Management:**
+  * **Add Channel:** Create new radio frequency rooms (e.g. `SquadB`, `FlightLead`).
+  * **Rename / Remove Channels:** Edit channel labels or delete them. If a channel is deleted, players currently in that channel are automatically moved back to the default `General` channel.
+* **Voice Profiles:**
+  * Define and manage specialized group audio settings.
+* **Player Administration:**
+  * **Force Move:** Manually shift a player into a different active radio frequency or select which frequencies they are allowed to listen to.
+  * **Assign Profile:** Apply specific voice profiles to active users.
+* **Moderation Tools:**
+  * **Kick Player:** Instantly disconnect a player from the voice server.
+  * **Reset Password:** Set a new password for user accounts if a player forgets theirs.
+  * **Ban Player:** Permanently block a player. You can choose to ban them by their username, their network **IP Address**, or their hardware **HWID** (preventing them from bypassing the ban by changing their account/IP).
+  * **Delete Account:** Remove user profiles from the server database completely.
+  * **Toggle Anonymous Mode:** Turn on global anonymous mode to hide usernames and protect player identities during open matches.
+* **Admin Management:**
+  * Create new administrator logins, remove existing ones, or update admin passwords.
 
 ---
 
