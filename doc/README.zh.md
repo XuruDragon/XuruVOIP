@@ -430,10 +430,12 @@ dotnet run
   4. 双击运行安装，按照向导完成即可。
 
 * **选项 B: 便携式 ZIP 压缩包**
-  1. 下载 `XuruVoipClient-win-x64.zip`。
-  2. 右键查看属性，勾选 **解除锁定** 确认。
-  3. 将压缩包解压至指定空目录中 (例如 `C:\Games\XuruVoip`)。
-  4. 双击双击 `XuruVoipClient.exe` 直接运行使用。
+  1. 从 [Releases 页面](https://github.com/XuruDragon/XuruVOIP/releases) 下载 `XuruVoipClient-win-x64.zip`。
+  2. 将 ZIP 压缩包中的文件解压至您选择的任何文件夹中（例如 `C:\Games\XuruVoip`）。
+  3. 然后右击解压出来的 `XuruVoipClient.exe` 文件并选择 **属性**。
+     - 在属性窗口的 *常规* 选项卡最底部，勾选 **解除锁定** 选框。
+     - 点击 **应用**，然后关闭属性窗口。
+  4. 双击 `XuruVoipClient.exe` 直接运行客户端，无需安装。
 
 ---
 

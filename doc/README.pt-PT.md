@@ -444,9 +444,11 @@ Como os ficheiros não possuem assinatura digital comercial, o SmartScreen do Wi
 
 * **Option B: Versão Portátil (ZIP)**
   1. Transfira o ficheiro `XuruVoipClient-win-x64.zip` na [página de versões (releases)](https://github.com/XuruDragon/XuruVOIP/releases).
-  2. Clique com o botão direito no ficheiro `.zip`, seleccione **Propriedades** e marque a opção **Desbloquear** na guia *Geral*. Aplique as alterações.
-  3. Extraia o conteúdo para a pasta desejada (ex: `C:\Games\XuruVoip`).
-  4. Dê um clique duplo em `XuruVoipClient.exe` para usar o cliente.
+  2. Extraia os ficheiros do pacote ZIP para qualquer pasta de sua escolha (ex: `C:\Games\XuruVoip`).
+  3. Em seguida, clique com o botão direito no ficheiro `XuruVoipClient.exe` extraído e seleccione **Propriedades**.
+     - Na janela de propriedades, sob a guia *Geral*, marque a caixa de selecção **Desbloquear** na parte inferior.
+     - Clique em **Aplicar** e, em seguida, feche a janela de propriedades.
+  4. Dê um clique duplo em `XuruVoipClient.exe` para executar o cliente directamente, sem instalá-lo.
 
 ---
 
