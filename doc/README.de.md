@@ -176,6 +176,14 @@ graph TD
 * **HUD-Overlay-Fenster**: Der Client bietet ein optionales, transparentes WPF-Overlay, das im Vordergrund läuft. Es zeigt den VoIP-Status, die aktive Funkfrequenz und eine Echtzeitliste der aktiven Sprecher mit Funksignalsymbolen.
 * **Win32-Durchklick-Integration**: Durch Win32-Window-Styles (`WS_EX_TRANSPARENT` und `WS_EX_NOACTIVATE`) stiehlt das Overlay keinen Fokus und lässt Mausereignisse direkt zum Spiel durch.
 * **API-unabhängiges Rendering**: Da transparente WPF-Fenster auf DWM-Komposition (Desktop Window Manager) basieren, greift das Overlay nicht in die Grafikpipeline ein. Das garantiert volle Kompatibilität mit **Vulkan** und **DirectX**, sofern Star Citizen im **"rahmenlosen Fenstermodus"** (Borderless Windowed) ausgeführt wird.
+* **📡 Taktischer HUD-Miniradar**: Zeigt die Positionen von Spielern auf einem kreisförmigen Miniradar im HUD-Overlay an.
+  * **Heading-Up Ausrichtung**: Das Radar dreht sich automatisch basierend auf dem Bewegungsrichtungsvektor des Spielers (Blickrichtung).
+  * **Relative Projektion**: Projiziert die Koordinaten naher sprechender Spieler. Aktive Sprecher zeigen pulsierende Schallwellenringe.
+  * **Konfigurierbarkeit**: Kann in den Einstellungen ein- und ausgeschaltet werden, mit einstellbarer maximaler Reichweite von 10m bis 200m.
+* **💬 HUD-Untertitel in Echtzeit (Speech-to-Text)**: Transkribiert Sprachübertragungen automatisch in Echtzeit und zeigt sie als Untertitel auf dem HUD-Overlay an.
+  * **Offline-Transkription**: Verwendet ein offline betriebenes, leichtgewichtiges Whisper-Modell (`ggml-tiny.bin`), das lokal ausgeführt wird (über Whisper.net).
+  * **Dynamische Sprachanpassung**: Passt die Spracherkennungsparameter automatisch an die im Client ausgewählte Benutzeroberflächen-Sprache an.
+  * **Bedarfsgesteuerte Einrichtung**: Lädt das 75-MB-Modell von HuggingFace erst bei der ersten Aktivierung der Funktion im Hintergrund herunter. Der Downloadfortschritt wird direkt auf dem HUD angezeigt.
 
 ### 7. Umgebungsakustik (Okklusion & Nachhall)
 * **Okklusionsfilter:** Wenn sich Sprecher und Hörer in unterschiedlichen Zonen oder Abteilen befinden, wendet der Client automatisch einen Tiefpassfilter (Grenzfrequenz 600Hz, Lautstärke 65%) an, um eine physische Blockade/Okklusion zu simulieren. Die Grenzfrequenz wird weich interpoliert, um Knackgeräusche zu vermeiden.
@@ -183,6 +191,14 @@ graph TD
   * *Höhlen / Tunnel:* 45% Wet-Mix, 100ms Verzögerung, 0.6 Feedback.
   * *Bunker / Stationen:* 25% Wet-Mix, 50ms Verzögerung, 0.4 Feedback.
   * *Hangars:* 35% Wet-Mix, 150ms Verzögerung, 0.5 Feedback.
+* **🗺️ Raumschiff-Deck- und Bunkerbereich-Okklusion**: Erkennt interne Decklayouts und Bunkerabteile, um den Ton basierend auf physischen Wänden/Decken zu dämpfen:
+  * *Carrack Decks*: Z-Koordinaten-Unterteilung (Command vs. Habitation vs. Technical Deck) wendet starken Tiefpassfilter an (Grenzfrequenz 350 Hz, Lautstärke 35%).
+  * *Carrack Abteile*: Y-Koordinaten-Unterteilung (Cockpit vs. Habitation vs. Triebwerke) dämpft den Ton (Grenzfrequenz 900 Hz, Lautstärke 65%).
+  * *Bunker-Ebenen*: Z-Koordinaten-Unterteilung (Aufzugslobby vs. Zwischenebene vs. Hauptebene) dämpft den Ton (Grenzfrequenz 300 Hz, Lautstärke 30%).
+  * *Bunker-Räume*: X-Koordinaten-Unterteilung (Grenzfrequenz 800 Hz, Lautstärke 60%).
+  * *Hercules Decks*: Z-Koordinaten-Unterteilung (Habitation vs. Frachtraum) dämpft den Ton (Grenzfrequenz 400 Hz, Lautstärke 45%).
+  * *Cutlass Abteile*: Y-Koordinaten-Unterteilung (Cockpit vs. Frachtraum) dämpft den Ton (Grenzfrequenz 1000 Hz, Lautstärke 70%).
+  * *Allgemeine Höhenheuristik*: Jede Höhendifferenz von mehr als 4,5 m zwischen Spielern in derselben Zone löst automatisch eine Decken-/Bodenokklusion aus (Grenzfrequenz 500 Hz, Lautstärke 45%).
 
 ### 8. Discord Rich Presence ohne externe Abhängigkeiten (RPC)
 * **Robuste Named-Pipe-Verbindung:** Der Client verbindet sich ohne schwere externe NuGet-Bibliotheken direkt mit Discord. Um eine robuste Konnektivität bei unterschiedlichen Discord-Konfigurationen oder mehreren Instanzen zu gewährleisten, sucht und versucht der Client Verbindungen auf allen Named-Pipe-Indizes von `discord-ipc-0` bis `discord-ipc-9`.
@@ -194,6 +210,35 @@ graph TD
 ### 9. Log-Rotation beim Start
 * **Tägliche Log-Rotation:** Beim Start überprüft der Client das Datum der aktiven Logdatei. Wenn diese an einem vorherigen Tag geändert wurde, wird sie als `xuru_voip.YYYY-MM-DD.log` archiviert.
 * **Bereinigung und Aufbewahrung:** Um den Speicherplatzbedarf zu begrenzen, scannt der Client das Log-Verzeichnis und bewahrt nur die 5 neuesten rotierten Logdateien auf. Ältere werden gelöscht.
+
+### 10. 🎙️ Echtzeit-Stimmenverzerrer & Anzugmodulatoren
+* **Stimmenverzerrer-DSP**: Wendet Echtzeit-Signalverarbeitungseffekte auf ausgehende Mikrofon-Audiodaten vor der Opus-Komprimierung an:
+  * **Pitch Shifter**: Echtzeit-Tonhöhenverschiebung im Zeitbereich unter Verwendung von zwei überlappenden und überblendenden Verzögerungsleitungen.
+  * **Ringmodulator**: Multipliert das Audiosignal mit einer Trägerwelle, um metallische, roboterhafte Sci-Fi-Töne zu erzeugen.
+  * **Flanger**: Kammfilter mit LFO-modulierter Verzögerungsleitung für einen schwebenden, weltraumartigen Swoosh-Effekt.
+* **Stimmenverzerrer-Voreinstellungen**:
+  * *Alien*: Tiefe Tonhöhenverschiebung (0.65x) kombiniert mit Ringmodulator (85 Hz) und Flanger.
+  * *Cyborg*: Metallische Verschiebung (0.82x), Ringmodulator (65 Hz), sanfte Tanh-Sättigung und Reduzierung der Auflösung (Bitcrushing) auf ein 8-Bit-Äquivalent.
+  * *Robotic*: Hohe Tonhöhenverschiebung (1.25x), Ringmodulator (140 Hz) und Flanger.
+  * *Eigene Tonhöhenverschiebung*: Manuell einstellbarer Pitch-Faktor von 0.5x to 2.0x.
+* **Helm-/Anzugmodulator**: Nach der Aktivierung wird ein authentisches Atemgeräusch und Sendebestätigungstöne bei Sendestart/-ende überlagert (beide Optionen sind separat ausschaltbar).
+
+---
+
+## 🎮 Übersicht der XuruVoip-Client-Einstellungen
+
+Das Einstellungsfenster bietet sechs Abschnitte:
+1. **General**: Sprachauswahl, Pfad der Star Citizen `Game.log`-Datei und Umschalter für das lokale Logging.
+2. **Connection**: Serveradresse, Audio- und Positionsports, Benutzername, Passwort und Serverpasswort/-token.
+3. **Position**: Wahl der Positionsquelle ("OCR Screen Scanner" vs. "Game.log Reader (GRTPR)"), Monitorauswahl, Scanintervall (ms), Scanbereich festlegen und Vorschau der letzten Texterkennung (OCR-Optionen werden ausgeblendet, wenn GRTPR aktiv ist).
+4. **Audio**: Audiogeräte auswählen, Lautstärke anpassen, Sendemodus (PTT / VAD) festlegen, VAD-Empfindlichkeit einstellen, **3D Spatial Audio** aktivieren, erweiterte Einstellungen für Funkverschlechterung und Funktöne, Anzugmodulator aktivieren und **Stimmenverzerrer-Voreinstellungen** (Alien, Cyborg, Robotic, PitchShift) auswählen und konfigurieren.
+5. **Hotkeys**: Belegung von Tasten für PTT (Nähe, Funk, Profil), Helm ein/aus, Funkkanal-Umschaltung sowie Mute-Tasten für Ausgang (Mikrofon) und Eingang (Wiedergabe).
+6. **Overlay**: Aktivierung des transparenten HUD-Overlays, Einstellung der Bildschirmecke für die Platzierung, Aktivierung des **Taktischen Miniradars** (mit einstellbarer maximaler Reichweite) und Aktivierung der **Echtzeit-Untertitel** (inklusive Hinweis zum Download des Modells).
+
+### Client kompilieren und ausführen
+
+#### Anforderungen
+- Windows 10 oder Windows 11
 
 ---
 
