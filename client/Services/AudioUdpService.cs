@@ -147,6 +147,7 @@ public class AudioUdpService : IAsyncDisposable
         }
         catch (Exception ex)
         {
+            if (_udpClient == null || client != _udpClient) return; // Ignore if disconnecting/disposed
             LogService.Error("Error sending audio frame over UDP", ex);
         }
     }
@@ -191,6 +192,7 @@ public class AudioUdpService : IAsyncDisposable
         }
         catch (Exception ex)
         {
+            if (_udpClient == null || client != _udpClient) return; // Ignore if disconnecting/disposed
             LogService.Error("Failed to send UDP registration/keep-alive packet", ex);
         }
     }
@@ -285,13 +287,25 @@ public class AudioUdpService : IAsyncDisposable
             }
             catch (Exception ex)
             {
-                // Don't crash receive thread on socket errors
-                if (client != _udpClient) break; // Client was replaced/closed
+                if (ct.IsCancellationRequested || client != _udpClient)
+                {
+                    break;
+                }
+
+                // If socket was disposed or closed, it might throw ObjectDisposedException or InvalidOperationException
+                if (ex is ObjectDisposedException || ex is InvalidOperationException)
+                {
+                    break;
+                }
+
                 LogService.Error("Error in UDP receive loop", ex);
-                
-                if (ex is InvalidOperationException || ex is ObjectDisposedException)
+                try
                 {
                     await Task.Delay(100, ct);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
                 }
             }
         }
