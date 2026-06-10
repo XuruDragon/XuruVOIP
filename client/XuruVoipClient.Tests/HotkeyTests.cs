@@ -114,18 +114,18 @@ public class HotkeyTests
     {
         // GIVEN
         await using var vm = new MainViewModel();
-        vm.Config.Config.MuteAudioProfileKey = "P";
+        vm.Config.Config.MuteAudioProfileKey = "U";
         Assert.False(vm.AudioProfileMuted);
         
         // WHEN
-        vm.KeyHook.SimulateKeyEvent(Key.P, true);
+        vm.KeyHook.SimulateKeyEvent(Key.U, true);
 
         // THEN
         Assert.True(vm.AudioProfileMuted);
         Assert.Contains("MUTED", vm.StatusMessage);
 
         // WHEN (Press again)
-        vm.KeyHook.SimulateKeyEvent(Key.P, true);
+        vm.KeyHook.SimulateKeyEvent(Key.U, true);
 
         // THEN
         Assert.False(vm.AudioProfileMuted);
