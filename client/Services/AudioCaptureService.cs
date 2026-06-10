@@ -26,6 +26,19 @@ public class AudioCaptureService : IDisposable
     private WebRtcVad? _vad;
     private readonly VoiceModulator _voiceModulator = new();
 
+    private readonly BiquadFilter _breathHp = new();
+    private readonly BiquadFilter _breathLp = new();
+    private double _breathPhase = 0;
+    private double _humPhase50 = 0;
+    private double _humPhase100 = 0;
+    private readonly Random _random = new();
+
+    public AudioCaptureService()
+    {
+        _breathHp.SetHpCoefficients(650, SampleRate);
+        _breathLp.SetLpCoefficients(1600, SampleRate);
+    }
+
     // Rolling buffer to accumulate exactly one Opus frame worth of PCM
     private readonly short[] _frameBuffer = new short[FrameSamples];
     private int _frameBufferPos = 0;
@@ -212,9 +225,12 @@ public class AudioCaptureService : IDisposable
             return;
         }
 
-        // Apply Voice Changer effects if enabled
+        // Apply helmet respirator & suit hum overlay if visor is down and helmet modulator is enabled
         var config = App.ViewModel?.Config?.Config;
-        if (config != null && config.EnableVoiceChanger && shouldTransmit)
+        bool isHelmetOn = App.ViewModel?.IsHelmetOn ?? false;
+        bool enableHelmetMod = config?.EnableHelmetModulator ?? true;
+
+        if (shouldTransmit)
         {
             float[] floatBuf = new float[FrameSamples];
             for (int i = 0; i < FrameSamples; i++)
@@ -222,8 +238,55 @@ public class AudioCaptureService : IDisposable
                 floatBuf[i] = pcmFrame[i] / 32768f;
             }
 
-            _voiceModulator.Process(floatBuf, FrameSamples, config.VoiceChangerType, config.VoicePitchFactor);
+            if (isHelmetOn && enableHelmetMod)
+            {
+                double cycleSamples = 4.5 * SampleRate;
+                for (int i = 0; i < FrameSamples; i++)
+                {
+                    // 1. Suit vent hum (50Hz and 100Hz sine waves)
+                    double hum50 = Math.Sin(_humPhase50);
+                    double hum100 = Math.Sin(_humPhase100);
+                    _humPhase50 += 2.0 * Math.PI * 50.0 / SampleRate;
+                    _humPhase100 += 2.0 * Math.PI * 100.0 / SampleRate;
+                    
+                    if (_humPhase50 > 2.0 * Math.PI) _humPhase50 -= 2.0 * Math.PI;
+                    if (_humPhase100 > 2.0 * Math.PI) _humPhase100 -= 2.0 * Math.PI;
 
+                    // Mix hum (subtle)
+                    floatBuf[i] += (float)(hum50 * 0.005 + hum100 * 0.0025);
+
+                    // 2. Respirator breathing noise
+                    double phase = _breathPhase % cycleSamples;
+                    _breathPhase = (_breathPhase + 1) % cycleSamples;
+
+                    double seconds = phase / SampleRate;
+                    double breathAmp = 0;
+                    if (seconds < 1.8)
+                    {
+                        breathAmp = Math.Sin((seconds / 1.8) * Math.PI);
+                    }
+                    else if (seconds >= 2.3 && seconds < 4.0)
+                    {
+                        breathAmp = 0.75 * Math.Sin(((seconds - 2.3) / 1.7) * Math.PI);
+                    }
+
+                    if (breathAmp > 0)
+                    {
+                        float breathNoise = (float)(_random.NextDouble() * 2.0 - 1.0);
+                        breathNoise = _breathHp.Process(breathNoise);
+                        breathNoise = _breathLp.Process(breathNoise);
+                        floatBuf[i] += (float)(breathNoise * breathAmp * 0.035f);
+                    }
+                }
+            }
+
+            // Apply Voice Changer effects if enabled
+            if (config != null && config.EnableVoiceChanger)
+            {
+                _voiceModulator.Process(floatBuf, FrameSamples, config.VoiceChangerType, config.VoicePitchFactor);
+            }
+
+            // Convert back to PCM
             for (int i = 0; i < FrameSamples; i++)
             {
                 pcmFrame[i] = (short)Math.Clamp(floatBuf[i] * 32768f, short.MinValue, short.MaxValue);

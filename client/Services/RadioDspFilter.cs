@@ -53,10 +53,6 @@ public class RadioDspFilter
     private readonly BiquadFilter hpOut = new();
     private readonly BiquadFilter lpOut = new();
 
-    private readonly BiquadFilter breathHp = new();
-    private readonly BiquadFilter breathLp = new();
-    private double breathPhase = 0;
-
     private int ringPhase = 0;
     private double _lastDegradation = -1.0;
     private readonly Random _random = new();
@@ -70,8 +66,6 @@ public class RadioDspFilter
     public RadioDspFilter()
     {
         UpdateCoefficients(0.0);
-        breathHp.SetHpCoefficients(650, SampleRate);
-        breathLp.SetLpCoefficients(1600, SampleRate);
     }
 
     private void UpdateCoefficients(double degradation)
@@ -97,37 +91,10 @@ public class RadioDspFilter
         float noiseIntensity = (float)(DegradationFactor * 0.35);
         double ringMix = 0.17 + DegradationFactor * 0.28;
         double drive = 2.0 + DegradationFactor * 4.0;
-        double cycleSamples = 4.5 * SampleRate;
 
         for (int i = 0; i < count; i++)
         {
             float sample = buffer[i];
-
-            // Mix respirator hiss / suit breathing noise
-            if (EnableHelmetModulator)
-            {
-                double phase = breathPhase % cycleSamples;
-                breathPhase = (breathPhase + 1) % cycleSamples;
-                
-                double seconds = phase / SampleRate;
-                double breathAmp = 0;
-                if (seconds < 1.8)
-                {
-                    breathAmp = Math.Sin((seconds / 1.8) * Math.PI);
-                }
-                else if (seconds >= 2.3 && seconds < 4.0)
-                {
-                    breathAmp = 0.75 * Math.Sin(((seconds - 2.3) / 1.7) * Math.PI);
-                }
-
-                if (breathAmp > 0)
-                {
-                    float breathNoise = (float)(_random.NextDouble() * 2.0 - 1.0);
-                    breathNoise = breathHp.Process(breathNoise);
-                    breathNoise = breathLp.Process(breathNoise);
-                    sample += (float)(breathNoise * breathAmp * 0.045f);
-                }
-            }
 
             // 0. Mix white noise at the input
             if (noiseIntensity > 0f)
