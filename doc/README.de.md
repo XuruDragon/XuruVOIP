@@ -460,9 +460,11 @@ Da die Installationsdateien und ausführbaren Dateien nicht digital signiert sin
 
 * **Option B: Portable ZIP-Version**
   1. Laden Sie `XuruVoipClient-win-x64.zip` von der [Release-Seite](https://github.com/XuruDragon/XuruVOIP/releases) herunter.
-  2. Machen Sie einen Rechtsklick auf das ZIP-Archiv und heben Sie die Blockierung unter **Eigenschaften** auf. Klicken Sie auf **Übernehmen**.
-  3. Entpacken Sie die ZIP-Datei in einen beliebigen Ordner (z.B. `C:\Games\XuruVoip`).
-  4. Starten Sie das Programm direkt per Doppelklick auf `XuruVoipClient.exe`.
+  2. Entpacken Sie die Dateien im ZIP-Paket in einen beliebigen Ordner Ihrer Wahl (z.B. `C:\Games\XuruVoip`).
+  3. Klicken Sie dann mit der rechten Maustaste auf die entpackte Datei `XuruVoipClient.exe` und wählen Sie **Eigenschaften**.
+     - Aktivieren Sie im Eigenschaftenfenster unter der Registerkarte *Allgemein* unten das Kontrollkästchen **Zulassen** (Sperre aufheben).
+     - Klicken Sie auf **Übernehmen** und schließen Sie das Eigenschaftenfenster.
+  4. Starten Sie das Programm direkt per Doppelklick auf `XuruVoipClient.exe`, ohne es zu installieren.
 
 ---
 

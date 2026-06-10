@@ -501,11 +501,10 @@ Since the installer and executables are not digitally signed, Windows SmartScree
 
 * **Option B: Portable ZIP Version**
   1. Download `XuruVoipClient-win-x64.zip` from the [releases page](https://github.com/XuruDragon/XuruVOIP/releases).
-  2. Before extracting the files, unblock the ZIP package:
-     - Right-click the downloaded `XuruVoipClient-win-x64.zip` file and select **Properties**.
+  2. Extract the files in the ZIP package to any folder of your choice (e.g., `C:\Games\XuruVoip`):
+  3. Then right-click the extracted `XuruVoipClient.exe` file and select **Properties**.
      - In the properties window under the *General* tab, check the **Unblock** checkbox at the bottom.
      - Click **Apply**, then close the Properties window.
-  3. Extract the ZIP contents to any folder of your choice (e.g., `C:\Games\XuruVoip`).
   4. Double-click `XuruVoipClient.exe` to run the client directly without installing it.
 
 ---
