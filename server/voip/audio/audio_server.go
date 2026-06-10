@@ -197,8 +197,11 @@ func handleUDPPacket(packet []byte, remoteAddr *net.UDPAddr) {
 		}
 
 		core.AudioLockout.RecordSuccess(ip)
-		player.SafeSetUDPAddr(remoteAddr)
-		core.Log(fmt.Sprintf("JOIN UDP Audio: %s (%s)", name, ip), core.ColorGreen)
+		oldAddr := player.SafeGetUDPAddr()
+		if oldAddr == nil || oldAddr.String() != remoteAddr.String() {
+			player.SafeSetUDPAddr(remoteAddr)
+			core.Log(fmt.Sprintf("JOIN UDP Audio: %s (%s)", name, ip), core.ColorGreen)
+		}
 
 		// Reply ACK: [0xFE]
 		if udpConn != nil {
