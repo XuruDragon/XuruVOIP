@@ -418,6 +418,9 @@ func AuthenticateAdmin(username, password string) (bool, error) {
 
 // DBGetPlayerState retrieves saved persistence profile/channels
 func DBGetPlayerState(username string) (PlayerPersistentState, bool) {
+	if db == nil {
+		return PlayerPersistentState{}, false
+	}
 	var profile string
 	var activeChannel string
 	var listenJSON string
@@ -439,6 +442,9 @@ func DBGetPlayerState(username string) (PlayerPersistentState, bool) {
 
 // DBSavePlayerState saves the player persistent settings
 func DBSavePlayerState(username string, profile string, activeChannel string, listeningChannels []string) error {
+	if db == nil {
+		return nil
+	}
 	listenJSON, err := json.Marshal(listeningChannels)
 	if err != nil {
 		return err

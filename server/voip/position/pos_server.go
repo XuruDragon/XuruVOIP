@@ -205,10 +205,14 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg core.MsgJoin) {
 	// Validate channel
 	channel := strings.TrimSpace(msg.Channel)
 	validCh := "General"
-	for _, c := range core.ServerConfig.ChannelsList {
-		if c == channel {
-			validCh = channel
-			break
+	if core.EnableIntercom && strings.HasPrefix(channel, "Intercom_") {
+		validCh = channel
+	} else {
+		for _, c := range core.ServerConfig.ChannelsList {
+			if c == channel {
+				validCh = channel
+				break
+			}
 		}
 	}
 
@@ -402,10 +406,14 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg core.MsgJoin) {
 			ch := strings.TrimSpace(m.Channel)
 			valid := ""
 			if ch != "" {
-				for _, c := range core.ServerConfig.ChannelsList {
-					if c == ch {
-						valid = ch
-						break
+				if core.EnableIntercom && strings.HasPrefix(ch, "Intercom_") {
+					valid = ch
+				} else {
+					for _, c := range core.ServerConfig.ChannelsList {
+						if c == ch {
+							valid = ch
+							break
+						}
 					}
 				}
 			}
@@ -426,10 +434,14 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg core.MsgJoin) {
 			var valid []string
 			for _, ch := range m.Channels {
 				trimmed := strings.TrimSpace(ch)
-				for _, c := range core.ServerConfig.ChannelsList {
-					if c == trimmed {
-						valid = append(valid, trimmed)
-						break
+				if core.EnableIntercom && strings.HasPrefix(trimmed, "Intercom_") {
+					valid = append(valid, trimmed)
+				} else {
+					for _, c := range core.ServerConfig.ChannelsList {
+						if c == trimmed {
+							valid = append(valid, trimmed)
+							break
+						}
 					}
 				}
 			}
