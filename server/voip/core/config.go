@@ -17,6 +17,7 @@ var EnableIntercom = true
 var EnableEvaMuting = true
 var EnableDiscordBridge = true
 var EnableRadioRepeaters = true
+var EnableShipPa = true
 
 // ParseEnvInt parses an integer from the environment
 func ParseEnvInt(key string, defaultVal int) int {
@@ -176,6 +177,14 @@ func LoadOrCreateConfig() error {
 		UpdateEnvFile("XURUVOIP_ENABLE_RADIO_REPEATERS", enableRadioRepeatersStr)
 	}
 	EnableRadioRepeaters = enableRadioRepeatersStr == "1" || strings.ToLower(enableRadioRepeatersStr) == "true"
+
+	enableShipPaStr := os.Getenv("XURUVOIP_ENABLE_SHIP_PA")
+	if enableShipPaStr == "" {
+		enableShipPaStr = "1"
+		_ = os.Setenv("XURUVOIP_ENABLE_SHIP_PA", enableShipPaStr)
+		UpdateEnvFile("XURUVOIP_ENABLE_SHIP_PA", enableShipPaStr)
+	}
+	EnableShipPa = enableShipPaStr == "1" || strings.ToLower(enableShipPaStr) == "true"
 	// 3. Load Channels
 	chList, err := DBGetChannels()
 	if err != nil {
@@ -311,6 +320,7 @@ XURUVOIP_ENABLE_INTERCOM=1
 XURUVOIP_ENABLE_EVA_MUTING=1
 XURUVOIP_ENABLE_DISCORD_BRIDGE=1
 XURUVOIP_ENABLE_RADIO_REPEATERS=1
+XURUVOIP_ENABLE_SHIP_PA=1
 `, serverPassword, adminServerPassword)
 
 	return os.WriteFile(envPath, []byte(content), 0600)

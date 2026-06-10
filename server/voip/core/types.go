@@ -5,6 +5,7 @@ const (
 	AudioTypeProximity byte = 0x00
 	AudioTypeRadio     byte = 0x01
 	AudioTypeProfile   byte = 0x02
+	AudioTypePA        byte = 0x03
 )
 
 // Position represents a player's 3D coordinates and zone
