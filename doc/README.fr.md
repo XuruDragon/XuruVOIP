@@ -89,13 +89,14 @@ Le client C# WPF fonctionne en parallèle de Star Citizen pour effectuer la capt
 graph TD
     subgraph Capture & Transmission
         Mic[Entrée Microphone] -->|Audio PCM| VAD[Détection d'Activité Vocale WebRTC]
-        VAD -->|Voix Active| OpusEnc[Encodeur Opus]
+        VAD -->|Voix Active| VoiceChanger[Changeur de Voix & DSP Combinaison]
+        VoiceChanger -->|PCM Modifié| OpusEnc[Encodeur Opus]
         OpusEnc -->|Paquets Opus| AudioWS[Client WebSocket Audio]
         AudioWS -->|Port WebSocket 8889| Server[Serveur Go]
     end
 
     subgraph Positionnement & Détection de Casque
-        SC[Processus Star Citizen] -->|r_DisplaySessionInfo| Screen[Capture d'Écran]
+        SC[Processus Star Citizen] -->|r_DisplaySessionInfo/r_DisplayInfo| Screen[Capture d'Écran]
         Screen -->|Prétraitement| Tess[Moteur OCR Tesseract]
         
         SC -->|Journal en Temps Réel| GameLog[Fichier Game.log]
@@ -113,34 +114,41 @@ graph TD
     end
 
     subgraph Mixage Spatial Stéréo 3D & DSP
-        Server -->|Target Proximity Audio + Metadata| AudioWS
-        AudioWS -->|Opus Frame + ProximityMetadata| Decoder[Opus Decoder]
-        Decoder -->|Mono Float PCM| DSP[Radio DSP Filter & Dégradation]
+        Server -->|Audio de proximité cible + Métadonnées| AudioWS
+        AudioWS -->|Trame Opus + Métadonnées de proximité| Decoder[Décodeur Opus]
+        Decoder -->|PCM Float Mono| OcclusionFilter[Filtre d'Occlusion de Pont & Compartiment]
+        OcclusionFilter -->|PCM Atténué| DSP[Filtre Radio DSP & Dégradation]
         DSP -->|Mono| Panner[PanningSampleProvider]
-        Panner -->|Stereo| Volume[VolumeSampleProvider]
+        Panner -->|Stéréo| Volume[VolumeSampleProvider]
         
-        LogParser -.->|local Helmet status| DSP
-        Zone -.->|Listener position & heading| MixerMath[Spatial Panning & Degradation Math]
+        LogParser -.->|Statut du casque local| DSP
+        Zone -.->|Position & Orientation de l'auditeur| MixerMath[Calculs Panoramiques Speciaux & Dégradation]
         
-        MixerMath -->|Pan parameter| Panner
-        MixerMath -->|Distance & Behind Attenuation| Volume
+        MixerMath -->|Paramètre panoramique| Panner
+        MixerMath -->|Atténuation de distance & arrière| Volume
         MixerMath -->|Facteur de dégradation| DSP
         
-        Volume -->|Left/Right Stereo| Mixer[MixingSampleProvider]
-        Mixer -->|Play back| Speakers[Audio Output Device]
+        Volume -->|Stéréo Gauche/Droite| Mixer[MixingSampleProvider]
+        Mixer -->|Lecture| Speakers[Périphérique de sortie audio]
+    end
+
+    subgraph Incrustation HUD & STT
+        Decoder -->|PCM Float Mono| STT[Transcription Whisper.net]
+        STT -->|Texte transcrit| Overlay[Fenêtre d'incrustation HUD]
+        Zone -.->|Position de l'auditeur| Overlay
+        AudioWS -.->|Coordonnées du locuteur distant| Overlay
+        Overlay -->|Sous-titres dynamiques & Mini-Radar 2D| ScreenOverlay[Affichage à l'écran]
     end
 ```
 
 ### 1. Capture Audio, VAD et Compression
 * **Capture Audio :** Le client capture le microphone en utilisant l'API **NAudio** à un taux de 48 000 Hz, 16 bits mono.
 * **Détection d'Activité Vocale (VAD) :** Les tampons audio sont évalués par le wrapper natif **WebRtcVad**. Si la confiance vocale descend sous le seuil configuré, la transmission s'arrête pour éviter de diffuser le bruit du clavier ou des ventilateurs.
-* **Résolution native d'exécutable unique :** Le client utilise des rappels de résolution d'assembly personnalisés pour charger la DLL native `WebRtcVad.dll` depuis le sous-répertoire `runtimes\win-x64\native` au démarrage, résolvant ainsi les problèmes de chargement de DLL pour les packages publiés en fichier unique.
 * **Compression :** Les voix actives sont encodées en paquets **Opus** compressés (via le wrapper C# **Concentus**) et transmises directement via WebSocket au serveur audio.
 
 ### 2. Suivi de Localisation et Orientation
-* **Sélecteur de Source de Position :** Les joueurs peuvent choisir entre deux méthodes de positionnement dans les paramètres :
+* **Sélecteur de Source de Position :** Les joueurs peuvent escolher entre deux méthodes de positionnement dans les paramètres :
   * **Scanner d'Écran OCR :** Capture régulièrement la zone configurée de l'écran (affichant les coordonnées de session `/showlocations` ou `r_DisplaySessionInfo`), prétraite l'image et la transmet au moteur **Tesseract OCR**.
-  * **Résolution native d'exécutable unique :** Les binaires natifs de Tesseract (`tesseract50.dll` et `leptonica-1.82.0.dll`) sont résolus par programme à partir du sous-répertoire `x64` au démarrage, garantissant un fonctionnement robuste de l'OCR lorsqu'il est déployé sous forme d'exécutable autonome.
   * **Lecteur Game.log (GRTPR) :** Analyse en continu le fichier `Game.log` de Star Citizen pour y lire les coordonnées. Pour activer cette méthode, les joueurs doivent ajouter `r_DisplaySessionInfo = 3` (ou `1`) à leur fichier `user.cfg`. Choisir GRTPR désactive et libère complètement le moteur Tesseract OCR, économisant les ressources CPU et RAM de la machine hôte.
 * **Filtrage de Zone Hiérarchique :** Les lignes de coordonnées contiennent des zones (compartiments de vaisseaux, ascenseurs, planètes). Le client filtre dynamiquement les sous-zones (comme `elevator`, `transit`, `seat`) et les zones globales (`solarsystem`, `Stanton`) pour éviter les coupures de voix intempestives entre joueurs proches.
 * **Estimation de l'Orientation :** Comme Star Citizen ne fournit pas l'orientation, le client calcule le vecteur de déplacement. Si le joueur bouge de plus de 0,5 mètre, l'orientation estimée est mise à jour.

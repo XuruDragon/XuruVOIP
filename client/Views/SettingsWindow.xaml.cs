@@ -12,12 +12,12 @@ public partial class SettingsWindow : Window
 {
     private readonly MainViewModel _vm;
     public MainViewModel ViewModel => _vm;
-    private AppConfig Cfg => _vm?.Config?.Config;
+    private AppConfig Cfg => _vm.Config.Config;
 
     public SettingsWindow(MainViewModel vm)
     {
-        InitializeComponent();
         _vm = vm;
+        InitializeComponent();
         DataContext = _vm.Config;
 
         LoadDevices();
@@ -25,7 +25,7 @@ public partial class SettingsWindow : Window
         LoadLanguages();
         LoadCurrentValues();
 
-        if (_vm?.Stt != null)
+        if (_vm.Stt != null)
         {
             _vm.Stt.DownloadCompleted += OnSttDownloadCompleted;
         }

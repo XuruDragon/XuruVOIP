@@ -67,7 +67,7 @@
     <sys:String x:Key="OptOcr">Scanner d'Écran OCR</sys:String>
     <sys:String x:Key="OptGrtpr">Lecteur Game.log (GRTPR)</sys:String>
     <sys:String x:Key="LblGrtprActive">Lecteur Game.log (GRTPR) Actif</sys:String>
-    <sys:String x:Key="LblGrtprDesc">Les coordonnées de position seront lues directement dans le fichier Game.log de Star Citizen. Assurez-vous que "r_DisplaySessionInfo = 3" (ou 1) est défini dans votre fichier user.cfg pour activer la journalisation des coordonnées en jeu. L'OCR Tesseract est complètement désactivé pour économiser les ressources système.</sys:String>
+    <sys:String x:Key="LblGrtprDesc">Les coordonnées de position seront lues directement depuis le fichier Game.log de Star Citizen. Cela nécessite que le chemin du Game.log soit renseigné dans l'onglet Général des paramètres, et que la fonction de débogage en jeu "r_DisplayInfo 1" (ou 3) ou "r_DisplaySessionInfo = 3" (ou 1) soit activée (dans user.cfg ou la console du jeu). L'OCR Tesseract est complètement désactivé pour économiser les ressources système.</sys:String>
     <sys:String x:Key="LblMonitor">Écran</sys:String>
     <sys:String x:Key="LblOcrInterval">Intervalle OCR (ms)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  Définir la zone de scan</sys:String>
@@ -167,4 +167,8 @@
     <sys:String x:Key="TitleSettingsSaved">Succès</sys:String>
     <sys:String x:Key="MsgInvalidServerAddress">L'adresse du serveur doit être une adresse IP valide (ex. : 127.0.0.1).</sys:String>
     <sys:String x:Key="TitleInvalidServerAddress">Adresse du serveur invalide</sys:String>
+
+    <!-- Avertissements de connexion -->
+    <sys:String x:Key="WarningGrtprNoPath">Le lecteur Game.log (GRTPR) est activé, mais le chemin du fichier Game.log n'est pas défini. Veuillez renseigner le chemin du fichier Game.log de Star Citizen dans l'onglet Général des paramètres avant de tenter de vous connecter au serveur.</sys:String>
+    <sys:String x:Key="TitleWarning">Avertissement</sys:String>
 </ResourceDictionary>

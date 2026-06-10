@@ -77,7 +77,7 @@ XuruVoip is a high-performance, secure, and dynamically spatialized **3D voice c
 ## 🗂️ Project Structure
 
 - **/server**: High-performance Go backend hosting the position, audio, and administration services.
-- **/client**: Modern C# WPF client utilizing NAudio, WebRtcVad, and Tesseract OCR for automated location tracking and log parsing.
+- **/client**: Modern C# WPF client utilizing NAudio, WebRtcVad, and Tesseract OCR or Game.log tail for automated location tracking and log parsing.
 
 ---
 
@@ -89,13 +89,14 @@ The C# WPF client runs alongside Star Citizen and performs real-time audio captu
 graph TD
     subgraph Capture & Transmit
         Mic[Microphone Input] -->|PCM Audio| VAD[WebRTC Voice Activity Detection]
-        VAD -->|Active Voice| OpusEnc[Opus Encoder]
+        VAD -->|Active Voice| VoiceChanger[Voice Changer & Suit DSP]
+        VoiceChanger -->|Modified PCM| OpusEnc[Opus Encoder]
         OpusEnc -->|Opus Packets| AudioWS[Audio WebSocket client]
         AudioWS -->|WebSocket Port 8889| Server[Go Server]
     end
 
     subgraph Positioning & Helmet Scanning
-        SC[Star Citizen Process] -->|r_DisplaySessionInfo| Screen[Screen Capture]
+        SC[Star Citizen Process] -->|r_DisplaySessionInfo/r_DisplayInfo| Screen[Screen Capture]
         Screen -->|Preprocessing| Tess[Tesseract OCR Engine]
         
         SC -->|Real-time Log| GameLog[Game.log File]
@@ -115,7 +116,8 @@ graph TD
     subgraph Playback & Spatial Mixing
         Server -->|Target Proximity Audio + Metadata| AudioWS
         AudioWS -->|Opus Frame + ProximityMetadata| Decoder[Opus Decoder]
-        Decoder -->|Mono Float PCM| DSP[Radio DSP Filter & Degradation]
+        Decoder -->|Mono Float PCM| OcclusionFilter[Deck & Compartment Occlusion Filter]
+        OcclusionFilter -->|Muffled PCM| DSP[Radio DSP Filter & Degradation]
         DSP -->|Mono| Panner[PanningSampleProvider]
         Panner -->|Stereo| Volume[VolumeSampleProvider]
         
@@ -129,18 +131,24 @@ graph TD
         Volume -->|Left/Right Stereo| Mixer[MixingSampleProvider]
         Mixer -->|Play back| Speakers[Audio Output Device]
     end
+
+    subgraph HUD Overlay & STT
+        Decoder -->|Mono Float PCM| STT[Speech-to-Text Whisper.net]
+        STT -->|Transcribed Text| Overlay[HUD Overlay Window]
+        Zone -.->|Listener Position| Overlay
+        AudioWS -.->|Remote Speaker Coordinates| Overlay
+        Overlay -->|Dynamic Subtitles & 2D Mini-Radar| ScreenOverlay[Screen Display]
+    end
 ```
 
 ### 1. Audio Capture, VAD, and Compression
 * **Audio Capture:** The client captures microphone audio using the **NAudio** API at a high-fidelity rate of 48,000 Hz, 16-bit mono.
 * **Voice Activity Detection (VAD):** Captured audio buffers are evaluated using the native **WebRtcVad** wrapper. If the speech confidence level falls below the configured VAD threshold, transmission halts, avoiding broadcasting ambient keyboard clicks or fan noise.
-* **Single-File Native Resolution:** The client uses custom assembly resolution callbacks to load the native `WebRtcVad.dll` from the `runtimes\win-x64\native` subdirectory at runtime, solving DLL loading issues for single-file published packages.
 * **Compression:** Active speech buffers are encoded into highly compressed **Opus** frames (using the **Concentus** C# wrapper) and transmitted immediately as binary WebSocket frames to the Go Audio Server.
 
 ### 2. Location Tracking and Heading Estimation
 * **Position Source Toggle:** Players can choose between two positioning methodologies in the client settings:
   * **OCR Screen Scanner:** Periodically takes a screenshot of the configured screen region (where `/showlocations` or `r_DisplaySessionInfo` renders coordinate text), preprocesses the image, and feeds it to the **Tesseract OCR** engine.
-  * **Single-File Native Resolution:** Tesseract's native binaries (`tesseract50.dll` and `leptonica-1.82.0.dll`) are programmatically resolved from the `x64` subdirectory at runtime, ensuring robust OCR operation when deployed as a self-contained single-file executable.
   * **Game.log Reader (GRTPR):** Tail-scans the Star Citizen `Game.log` file directly for coordinates logged by the game. To enable this, players must add `r_DisplaySessionInfo = 3` (or `1`) to their `user.cfg` file. Selecting GRTPR completely shuts down and disposes the Tesseract OCR engine, saving substantial CPU and RAM resources on the host machine.
 * **Hierarchical Zone Filtering:** The parsed position text contains multiple hierarchical lines of player coordinates (e.g. planetary coordinates, ship compartments, elevators). The client parses these lines and dynamically filters out sub-zones (like `elevator`, `transit`, `seat`) and system-wide zones (like `solarsystem`, `Stanton`). This ensures players inside a ship compartment can hear players in the adjacent corridor without audio cutting off due to minor sub-zone differences.
 * **Heading Estimation:** Since Star Citizen does not output player orientation, the client tracks coordinate displacement ($Position_{current} - Position_{previous}$). If the player moves more than 0.5 meters, the client calculates the movement direction vector as the estimated look heading. When the player is stationary, the last calculated heading is preserved.

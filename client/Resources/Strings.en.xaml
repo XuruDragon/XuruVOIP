@@ -67,7 +67,7 @@
     <sys:String x:Key="OptOcr">OCR Screen Scanner</sys:String>
     <sys:String x:Key="OptGrtpr">Game.log Reader (GRTPR)</sys:String>
     <sys:String x:Key="LblGrtprActive">Game.log Reader (GRTPR) Active</sys:String>
-    <sys:String x:Key="LblGrtprDesc">Positional coordinates will be read directly from Star Citizen's Game.log file. Ensure "r_DisplaySessionInfo = 3" (or 1) is set in your user.cfg to enable coordinate logging in-game. Tesseract OCR is completely disabled to save system resources.</sys:String>
+    <sys:String x:Key="LblGrtprDesc">Positional coordinates will be read directly from Star Citizen's Game.log file. This requires the Game.log path to be filled in the General settings tab, and the in-game debug function "r_DisplayInfo 1" (or 3) or "r_DisplaySessionInfo = 3" (or 1) to be enabled (in user.cfg or game console). Tesseract OCR is completely disabled to save system resources.</sys:String>
     <sys:String x:Key="LblMonitor">Monitor</sys:String>
     <sys:String x:Key="LblOcrInterval">OCR Interval (ms)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  Define Scan Region</sys:String>
@@ -167,4 +167,8 @@
     <sys:String x:Key="TitleSettingsSaved">Success</sys:String>
     <sys:String x:Key="MsgInvalidServerAddress">The Server Address must be a valid IP address (e.g., 127.0.0.1).</sys:String>
     <sys:String x:Key="TitleInvalidServerAddress">Invalid Server Address</sys:String>
+
+    <!-- Connection Warnings -->
+    <sys:String x:Key="WarningGrtprNoPath">Game.log Reader (GRTPR) is enabled, but the Game.log file path is not set. Please fill in your Star Citizen Game.log path under the General settings tab before trying to connect to the server.</sys:String>
+    <sys:String x:Key="TitleWarning">Warning</sys:String>
 </ResourceDictionary>

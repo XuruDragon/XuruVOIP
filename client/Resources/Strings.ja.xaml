@@ -67,7 +67,7 @@
     <sys:String x:Key="OptOcr">OCR 画面スキャナー</sys:String>
     <sys:String x:Key="OptGrtpr">Game.log リーダー (GRTPR)</sys:String>
     <sys:String x:Key="LblGrtprActive">Game.log リーダー (GRTPR) 有効</sys:String>
-    <sys:String x:Key="LblGrtprDesc">位置座標は Star Citizen の Game.log ファイルから直接読み込まれます。ゲーム内の座標ログ出力を有効にするために、user.cfg に "r_DisplaySessionInfo = 3" (または 1) が設定されていることを確認してください。システムリソースを節約するため、Tesseract OCR エンジンは完全に無効化されます。</sys:String>
+    <sys:String x:Key="LblGrtprDesc">位置座標はStar CitizenのGame.logファイルから直接読み取られます。これには、「全般 (General)」設定タブでGame.logのパスを入力し、ゲーム内デバッグ機能「r_DisplayInfo 1」（または 3）もしくは「r_DisplaySessionInfo = 3」（または 1）を（user.cfgまたはゲーム内コンソールで）有効にする必要があります。システムリソースを節約するため、Tesseract OCRは完全に無効化されます。</sys:String>
     <sys:String x:Key="LblMonitor">モニター</sys:String>
     <sys:String x:Key="LblOcrInterval">OCR 間隔 (ms)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  スキャン範囲を定義</sys:String>
@@ -167,4 +167,8 @@
     <sys:String x:Key="TitleSettingsSaved">成功</sys:String>
     <sys:String x:Key="MsgInvalidServerAddress">サーバーアドレスは有効なIPアドレスでなければなりません (例: 127.0.0.1)。</sys:String>
     <sys:String x:Key="TitleInvalidServerAddress">無効なサーバーアドレス</sys:String>
+
+    <!-- 接続警告 -->
+    <sys:String x:Key="WarningGrtprNoPath">Game.logリーダー (GRTPR) が有効になっていますが、Game.logのファイルパスが設定されていません。サーバーに接続する前に、設定の「全般 (General)」タブでStar CitizenのGame.logパスを入力してください。</sys:String>
+    <sys:String x:Key="TitleWarning">警告</sys:String>
 </ResourceDictionary>

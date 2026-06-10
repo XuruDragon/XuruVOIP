@@ -621,6 +621,15 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     public async Task ConnectAsync()
     {
+        if (Config.Config.UseGrtpr && string.IsNullOrWhiteSpace(Config.Config.CustomGameLogPath))
+        {
+            string warnTitle = Application.Current.TryFindResource("TitleWarning") as string ?? "Warning";
+            string warnMsg = Application.Current.TryFindResource("WarningGrtprNoPath") as string ?? 
+                "Game.log Reader (GRTPR) is enabled, but the Game.log file path is not set.\nPlease fill in your Star Citizen Game.log path under the General settings tab before trying to connect to the server.";
+            System.Windows.MessageBox.Show(warnMsg, warnTitle, System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+
         _isManualDisconnect = false;
         _reconnectCts?.Cancel();
         StatusMessage = Application.Current.TryFindResource("StatusConnecting") as string ?? "Connecting...";
