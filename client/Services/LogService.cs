@@ -13,6 +13,8 @@ public static class LogService
 
     public static bool EnableGeneralLogs { get; set; } = false;
 
+    internal static long MaxLogSizeBytes { get; set; } = 100 * 1024 * 1024; // 100 MB default
+
     public static void RotateLogs()
     {
         RotateLogsInternal(LogDir, LogPath);
@@ -31,48 +33,110 @@ public static class LogService
             // Check if the date is anterior to the actual date (do not compare time)
             if (lastWrite.Date < today)
             {
-                Directory.CreateDirectory(logDir);
-
-                // Rename to xuru_voip.yyyy-MM-dd.log using the date of the latest log entries
-                string dateStr = lastWrite.ToString("yyyy-MM-dd");
-                string rotatedPath = Path.Combine(logDir, $"xuru_voip.{dateStr}.log");
-
                 lock (LogLock)
                 {
-                    if (File.Exists(rotatedPath))
+                    if (File.Exists(logPath))
                     {
-                        File.Delete(rotatedPath);
+                        var innerFi = new FileInfo(logPath);
+                        if (innerFi.LastWriteTime.Date < today)
+                        {
+                            RotateActiveLog(logDir, logPath, innerFi.LastWriteTime);
+                        }
                     }
-                    File.Move(logPath, rotatedPath);
-                }
-
-                // Keep only the last 5 rotated files
-                var logFiles = Directory.GetFiles(logDir, "xuru_voip.*.log");
-                var rotatedLogsList = new System.Collections.Generic.List<FileInfo>();
-                foreach (var file in logFiles)
-                {
-                    var name = Path.GetFileName(file);
-                    if (name != "xuru_voip.log" && name != "crash.log")
-                    {
-                        rotatedLogsList.Add(new FileInfo(file));
-                    }
-                }
-
-                // Sort by Name (lexicographical sorting of yyyy-MM-dd yields chronological order)
-                rotatedLogsList.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
-
-                // If we have more than 5, delete the oldest ones (first in the list) until we have 5
-                while (rotatedLogsList.Count > 5)
-                {
-                    var oldest = rotatedLogsList[0];
-                    oldest.Delete();
-                    rotatedLogsList.RemoveAt(0);
                 }
             }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Log rotation failed: {ex.Message}");
+        }
+    }
+
+    internal static void RotateActiveLog(string logDir, string logPath, DateTime logDate)
+    {
+        try
+        {
+            Directory.CreateDirectory(logDir);
+            string dateStr = logDate.ToString("yyyy-MM-dd");
+
+            // Find next available file name: xuru_voip.yyyy-MM-dd.log, then xuru_voip.yyyy-MM-dd.1.log, xuru_voip.yyyy-MM-dd.2.log, etc.
+            string rotatedPath = Path.Combine(logDir, $"xuru_voip.{dateStr}.log");
+            int counter = 1;
+            while (File.Exists(rotatedPath))
+            {
+                rotatedPath = Path.Combine(logDir, $"xuru_voip.{dateStr}.{counter}.log");
+                counter++;
+            }
+
+            File.Move(logPath, rotatedPath);
+            EnforceRotatedLogsLimit(logDir);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to rotate active log file: {ex.Message}");
+        }
+    }
+
+    internal static (string DateStr, int Index) ParseLogFileName(string name)
+    {
+        // Name format is: xuru_voip.yyyy-MM-dd.log or xuru_voip.yyyy-MM-dd.counter.log
+        if (name.StartsWith("xuru_voip.") && name.EndsWith(".log"))
+        {
+            string middle = name.Substring(10, name.Length - 14); // length of "xuru_voip." is 10, ".log" is 4
+            string[] parts = middle.Split('.');
+            if (parts.Length == 1)
+            {
+                return (parts[0], 0); // No counter, so index 0
+            }
+            if (parts.Length == 2 && int.TryParse(parts[1], out int index))
+            {
+                return (parts[0], index);
+            }
+        }
+        return (name, 0);
+    }
+
+    internal static void EnforceRotatedLogsLimit(string logDir)
+    {
+        try
+        {
+            var logFiles = Directory.GetFiles(logDir, "xuru_voip.*.log");
+            var rotatedLogsList = new System.Collections.Generic.List<FileInfo>();
+            foreach (var file in logFiles)
+            {
+                var name = Path.GetFileName(file);
+                if (name != "xuru_voip.log" && name != "crash.log")
+                {
+                    rotatedLogsList.Add(new FileInfo(file));
+                }
+            }
+
+            // Sort chronologically using date name and index suffix to avoid timestamp caching issues
+            rotatedLogsList.Sort((a, b) =>
+            {
+                var parsedA = ParseLogFileName(a.Name);
+                var parsedB = ParseLogFileName(b.Name);
+
+                int dateCompare = string.Compare(parsedA.DateStr, parsedB.DateStr, StringComparison.Ordinal);
+                if (dateCompare != 0) return dateCompare;
+
+                return parsedA.Index.CompareTo(parsedB.Index);
+            });
+
+            while (rotatedLogsList.Count > 5)
+            {
+                var oldest = rotatedLogsList[0];
+                try
+                {
+                    oldest.Delete();
+                }
+                catch { /* Ignore deletion failure of a single file */ }
+                rotatedLogsList.RemoveAt(0);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to enforce rotated logs limit: {ex.Message}");
         }
     }
 
@@ -121,6 +185,15 @@ public static class LogService
             Directory.CreateDirectory(LogDir);
             lock (LogLock)
             {
+                if (File.Exists(LogPath))
+                {
+                    var fi = new FileInfo(LogPath);
+                    if (fi.Length >= MaxLogSizeBytes)
+                    {
+                        RotateActiveLog(LogDir, LogPath, fi.LastWriteTime);
+                    }
+                }
+
                 var formatted = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [{level}] {message}\n";
                 File.AppendAllText(LogPath, formatted);
             }
