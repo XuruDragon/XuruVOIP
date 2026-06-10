@@ -139,7 +139,8 @@ public class CompanionAppService : IDisposable
                     exertion = _viewModel.Exertion,
                     enableExertionDistortion = _viewModel.Config.Config.EnableExertionDistortion,
                     isRadioRepeater = _viewModel.Config.Config.IsRadioRepeater,
-                    enableRadioRepeaters = _viewModel.Config.Config.EnableRadioRepeaters
+                    enableRadioRepeaters = _viewModel.Config.Config.EnableRadioRepeaters,
+                    enableShipPa = _viewModel.Config.Config.EnableShipPa
                 };
 
                 string json = JsonSerializer.Serialize(status);
@@ -245,6 +246,12 @@ public class CompanionAppService : IDisposable
                 _viewModel.Config.Config.IsRadioRepeater = !_viewModel.Config.Config.IsRadioRepeater;
                 _viewModel.SaveConfig();
                 _viewModel.ApplySettings();
+                break;
+            case "start_pa":
+                _viewModel.SetMockPttPaState(true);
+                break;
+            case "stop_pa":
+                _viewModel.SetMockPttPaState(false);
                 break;
         }
     }
@@ -557,6 +564,14 @@ public class CompanionAppService : IDisposable
                     <span>Beacon Mode (Repeater)</span>
                 </button>
             </div>
+            <div class="control-row" style="margin-top:12px;">
+                <div class="section-title">Ship Public Address (PA)</div>
+                <button class="btn" id="btn-pa" style="width:100%; height:80px; font-size:18px; font-weight:800; text-transform:uppercase; letter-spacing:1px; background: rgba(0, 242, 254, 0.04); border-color: rgba(0, 242, 254, 0.2);" 
+                        onmousedown="postAction('start_pa')" onmouseup="postAction('stop_pa')" 
+                        ontouchstart="postAction('start_pa')" ontouchend="postAction('stop_pa')">
+                    📢 PA Broadcast
+                </button>
+            </div>
         </div>
 
         <div class="section-title">Active Speakers</div>
@@ -635,6 +650,16 @@ public class CompanionAppService : IDisposable
                         btnRep.parentElement.style.display = 'block';
                     } else {
                         btnRep.parentElement.style.display = 'none';
+                    }
+                }
+
+                // Update PA button
+                const btnPa = document.getElementById('btn-pa');
+                if (btnPa) {
+                    if (data.enableShipPa) {
+                        btnPa.parentElement.style.display = 'block';
+                    } else {
+                        btnPa.parentElement.style.display = 'none';
                     }
                 }
                 

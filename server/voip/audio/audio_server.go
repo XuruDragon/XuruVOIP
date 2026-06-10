@@ -315,6 +315,21 @@ func handleUDPPacket(packet []byte, remoteAddr *net.UDPAddr) {
 				statsMu.Unlock()
 			}
 		}
+	case core.AudioTypePA:
+		if core.EnableShipPa {
+			core.ActiveHub.Mu.RLock()
+			if sender.Pos != nil && sender.Pos.ContainerID != "" {
+				senderContainerID := sender.Pos.ContainerID
+				senderZone := sender.Pos.Zone
+				for _, p := range core.ActiveHub.Players {
+					if p.Name != senderName && p.SafeGetUDPAddr() != nil && p.Pos != nil &&
+						p.Pos.ContainerID == senderContainerID && p.Pos.Zone == senderZone {
+						targets = append(targets, p)
+					}
+				}
+			}
+			core.ActiveHub.Mu.RUnlock()
+		}
 	}
 
 	if len(targets) == 0 {

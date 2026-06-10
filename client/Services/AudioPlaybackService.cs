@@ -32,11 +32,13 @@ public class AudioPlaybackService : IDisposable
 
     private static readonly float[] KeyDownChime;
     private static readonly float[] KeyUpChime;
+    private static readonly float[] PaKlaxonChime;
 
     static AudioPlaybackService()
     {
         KeyDownChime = GenerateKeyDownChime();
         KeyUpChime = GenerateKeyUpChime();
+        PaKlaxonChime = GeneratePaKlaxonChime();
     }
 
     public bool ProximityMuted { get; set; } = false;
@@ -50,6 +52,7 @@ public class AudioPlaybackService : IDisposable
     public bool EnableEnvironmentalAcoustics { get; set; } = true;
     public bool EnableHelmetModulator { get; set; } = true;
     public bool EnableStt { get; set; } = false;
+    public bool EnableShipPa { get; set; } = true;
 
     public event Action<string, float[], byte>? SttAudioChunkReady;
 
@@ -107,6 +110,38 @@ public class AudioPlaybackService : IDisposable
             else env = 1.0f - ((i - 96) / (float)(samples - 96));
 
             buffer[i] = noise * env * 0.25f; // Static hiss (25%)
+        }
+        return buffer;
+    }
+
+    private static float[] GeneratePaKlaxonChime()
+    {
+        int samples = 48000 * 500 / 1000;
+        float[] buffer = new float[samples];
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / 48000.0;
+            float sample = 0f;
+            
+            if (i < 9600) // First 200ms: 660Hz
+            {
+                sample = (float)Math.Sin(2 * Math.PI * 660.0 * t);
+                float env = 1.0f;
+                if (i < 480) env = i / 480.0f;
+                else if (i > 9120) env = (9600 - i) / 480.0f;
+                sample *= env;
+            }
+            else if (i >= 12000 && i < 21600) // Second note: 250ms to 450ms (880Hz)
+            {
+                double t2 = (double)(i - 12000) / 48000.0;
+                sample = (float)Math.Sin(2 * Math.PI * 880.0 * t2);
+                float env = 1.0f;
+                if (i - 12000 < 480) env = (i - 12000) / 480.0f;
+                else if (i > 21120) env = (21600 - i) / 480.0f;
+                sample *= env;
+            }
+
+            buffer[i] = sample * 0.15f;
         }
         return buffer;
     }
@@ -208,6 +243,7 @@ public class AudioPlaybackService : IDisposable
         if (audioType == 0x00 && ProximityMuted) return;
         if (audioType == 0x01 && RadioMuted) return;
         if (audioType == 0x02 && ProfileMuted) return;
+        if (audioType == 0x03 && !EnableShipPa) return;
 
         PlayerAudioTrack track;
         lock (_lock)
@@ -294,7 +330,11 @@ public class AudioPlaybackService : IDisposable
                         track.IsTransmitting = true;
                         track.LastAudioType = packet.AudioType;
                         track.IsIntercom = packet.IsIntercom;
-                        if (EnablePttChimes && packet.ApplyRadioEffect)
+                        if (packet.AudioType == 0x03)
+                        {
+                            WriteFloatBuffer(track.Buffer, PaKlaxonChime);
+                        }
+                        else if (EnablePttChimes && packet.ApplyRadioEffect)
                         {
                             WriteFloatBuffer(track.Buffer, KeyDownChime);
                         }
@@ -467,7 +507,11 @@ public class AudioPlaybackService : IDisposable
             track.AcousticFilter.Process(floatBuf, decoded);
         }
 
-        if (applyRadioEffect)
+        if (track.LastAudioType == 0x03)
+        {
+            track.MegaphoneFilter.Process(floatBuf, decoded);
+        }
+        else if (applyRadioEffect)
         {
             track.DspFilter.EnableHelmetModulator = EnableHelmetModulator;
             track.DspFilter.Process(floatBuf, decoded);
@@ -627,6 +671,7 @@ public class AudioPlaybackService : IDisposable
         public VolumeSampleProvider Volume { get; } = volume;
         public float VolumeLinear { get; set; } = 1.0f;
         public RadioDspFilter DspFilter { get; } = new();
+        public MegaphoneDspFilter MegaphoneFilter { get; } = new();
         public EnvironmentalAcousticFilter AcousticFilter { get; } = new();
         public bool IsTransmitting { get; set; } = false;
         public DateTime LastReceivedTime { get; set; } = DateTime.MinValue;

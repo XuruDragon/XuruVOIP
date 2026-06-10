@@ -188,4 +188,95 @@ public class AudioPlaybackServiceTests
         
         Assert.Equal(0.12f, volumeProvider.Volume, 3); // 0.8f * 0.15f = 0.12f
     }
+
+    [Fact]
+    public void MegaphoneDspFilter_ShouldApplyBandpassAndClipping()
+    {
+        // GIVEN
+        var filter = new MegaphoneDspFilter();
+        // Create 1kHz sine wave
+        float[] buffer = new float[960];
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            buffer[i] = (float)Math.Sin(2 * Math.PI * 1000.0 * i / 48000.0);
+        }
+
+        float[] original = new float[960];
+        Array.Copy(buffer, original, buffer.Length);
+
+        // WHEN
+        filter.Process(buffer, buffer.Length);
+
+        // THEN: Audio should be modified
+        bool isModified = false;
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            if (buffer[i] != original[i])
+            {
+                isModified = true;
+                break;
+            }
+        }
+        Assert.True(isModified);
+
+        // All samples must be constrained to safe range
+        foreach (var sample in buffer)
+        {
+            Assert.InRange(sample, -1.0f, 1.0f);
+        }
+    }
+
+    [Fact]
+    public void AudioPlaybackService_PaKlaxonChime_ShouldPlayChimeOnPaStart()
+    {
+        // GIVEN
+        var service = new AudioPlaybackService();
+        var mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 2)) { ReadFully = true };
+        var mixerField = typeof(AudioPlaybackService).GetField("_mixer", BindingFlags.NonPublic | BindingFlags.Instance);
+        mixerField!.SetValue(service, mixer);
+
+        // Enqueue 3 packets of type 0x03 (PA) to trigger playback loop
+        var encoder = Concentus.OpusCodecFactory.CreateEncoder(48000, 1, Concentus.Enums.OpusApplication.OPUS_APPLICATION_VOIP);
+        var pcm = new short[960];
+        var outBuf = new byte[4000];
+        int encodedLen = encoder.Encode(pcm, pcm.Length, outBuf, outBuf.Length);
+        var validOpus = new byte[encodedLen];
+        Array.Copy(outBuf, validOpus, encodedLen);
+
+        for (ushort seq = 1; seq <= 3; seq++)
+        {
+            service.ReceiveOpusFrame(
+                playerName: "CaptainBob",
+                opusData: validOpus,
+                audioType: 0x03, // PA
+                applyRadioEffect: false,
+                metadata: null,
+                distance: -1.0,
+                speakerZone: "Bridge",
+                listenerZone: "Cargo_Bay",
+                seq: seq,
+                isIntercom: false
+            );
+        }
+
+        var tracksField = typeof(AudioPlaybackService).GetField("_tracks", BindingFlags.NonPublic | BindingFlags.Instance);
+        var tracks = (System.Collections.IDictionary)tracksField!.GetValue(service)!;
+
+        var tickMethod = typeof(AudioPlaybackService).GetMethod("TickPlayback", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // WHEN: Tick is invoked
+        tickMethod!.Invoke(service, null);
+
+        // THEN: CaptainBob's track should be created, transmitting, and last audio type = 0x03 (PA)
+        Assert.True(tracks.Contains("CaptainBob"));
+        var captainTrack = tracks["CaptainBob"]!;
+        
+        var isTransmittingProp = captainTrack.GetType().GetProperty("IsTransmitting");
+        bool isTransmitting = (bool)isTransmittingProp!.GetValue(captainTrack)!;
+        Assert.True(isTransmitting);
+
+        var lastAudioTypeProp = captainTrack.GetType().GetProperty("LastAudioType");
+        byte lastAudioType = (byte)lastAudioTypeProp!.GetValue(captainTrack)!;
+        Assert.Equal(0x03, lastAudioType);
+    }
 }

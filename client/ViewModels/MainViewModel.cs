@@ -135,6 +135,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private bool _isPttProximityDown = false;
     private bool _isPttRadioDown = false;
     private bool _isPttProfileDown = false;
+    private bool _isPttPaDown = false;
 
     private bool _micProximityMuted = false;
     public bool MicProximityMuted
@@ -262,6 +263,11 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             else if (keyStr == cfg.PttProfileKey)
             {
                 _isPttProfileDown = isDown;
+                UpdatePttState();
+            }
+            else if (keyStr == cfg.PttPaKey)
+            {
+                _isPttPaDown = isDown;
                 UpdatePttState();
             }
             else if (keyStr == cfg.HelmetToggleKey && isDown)
@@ -670,7 +676,12 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             _wasRadioTransmitting = isRadioTransmitting;
         }
 
-        if (_isPttProfileDown)
+        if (_isPttPaDown && Config.Config.EnableShipPa)
+        {
+            _capture.SetPttState(true, 0x03);
+            IsTalking = true;
+        }
+        else if (_isPttProfileDown)
         {
             _capture.SetPttState(true, 0x02);
             IsTalking = !MicProfileMuted;
@@ -844,6 +855,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableEnvironmentalAcoustics = cfg.EnableEnvironmentalAcoustics;
         _playback.EnableHelmetModulator = cfg.EnableHelmetModulator;
         _playback.EnableStt = cfg.EnableStt;
+        _playback.EnableShipPa = cfg.EnableShipPa;
         _playback.Start(cfg.OutputDeviceIndex, cfg.OutputGainPercent);
         
         // Synchronize mute states
@@ -1122,6 +1134,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableEnvironmentalAcoustics = Config.Config.EnableEnvironmentalAcoustics;
         _playback.EnableHelmetModulator = Config.Config.EnableHelmetModulator;
         _playback.EnableStt = Config.Config.EnableStt;
+        _playback.EnableShipPa = Config.Config.EnableShipPa;
         _discordRpc.Enabled = Config.Config.EnableDiscordRpc;
 
         // Sync position tracking source
@@ -1388,6 +1401,15 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         }
 
         return routedMaxHop;
+    }
+
+    public void SetMockPttPaState(bool isDown)
+    {
+        Application.Current?.Dispatcher.Invoke(() =>
+        {
+            _isPttPaDown = isDown;
+            UpdatePttState();
+        });
     }
 
     private void UpdateDiscordPresence()
