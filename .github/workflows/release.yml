@@ -3,7 +3,7 @@ name: Release Build
 on:
   workflow_dispatch:
   release:
-    types: [published]
+    types: [created]
 
 permissions:
   contents: write
@@ -118,5 +118,15 @@ jobs:
           body: ${{ github.event.release.body }}
           files: |
             release-binaries/*
+          draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Publish to WinGet
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: XuruDragon.XuruVOIPClient # Your app package ID in winget format
+          installers-regex: '\.msi$' # Matches the .msi file built during release
+          token: ${{ secrets.GH_TOKEN }}
+          max-versions-to-keep: 5
+

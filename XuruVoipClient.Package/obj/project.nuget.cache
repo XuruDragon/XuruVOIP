@@ -1,0 +1,75 @@
+{
+  "version": 2,
+  "dgSpecHash": "R9jfZSwr2XY=",
+  "success": true,
+  "projectFilePath": "F:\\UE\\starcitizen-voip\\XuruVoipClient.Package\\XuruVoipClient.Package.wapproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\xurud\\.nuget\\packages\\concentus\\2.2.2\\concentus.2.2.2.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\hardcodet.notifyicon.wpf\\2.0.1\\hardcodet.notifyicon.wpf.2.0.1.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\10.0.7\\microsoft.bcl.asyncinterfaces.10.0.7.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\microsoft.extensions.ai.abstractions\\10.2.0\\microsoft.extensions.ai.abstractions.10.2.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\naudio\\2.3.0\\naudio.2.3.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\naudio.asio\\2.3.0\\naudio.asio.2.3.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\naudio.core\\2.3.0\\naudio.core.2.3.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\naudio.midi\\2.3.0\\naudio.midi.2.3.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\naudio.wasapi\\2.3.0\\naudio.wasapi.2.3.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\naudio.winforms\\2.3.0\\naudio.winforms.2.3.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\naudio.winmm\\2.3.0\\naudio.winmm.2.3.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.buffers\\4.6.1\\system.buffers.4.6.1.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.io.pipelines\\10.0.2\\system.io.pipelines.10.0.2.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.memory\\4.6.3\\system.memory.4.6.3.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.numerics.vectors\\4.6.1\\system.numerics.vectors.4.6.1.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.reflection.emit\\4.7.0\\system.reflection.emit.4.7.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.reflection.emit.ilgeneration\\4.7.0\\system.reflection.emit.ilgeneration.4.7.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.1.2\\system.runtime.compilerservices.unsafe.6.1.2.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.text.encodings.web\\10.0.2\\system.text.encodings.web.10.0.2.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.text.json\\10.0.2\\system.text.json.10.0.2.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\system.threading.tasks.extensions\\4.6.3\\system.threading.tasks.extensions.4.6.3.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\tesseract\\5.2.0\\tesseract.5.2.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\tesseract.drawing\\5.2.0\\tesseract.drawing.5.2.0.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\webrtcvadsharp\\1.3.2\\webrtcvadsharp.1.3.2.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\whisper.net\\1.9.1\\whisper.net.1.9.1.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\whisper.net.runtime\\1.9.1\\whisper.net.runtime.1.9.1.nupkg.sha512",
+    "C:\\Users\\xurud\\.nuget\\packages\\whisper.net.runtime.metal\\1.9.1\\whisper.net.runtime.metal.1.9.1.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "message": "Le package 'Hardcodet.NotifyIcon.Wpf 2.0.1' a été restauré en utilisant '.NETCoreApp,Version=v3.1, .NETCoreApp,Version=v3.0, .NETCoreApp,Version=v2.0, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1, net11.0-windows10.0.26100, .NETFramework,Version=v4.6.1' au lieu du framework cible du projet 'UAP,Version=v10.0.26100'. Ce package n'est peut-être pas totalement compatible avec votre projet.",
+      "projectPath": "F:\\UE\\starcitizen-voip\\XuruVoipClient.Package\\XuruVoipClient.Package.wapproj",
+      "warningLevel": 1,
+      "filePath": "F:\\UE\\starcitizen-voip\\XuruVoipClient.Package\\XuruVoipClient.Package.wapproj",
+      "libraryId": "Hardcodet.NotifyIcon.Wpf",
+      "targetGraphs": [
+        "net451"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "message": "Le package 'NAudio 2.3.0' a été restauré en utilisant '.NETCoreApp,Version=v3.1, .NETCoreApp,Version=v3.0, .NETCoreApp,Version=v2.0, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1, net11.0-windows10.0.26100, .NETFramework,Version=v4.6.1' au lieu du framework cible du projet 'UAP,Version=v10.0.26100'. Ce package n'est peut-être pas totalement compatible avec votre projet.",
+      "projectPath": "F:\\UE\\starcitizen-voip\\XuruVoipClient.Package\\XuruVoipClient.Package.wapproj",
+      "warningLevel": 1,
+      "filePath": "F:\\UE\\starcitizen-voip\\XuruVoipClient.Package\\XuruVoipClient.Package.wapproj",
+      "libraryId": "NAudio",
+      "targetGraphs": [
+        "net451"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "message": "Le package 'NAudio.WinForms 2.3.0' a été restauré en utilisant '.NETCoreApp,Version=v3.1, .NETCoreApp,Version=v3.0, .NETCoreApp,Version=v2.0, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1, net11.0-windows10.0.26100, .NETFramework,Version=v4.6.1' au lieu du framework cible du projet 'UAP,Version=v10.0.26100'. Ce package n'est peut-être pas totalement compatible avec votre projet.",
+      "projectPath": "F:\\UE\\starcitizen-voip\\XuruVoipClient.Package\\XuruVoipClient.Package.wapproj",
+      "warningLevel": 1,
+      "filePath": "F:\\UE\\starcitizen-voip\\XuruVoipClient.Package\\XuruVoipClient.Package.wapproj",
+      "libraryId": "NAudio.WinForms",
+      "targetGraphs": [
+        "net451"
+      ]
+    }
+  ]
+}
