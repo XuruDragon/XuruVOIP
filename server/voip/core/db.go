@@ -80,7 +80,7 @@ func createTables() error {
 			password_hash TEXT NOT NULL,
 			profile TEXT DEFAULT '',
 			active_channel TEXT DEFAULT 'General',
-			listening_channels TEXT DEFAULT '[]',
+			listening_channels TEXT DEFAULT '["General"]',
 			is_banned INTEGER DEFAULT 0,
 			hwid TEXT DEFAULT '',
 			last_ip TEXT DEFAULT '',
@@ -346,7 +346,7 @@ func AuthenticatePlayer(username, password, initialChannel, ip, hwid string) (su
 		}
 		_, err = db.Exec(
 			"INSERT INTO users (username, password_hash, profile, active_channel, listening_channels, is_banned, hwid, last_ip, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?)",
-			username, string(hashed), "", initialChannel, "[]", hwid, ip, time.Now(), time.Now(),
+			username, string(hashed), "", initialChannel, "[\"General\"]", hwid, ip, time.Now(), time.Now(),
 		)
 		if err != nil {
 			return false, false, err

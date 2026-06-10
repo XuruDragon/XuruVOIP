@@ -113,6 +113,10 @@ func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel s
 		profile = persist.Profile
 	}
 
+	if len(listenChans) == 0 {
+		listenChans = []string{"General"}
+	}
+
 	if exists {
 		// Close previous position socket if it exists to avoid leakage
 		p.PosMu.Lock()
