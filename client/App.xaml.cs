@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using XuruVoipClient.Services;
@@ -17,6 +18,96 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += (s, args) => HandleCrash(args.ExceptionObject as Exception);
         DispatcherUnhandledException += (s, args) => { HandleCrash(args.Exception); args.Handled = true; };
         TaskScheduler.UnobservedTaskException += (s, args) => { HandleCrash(args.Exception); args.SetObserved(); };
+
+        // Perform log rotation at application startup
+        LogService.RotateLogs();
+
+        // Register native DLL resolver for WebRtcVadSharp to support single-file publish
+        NativeLibrary.SetDllImportResolver(typeof(WebRtcVadSharp.WebRtcVad).Assembly, (libraryName, assembly, searchPath) =>
+        {
+            if (libraryName == "WebRtcVad" || libraryName == "WebRtcVad.dll")
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                
+                // 1. Try runtimes/win-x64/native/WebRtcVad.dll
+                string nativePath = Path.Combine(baseDir, "runtimes", "win-x64", "native", "WebRtcVad.dll");
+                if (File.Exists(nativePath))
+                {
+                    if (NativeLibrary.TryLoad(nativePath, out var handle))
+                    {
+                        return handle;
+                    }
+                }
+
+                // 2. Try app root
+                string rootPath = Path.Combine(baseDir, "WebRtcVad.dll");
+                if (File.Exists(rootPath))
+                {
+                    if (NativeLibrary.TryLoad(rootPath, out var handle))
+                    {
+                        return handle;
+                    }
+                }
+            }
+            return IntPtr.Zero;
+        });
+
+        // Register native DLL resolver for Tesseract to support single-file publish
+        NativeLibrary.SetDllImportResolver(typeof(Tesseract.TesseractEngine).Assembly, (libraryName, assembly, searchPath) =>
+        {
+            if (libraryName.StartsWith("tesseract", StringComparison.OrdinalIgnoreCase) ||
+                libraryName.StartsWith("leptonica", StringComparison.OrdinalIgnoreCase) ||
+                libraryName.Contains("lept", StringComparison.OrdinalIgnoreCase))
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string arch = Environment.Is64BitProcess ? "x64" : "x86";
+
+                // 1. Try x64/x86 subfolder
+                string nativePath = Path.Combine(baseDir, arch, libraryName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ? libraryName : $"{libraryName}.dll");
+                if (File.Exists(nativePath))
+                {
+                    if (NativeLibrary.TryLoad(nativePath, out var handle))
+                    {
+                        return handle;
+                    }
+                }
+
+                // 1b. In case libraryName doesn't end with suffix or is slightly different, try exact expected filenames
+                if (libraryName.Contains("lept", StringComparison.OrdinalIgnoreCase))
+                {
+                    string leptPath = Path.Combine(baseDir, arch, "leptonica-1.82.0.dll");
+                    if (File.Exists(leptPath))
+                    {
+                        if (NativeLibrary.TryLoad(leptPath, out var handle))
+                        {
+                            return handle;
+                        }
+                    }
+                }
+                else if (libraryName.StartsWith("tesseract", StringComparison.OrdinalIgnoreCase))
+                {
+                    string tessPath = Path.Combine(baseDir, arch, "tesseract50.dll");
+                    if (File.Exists(tessPath))
+                    {
+                        if (NativeLibrary.TryLoad(tessPath, out var handle))
+                        {
+                            return handle;
+                        }
+                    }
+                }
+
+                // 2. Try app root directory
+                string rootPath = Path.Combine(baseDir, libraryName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ? libraryName : $"{libraryName}.dll");
+                if (File.Exists(rootPath))
+                {
+                    if (NativeLibrary.TryLoad(rootPath, out var handle))
+                    {
+                        return handle;
+                    }
+                }
+            }
+            return IntPtr.Zero;
+        });
 
         try
         {

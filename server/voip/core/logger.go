@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -21,6 +23,64 @@ const (
 )
 
 var logFile *os.File
+
+// RotateLogs checks the xuruvoip.log file and rotates it if its modification time is from a previous day.
+func RotateLogs() {
+	dataDir := ResolveDataDir()
+	logPath := filepath.Join(dataDir, "xuruvoip.log")
+
+	fi, err := os.Stat(logPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return
+		}
+		return
+	}
+
+	modTime := fi.ModTime()
+	now := time.Now()
+
+	// Compare dates (year, month, day)
+	if modTime.Year() < now.Year() || 
+		(modTime.Year() == now.Year() && modTime.Month() < now.Month()) || 
+		(modTime.Year() == now.Year() && modTime.Month() == now.Month() && modTime.Day() < now.Day()) {
+		
+		// Rename xuruvoip.log to xuruvoip.yyyy-MM-dd.log using the date the log was written
+		dateStr := modTime.Format("2006-01-02")
+		rotatedPath := filepath.Join(dataDir, fmt.Sprintf("xuruvoip.%s.log", dateStr))
+
+		// Remove existing rotated file if it exists, then rename the current active log to it
+		_ = os.Remove(rotatedPath)
+		_ = os.Rename(logPath, rotatedPath)
+
+		// Keep only the last 5 rotated files
+		files, err := os.ReadDir(dataDir)
+		if err != nil {
+			return
+		}
+
+		var rotatedFiles []os.DirEntry
+		for _, file := range files {
+			if !file.IsDir() && strings.HasPrefix(file.Name(), "xuruvoip.") && strings.HasSuffix(file.Name(), ".log") {
+				if file.Name() != "xuruvoip.log" {
+					rotatedFiles = append(rotatedFiles, file)
+				}
+			}
+		}
+
+		// Sort rotated files alphabetically (since YYYY-MM-DD name layout yields chronological order)
+		sort.Slice(rotatedFiles, func(i, j int) bool {
+			return rotatedFiles[i].Name() < rotatedFiles[j].Name()
+		})
+
+		// Delete oldest rotated files until we have at most 5
+		for len(rotatedFiles) > 5 {
+			oldestPath := filepath.Join(dataDir, rotatedFiles[0].Name())
+			_ = os.Remove(oldestPath)
+			rotatedFiles = rotatedFiles[1:]
+		}
+	}
+}
 
 // InitLogger opens the xuruvoip.log file in append mode
 func InitLogger() {

@@ -13,6 +13,69 @@ public static class LogService
 
     public static bool EnableGeneralLogs { get; set; } = false;
 
+    public static void RotateLogs()
+    {
+        RotateLogsInternal(LogDir, LogPath);
+    }
+
+    internal static void RotateLogsInternal(string logDir, string logPath)
+    {
+        try
+        {
+            if (!File.Exists(logPath)) return;
+
+            var fi = new FileInfo(logPath);
+            DateTime lastWrite = fi.LastWriteTime;
+            DateTime today = DateTime.Today;
+
+            // Check if the date is anterior to the actual date (do not compare time)
+            if (lastWrite.Date < today)
+            {
+                Directory.CreateDirectory(logDir);
+
+                // Rename to xuru_voip.yyyy-MM-dd.log using the date of the latest log entries
+                string dateStr = lastWrite.ToString("yyyy-MM-dd");
+                string rotatedPath = Path.Combine(logDir, $"xuru_voip.{dateStr}.log");
+
+                lock (LogLock)
+                {
+                    if (File.Exists(rotatedPath))
+                    {
+                        File.Delete(rotatedPath);
+                    }
+                    File.Move(logPath, rotatedPath);
+                }
+
+                // Keep only the last 5 rotated files
+                var logFiles = Directory.GetFiles(logDir, "xuru_voip.*.log");
+                var rotatedLogsList = new System.Collections.Generic.List<FileInfo>();
+                foreach (var file in logFiles)
+                {
+                    var name = Path.GetFileName(file);
+                    if (name != "xuru_voip.log" && name != "crash.log")
+                    {
+                        rotatedLogsList.Add(new FileInfo(file));
+                    }
+                }
+
+                // Sort by Name (lexicographical sorting of yyyy-MM-dd yields chronological order)
+                rotatedLogsList.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+
+                // If we have more than 5, delete the oldest ones (first in the list) until we have 5
+                while (rotatedLogsList.Count > 5)
+                {
+                    var oldest = rotatedLogsList[0];
+                    oldest.Delete();
+                    rotatedLogsList.RemoveAt(0);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Log rotation failed: {ex.Message}");
+        }
+    }
+
     public static void Info(string message)
     {
         if (!EnableGeneralLogs) return;

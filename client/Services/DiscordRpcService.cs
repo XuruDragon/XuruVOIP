@@ -88,17 +88,33 @@ public class DiscordRpcService : IDisposable
                     {
                         _isConnected = false;
                         _pipeStream?.Dispose();
-                        
-                        _pipeStream = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
-                        await _pipeStream.ConnectAsync(2000, _cts.Token);
-                        
-                        if (SendHandshake())
+                        _pipeStream = null;
+
+                        // Try to connect to any active Discord IPC pipe index (0 to 9)
+                        for (int i = 0; i < 10; i++)
                         {
-                            byte[] response = await ReadFrameAsync(_cts.Token);
-                            if (response.Length > 0)
+                            try
                             {
-                                _isConnected = true;
-                                SendPresence();
+                                var stream = new NamedPipeClientStream(".", $"discord-ipc-{i}", PipeDirection.InOut, PipeOptions.Asynchronous);
+                                await stream.ConnectAsync(500, _cts.Token); // 500ms timeout per pipe attempt
+                                _pipeStream = stream;
+
+                                if (SendHandshake())
+                                {
+                                    byte[] response = await ReadFrameAsync(_cts.Token);
+                                    if (response.Length > 0)
+                                    {
+                                        _isConnected = true;
+                                        SendPresence();
+                                        break; // Successfully connected and authenticated
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                // Clean up and try the next pipe index
+                                _pipeStream?.Dispose();
+                                _pipeStream = null;
                             }
                         }
                     }

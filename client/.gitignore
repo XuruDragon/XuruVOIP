@@ -49,3 +49,5 @@ nunit-*.xml
 
 .vs/
 obj/
+
+publish/
