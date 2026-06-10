@@ -25,7 +25,25 @@
   <img src="logo.png" alt="XuruVoip Logo" width="400" height="400" />
 </p>
 
-XuruVoip is a high-performance, secure, and dynamically spatialized **3D voice communication (VoIP) suite** designed specifically for custom gaming integrations with **Star Citizen**. It consists of a Go-based backend server and a modern C# WPF client.
+XuruVoip is a high-performance, secure, and dynamically spatialized **3D voice communication (VoIP) suite** designed specifically for custom gaming integrations with **Star Citizen**. It consists of a Go-based backend server and a modern C# WPF client with a built-in Companion App (web interface) and Elgato Stream Deck integration.
+
+### 🎯 Project Goal
+The goal of XuruVoip is to provide Star Citizen gaming events, roleplay organizations, and tactical squads with an **unprecedented level of audio immersion and operational convenience**. By reading real-time coordinate, visor, and vehicle states from the game client, XuruVoip dynamically shapes player voices in 3D space, simulates planetary/vacuum atmospheres, and routes tactical communications automatically without requiring manual client configurations.
+
+---
+
+### 🗺️ Navigation Directory
+
+| Section | Description |
+| :--- | :--- |
+| [📸 Screenshots & UI](#-screenshots--ui) | Visual showcase of client screens, admin portal, and settings. |
+| [🗂️ Project Structure](#️-project-structure) | Repository layout and folder breakdown. |
+| [⚙️ System Architecture](#️-system-architecture) | The complete actual workflow diagram of the WPF client, Go server, and external devices. |
+| [💡 Core Features Overview](#-core-features-overview) | Detailed breakdown of the 11+ implemented spatial and networking features. |
+| [🖥️ Go Server (Go)](#️-xuruvoip-server-go) | Server build, run, deployment, and configuration instructions. |
+| [🎛️ Discord Voice Bridge](#️-discord-voice-bridge-setup-guide) | Connecting Go server radio channels to a Discord Voice Channel. |
+| [📱 Companion App & Stream Deck](#-companion-app--stream-deck-integration) | Remote device control and Stream Deck physical keys setup. |
+| [🛠️ WPF Client (C#)](#-building--running-the-client) | Client requirements, compilation, and MSI/Portable installation guides. |
 
 ---
 
@@ -77,172 +95,156 @@ XuruVoip is a high-performance, secure, and dynamically spatialized **3D voice c
 ## 🗂️ Project Structure
 
 - **/server**: High-performance Go backend hosting the position, audio, and administration services.
-- **/client**: Modern C# WPF client utilizing NAudio, WebRtcVad, and Tesseract OCR or Game.log tail for automated location tracking and log parsing.
+- **/client**: Modern C# WPF client utilizing NAudio, WebRtcVad, and Tesseract OCR or Game.log tail for automated location tracking and log parsing. The companion app is also included in this project.
+- **/streamdeck**: Stream Deck plugin for XuruVoIP client.
 
 ---
 
-## ⚙️ How the Application Works (Client Architecture)
+## ⚙️ System Architecture
 
-The C# WPF client runs alongside Star Citizen and performs real-time audio capturing, processing, coordinate recognition, and playback. Below is the workflow of the client system:
+Below is the complete actual architecture of the XuruVoip system, illustrating the capture, positioning, playback, and HUD rendering loops inside the WPF client, the Go server websocket hubs, and the external integrations:
 
 ```mermaid
-graph TD
-    subgraph Capture & Transmit
-        Mic[Microphone Input] -->|PCM Audio| VAD[WebRTC Voice Activity Detection]
-        VAD -->|Active Voice| VoiceChanger[Voice Changer & Suit DSP]
-        VoiceChanger -->|Modified PCM| OpusEnc[Opus Encoder]
-        OpusEnc -->|Opus Packets| AudioWS[Audio WebSocket client]
-        AudioWS -->|WebSocket Port 8889| Server[Go Server]
+graph TB
+    subgraph STIM ["Game Environment (Star Citizen)"]
+        SC["Star Citizen Client"]
+        LOGS["Game.log (Log File)"]
+        SCREEN["Graphics Output (Vulkan/DX)"]
     end
 
-    subgraph Positioning & Helmet Scanning
-        SC[Star Citizen Process] -->|r_DisplaySessionInfo/r_DisplayInfo| Screen[Screen Capture]
-        Screen -->|Preprocessing| Tess[Tesseract OCR Engine]
-        
-        SC -->|Real-time Log| GameLog[Game.log File]
-        GameLog -->|Tail Scanner| LogParser[Log Service Parser]
-        
-        Tess -->|Parsed Coordinates| PosSelector{Position Source Toggle}
-        LogParser -->|Parsed Coordinates| PosSelector
-        
-        PosSelector -->|Selected Coordinates| Zone[Hierarchical Zone Filter]
-        Zone -->|Listener Coordinates & Zone| PosWS[Position WebSocket client]
-        PosWS -->|WebSocket Port 8888| Server
+    subgraph WPF ["XuruVOIP WPF Client"]
+        direction TB
+        subgraph CAPT ["Microphone Capture & DSP"]
+            MIC["Mic Input"] --> VAD["WebRTC VAD"]
+            VAD -->|Speech Detected| VC["Voice Changer (Alien/Cyborg/Robot)"]
+            VC -->|Modulated PCM| HELM_OSC["Helmet Breathing & Vent Hum Overlay"]
+            HELM_OSC --> OPUS_ENC["Opus Encoder"]
+        end
 
-        LogParser -->|Equip/Unequip events| Helmet[Helmet Mode Sync]
-        Helmet -->|Helmet status packet| PosWS
+        subgraph POS_TRACK ["Positioning & State Tracking"]
+            LOGS -->|Tail Scanner| LOG_PAR["Game.log Parser"]
+            SCREEN -->|showlocations Capture| OCR["Tesseract OCR Engine"]
+            LOG_PAR -->|Equip/Visor Events| HELM_DET["Visor State Auto-Sync"]
+            OCR -->|Coords| POS_SEL{"Source Selector"}
+            LOG_PAR -->|Coords & ContainerID| POS_SEL
+        end
+
+        subgraph PLAY ["Spatial Playback & DSP"]
+            OPUS_DEC["Opus Decoder"] --> OCC_FIL["Carrack/Hercules Deck & Room Occlusion"]
+            OCC_FIL --> REV_FIL["Location-Aware Reverb (Caves/Bunkers/Hangars)"]
+            REV_FIL --> RAD_FIL["Radio bandpass & Long-Range Degradation"]
+            RAD_FIL --> CHIMES["PTT Mic Chirps & Squelch Tail Generator"]
+            CHIMES --> PAN["Spatial 3D Panning Math"]
+            PAN --> VOL["Spatial Distance Attenuation"]
+            VOL --> MIXER["NAudio Mixer"] --> SPK["Audio Output Devices"]
+        end
+
+        subgraph HUD ["HUD Overlay (Win32 Click-Through)"]
+            T_RAD["Tactical 2D Mini-Radar"]
+            STT["Whisper.net Speech-to-Text"]
+            OPUS_DEC -.->|Incoming Voice| STT
+            STT -->|Subtitles| SUB["Real-Time HUD Subtitles"]
+        end
+
+        subgraph COMP ["Companion Web Server"]
+            HTTP_SRV["Local HTTP Listener (Custom Port)"]
+            DASH["Glassmorphic HTML/JS Dashboard"]
+        end
+
+        POS_SEL -->|Coordinates & Zone| POS_WS["Position WS Client"]
+        HELM_DET -->|Visor State| POS_WS
+        OPUS_ENC -->|Audio Packets| AUD_WS["Audio WS Client"]
     end
 
-    subgraph Playback & Spatial Mixing
-        Server -->|Target Proximity Audio + Metadata| AudioWS
-        AudioWS -->|Opus Frame + ProximityMetadata| Decoder[Opus Decoder]
-        Decoder -->|Mono Float PCM| OcclusionFilter[Deck & Compartment Occlusion Filter]
-        OcclusionFilter -->|Muffled PCM| DSP[Radio DSP Filter & Degradation]
-        DSP -->|Mono| Panner[PanningSampleProvider]
-        Panner -->|Stereo| Volume[VolumeSampleProvider]
-        
-        LogParser -.->|local Helmet status| DSP
-        Zone -.->|Listener position & heading| MixerMath[Spatial Panning & Degradation Math]
-        
-        MixerMath -->|Pan parameter| Panner
-        MixerMath -->|Distance & Behind Attenuation| Volume
-        MixerMath -->|Degradation Factor| DSP
-        
-        Volume -->|Left/Right Stereo| Mixer[MixingSampleProvider]
-        Mixer -->|Play back| Speakers[Audio Output Device]
+    subgraph SERVER ["XuruVOIP Go Server"]
+        direction TB
+        WS_HUB["Websocket Connection Hub"]
+        POS_HUB["Spatial Positioning & Zone Hub"]
+        DB["SQLite DB & Persistent Channels"]
+        DISC_BRIDGE["Discord Voice Bridge"]
+        ADM_PORT["Admin Web Portal (Canvas Live Radar)"]
+
+        WS_HUB <--> POS_HUB
+        POS_HUB <--> DB
+        DISC_BRIDGE <--> WS_HUB
     end
 
-    subgraph HUD Overlay & STT
-        Decoder -->|Mono Float PCM| STT[Speech-to-Text Whisper.net]
-        STT -->|Transcribed Text| Overlay[HUD Overlay Window]
-        Zone -.->|Listener Position| Overlay
-        AudioWS -.->|Remote Speaker Coordinates| Overlay
-        Overlay -->|Dynamic Subtitles & 2D Mini-Radar| ScreenOverlay[Screen Display]
+    subgraph EXT ["External Interfaces"]
+        DISC["Discord Voice Channel"] <-->|Bidirectional Voice Bridge| DISC_BRIDGE
+        SD["Stream Deck App"] <-->|WebSocket Actions / Port Setting| HTTP_SRV
+        MOB["Mobile Controller"] <-->|REST API Status & Toggles| HTTP_SRV
     end
+
+    POS_WS <-->|WS Port 8888| WS_HUB
+    AUD_WS <-->|WS Port 8889| WS_HUB
 ```
 
-### 1. Audio Capture, VAD, and Compression
-* **Audio Capture:** The client captures microphone audio using the **NAudio** API at a high-fidelity rate of 48,000 Hz, 16-bit mono.
-* **Voice Activity Detection (VAD):** Captured audio buffers are evaluated using the native **WebRtcVad** wrapper. If the speech confidence level falls below the configured VAD threshold, transmission halts, avoiding broadcasting ambient keyboard clicks or fan noise.
-* **Compression:** Active speech buffers are encoded into highly compressed **Opus** frames (using the **Concentus** C# wrapper) and transmitted immediately as binary WebSocket frames to the Go Audio Server.
+---
 
-### 2. Location Tracking and Heading Estimation
-* **Position Source Toggle:** Players can choose between two positioning methodologies in the client settings:
-  * **OCR Screen Scanner:** Periodically takes a screenshot of the configured screen region (where `/showlocations` or `r_DisplaySessionInfo` renders coordinate text), preprocesses the image, and feeds it to the **Tesseract OCR** engine.
-  * **Game.log Reader (GRTPR):** Tail-scans the Star Citizen `Game.log` file directly for coordinates logged by the game. To enable this, players must add `r_DisplaySessionInfo = 3` (or `1`) to their `user.cfg` file. Selecting GRTPR completely shuts down and disposes the Tesseract OCR engine, saving substantial CPU and RAM resources on the host machine.
-* **Hierarchical Zone Filtering:** The parsed position text contains multiple hierarchical lines of player coordinates (e.g. planetary coordinates, ship compartments, elevators). The client parses these lines and dynamically filters out sub-zones (like `elevator`, `transit`, `seat`) and system-wide zones (like `solarsystem`, `Stanton`). This ensures players inside a ship compartment can hear players in the adjacent corridor without audio cutting off due to minor sub-zone differences.
-* **Heading Estimation:** Since Star Citizen does not output player orientation, the client tracks coordinate displacement ($Position_{current} - Position_{previous}$). If the player moves more than 0.5 meters, the client calculates the movement direction vector as the estimated look heading. When the player is stationary, the last calculated heading is preserved.
+## 💡 Core Features Overview
 
-### 3. Real-time Helmet Detection (Log Tail-Scanning)
-* **Tail Scanner:** The client spins up a background task that tail-reads the Star Citizen `Game.log` file in real-time.
-* **Attachment Tracking:** The scanner monitors log notifications (like `<AttachmentReceived>`) for items matching utility helmets and visors (e.g. `FP_Visor`, `helmethook_attach`).
-* **Auto-Synchronization:** When a helmet is equipped or removed in-game, the client instantly synchronizes the player's Helmet Mode (ON/OFF) without requiring manual key bindings.
+### 1. 🔊 Real-Time 3D Spatial Audio
+* **Dynamic Stereo Panning:** PROJECTS remote speaker coordinates onto the listener's Forward and Right direction vectors to calculate exact left/right panning using a constant-power formula.
+* **Front-Back Ambiguity Resolution:** Attenuates audio volume by 25% if a speaker is standing behind the listener, resolving standard 2D audio panning limitations.
+* **Distance Roll-Off:** Fades out proximity voices linearly based on distance, ensuring natural loudness levels (fades completely to zero at 50 meters, or 5 meters for whispers).
 
-### 4. Stereo 3D Spatial Mixing & DSP
-* **Receive Loop:** The client receives binary Opus audio packets from the server. Proximity audio packets contain extra metadata: distance to the speaker, maximum range, and the speaker's coordinates.
-* **Spatial Calculations:** The client calculates the angle between the estimated listener heading and the speaker's location. The coordinates are projected onto the listener's **Forward** and **Right** vectors:
-  * **Stereo Panning:** The projection on the Right vector controls the left/right speaker balance (from `-1.0` full left to `+1.0` full right) using NAudio's constant-power `PanningSampleProvider`.
-  * **Front-Back Ambiguity Resolution:** If the Forward projection is negative (the speaker is behind the listener), a psychoacoustic volume attenuation (up to 25% drop) is applied.
-  * **Distance Attenuation:** Audio volume fades out linearly based on the speaker's distance, reaching zero at the proximity range (50m default, or 5m whisper).
-* **Audio Playback**: The Opus frames are decoded, panned, volume-attenuated, and mixed into a stereo stream.
-* **Radio DSP & Degradation**: Audio is processed through a **Radio DSP filter** (if either speaker or listener has their helmet on, or on radio channels).
-  * **Dynamic Radio Degradation:** If enabled, the DSP filter dynamically narrows the high/low bandpass cutoff frequencies and mixes in bandpass-filtered white noise as the distance between players approaches the maximum communication range, simulating low-fi radio signal degradation.
-  * **Authentic PTT & Radio Chimes:** When keying or unkeying the transmitter, NAudio synthesizes radio effects. Starting a transmission plays a 50ms pitch-sweeping **Mic Key Chirp** (900Hz to 700Hz). Ending a transmission triggers a 180ms bandpass-filtered static noise **Squelch Tail** when the playback service receives a final 0-byte Opus frame. An option for local PTT chime feedback allows players to hear their own transmitter chimes.
+### 2. 🗺️ Location-Aware Acoustics & Ship/Bunker Occlusion
+* **Deck and Wall Occlusion:** Detects internal boundaries inside spaces. If players are on different decks (e.g. Carrack, Hercules) or rooms (e.g. Bunkers), low-pass filtering (cutoff frequencies from 300Hz to 900Hz) and volume dampening are dynamically applied.
+* **Environmental Reverb:** Reads the hierarchical zone of the player and automatically applies custom wet-mix, delay, and feedback reverb parameters for **Caves**, **Bunkers**, and **Hangars**.
 
-### 5. Dynamic Mic States & Muting Controls
-* **Dynamic Microphone Display:** The main window's microphone status label dynamically updates in real-time to show the exact state of your transmitter:
-  * `Proximity PTT (Off)` / `Proximity PTT (On)` (Push-To-Talk proximity channel)
-  * `Proximity VAD (OFF)` / `Proximity VAD (ON)` (Voice-activation mode, switches to ON when speech is detected)
-  * `Radio Channel PTT (ON)` (Transmitting on active Radio channel)
-  * `Profile PTT (ON)` (Transmitting on Profile channel)
-  * `(Muted)` (e.g. `Proximity PTT (Muted)`) when the microphone for the current channel is muted.
-* **Channel Muting Status Table:** Below the active channel and helmet status, the main window includes a structured table summarizing the active/muted status of both the microphone (outgoing) and audio (incoming) for all three communication channels (Proximity, Radio, and Profile). Statuses are color-coded (Green for ACTIVE, Red for MUTED) and dynamically updated.
-* **Separated Microphone & Audio Mute Hotkeys:**
-  * **Microphone Mute (Outgoing):** Toggles microphone transmission muting for each channel. Defaults: Proximity (`M`), Radio (`,`), Profile (`.`). When muted, PTT presses and VAD speech will not transmit audio to the server, and the main window LED remains orange.
-  * **Audio Mute (Incoming):** Toggles playback muting for other players' voice on each channel. Defaults are unassigned (`None`) and can be fully customized in the settings window.
+### 3. 💨 Helmet & EVA Atmospheric Simulation
+* **EVA Muting:** Automatically mutes proximity voice communications in space or vacuum zones (EVA), forcing players to use radio channels to communicate.
+* **Visor Respirator Overlay:** Simulates air pressure when the visor is down. Synthesizes a low-frequency breathing whoosh and a dual-frequency (50Hz + 100Hz) suit vent fan hum onto the captured mic feed.
+* **Auto Visor Synchronization:** Reads attachment logs in `Game.log` to automatically detect when a helmet is equipped/removed and updates the visor state in real-time.
 
-### 6. Vulkan-Compatible Borderless HUD Overlay
-* **HUD Overlay Window**: The client provides an optional, lightweight WPF overlay window that renders topmost. It displays client VoIP status, current communication frequency, and an active speaker list with visual radio signal indicators.
-* **Win32 Click-Through Integration**: By using Win32 API window styles (`WS_EX_TRANSPARENT` and `WS_EX_NOACTIVATE`), the overlay does not steal focus and allows mouse clicks to pass directly through to the game.
-* **API Agnostic Rendering**: Since standard transparent WPF windows rely on Windows Desktop Window Manager (DWM) composition, the overlay does not hook the graphics pipeline. This guarantees full rendering compatibility with both **Vulkan** and **DirectX**, provided the game is run in **"Borderless Windowed"** mode.
-* **📡 Tactical HUD Mini-Radar**: Renders player locations on a circular mini-radar drawn on the overlay.
-  * **Heading-Up Alignment**: The radar automatically rotates based on the player's movement direction vector (look heading).
-  * **Relative Projection**: Projects coordinates of nearby speaking players in proximity. Active speakers display pulsating sound rings.
-  * **Configurability**: Can be toggled on/off in Settings, with maximum range adjustable from 10m to 200m.
-* **💬 Real-Time HUD Subtitles (Speech-to-Text)**: Automatically transcribes voice communications in real-time and displays them as subtitles on the overlay.
-  * **Offline Transcription**: Uses an offline, lightweight Whisper model (`ggml-tiny.bin`) run locally (via Whisper.net).
-  * **Dynamic Language Adaptation**: Matches the speech recognition parameters dynamically to the user's selected interface language.
-  * **On-Demand Background Setup**: Only downloads the 75MB model from Huggingface on first activation. Background download progress is displayed directly on the HUD.
+### 4. 🎙️ Sci-Fi Voice Changer & Suit Modulators
+* **Real-Time DSP Filters:** Time-domain pitch shifting, flanging, ring modulation, soft-tanh saturation, and 8-bit bitcrushing.
+* **Atmospheric Presets:** Instantly load preset voice profiles including **Alien**, **Cyborg**, **Robotic**, or **Custom Pitch Shift** (0.5x to 2.0x).
 
-### 7. Environmental Acoustics (Occlusion & Reverb)
-* **Occlusion Filter:** If the speaker and listener are in different zones or compartments, the client automatically applies a low-pass filter to simulate physical obstruction/occlusion. The cutoff frequency transitions smoothly to prevent audio clicks.
-* **Location-Aware Reverb:** If the listener is located in a specific environment (Caves, Bunkers, or Hangars), a feedback delay-line comb filter applies environment-specific wet mix, delay, and feedback parameters:
-  * *Caves / Tunnels:* 45% wet, 100ms delay, 0.6 feedback.
-  * *Bunkers / Stations:* 25% wet, 50ms delay, 0.4 feedback.
-  * *Hangars:* 35% wet, 150ms delay, 0.5 feedback.
-* **🗺️ Compartment-Specific and Deck Occlusion**: Supports specific ship layouts and facilities, separating audio based on internal physical boundaries:
-  * *Carrack Decks:* Z-coordinate divisions (Command vs Habitation vs Technical deck) apply low-pass filtering (cutoff 350Hz, volume 35%).
-  * *Carrack Compartments:* Y-coordinate divisions (Cockpit vs Habitation vs Engine room) filter audio (cutoff 900Hz, volume 65%).
-  * *Bunker Levels:* Z-coordinate divisions (Elevator lobby vs Intermediate level vs Main level) filter audio (cutoff 300Hz, volume 30%).
-  * *Bunker Rooms:* X-coordinate divisions filter audio (cutoff 800Hz, volume 60%).
-  * *Hercules Decks:* Z-coordinate divisions (Habitation vs Cargo hold) filter audio (cutoff 400Hz, volume 45%).
-  * *Cutlass Compartments:* Y-coordinate divisions (Cockpit vs Cargo hold) filter audio (cutoff 1000Hz, volume 70%).
-  * *Elevation Heuristic:* Any height difference greater than 4.5m between players in the same zone automatically triggers floor/ceiling occlusion (cutoff 500Hz, volume 45%).
+### 5. 📻 Immersive Radio Degradation & Chimes
+* **Bandpass Filtering:** Models radio filters with low/high cutoffs when using radio channels or when suit visors are down.
+* **Radio Signal Degradation:** Narrow cutoff bands and blends in bandpass-filtered static noise as distance between players approaches the radio transmitter limit.
+* **Acoustic Radio Chimes:** Plays a pitch-sweeping mic-key chirp (900Hz to 700Hz) on key-down and a squelch static tail on key-up.
 
-### 8. Zero-Dependency Discord Rich Presence (RPC)
-* **Robust Named Pipe Connection:** The client integrates with Discord without requiring heavy external dependencies. To ensure robust connectivity across different Discord configurations or multiple instances, it scans and attempts connection on all named pipe indexes from `discord-ipc-0` through `discord-ipc-9`.
-* **Dynamic Activity Updates:** Instantly updates your Discord presence with:
-  * **Details:** Current in-game location zone (e.g. `"At MicroTech Cave"`).
-  * **State:** Connected channel and state (e.g. `"On Radio: Bravo Channel (Helmet On)"` or `"In Proximity"`).
-  * **Time Elapsed:** Displays elapsed time since the server connection was established.
+### 6. 💬 Automatic Ship Intercom System
+* **Vehicle Intercom Channels:** Boarding a vehicle automatically subscribes players to a dynamic `Intercom_<ContainerID>` radio channel.
+* **Pilot Priority Ducking:** When a player in a cockpit or driver seat transmits on the intercom, all other players' proximity audio is ducked by 85% to ensure flight command clarity.
+* **Cleanup Cooldown:** Counts down 5 minutes after the last player leaves the ship before deleting the intercom channel, maximizing server performance.
 
-### 9. Startup Log Rotation
-* **Daily Log Rotation:** At startup, the client checks the active log file's date. If it was modified on a previous day, it is archived as `xuru_voip.YYYY-MM-DD.log`.
-* **Pruning and Retention:** To limit disk space consumption, the client scans the log directory and retains only the 5 most recent rotated log files, deleting older ones.
+### 7. 📡 Vulkan-Compatible HUD Overlay & 2D Tactical Radar
+* **Win32 Click-Through Overlay:** A borderless HUD overlay showing VoIP connections, frequencies, and speaking states. Vulkan and DirectX compatible (running in borderless windowed mode).
+* **Tactical Mini-Radar:** Features a heading-aligned 2D HUD radar that displays relative speaking players, drawing pulsating sound rings around them.
+* **Speech-to-Text Subtitles:** Transcribes incoming radio/proximity audio to localized HUD subtitles using an offline, lightweight Whisper model (`ggml-tiny.bin`).
 
-### 10. 🎙️ Real-time Voice Changer & Suit Modulators
-* **Voice Modulator DSP**: Applies real-time digital signal processing effects to outgoing microphone audio prior to Opus compression:
-  * **Pitch Shifter**: Real-time time-domain pitch shifter using two overlapping cross-fading delay lines.
-  * **Ring Modulator**: Multiplies the audio signal by a carrier wave to produce metallic, robotic sci-fi tones.
-  * **Flanger**: Comb filter with an LFO-modulated delay line to produce sweeping, space-like swoosh effects.
-* **Voice Changer Presets**:
-  * *Alien*: Deep pitch shift (0.65x) combined with ring modulation (85Hz) and flanger.
-  * *Cyborg*: Metallic shift (0.82x), ring modulation (65Hz), soft tanh saturation, and 8-bit bitcrushing.
-  * *Robotic*: High pitch shift (1.25x), ring modulation (140Hz), and flanger.
-  * *Custom Pitch Shift*: Manually adjustable pitch factor (0.5x to 2.0x).
-* **Helmet/Suit Comms Modulator**: When enabled, overlays an authentic respirator breathing hiss and key chime tones on transmission start/end (hiss and chimes are fully toggleable).
+### 8. 📱 Companion App & REST API
+* **Local HTTP Web Server:** Hosts a local dashboard on a configurable port (default: `8891`, disabled by default).
+* **Glassmorphic Controller:** Connects from phones or secondary screens to toggle mutes, channel cycles, helmets, or voice changers.
+* **REST API:** Exposes endpoints `GET /api/status` and `POST /api/action` for external integrations.
+
+### 9. 🎛️ Stream Deck Plugin
+* **Stream Deck Action Pack:** Exposes 8 actions to control microphone mutes, audio mutes, helmet visors, and radio frequency cycles.
+* **Dynamic Key Icons:** Continuous WebSockets update button graphics (active cyan vs muted amber) to reflect current client state.
+* **Live Frequency Title:** Displays active radio channel names directly on physical Stream Deck buttons.
+
+### 10. 🔌 Discord Voice Bridge
+* **Bidirectional Audio Relay:** Relays communications between a Go server radio channel and a Discord voice channel.
+* **Nicknames Mapping:** Captures Discord speech and maps SSRC IDs to server nicknames.
+
+### 11. 🛡️ Security, Log Rotation, and Admin Canvas Radar
+* **Daily Log Rotation:** Startup log archiver retaining only the 5 most recent logs.
+* **Admin Dashboard:** Real-time web admin panel with lockout security, rate-limiting, and an interactive 2D HTML5 Canvas Live Radar map allowing administrators to zoom, pan, and trace historical player trails.
 
 ---
 
 ## 🎮 XuruVoip Client Settings Tab Breakdown
 
-The settings window is divided into six specialized tabs:
-1. **General**: Select client language, configure the custom Star Citizen `Game.log` file path, and toggle general log file writing.
-2. **Connection**: Configure the Server IP address, Position & Audio ports, Username, User Password, and Server Token/Password.
-3. **Position**: Toggle the coordinates source ("OCR Screen Scanner" vs "Game.log Reader (GRTPR)"), select monitor, scan interval (ms), crop region bounding box, and preview real-time OCR results (OCR settings are hidden when GRTPR is active).
-4. **Audio**: Choose input/output devices, adjust gains, select transmission mode (PTT / VAD), configure VAD threshold, toggle **Enable 3D Spatial Audio**, configure distance-based radio degradation and synthesized PTT mic chimes, toggle helmet/suit modulator, and choose/configure **Voice Changer** presets (Alien, Cyborg, Robotic, PitchShift).
-5. **Hotkeys**: Record keys for Proximity PTT, Radio PTT, Profile PTT, Helmet toggle, Radio channel cycle, muting outgoing microphone channels, and muting incoming audio channels.
-6. **Overlay**: Toggle the borderless HUD overlay window, configure the screen corner placement, enable the **Tactical Mini-Radar** (with configurable maximum range), and toggle real-time **Speech-to-Text captions** (including the HuggingFace model download notice).
+The WPF settings window is structured into six configuration categories:
+1. **General**: Configure languages, tail `Game.log` files, toggle general file logging, and enable/configure the local **Companion App HTTP Server** and Port.
+2. **Connection**: Edit the Target Server IP, Position & Audio ports, Username, User Password, and Server Password.
+3. **Position**: Toggle the location source ("OCR Screen Scanner" vs "Game.log Reader (GRTPR)"), configure monitor indexes, crop regions, OCR intervals, and preview live coordinate text.
+4. **Audio**: Choose input/output hardware, adjust dB gains, select transmission mode (PTT vs VAD), configure VAD thresholds, toggle **Enable 3D Spatial Audio**, configure radio degradation, synthesized local chimes, visor modulator, and select **Voice Changer** presets.
+5. **Hotkeys**: Bind keys to Proximity PTT, Radio PTT, Profile PTT, Helmet visor, Radio channel cycle, and individual microphone and audio channel mute switches.
+6. **Overlay**: Toggle HUD overlay, set corner placements, enable the **Tactical Mini-Radar** (with configurable maximum range), and toggle real-time **Speech-to-Text captions**.
 
 ---
 
@@ -301,7 +303,45 @@ XURUVOIP_LIMIT_BURST_AUDIO=120
 XURUVOIP_LOCKOUT_ATTEMPTS=5
 XURUVOIP_LOCKOUT_WINDOW=60
 XURUVOIP_LOCKOUT_DURATION=600
+
+# Dynamic Intercom and Immersion features (1 = enabled, 0 = disabled)
+XURUVOIP_ENABLE_INTERCOM=1
+XURUVOIP_ENABLE_EVA_MUTING=1
+
+# Discord Voice Bridge Settings (1 = enabled, 0 = disabled)
+XURUVOIP_ENABLE_DISCORD_BRIDGE=1
+XURUVOIP_DISCORD_TOKEN=your_discord_bot_token
+XURUVOIP_DISCORD_GUILD_ID=your_discord_guild_id
+XURUVOIP_DISCORD_CHANNEL_ID=your_discord_channel_id
+XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
+
+### 🎛️ Discord Voice Bridge Setup Guide
+
+To bridge a local Go server radio channel to a Discord voice channel, follow these setup steps:
+
+1. **Create a Discord Bot Application:**
+   * Visit the [Discord Developer Portal](https://discord.com/developers/applications) and sign in.
+   * Click **New Application**, give it a name (e.g., `XuruVOIP Bridge`), and click **Create**.
+   * Navigate to the **Bot** tab on the left sidebar, click **Reset Token**, and copy the generated **Bot Token**. Paste this as `XURUVOIP_DISCORD_TOKEN` in your server's `.env` file.
+   * Under **Privileged Gateway Intents** on the same Bot page, enable the **Message Content Intent** (required for reading specific commands).
+
+2. **Invite the Bot to your Discord Server:**
+   * Go to the **OAuth2** tab, then select **URL Generator**.
+   * Under **Scopes**, check `bot` and `applications.commands`.
+   * Under **Bot Permissions**, select the following privileges:
+     * *General Permissions:* `View Channels`
+     * *Text Permissions:* `Send Messages`
+     * *Voice Permissions:* `Connect`, `Speak`, `Use Voice Activity`
+   * Copy the generated URL at the bottom of the page, paste it into a web browser, select your target Discord server (Guild), and click **Authorize**.
+
+3. **Get Server (Guild) & Voice Channel IDs:**
+   * Open Discord, go to **User Settings** -> **Advanced**, and toggle **Developer Mode** on.
+   * Right-click your Discord server icon in the server list and select **Copy Server ID** (this is your Guild ID). Paste it as `XURUVOIP_DISCORD_GUILD_ID` in `.env`.
+   * Right-click the target Discord Voice Channel where you want the bot to join, and select **Copy Channel ID**. Paste it as `XURUVOIP_DISCORD_CHANNEL_ID` in `.env`.
+
+4. **Map Go Server Radio Channel:**
+   * Configure `XURUVOIP_DISCORD_BRIDGE_CHANNEL` to the exact name of the radio channel you want to bridge (e.g. `General`, `Bravo`, `Alpha`, etc.). Any audio transmitted on this Go server radio frequency will be bidirectionally broadcasted to the Discord Voice Channel!
 
 ### Building the Server from source
 
@@ -472,16 +512,6 @@ Start-Service -Name XuruVoipServer
 
 ---
 
-## 🎮 XuruVoip Client Settings Tab Breakdown
-
-The settings window is divided into six specialized tabs:
-1. **General**: Select client language, configure the custom Star Citizen `Game.log` file path, and toggle general log file writing.
-2. **Connection**: Configure the Server IP address, Position & Audio ports, Username, User Password, and Server Token/Password.
-3. **Position**: Toggle the coordinates source ("OCR Screen Scanner" vs "Game.log Reader (GRTPR)"), select monitor, scan interval (ms), crop region bounding box, and preview real-time OCR results (OCR settings are hidden when GRTPR is active).
-4. **Audio**: Choose input/output devices, adjust gains, select transmission mode (PTT / VAD), configure VAD threshold, toggle **Enable 3D Spatial Audio**, and configure advanced options like distance-based radio degradation and synthesized PTT mic chimes.
-5. **Hotkeys**: Record keys for Proximity PTT, Radio PTT, Profile PTT, Helmet toggle, Radio channel cycle, muting outgoing microphone channels, and muting incoming audio channels.
-6. **Overlay**: Toggle the borderless HUD overlay window and configure the screen corner placement (e.g., Top-Left, Top-Right).
-
 ### Building & Running the Client
 
 #### Requirements
@@ -514,6 +544,45 @@ Since the installer and executables are not digitally signed, Windows SmartScree
      - In the properties window under the *General* tab, check the **Unblock** checkbox at the bottom.
      - Click **Apply**, then close the Properties window.
   4. Double-click `XuruVoipClient.exe` to run the client directly without installing it.
+
+## 📱 Companion App & Stream Deck Integration
+
+XuruVOIP includes a built-in Companion App web service and an official Stream Deck plugin allowing you to monitor and trigger voice actions directly from secondary devices or physical keys.
+
+### 1. Enabling the Companion App
+By default, the Companion App local HTTP server is disabled to save system resources. To enable it:
+1. Open the XuruVOIP client and click the **Settings** icon.
+2. In the **General** tab, check the box **Enable Companion HTTP Server**.
+3. Under **Companion Server Port**, you can customize the port number (default: `8891`).
+4. Click **Save & Close** to apply. The HTTP server will now start locally. You can open `http://localhost:8891` in any browser on your PC or mobile device to access the web controller dashboard.
+
+---
+
+### 2. Stream Deck Plugin Installation
+The release package includes the pre-packaged `.streamDeckPlugin` file.
+1. Download `com.xuru.voip.streamDeckPlugin` from the [releases page](https://github.com/XuruDragon/XuruVOIP/releases).
+2. Double-click the file to install it directly to your Elgato Stream Deck software. 
+   *(Alternatively, you can manually extract and copy the `com.xuru.voip.sdPlugin` folder to `%appdata%\Elgato\StreamDeck\Plugins\`)*
+3. Once installed, a new action category called **XuruVOIP** will appear in the right-side list of your Stream Deck desktop app.
+
+---
+
+### 3. Adding and Configuring Actions
+You can drag and drop any of the following 8 actions onto your Stream Deck keys:
+* 🎤 **Proximity Mute**: Toggles outgoing proximity microphone muting.
+* 📻 **Radio Mute**: Toggles outgoing radio microphone muting.
+* 👤 **Profile Mute**: Toggles outgoing profile microphone muting.
+* 🔊 **Audio Proximity Mute**: Toggles incoming proximity playback muting.
+* 🔊 **Audio Radio Mute**: Toggles incoming radio playback muting.
+* 🔊 **Audio Profile Mute**: Toggles incoming profile playback muting.
+* 🪖 **Toggle Helmet**: Toggles your space suit helmet visor down or up.
+* 🔄 **Cycle Radio**: Cycles through available radio channels.
+
+#### Configuration (Property Inspector):
+For each action you drag onto a key, click on it and configure the target port in the **Property Inspector** panel at the bottom:
+* Set **Companion Port** to match the port configured in your WPF client settings (default: `8891`).
+* **Dynamic Feedback:** Toggles (like Proximity Mute) automatically update their icon in real-time on your device to display whether the state is active (cyan glow icon) or muted (amber strike-through icon).
+* **Live Frequency Display:** The **Cycle Radio** key will dynamically display the currently active frequency name (e.g. `120.5` or `General`) directly on the physical button in real-time!
 
 ---
 

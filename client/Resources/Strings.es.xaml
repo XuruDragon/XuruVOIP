@@ -38,6 +38,7 @@
     <sys:String x:Key="BtnConnect">Conectar</sys:String>
     <sys:String x:Key="BtnDisconnect">Desconectar</sys:String>
     <sys:String x:Key="BtnDownload">Descargar</sys:String>
+    <sys:String x:Key="BtnUpdate">Actualizar</sys:String>
     <sys:String x:Key="UpdateBannerText">Nueva versión disponible</sys:String>
 
     <!-- Ventana de Ajustes -->
@@ -120,6 +121,8 @@
     <sys:String x:Key="OptBottomCenter">Abajo-Centro</sys:String>
     <sys:String x:Key="OptBottomRight">Abajo-Derecha</sys:String>
     <sys:String x:Key="LblEnableDiscordRpc">Activar Discord Rich Presence</sys:String>
+    <sys:String x:Key="LblEnableCompanionApp">Activar servidor HTTP Companion</sys:String>
+    <sys:String x:Key="LblCompanionAppPort">Puerto del servidor Companion</sys:String>
     <sys:String x:Key="LblOverlayCapabilities">Capacidades de la Superposición</sys:String>
     <sys:String x:Key="LblOverlayCapabilitiesDesc">La superposición de HUD es totalmente compatible con Vulkan y DirectX cuando Star Citizen se ejecuta en modo "Ventana sin bordes". Muestra el estado de la conexión VoIP en el juego, la frecuencia de radio activa y los indicadores de habla en tiempo real sin inyectarse en el código del juego ni arriesgarse a baneos.</sys:String>
 

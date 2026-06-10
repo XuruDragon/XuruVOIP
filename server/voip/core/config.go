@@ -13,6 +13,9 @@ import (
 var MaxPlayers = 64
 var BindIP = "0.0.0.0"
 var SpatialAudioEnabled = true
+var EnableIntercom = true
+var EnableEvaMuting = true
+var EnableDiscordBridge = true
 
 // ParseEnvInt parses an integer from the environment
 func ParseEnvInt(key string, defaultVal int) int {
@@ -140,6 +143,30 @@ func LoadOrCreateConfig() error {
 		UpdateEnvFile("XURUVOIP_SPATIAL_AUDIO", spatialAudioStr)
 	}
 	SpatialAudioEnabled = spatialAudioStr == "1" || strings.ToLower(spatialAudioStr) == "true"
+
+	enableIntercomStr := os.Getenv("XURUVOIP_ENABLE_INTERCOM")
+	if enableIntercomStr == "" {
+		enableIntercomStr = "1"
+		_ = os.Setenv("XURUVOIP_ENABLE_INTERCOM", enableIntercomStr)
+		UpdateEnvFile("XURUVOIP_ENABLE_INTERCOM", enableIntercomStr)
+	}
+	EnableIntercom = enableIntercomStr == "1" || strings.ToLower(enableIntercomStr) == "true"
+
+	enableEvaMutingStr := os.Getenv("XURUVOIP_ENABLE_EVA_MUTING")
+	if enableEvaMutingStr == "" {
+		enableEvaMutingStr = "1"
+		_ = os.Setenv("XURUVOIP_ENABLE_EVA_MUTING", enableEvaMutingStr)
+		UpdateEnvFile("XURUVOIP_ENABLE_EVA_MUTING", enableEvaMutingStr)
+	}
+	EnableEvaMuting = enableEvaMutingStr == "1" || strings.ToLower(enableEvaMutingStr) == "true"
+
+	enableDiscordBridgeStr := os.Getenv("XURUVOIP_ENABLE_DISCORD_BRIDGE")
+	if enableDiscordBridgeStr == "" {
+		enableDiscordBridgeStr = "1"
+		_ = os.Setenv("XURUVOIP_ENABLE_DISCORD_BRIDGE", enableDiscordBridgeStr)
+		UpdateEnvFile("XURUVOIP_ENABLE_DISCORD_BRIDGE", enableDiscordBridgeStr)
+	}
+	EnableDiscordBridge = enableDiscordBridgeStr == "1" || strings.ToLower(enableDiscordBridgeStr) == "true"
 	// 3. Load Channels
 	chList, err := DBGetChannels()
 	if err != nil {
@@ -269,6 +296,11 @@ XURUVOIP_LOCKOUT_DURATION=600
 
 # Spatial Audio (1 = enabled, 0 = disabled)
 XURUVOIP_SPATIAL_AUDIO=1
+
+# Dynamic Intercom and Immersion features (1 = enabled, 0 = disabled)
+XURUVOIP_ENABLE_INTERCOM=1
+XURUVOIP_ENABLE_EVA_MUTING=1
+XURUVOIP_ENABLE_DISCORD_BRIDGE=1
 `, serverPassword, adminServerPassword)
 
 	return os.WriteFile(envPath, []byte(content), 0600)

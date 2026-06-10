@@ -152,6 +152,16 @@ public partial class SettingsWindow : Window
         CbEnableStt.IsChecked = Cfg.EnableStt;
         SttWarningPanel.Visibility = (_vm?.Stt != null && !_vm.Stt.IsModelReady) ? Visibility.Visible : Visibility.Collapsed;
 
+        // Companion App settings
+        if (CbEnableCompanionApp != null)
+        {
+            CbEnableCompanionApp.IsChecked = Cfg.EnableCompanionApp;
+        }
+        if (CompanionPortPanel != null)
+        {
+            CompanionPortPanel.Visibility = Cfg.EnableCompanionApp ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         // OCR region display
         UpdateRegionDisplay();
     }
@@ -352,6 +362,14 @@ public partial class SettingsWindow : Window
         {
             _ = _vm.Stt.EnsureModelDownloadedAsync();
         }
+    }
+
+    private void CompanionApp_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || CompanionPortPanel == null) return;
+        bool enabled = CbEnableCompanionApp.IsChecked == true;
+        Cfg.EnableCompanionApp = enabled;
+        CompanionPortPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
     }
 
     protected override void OnClosed(EventArgs e)

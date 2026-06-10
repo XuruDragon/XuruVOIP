@@ -288,13 +288,15 @@ func handleUDPPacket(packet []byte, remoteAddr *net.UDPAddr) {
 		if core.VerboseLogs >= 2 {
 			atomic.AddUint64(&radioFramesTotal, 1)
 		}
+		core.ActiveHub.Mu.RLock()
+		senderChan := sender.ActiveChannel
+		core.ActiveHub.Mu.RUnlock()
+		SendToDiscord(senderChan, audioData)
+
 		if core.VerboseLogs >= 3 {
-			core.ActiveHub.Mu.RLock()
-			ch := sender.ActiveChannel
-			core.ActiveHub.Mu.RUnlock()
-			if ch != "" {
+			if senderChan != "" {
 				statsMu.Lock()
-				radioChannelFrames[ch]++
+				radioChannelFrames[senderChan]++
 				statsMu.Unlock()
 			}
 		}
@@ -436,5 +438,55 @@ func sweepTalkingLoop() {
 				IsTalking: false,
 			})
 		}
+	}
+}
+
+// InjectRadioAudio injects radio audio from an external source (like the Discord bridge)
+func InjectRadioAudio(senderName string, seq uint16, audioData []byte, channel string) {
+	var targets []*core.ActivePlayer
+	core.ActiveHub.Mu.RLock()
+	for _, p := range core.ActiveHub.Players {
+		// check if listening to channel
+		listening := false
+		for _, ch := range p.ListeningChannels {
+			if ch == channel {
+				listening = true
+				break
+			}
+		}
+		if listening || p.ActiveChannel == channel {
+			targets = append(targets, p)
+		}
+	}
+	core.ActiveHub.Mu.RUnlock()
+
+	if len(targets) == 0 {
+		return
+	}
+
+	nameBytes := []byte(senderName)
+	nameLen := len(nameBytes)
+	if nameLen > 255 {
+		nameBytes = nameBytes[:255]
+		nameLen = 255
+	}
+
+	packetToSend := make([]byte, 2+1+1+nameLen+len(audioData))
+	binary.BigEndian.PutUint16(packetToSend[0:2], seq)
+	packetToSend[2] = core.AudioTypeRadio
+	packetToSend[3] = byte(nameLen)
+	copy(packetToSend[4:], nameBytes)
+	copy(packetToSend[4+nameLen:], audioData)
+
+	if udpConn == nil {
+		return
+	}
+
+	for _, targetPlayer := range targets {
+		targetAddr := targetPlayer.SafeGetUDPAddr()
+		if targetAddr == nil {
+			continue
+		}
+		_, _ = udpConn.WriteToUDP(packetToSend, targetAddr)
 	}
 }

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Outer Helmet Shell -->
+    <path d="M36 12C23 12 18 20 18 34V46C18 52 23 58 36 58C49 58 54 52 54 46V34C54 20 49 12 36 12Z" fill="none" stroke="#00f0ff" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Visor Down / Closed (Glowing visor shield filling the middle of the helmet) -->
+    <path d="M22 28C22 28 25 38 36 38C47 38 50 28 50 28V36C50 42 45 46 36 46C27 46 22 42 22 36V28Z" fill="#00a2ff" fill-opacity="0.3" stroke="#00f0ff" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- Visor reflection line -->
+    <path d="M26 31C28 35 32 36 32 36" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+</svg>

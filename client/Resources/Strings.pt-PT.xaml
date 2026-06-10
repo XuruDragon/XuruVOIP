@@ -38,6 +38,7 @@
     <sys:String x:Key="BtnConnect">Ligar</sys:String>
     <sys:String x:Key="BtnDisconnect">Desconectar</sys:String>
     <sys:String x:Key="BtnDownload">Descarregar</sys:String>
+    <sys:String x:Key="BtnUpdate">Atualizar</sys:String>
     <sys:String x:Key="UpdateBannerText">Nova versão disponível</sys:String>
 
     <!-- Settings Window -->
@@ -120,6 +121,8 @@
     <sys:String x:Key="OptBottomCenter">Inferior Centro</sys:String>
     <sys:String x:Key="OptBottomRight">Inferior Direito</sys:String>
     <sys:String x:Key="LblEnableDiscordRpc">Ativar Discord Rich Presence</sys:String>
+    <sys:String x:Key="LblEnableCompanionApp">Ativar servidor HTTP Companion</sys:String>
+    <sys:String x:Key="LblCompanionAppPort">Porta do servidor Companion</sys:String>
     <sys:String x:Key="LblOverlayCapabilities">Capacidades do Overlay</sys:String>
     <sys:String x:Key="LblOverlayCapabilitiesDesc">O overlay HUD é totalmente compatível com Vulkan e DirectX quando o Star Citizen é executado em modo "Janela sem Bordas". Exibe o estado da ligação VoIP no jogo, a frequência de rádio ativa e os indicadores de fala em tempo real sem injetar no código do jogo ou correr o risco de banimentos.</sys:String>
 

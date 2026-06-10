@@ -113,6 +113,10 @@ func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel s
 		profile = persist.Profile
 	}
 
+	if len(listenChans) == 0 {
+		listenChans = []string{"General"}
+	}
+
 	if exists {
 		// Close previous position socket if it exists to avoid leakage
 		p.PosMu.Lock()
@@ -173,6 +177,9 @@ func (h *Hub) UnregisterPosConn(conn *websocket.Conn) (string, bool) {
 		}
 		p.PosMu.Unlock()
 		if isMatch {
+			if EnableIntercom && p.Pos != nil && p.Pos.ContainerID != "" {
+				h.handleIntercomTransition(p, p.Pos.ContainerID, "")
+			}
 			delete(h.Players, name)
 			return name, true // Fully left
 		}
@@ -253,8 +260,18 @@ func (h *Hub) UpdatePosition(name string, pos Position) bool {
 		return false
 	}
 
+	oldContainerID := ""
+	if p.Pos != nil {
+		oldContainerID = p.Pos.ContainerID
+	}
+
 	p.Pos = &pos
 	p.LastSeen = time.Now()
+
+	if EnableIntercom {
+		h.handleIntercomTransition(p, oldContainerID, pos.ContainerID)
+	}
+
 	return true
 }
 
@@ -410,6 +427,23 @@ func (h *Hub) GetAllPlayerStates() []PlayerState {
 	return states
 }
 
+func isEvaZone(zone string) bool {
+	lower := strings.ToLower(zone)
+	if lower == "planetary_system_stanton" {
+		return true
+	}
+	if strings.Contains(lower, "space") || strings.Contains(lower, "orbit") || strings.Contains(lower, "void") {
+		excluded := []string{"ship", "facility", "station", "hangar", "interior", "cabin", "deck", "chamber", "room", "corridor", "airlock", "cockpit", "habitation", "hab"}
+		for _, ex := range excluded {
+			if strings.Contains(lower, ex) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 // GetAudioPlayersInProximity returns the players within proximity of sender
 func (h *Hub) GetAudioPlayersInProximity(senderName string) []*ActivePlayer {
 	h.Mu.RLock()
@@ -420,9 +454,17 @@ func (h *Hub) GetAudioPlayersInProximity(senderName string) []*ActivePlayer {
 		return nil
 	}
 
+	if EnableEvaMuting && isEvaZone(sender.Pos.Zone) {
+		return nil
+	}
+
 	var players []*ActivePlayer
 	for name, p := range h.Players {
 		if name == senderName || p.SafeGetUDPAddr() == nil || p.Pos == nil {
+			continue
+		}
+
+		if EnableEvaMuting && isEvaZone(p.Pos.Zone) {
 			continue
 		}
 
@@ -643,4 +685,179 @@ func (h *Hub) Shutdown() {
 	for conn := range h.Admins {
 		_ = conn.Close()
 	}
+}
+
+// IntercomManager keeps track of dynamic ship intercom channel deletion countdown timers
+type IntercomManager struct {
+	mu        sync.Mutex
+	deletions map[string]*time.Timer
+}
+
+var ActiveIntercoms = IntercomManager{
+	deletions: make(map[string]*time.Timer),
+}
+
+func isShipZone(zone string) bool {
+	lower := strings.ToLower(zone)
+	shipKeywords := []string{
+		"aegis", "anvil", "drake", "misc", "rsi", "origin", "crusader", "argo", "banu", "esperia", "consolidated", "gatac",
+		"carrack", "reclaimer", "hammerhead", "starfarer", "freelancer", "caterpillar", "cutlass", "constellation", "avenger",
+		"gladius", "arrow", "sabre", "valkyrie", "prowler", "vanguard", "buccaneer", "herald", "prospector", "mole",
+		"ship_", "vehicle_",
+	}
+	for _, kw := range shipKeywords {
+		if strings.Contains(lower, kw) {
+			return true
+		}
+	}
+	return false
+}
+
+// handleIntercomTransition manages player subscription and lifecycle of dynamic ship intercom channels
+func (h *Hub) handleIntercomTransition(p *ActivePlayer, oldContainerID, newContainerID string) {
+	if oldContainerID == newContainerID {
+		return
+	}
+
+	// 1. Leave old container intercom if we were in one
+	if oldContainerID != "" {
+		oldChanName := "Intercom_" + oldContainerID
+		p.ListeningChannels = removeStringSlice(p.ListeningChannels, oldChanName)
+		if p.ActiveChannel == oldChanName {
+			p.ActiveChannel = "General"
+		}
+		_ = DBSavePlayerState(p.Name, p.Profile, p.ActiveChannel, p.ListeningChannels)
+		
+		// Check if anyone else is left in the old ship
+		shipEmpty := true
+		for _, other := range h.Players {
+			if other.Name != p.Name && other.Pos != nil && other.Pos.ContainerID == oldContainerID {
+				shipEmpty = false
+				break
+			}
+		}
+
+		if shipEmpty {
+			// Start 5-minute countdown to delete the intercom channel
+			ActiveIntercoms.mu.Lock()
+			if t, ok := ActiveIntercoms.deletions[oldChanName]; ok {
+				t.Stop()
+			}
+			ActiveIntercoms.deletions[oldChanName] = time.AfterFunc(5*time.Minute, func() {
+				h.deleteIntercomChannel(oldChanName)
+			})
+			ActiveIntercoms.mu.Unlock()
+		}
+	}
+
+	// 2. Join new container intercom if we are entering one and it's a ship
+	if newContainerID != "" && isShipZone(p.Pos.Zone) {
+		newChanName := "Intercom_" + newContainerID
+
+		// Cancel any pending deletion timer
+		ActiveIntercoms.mu.Lock()
+		if t, ok := ActiveIntercoms.deletions[newChanName]; ok {
+			t.Stop()
+			delete(ActiveIntercoms.deletions, newChanName)
+		}
+		ActiveIntercoms.mu.Unlock()
+
+		// Create channel if it doesn't exist
+		channelExists := false
+		for _, ch := range ServerConfig.ChannelsList {
+			if ch == newChanName {
+				channelExists = true
+				break
+			}
+		}
+
+		if !channelExists {
+			ServerConfig.ChannelsList = append(ServerConfig.ChannelsList, newChanName)
+			h.broadcastChannelsListLocked()
+		}
+
+		// Add to p's listening channels
+		if !containsStringSlice(p.ListeningChannels, newChanName) {
+			p.ListeningChannels = append(p.ListeningChannels, newChanName)
+			_ = DBSavePlayerState(p.Name, p.Profile, p.ActiveChannel, p.ListeningChannels)
+		}
+	}
+}
+
+func (h *Hub) deleteIntercomChannel(chanName string) {
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
+
+	// Double check if anyone has re-entered in the meantime
+	containerID := strings.TrimPrefix(chanName, "Intercom_")
+	shipEmpty := true
+	for _, p := range h.Players {
+		if p.Pos != nil && p.Pos.ContainerID == containerID {
+			shipEmpty = false
+			break
+		}
+	}
+
+	if !shipEmpty {
+		// Someone re-entered, cancel deletion
+		ActiveIntercoms.mu.Lock()
+		delete(ActiveIntercoms.deletions, chanName)
+		ActiveIntercoms.mu.Unlock()
+		return
+	}
+
+	// Remove from ServerConfig.ChannelsList
+	newList := make([]string, 0, len(ServerConfig.ChannelsList))
+	for _, ch := range ServerConfig.ChannelsList {
+		if ch != chanName {
+			newList = append(newList, ch)
+		}
+	}
+	ServerConfig.ChannelsList = newList
+
+	// Clean up from players' active/listening channels in memory
+	for _, p := range h.Players {
+		p.ListeningChannels = removeStringSlice(p.ListeningChannels, chanName)
+		if p.ActiveChannel == chanName {
+			p.ActiveChannel = "General"
+		}
+	}
+
+	ActiveIntercoms.mu.Lock()
+	delete(ActiveIntercoms.deletions, chanName)
+	ActiveIntercoms.mu.Unlock()
+
+	h.broadcastChannelsListLocked()
+}
+
+func (h *Hub) broadcastChannelsListLocked() {
+	msg := struct {
+		Type     string   `json:"type"`
+		Channels []string `json:"channels"`
+	}{
+		Type:     "channels_list",
+		Channels: ServerConfig.ChannelsList,
+	}
+	for _, p := range h.Players {
+		_ = p.SafeWritePosJSON(msg)
+	}
+}
+
+func removeStringSlice(slice []string, s string) []string {
+	res := make([]string, 0, len(slice))
+	for _, x := range slice {
+		if x != s {
+			res = append(res, x)
+		}
+	}
+	return res
+}
+
+func containsStringSlice(slice []string, s string) bool {
+	for _, x := range slice {
+		if x == s {
+			return true
+		}
+	}
+	return false
 }

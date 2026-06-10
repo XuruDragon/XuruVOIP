@@ -1,21 +1,18 @@
-# XuruVoip (Español)
+#XuruVoip
 
 <p align="center">
   <a href="https://github.com/XuruDragon/XuruVOIP/actions/workflows/tests.yml">
-    <img src="https://github.com/XuruDragon/XuruVOIP/actions/workflows/tests.yml/badge.svg" alt="Estado de las Pruebas" />
+    <img src="https://github.com/XuruDragon/XuruVOIP/actions/workflows/tests.yml/badge.svg" alt="Tests Status" />
   </a>
   <a href="https://github.com/XuruDragon/XuruVOIP/releases">
-    <img src="https://img.shields.io/github/v/release/XuruDragon/XuruVOIP?color=blue&logo=github" alt="Último Lanzamiento" />
-  </a>
-  <a href="https://github.com/XuruDragon/XuruVOIP/releases">
-    <img src="https://img.shields.io/github/downloads/XuruDragon/XuruVOIP/total?color=green&logo=github" alt="Descargas Totales" />
+    <img src="https://img.shields.io/github/v/release/XuruDragon/XuruVOIP?color=blue&logo=github" alt="Latest Release" />
   </a>
 </p>
 
 <p align="center">
   <b>Traducciones:</b><br/>
-  <a href="../README.md">English</a> •
-  <a href="README.fr.md">Français</a> •
+  <a href="../README.md">Inglés</a> •
+  <a href="README.fr.md">Francés</a> •
   <a href="README.de.md">Deutsch</a> •
   <a href="README.es.md">Español</a> •
   <a href="README.pt-BR.md">Português (Brasil)</a> •
@@ -25,355 +22,394 @@
 </p>
 
 <p align="center">
-  <img src="../logo.png" alt="Logo de XuruVoip" width="400" height="400" />
+  <img src="../logo.png" alt="XuruVoip Logo" width="400" height="400" />
 </p>
 
-XuruVoip es una suite de comunicación de voz 3D (VoIP) de alto rendimiento, segura y espacializada dinámicamente, diseñada específicamente para integraciones de juego personalizadas con **Star Citizen**. Consta de un servidor backend en Go y de un cliente moderno en C# WPF.
+XuruVoip es una **suite de comunicación de voz (VoIP) 3D** de alto rendimiento, segura y espacializada dinámicamente diseñada específicamente para integraciones de juegos personalizados con **Star Citizen**. Consiste en un servidor backend basado en Go y un cliente WPF C# moderno con una aplicación complementaria incorporada (interfaz web) e integración de Elgato Stream Deck.
+
+### 🎯 Objetivo del proyecto
+El objetivo de XuruVoip es proporcionar eventos de juegos de Star Citizen, organizaciones de juegos de rol y escuadrones tácticos con un **nivel sin precedentes de inmersión de audio y conveniencia operativa**. Al leer en tiempo real los estados de coordenadas, visores y vehículos del cliente del juego, XuruVoip da forma dinámicamente a las voces de los jugadores en el espacio 3D, simula atmósferas planetarias/de vacío y enruta las comunicaciones tácticas automáticamente sin necesidad de configuraciones manuales del cliente.
 
 ---
 
-## 📸 Capturas de Pantalla e Interfaz de Usuario
+### 🗺️ Directorio de navegación
+
+| Sección | Descripción |
+| :--- | :--- |
+| [📸 Capturas de pantalla y interfaz de usuario](#-capturas-de-pantalla-y-interfaz-de-usuario) | Muestra visual de las pantallas de los clientes, el portal de administración y la configuración. |
+| [🗂️ Estructura del proyecto](#️-project-structure) | Diseño del repositorio y desglose de carpetas. |
+| [⚙️ Arquitectura del sistema](#️-system-architecture) | El diagrama de flujo de trabajo real completo del cliente WPF, el servidor Go y los dispositivos externos. |
+| [💡 Descripción general de las funciones principales](#-descripción-general-de-las-funciones-principales) | Desglose detallado de las más de 11 funciones espaciales y de redes implementadas. |
+| [🖥️ Ir al servidor (Ir)](#️-xuruvoip-server-go) | Instrucciones de construcción, ejecución, implementación y configuración del servidor. |
+| [🎛️ Puente de voz de Discord](#️-discord-voice-bridge-setup-guide) | Conexión de canales de radio del servidor Go a un canal de voz de Discord. |
+| [📱 Aplicación complementaria y plataforma de transmisión](#-integración-de-aplicación-complementaria-y-plataforma-de-transmisión) | Control remoto de dispositivos y configuración de teclas físicas de Stream Deck. |
+| [🛠️ Cliente WPF (C#)](#-building--running-the-client) | Requisitos del cliente, compilación y guías de instalación de MSI/portátil. |
+
+---
+
+## 📸 Capturas de pantalla y interfaz de usuario
 
 <details>
-<summary>📸 Haz clic para ver las capturas de pantalla</summary>
+<summary>📸 Haga clic para ver capturas de pantalla</summary>
 
-### 1. Ventana Principal del Cliente
-![Ventana Principal del Cliente](/screenshots/main.png)
+### 1. Ventana principal del cliente
+![Ventana principal del cliente](/screenshots/main.png)
 
-### 2. Pestaña de Ajustes de Audio (Control Espacial 3D)
-![Pestaña de Ajustes de Audio](/screenshots/audio.png)
+### 2. Pestaña Configuración de audio (Control de audio espacial 3D)
+![Pestaña Configuración de audio](/screenshots/audio.png)
 
-### 3. Pestaña de Ajustes Generales (Idioma y Ruta de Game.log)
-![Pestaña de Ajustes Generales](/screenshots/general.png)
+### 3. Pestaña Configuración general (selección de idioma y registro de juego)
+![Pestaña Configuración general](/screenshots/general.png)
 
-### 4. Pestaña de Ajustes de Conexión
-![Pestaña de Ajustes de Conexión](/screenshots/connection.png)
+### 4. Pestaña Configuración de conexión
+![Pestaña Configuración de conexión](/screenshots/connection.png)
 
-### 5. Pestaña de Raccourcis / Atajos de Teclado
-![Pestaña de Raccourcis / Atajos de Teclado](/screenshots/hotkeys.png)
+### 5. Pestaña Configuración de teclas de acceso rápido
+![Pestaña Configuración de teclas de acceso rápido](/screenshots/hotkeys.png)
 
-### 6. Pestaña de Ajustes de Superposición (HUD Vulkan y DirectX)
-![Pestaña de Ajustes de Superposición](/screenshots/overlay.png)
+### 6. Pestaña Configuración de superposición (Vulkan y DirectX HUD)
+![Pestaña Configuración de superposición](/screenshots/overlay.png)
 
-### 7. Página de Inicio de Sesión del Portal Web de Administración
-![Página de Inicio de Sesión del Portal Web de Administración](/screenshots/admin_login.png)
+### 7. Pestaña Configuración de OCR (Tesseract OCR)
+![Pestaña Configuración de OCR](/screenshots/ocr.png)
 
-### 8. Panel de Control del Portal Web de Administración
-![Panel de Control del Portal Web de Administración](/screenshots/admin_dashboard.png)
+### 8. Página de inicio de sesión del portal web de administración
+![Página de inicio de sesión del portal web de administración](/screenshots/admin_login.png)
+### 9. Panel de control del portal web de administración
+![Panel del portal web de administración](/screenshots/admin_dashboard.png)
 
-### 9. Lista de Jugadores del Portal Web de Administración
-![Lista de Jugadores del Portal Web de Administración](/screenshots/admin_players_list.png)
+### 10. Administrador de jugadores del portal web
+![Reproductores del portal web de administración](/screenshots/admin_players_list.png)
 
-### 10. Lista de Administradores del Portal Web de Administración
-![Lista de Administradores del Portal Web de Administración](/screenshots/admin_admin_list.png)
+### 11. Lista de administradores del portal web de administración
+![Lista de administradores del portal web de administración](/screenshots/admin_admin_list.png)
 
-### 11. Lista de Bloqueados (Baneos) del Portal Web de Administración
-![Lista de Bloqueados (Baneos) del Portal Web de Administración](/screenshots/admin_ban_list.png)
+### 12. Lista de prohibiciones del portal web de administración
+![Lista de prohibiciones del portal web de administración](/screenshots/admin_ban_list.png)
 
 </details>
 
 ---
 
-## 🗂️ Estructura del Proyecto
+## 🗂️ Estructura del proyecto
 
-- **/server**: Servidor backend en Go de alto rendimiento que aloja los servicios de posición, audio y administración.
-- **/client**: Cliente moderno en C# WPF que utiliza NAudio, WebRtcVad y Tesseract OCR para el seguimiento automatizado de ubicaciones y el análisis de registros (logs).
+- **/servidor**: Backend Go de alto rendimiento que aloja los servicios de puesto, audio y administración.
+- **/client**: cliente WPF de C# moderno que utiliza NAudio, WebRtcVad y Tesseract OCR o Game.log tail para el seguimiento automatizado de la ubicación y el análisis de registros. La aplicación complementaria también se incluye en este proyecto.
+- **/streamdeck**: complemento Stream Deck para el cliente XuruVoIP.
 
 ---
 
-## ⚙️ Cómo Funciona la Aplicación (Arquitectura del Cliente)
+## ⚙️ Arquitectura del sistema
 
-El cliente C# WPF se ejecuta en paralelo con Star Citizen y realiza captura de audio, procesamiento, reconocimiento de coordenadas y reproducción en tiempo real. A continuación se detalla el flujo de trabajo del sistema cliente:
-
-```mermaid
-graph TD
-    subgraph Captura & Transmisión
-        Mic[Entrada de Micrófono] -->|Audio PCM| VAD[Detección de Actividad de Voz WebRTC]
-        VAD -->|Voz Activa| VoiceChanger[Modulador de Voz & DSP de Traje]
-        VoiceChanger -->|PCM Modificado| OpusEnc[Codificador Opus]
-        OpusEnc -->|Paquetes Opus| AudioWS[Cliente WebSocket de Audio]
-        AudioWS -->|Puerto WebSocket 8889| Server[Servidor Go]
+A continuación se muestra la arquitectura real completa del sistema XuruVoip, que ilustra los bucles de captura, posicionamiento, reproducción y representación de HUD dentro del cliente WPF, los concentradores websocket del servidor Go y las integraciones externas:```mermaid
+graph TB
+    subgraph STIM ["Entorno de juego (Star Citizen)"]
+        SC["Cliente Star Citizen"]
+        LOGS["Game.log (archivo de registro)"]
+        SCREEN["Salida de gráficos (Vulkan/DX)"]
     end
 
-    subgraph Posicionamiento & Sincronización de Casco
-        SC[Proceso Star Citizen] -->|r_DisplaySessionInfo/r_DisplayInfo| Screen[Captura de Pantalla]
-        Screen -->|Preprocesamiento| Tess[Motor OCR Tesseract]
-        
-        SC -->|Log en Tiempo Real| GameLog[Archivo Game.log]
-        GameLog -->|Escáner del Log| LogParser[Analizador del Servicio de Logs]
-        
-        Tess -->|Coordenadas Analizadas| PosSelector{Selector de Fuente}
-        LogParser -->|Coordenadas Analizadas| PosSelector
-        
-        PosSelector -->|Coordenadas Seleccionadas| Zone[Filtro Jerárquico de Zona]
-        Zone -->|Coordenadas & Zona del Oyente| PosWS[Cliente WebSocket de Posición]
-        PosWS -->|Puerto WebSocket 8888| Server
+    subgraph WPF ["Cliente XuruVOIP WPF"]
+        direction TB
+        subgraph CAPT ["Captura de micrófono y DSP"]
+            MIC["Entrada de micrófono"] --> VAD["WebRTC VAD"]
+            VAD -->|Speech Detected| VC["Cambiador de voz (Alien/Cyborg/Robot)"]
+            VC -->|Modulated PCM| HELM_OSC["Superposición de zumbidos de ventilación y respiración del casco"]
+            HELM_OSC --> OPUS_ENC["Codificador de obra"]
+        end
 
-        LogParser -->|Equipar/Quitar casco| Helmet[Sincronización de Casco]
-        Helmet -->|Paquete de estado del casco| PosWS
+        subgraph POS_TRACK ["Posicionamiento y seguimiento de estado"]
+            LOGS -->|Tail Scanner| LOG_PAR["Analizador de Game.log"]
+            SCREEN -->|showlocations Capture| OCR["Motor OCR Tesseract"]
+            LOG_PAR -->|Equip/Visor Events| HELM_DET["Sincronización automática del estado del visor"]
+            OCR -->|Coords| POS_SEL{"Selector de fuente"}
+            LOG_PAR -->|Coords & ContainerID| POS_SEL
+        end
+
+        subgraph PLAY ["Reproducción espacial y DSP"]
+            OPUS_DEC["Decodificador de obra"] --> OCC_FIL["Cubierta Carrack/Hercules y oclusión de habitaciones"]
+            OCC_FIL --> REV_FIL["Reverberación con reconocimiento de ubicación (cuevas/bunkers/hangares)"]
+            REV_FIL --> RAD_FIL["Paso de banda de radio y degradación de largo alcance"]
+            RAD_FIL --> CHIMES["Generador de chirridos de micrófono PTT y cola de silenciamiento"]
+            CHIMES --> PAN["Matemáticas de panorámica espacial 3D"]
+            PAN --> VOL["Atenuación de distancia espacial"]
+            VOL --> MIXER["Mezclador de audio"] --> SPK["Dispositivos de salida de audio"]
+        end
+
+        subgraph HUD ["Superposición de HUD (clic de Win32)"]
+            T_RAD["Miniradar táctico 2D"]
+            STT["Whisper.net Voz a Texto"]
+            OPUS_DEC -.->|Incoming Voice| STT
+            STT -->|Subtitles| SUB["Subtítulos HUD en tiempo real"]
+        end
+
+        subgraph COMP ["Servidor web complementario"]
+            HTTP_SRV["Escucha HTTP local (puerto personalizado)"]
+            DASH["Panel de control Glassmorphic HTML/JS"]
+        end
+
+        POS_SEL -->|Coordinates & Zone| POS_WS["Posición cliente WS"]
+        HELM_DET -->|Visor State| POS_WS
+        OPUS_ENC -->|Audio Packets| AUD_WS["Cliente WS de audio"]
     end
 
-    subgraph Reproducción & Mezcla Espacial
-        Server -->|Audio Proximidad + Metadatos| AudioWS
-        AudioWS -->|Trama Opus + Metadatos| Decoder[Decodificador Opus]
-        Decoder -->|Mono Float PCM| OcclusionFilter[Filtro de Oclusión de Cubierta & Compartimento]
-        OcclusionFilter -->|PCM Atenuado| DSP[Filtro DSP de Radio & Degradación]
-        DSP -->|Mono| Panner[PanningSampleProvider]
-        Panner -->|Estéreo| Volume[VolumeSampleProvider]
-        
-        LogParser -.->|Estado local del casco| DSP
-        Zone -.->|Posición & orientación del oyente| MixerMath[Matemáticas de Espacialización & Degradación]
-        
-        MixerMath -->|Parámetro Balance Pan| Panner
-        MixerMath -->|Atenuación por Distancia & Trasera| Volume
-        MixerMath -->|Factor de Degradación| DSP
-        
-        Volume -->|Estéreo Izquierda/Derecha| Mixer[MixingSampleProvider]
-        Mixer -->|Reproducción de Audio| Speakers[Dispositivo de Salida de Audio]
+    subgraph SERVER ["Servidor XuruVOIP Go"]
+        direction TB
+        WS_HUB["Centro de conexión Websocket"]
+        POS_HUB["Posicionamiento espacial y centro de zonas"]
+        DB["Base de datos SQLite y canales persistentes"]
+        DISC_BRIDGE["Puente de voz de discordia"]
+        ADM_PORT["Portal web de administración (Canvas Live Radar)"]
+
+        WS_HUB <--> POS_HUB
+        POS_HUB <--> DB
+        DISC_BRIDGE <--> WS_HUB
     end
 
-    subgraph Superposición HUD & STT
-        Decoder -->|Mono Float PCM| STT[Speech-to-Text Whisper.net]
-        STT -->|Texto Transcrito| Overlay[Ventana de Superposición HUD]
-        Zone -.->|Posición del Oyente| Overlay
-        AudioWS -.->|Coordenadas del Emisor Remoto| Overlay
-        Overlay -->|Subtítulos Dinámicos & Mini-Radar 2D| ScreenOverlay[Pantalla de Superposición]
+    subgraph EXT ["Interfaces externas"]
+        DISC["Canal de voz de discordia"] <-->|Bidirectional Voice Bridge| DISC_BRIDGE
+        SD["Aplicación Stream Deck"] <-->|WebSocket Actions / Port Setting| HTTP_SRV
+        MOB["Controlador móvil"] <-->|REST API Status & Toggles| HTTP_SRV
     end
+
+    POS_WS <-->|WS Port 8888| WS_HUB
+    AUD_WS <-->|WS Port 8889| WS_HUB
 ```
+---
 
-### 1. Captura de Audio, VAD y Compresión
-* **Captura de Audio:** El cliente captura el audio del micrófono utilizando la API **NAudio** a una tasa de alta fidelidad de 48,000 Hz, 16 bits mono.
-* **Detección de Actividad de Voz (VAD):** Los búferes de audio son evaluados por el wrapper nativo **WebRtcVad**. Si la confianza de voz cae por debajo del umbral, la transmisión se detiene para evitar emitir el ruido del teclado o ventiladores.
-* **Compresión:** Los búferes de voz activa se codifican en tramas **Opus** altamente comprimidas (utilizando el wrapper C# **Concentus**) y se transmiten inmediatamente como tramas WebSocket binarias al servidor de audio Go.
+## 💡 Descripción general de las funciones principales
 
-### 2. Seguimiento de Ubicación y Estimación de Orientación
-* **Alternar Fuente de Posición:** Los jugadores pueden elegir entre dos metodologías de posicionamiento en la configuración del cliente:
-  * **Escáner de Pantalla OCR:** Realiza periódicamente capturas de pantalla de la región configurada (donde se muestran las coordenadas con `/showlocations` o `r_DisplaySessionInfo`), preprocesa la imagen y la envía al motor **Tesseract OCR**.
-  * **Lector Game.log (GRTPR):** Escanea directamente el archivo `Game.log` de Star Citizen para obtener las coordenadas registradas. Para habilitar esto, se debe añadir `r_DisplaySessionInfo = 3` (o `1`) al archivo `user.cfg` del juego. Al seleccionar GRTPR, el motor Tesseract OCR se detiene y se libera por completo, reduciendo sustancialmente el uso de CPU y RAM del equipo.
-* **Filtrado de Zona Jerárquico:** El texto de posición analizado contiene múltiples líneas de coordenadas jerárquicas (por ejemplo, planetas, compartimentos, ascensores). El cliente filtra dinámicamente las diferencias de subzonas (como ascensores, asientos) para que los jugadores en zonas adyacentes se escuchen sin interrupciones.
-* **Estimación de Orientación:** Dado que Star Citizen no proporciona orientación, el cliente calcula la dirección de movimiento a partir del cambio de posición ($Position_{actual} - Position_{anterior}$). En parada, se mantiene el último valor.
+### 1. 🔊 Audio espacial 3D en tiempo real
+* **Panorámica estéreo dinámica:** PROYECTA las coordenadas del altavoz remoto en los vectores de dirección hacia adelante y hacia la derecha del oyente para calcular la panorámica izquierda/derecha exacta usando una fórmula de potencia constante.
+* **Resolución de ambigüedad frontal-posterior:** Atenúa el volumen de audio en un 25% si un orador está detrás del oyente, resolviendo las limitaciones estándar de panorámica de audio 2D.
+* **Reducción de distancia:** Desvanece las voces de proximidad linealmente según la distancia, lo que garantiza niveles de volumen naturales (se desvanece completamente a cero a 50 metros o 5 metros para susurros).
 
-### 3. Detección de Casco en Tiempo Real
-* **Escáner del Log:** Un proceso en segundo plano lee en tiempo real el archivo `Game.log` de Star Citizen.
-* **Seguimiento de Accesorios:** El escáner busca líneas de equipamiento de cascos/visores (`FP_Visor`, `helmethook_attach`). El modo casco (Activo/Inactivo) se sincroniza automáticamente de manera instantánea.
+### 2. 🗺️ Acústica basada en la ubicación y oclusión de barcos/búnkeres
+* **Oclusión de terrazas y paredes:** Detecta límites internos dentro de espacios. Si los jugadores están en diferentes decks (por ejemplo, Carrack, Hercules) o salas (por ejemplo, Bunkers), se aplican dinámicamente el filtrado de paso bajo (frecuencias de corte de 300 Hz a 900 Hz) y la amortiguación de volumen.
+* **Reverberación ambiental:** Lee la zona jerárquica del reproductor y aplica automáticamente parámetros personalizados de mezcla húmeda, retardo y reverberación de retroalimentación para **Cuevas**, **Bunkers** y **Hangars**.
 
-### 4. Mezcla Espacial Estéreo 3D y DSP
-* **Bucle de Recepción:** El cliente recibe paquetes Opus con metadatos de proximidad (distancia, rango máximo y coordenadas del emisor).
-* **Cálculos Espaciales:** La señal se proyecta sobre los vectores del oyente:
-  * **Paneo Estéreo (Pan):** Controla el balance izquierdo/derecho desde `-1.0` (izquierdo completo) hasta `+1.0` (derecho completo).
-  * **Resolución de la Ambigüedad Delante-Atrás:** Si el emisor está detrás, se aplica una atenuación de volumen de hasta 25% para ayudar a la localización auditiva.
-  * **Atenuación por Distancia:** El volumen disminuye linealmente y se reduce a cero al alcanzar el rango máximo (50m por defecto).
-* **Reproducción y DSP de Radio:** Las tramas Opus decodificadas pasan por un **filtro DSP de radio** (si alguno de los jugadores tiene el casco puesto o habla por un canal de radio), se espacializan, se ajustan en volumen y se mezclan.
-  * **Degradación Dinámica de la Señal de Radio:** Si está activada, el filtro DSP reduce las frecuencias de corte de paso alto/bajo y mezcla ruido blanco filtrado a medida que se acerca al rango máximo, simulando la degradación de la señal de radio.
-  * **Efectos PTT y Tonos de Radio Realistas:** NAudio sintetiza tonos de radio para la activación de transmisiones. Al iniciar la transmisión, se produce un mic-key chirp de 50ms (barrido de frecuencia de 900Hz a 700Hz). Al finalizar la transmisión, se desencadena un ruido de squelch de 180ms al recibir una trama Opus vacía de 0 bytes. Una opción de retorno local permite escuchar sus propios efectos de sonido.
+### 3. 💨 Simulación atmosférica de casco y EVA
+* **Silenciamiento de EVA:** Silencia automáticamente las comunicaciones de voz de proximidad en el espacio o zonas de vacío (EVA), lo que obliga a los jugadores a utilizar canales de radio para comunicarse.
+* **Superposición del respirador con visera:** Simula la presión del aire cuando la visera está bajada. Sintetiza un silbido de respiración de baja frecuencia y un zumbido de ventilador de traje de doble frecuencia (50 Hz + 100 Hz) en la alimentación del micrófono capturado.
+* **Sincronización automática de la visera:** Lee los registros adjuntos en `Game.log` para detectar automáticamente cuándo se coloca o se quita un casco y actualiza el estado de la visera en tiempo real.
 
-### 5. Estados de Micrófono Dinámicos y Controles de Silenciamiento
-* **Pantalla de Micrófono Dinámico:** La etiqueta de estado del micrófono en la ventana principal se actualiza en tiempo real para mostrar el estado exacto de su transmisor:
-  * `Proximity PTT (Off)` / `Proximity PTT (On)` (Canal de proximidad Push-To-Talk)
-  * `Proximity VAD (OFF)` / `Proximity VAD (ON)` (Modo de activación por voz, cambia a ON cuando se detecta voz)
-  * `Radio Channel PTT (ON)` (Transmitiendo en el canal de radio activo)
-  * `Profile PTT (ON)` (Transmitiendo en el canal de perfil)
-  * `(Muted)` (ej. `Proximity PTT (Muted)`) cuando el micrófono para el canal actual está silenciado.
-* **Tabla de Estado de Silenciamiento de Canales:** Debajo del canal activo y el estado del casco, la ventana principal incluye una tabla estructurada que resume el estado activo/silenciado tanto del micrófono (saliente) como del audio (entrante) para los tres canales de comunicación (Proximidad, Radio y Perfil). Los estados están codificados por colores (Verde para ACTIVO, Rojo para SILENCIADO) y se actualizan dinámicamente.
-* **Raccourcis de Teclado Separados para Silenciar Micrófono y Audio:**
-  * **Silenciar Micrófono (Saliente):** Alterna el silencio del micrófono para cada canal. Por defecto: Proximidad (`M`), Radio (`,`), Perfil (`.`). Cuando está silenciado, las presiones PTT y el habla VAD no transmitirán audio al servidor, y el LED de la ventana principal permanece naranja.
-  * **Silenciar Audio (Entrante):** Alterna el silencio de la reproducción de la voz de otros jugadores en cada canal. Los valores predeterminados no están asignados (`Ninguno`) y se pueden personalizar en la ventana de configuración.
+### 4. 🎙️ Cambiador de voz y moduladores de traje de ciencia ficción
+* **Filtros DSP en tiempo real:** Cambio de tono en el dominio del tiempo, flanging, modulación en anillo, saturación suave y trituración de bits de 8 bits.
+* **Preajustes atmosféricos:** Cargue instantáneamente perfiles de voz preestablecidos que incluyen **Alien**, **Cyborg**, **Robotic** o **Custom Pitch Shift** (de 0,5x a 2,0x).
 
-### 6. Incrustación HUD (Overlay) Compatible con Vulkan y DirectX
-* **Ventana de Incrustación HUD**: El cliente proporciona un overlay WPF opcional y ligero que se muestra en primer plano. Indica el estado de la VoIP, la frecuencia activa y la lista de interlocutores que hablan con indicadores de señal de radio.
-* **Integración Transparente Win32**: Gracias a los estilos de ventana Win32 (`WS_EX_TRANSPARENT` y `WS_EX_NOACTIVATE`), la incrustación no roba el foco y permite que todos los clics del mouse pasen directamente al juego.
-* **Rendimiento Independiente de la API**: Dado que las ventanas transparentes WPF se basan en la composición del Desktop Window Manager (DWM) de Windows, el overlay no se inyecta en el pipeline gráfico del juego. Esto garantiza una compatibilidad total tanto con **Vulkan** como con **DirectX**, siempre que el juego se ejecute en modo **"Ventana sin Bordes"** (Borderless Windowed).
-* **📡 Mini-Radar Táctico HUD**: Muestra las posiciones de los jugadores en un mini-radar circular incrustado en el HUD.
-  * **Alineación de Orientación (Heading-Up)**: El radar gira automáticamente según la dirección de movimiento del jugador (vector de desplazamiento).
-  * **Proyección Relativa**: Proyecta las coordenadas de los jugadores cercanos cuando hablan en proximidad. Los interlocutores activos muestran ondas de sonido concéntricas pulsadas.
-  * **Configurabilidad**: Puede activarse/desactivarse en los ajustes, con un rango máximo ajustable de 10m a 200m.
-* **💬 Subtítulos HUD en Tiempo Real (Speech-to-Text)**: Transcribe automáticamente las comunicaciones de voz en tiempo real y las muestra como subtítulos en la superposición del HUD.
-  * **Transcripción Sin Conexión**: Utiliza un modelo Whisper ligero y local (`ggml-tiny.bin`) que se ejecuta de forma completamente local (mediante Whisper.net).
-  * **Adaptación de Idioma Dinámica**: Sincroniza dinámicamente el idioma de reconocimiento de voz con el idioma de interfaz de usuario seleccionado por el usuario.
-  * **Instalación en Segundo Plano**: Descarga el modelo de 75 MB desde HuggingFace solo tras la primera activación de la función. El progreso de descarga se muestra directamente en el HUD.
+### 5. 📻 Degradación de radio inmersiva y timbres
+* **Filtrado de paso de banda:** Modelos con filtros de radio con cortes bajos/altos cuando se usan canales de radio o cuando los visores del traje están bajados.
+* **Degradación de la señal de radio:** Bandas de corte estrechas y mezclas de ruido estático filtrado por paso de banda a medida que la distancia entre los reproductores se acerca al límite del transmisor de radio.
+* **Timbres acústicos de radio:** Reproduce un chirrido de tecla de micrófono que barre el tono (900 Hz a 700 Hz) al presionar el botón y una cola estática de silenciamiento al presionar el botón.
 
-### 7. Acústica Ambiental (Oclusión y Reverberación)
-* **Filtro de Oclusión:** Si el hablante y el oyente están en compartimentos diferentes, el cliente aplica automáticamente un filtro de paso bajo (corte a 600 Hz, volumen al 65%) para simular la obstrucción física. La transición es suave para evitar clics.
-* **Reverberación Inteligente:** Si el oyente se encuentra en una cueva, bunker o hangar, un filtro en peine de línea de retardo aplica parámetros específicos:
-  * *Cuevas / Túneles:* 45% wet, 100ms de retraso, 0.6 de feedback.
-  * *Bunkers / Estaciones:* 25% wet, 50ms de retraso, 0.4 de feedback.
-  * *Hangares:* 35% wet, 150ms de retraso, 0.5 de feedback.
-* **🗺️ Oclusión Específica de Compartimentos y Cubiertas**: Admite el diseño interno de naves y búnkeres para atenuar el audio en función de las paredes y cubiertas físicas:
-  * *Cubiertas de Carrack*: Las divisiones de coordenadas Z (cubierta de mando, cubierta de habitáculo, cubierta técnica) aplican un filtro de paso bajo pronunciado (corte a 350 Hz, volumen al 35%).
-  * *Compartimentos de Carrack*: Las divisiones de coordenadas Y (cabina, habitáculo, motores) atenúan el sonido (corte a 900 Hz, volumen al 65%).
-  * *Niveles de Búnker*: Las divisiones de coordenadas Z (vestíbulo del ascensor, nivel intermedio, nivel principal) atenúan el sonido (corte a 300 Hz, volumen al 30%).
-  * *Salas de Búnker*: Las divisiones de coordenadas X atenúan el sonido (corte a 800 Hz, volumen al 60%).
-  * *Cubiertas de Hercules*: Las divisiones de coordenadas Z (habitáculo, bodega de carga) atenúan el sonido (corte a 400 Hz, volumen al 45%).
-  * *Compartimentos de Cutlass*: Las divisiones de coordenadas Y (cabina, bodega de carga) atenúan el sonido (corte a 1000 Hz, volumen al 70%).
-  * *Heurística de Elevación General*: Cualquier diferencia de altura mayor a 4.5m entre jugadores en la misma zona activa automáticamente la oclusión de suelo/techo (corte a 500 Hz, volumen al 45%).
+### 6. 💬 Sistema automático de intercomunicación para barcos
+* **Canales de intercomunicación del vehículo:** Al abordar un vehículo, los jugadores se suscriben automáticamente a un canal de radio dinámico `Intercom_<ContainerID>`.
+* **Agachamiento de prioridad del piloto:** Cuando un jugador en la cabina o en el asiento del conductor transmite por el intercomunicador, el audio de proximidad de todos los demás jugadores se reduce en un 85% para garantizar la claridad del comando de vuelo.
+* **Enfriamiento de limpieza:** Cuenta regresiva 5 minutos después de que el último jugador abandona el barco antes de eliminar el canal de intercomunicación, lo que maximiza el rendimiento del servidor.
 
-### 8. Discord Rich Presence sin Dependencias Externas (RPC)
-* **Conexión de tubería nombrada robusta:** El cliente se integra con Discord sin requerir dependencias externas pesadas. Para garantizar una conectividad sólida en diferentes configuraciones de Discord o múltiples instancias, escanea e intenta la conexión en todos los índices de tuberías nombradas desde `discord-ipc-0` hasta `discord-ipc-9`.
-* **Actualizaciones de Actividad Dinámica:** Actualiza en tiempo real su presencia en Discord:
-  * **Detalles:** Zona de ubicación en juego (ej. `"En una cueva de MicroTech"`).
-  * **Estado:** Canal activo y estado del casco (ej. `"En la radio: Canal Bravo (Casco puesto)"` o `"En proximidad"`).
-  * **Tiempo Transcurrido:** Muestra el cronómetro desde la conexión al servidor VoIP.
+### 7. 📡 Superposición de HUD y radar táctico 2D compatible con Vulkan
+* **Superposición de clic de Win32:** Una superposición de HUD sin bordes que muestra conexiones VoIP, frecuencias y estados de conversación. Compatible con Vulkan y DirectX (se ejecuta en modo de ventana sin bordes).
+* **Mini-radar táctico:** Cuenta con un radar HUD 2D alineado con el rumbo que muestra a los jugadores que hablan en relación, dibujando anillos de sonido pulsantes a su alrededor.
+* **Subtítulos de voz a texto:** Transcribe audio entrante de radio/proximidad a subtítulos HUD localizados usando un modelo Whisper liviano y fuera de línea (`ggml-tiny.bin`).
 
-### 9. Rotación de registros al inicio
-* **Rotación diaria de registros:** Al iniciar, el cliente verifica la fecha del archivo de registro activo. Si se modificó un día anterior, se archiva como `xuru_voip.YYYY-MM-DD.log`.
-* **Depuración y retención:** Para limitar el consumo de espacio en disco, el cliente escanea el directorio de registros y conserva solo los 5 archivos de registro rotados más recientes, eliminando los más antiguos.
+### 8. 📱 Aplicación complementaria y API REST
+* **Servidor web HTTP local:** Alberga un panel local en un puerto configurable (predeterminado: `8891`, deshabilitado de forma predeterminada).
+* **Controlador Glassmorphic:** Se conecta desde teléfonos o pantallas secundarias para alternar silencios, ciclos de canales, cascos o cambiadores de voz.
+* **API REST:** Expone los puntos finales `GET /api/status` y `POST /api/action` para integraciones externas.
 
-### 10. 🎙️ Moduladores de Voz y de Traje en Tiempo Real
-* **DSP de Modulación de Voz**: Aplica efectos de procesamiento de señal digital en tiempo real al audio del micrófono antes de la compresión Opus:
-  * **Pitch Shifter**: Desplazamiento de tono en tiempo real utilizando dos líneas de retraso superpuestas con atenuación cruzada.
-  * **Ring Modulator**: Multiplica la señal de audio por una onda portadora para crear sonidos metálicos y robóticos de ciencia ficción.
-  * **Flanger**: Filtro de peine con una línea de retraso modulada por LFO para crear un efecto de barrido espacial.
-* **Ajustes Preestablecidos del Modulador**:
-  * *Alien*: Modulación grave (0.65x) con Ring Modulator (85 Hz) y Flanger.
-  * *Cyborg*: Tono metálico (0.82x), Ring Modulator (65 Hz), saturación suave de tanh y reducción de resolución (bitcrushing) a un equivalente de 8 bits.
-  * *Robotic*: Modulación aguda (1.25x), Ring Modulator (140 Hz) y Flanger.
-  * *Desplazamiento de Tono Personalizado*: Ajuste manual del factor de tono de 0.5x a 2.0x.
-* **Modulador de Casco y Traje**: Superpone un sonido de respiración de respirador realista y tonos de timbre al activar/desactivar la transmisión (totalmente configurables de forma independiente).
+### 9. 🎛️ Complemento Stream Deck
+* **Paquete de acción Stream Deck:** Expone 8 acciones para controlar el silenciamiento del micrófono, el silenciamiento del audio, los visores del casco y los ciclos de radiofrecuencia.
+* **Iconos de teclas dinámicas:** Gráficos del botón de actualización continua de WebSockets (cian activo frente a ámbar apagado) para reflejar el estado actual del cliente.
+* **Título de frecuencia en vivo:** Muestra los nombres de los canales de radio activos directamente en los botones físicos de Stream Deck.
+
+### 10. 🔌 Puente de voz de Discord
+* **Retransmisión de audio bidireccional:** Retransmite las comunicaciones entre un canal de radio del servidor Go y un canal de voz de Discord.
+* **Mapeo de apodos:** Captura el discurso de Discord y asigna los ID de SSRC a los apodos del servidor.
+
+### 11. 🛡️ Seguridad, rotación de registros y radar de lienzo de administración
+* **Rotación diaria de registros:** El archivador de registros de inicio conserva solo los 5 registros más recientes.
+* **Panel de administración:** Panel de administración web en tiempo real con seguridad de bloqueo, limitación de velocidad y un mapa interactivo 2D HTML5 Canvas Live Radar que permite a los administradores hacer zoom, desplazarse y rastrear rutas históricas de jugadores.
 
 ---
 
-## 🎮 Pestañas de Ajustes de XuruVoip Client
+## 🎮 Desglose de la pestaña Configuración del cliente XuruVoip
 
-El panel de configuración incluye seis secciones:
-1. **General**: Selección de idioma, ruta del archivo `Game.log` de Star Citizen y activación del registro local.
-2. **Connection**: Dirección IP del servidor, puertos de audio y posición, nombre de usuario, contraseña del perfil y contraseña del servidor.
-3. **Position**: Elección de la fuente de posición ("Escáner de Pantalla OCR" vs. "Lector Game.log (GRTPR)"), selección del monitor, frecuencia de escaneo (ms), definición del área de escaneo de pantalla y vista previa del texto parseado (las opciones OCR se ocultan cuando GRTPR está activo).
-4. **Audio**: Dispositivos de audio, ajuste de ganancias de volumen, modo de transmisión (PTT / VAD), sensibilidad del VAD, activación de **3D Spatial Audio**, degradación de radio y tonos PTT de micro, activar modulador de traje y elegir/configurar **ajustes preestablecidos del modulador de voz** (Alien, Cyborg, Robotic, PitchShift).
-5. **Hotkeys**: Registro de las teclas de atajo de teclado para el PTT, silenciar canales de transmisión y silenciar canales de audio recibidos.
-6. **Overlay**: Activación de la superposición HUD transparente, configuración de la ubicación en pantalla, activar el **Mini-Radar Táctico** (con rango máximo configurable) y activar los **subtítulos en tiempo real** (con aviso de descarga del modelo Whisper).
-
-### Compilación y Ejecución del Cliente
-
-#### Requisitos
-- Windows 10 o Windows 11
+La ventana de configuración de WPF está estructurada en seis categorías de configuración:
+1. **General**: configure idiomas, siga los archivos `Game.log`, alterne el registro general de archivos y habilite/configure el **servidor HTTP de la aplicación complementaria** y el puerto locales.
+2. **Conexión**: edite la IP del servidor de destino, los puertos de audio y posición, el nombre de usuario, la contraseña de usuario y la contraseña del servidor.
+3. **Posición**: cambie la fuente de ubicación ("OCR Screen Scanner" frente a "Game.log Reader (GRTPR)"), configure índices de monitor, regiones de recorte, intervalos de OCR y obtenga una vista previa del texto de coordenadas en vivo.
+4. **Audio**: elija el hardware de entrada/salida, ajuste las ganancias de dB, seleccione el modo de transmisión (PTT vs VAD), configure los umbrales de VAD, active **Habilitar audio espacial 3D**, configure la degradación de radio, los timbres locales sintetizados, el modulador de visor y seleccione los ajustes preestablecidos de **Cambiador de voz**.
+5. **Teclas de acceso rápido**: Vincula teclas a PTT de proximidad, PTT de radio, PTT de perfil, visor del casco, ciclo de canales de radio e interruptores de silencio de canales de audio y micrófono individuales.
+6. **Superposición**: alterna la superposición de HUD, establece la ubicación de las esquinas, activa el **miniradar táctico** (con alcance máximo configurable) y alterna los **subtítulos de voz a texto** en tiempo real.
 
 ---
 
-## 🖥️ Servidor XuruVoip (Go)
+## 🖥️ Servidor XuruVoip (Ir)
 
-El servidor coordina las posiciones, autentica conexiones y enruta los paquetes de audio según las distancias y los canales de radio.
+El servidor coordina las posiciones de los jugadores, maneja la autenticación segura y enruta dinámicamente paquetes de audio según la distancia espacial y los canales de radio.
 
-### Características Claves
-* **Control de Proximidad Codo Servidor** : Transmite el audio de proximidad solo a los jugadores dentro del rango (50m por defecto).
-* **Configuración del Modo de Spatialización** : Opción `XURUVOIP_SPATIAL_AUDIO` en el archivo `.env` para activar o desactivar el envío de coordenadas reales a los clientes.
-* **Enrutamiento de Radio Multicanal** : Permite escuchar múltiples canales de radio a la vez mientras se transmite en el canal activo.
-* **Sistema de Perfiles de Audio** : Asigna efectos (ej. radio, eco) a los perfiles de los jugadores.
-* **Base de Datos SQLite** : Almacena canales y perfiles de forma permanente.
-* **Seguridad Anti-Evasión** : Bloquea por nombre de usuario, dirección IP y huella de hardware (HWID/MachineGuid).
-* **Portal de Administración Web** : Interfaz web segura en HTTPS/WebSockets con registros en tiempo real y gestión de baneos.
-* **Mapa de Radar de Administración** : Un mapa de radar 2D Canvas HTML5 en tiempo real en el panel de control para seguir a los jugadores, con desplazamiento de clic y arrastre, zoom de rueda de mouse, filtrado por zona y visualización de ondas concéntricas animadas alrededor de los hablantes.
-* **Rotación de registros al inicio**: Verifica el registro del servidor (`xuruvoip.log`) al iniciar. Si el archivo de registro contiene entradas de un día anterior, se rota a `xuruvoip.YYYY-MM-DD.log`. El servidor conserva solo los 5 archivos rotados más recientes y elimina los más antiguos para evitar un uso excesivo del espacio en disco.
+### Características clave
 
-### Configuración del Servidor (`.env`)
-En su primera ejecución, el servidor autogenera un archivo `.env`:
-```env
+* **Control de proximidad del lado del servidor**: transmite dinámicamente audio de proximidad solo a los reproductores dentro del alcance (50 m por defecto o 5 m en susurro).
+* **Configuración espacial**: opción conmutable del lado del servidor (`XURUVOIP_SPATIAL_AUDIO` en `.env`) que determina si se deben enviar coordenadas o solo la distancia a los clientes.
+* **Enrutamiento de radio multicanal**: permite a los jugadores escuchar múltiples canales de radio simultáneamente mientras transmiten en su canal activo.
+* **Sistema de perfil de audio**: Asigna efectos de audio (por ejemplo, filtro de radio, eco) a los reproductores.
+* **SQLite Persistence**: almacena las preferencias del canal del jugador y las asignaciones de perfiles cuando se reinicia el servidor.
+* **Seguridad anti-bypass**: prohíbe a los alborotadores por nombre de usuario, IP y huella digital de hardware (HWID/MachineGuid) para evitar eludir la prohibición.
+* **Portal de administración web**: interfaz web segura (HTTPS/WebSockets) para paneles en tiempo real, transmisión de registros, configuración de canales/perfiles y gestión de prohibiciones.
+* **Mapa de radar de administración del servidor**: radar de reproductor en tiempo real 2D HTML5 Canvas integrado en el panel de administración, que admite desplazamiento panorámico con hacer clic y arrastrar, zoom con la rueda del mouse, filtrado de zonas activas, senderos históricos para caminar de los jugadores (migas de pan) y anillos de ondas sonoras concéntricas pulsantes en vivo alrededor de los jugadores que hablan.
+* **Rotación del registro de inicio**: Comprueba el registro del servidor (`xuruvoip.log`) al inicio. Si el archivo de registro contiene entradas de un día anterior, se rota a `xuruvoip.AAAA-MM-DD.log`. El servidor conserva sólo los 5 archivos rotados más recientes y elimina los más antiguos para evitar el uso excesivo del disco.
+
+### Configuración del servidor (`.env`)
+
+En el primer inicio, el servidor genera automáticamente un archivo `.env` que contiene estos valores predeterminados:```env
+# BIND IP address and server ports
+# Leave IP empty to listen on all interfaces (0.0.0.0)
 XURUVOIP_SERVER_IP=
 XURUVOIP_PORT=8888
 XURUVOIP_AUDIO_PORT=8889
 XURUVOIP_DATA_DIR=.
+
+# Maximum Server Capacity (can be higher, depends on server performances)
 XURUVOIP_MAX_PLAYERS=500
+
+# Spatial Audio (1 = enabled and transmits coordinates, 0 = disabled and transmits distance only)
 XURUVOIP_SPATIAL_AUDIO=1
+
+# Public Server Settings (1 = players will not need to enter the server password to connect, 0 = required)
 XURUVOIP_PUBLIC_SERVER=0
+
+# Server Password / Token for player connections (only if public server is disabled)
 XURUVOIP_SERVER_PASSWORD=auto_generated_32_chars_token
+
+# Admin Server Password / Token for the admin portal page (https://[XURUVOIP_SERVER_IP]:[XURUVOIP_PORT]/admin)
 XURUVOIP_ADMIN_SERVER_PASSWORD=auto_generated_32_chars_token
+
+# Verbose logging level (0 = none, 1 = default, 2 = global frames per type, 3 = detailed channels/profiles)
 XURUVOIP_VERBOSE_LOGS=1
+
+# Security Settings (Rate Limiting and IP Lockout)
 XURUVOIP_LIMIT_RATE_POS=50.0
 XURUVOIP_LIMIT_BURST_POS=100
 XURUVOIP_LIMIT_RATE_AUDIO=60.0
 XURUVOIP_LIMIT_BURST_AUDIO=120
+
 XURUVOIP_LOCKOUT_ATTEMPTS=5
 XURUVOIP_LOCKOUT_WINDOW=60
 XURUVOIP_LOCKOUT_DURATION=600
+
+# Dynamic Intercom and Immersion features (1 = enabled, 0 = disabled)
+XURUVOIP_ENABLE_INTERCOM=1
+XURUVOIP_ENABLE_EVA_MUTING=1
+
+# Discord Voice Bridge Settings (1 = enabled, 0 = disabled)
+XURUVOIP_ENABLE_DISCORD_BRIDGE=1
+XURUVOIP_DISCORD_TOKEN=your_discord_bot_token
+XURUVOIP_DISCORD_GUILD_ID=your_discord_guild_id
+XURUVOIP_DISCORD_CHANNEL_ID=your_discord_channel_id
+XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
+### 🎛️ Guía de configuración del puente de voz de Discord
 
-### Compilación desde las fuentes
+Para conectar un canal de radio del servidor Go local a un canal de voz de Discord, siga estos pasos de configuración:
 
-#### Linux
-```bash
+1. **Crea una aplicación de Discord Bot:**
+   * Visite el [Portal para desarrolladores de Discord](https://discord.com/developers/applications) e inicie sesión.
+   * Haga clic en **Nueva aplicación**, asígnele un nombre (por ejemplo, `Puente XuruVOIP`) y haga clic en **Crear**.
+   * Navegue a la pestaña **Bot** en la barra lateral izquierda, haga clic en **Restablecer token** y copie el **Bot Token** generado. Pegue esto como `XURUVOIP_DISCORD_TOKEN` en el archivo `.env` de su servidor.
+   * En **Intenciones de puerta de enlace privilegiada** en la misma página del Bot, habilite la **Intención de contenido del mensaje** (obligatoria para leer comandos específicos).
+
+2. **Invita al Bot a tu servidor de Discord:**
+   * Vaya a la pestaña **OAuth2** y luego seleccione **Generador de URL**.
+   * En **Ámbitos**, marque `bot` y `applications.commands`.
+   * En **Permisos de bot**, seleccione los siguientes privilegios:
+     * *Permisos generales:* `Ver canales`
+     * *Permisos de texto:* `Enviar mensajes`
+     * *Permisos de voz:* `Conectar`, `Hablar`, `Usar actividad de voz`
+   * Copie la URL generada en la parte inferior de la página, péguela en un navegador web, seleccione su servidor de Discord de destino (Gremio) y haga clic en **Autorizar**.
+
+3. **Obtener ID de servidor (gremio) y canal de voz:**
+   * Abra Discord, vaya a **Configuración de usuario** -> **Avanzado** y active el **Modo de desarrollador**.
+   * Haga clic derecho en el ícono de su servidor Discord en la lista de servidores y seleccione **Copiar ID de servidor** (esta es su ID de gremio). Pégalo como `XURUVOIP_DISCORD_GUILD_ID` en `.env`.
+   * Haga clic con el botón derecho en el canal de voz de Discord objetivo al que desea que se una el bot y seleccione **Copiar ID de canal**. Pégalo como `XURUVOIP_DISCORD_CHANNEL_ID` en `.env`.
+
+4. ** Canal de radio del servidor Map Go: **
+   * Configure `XURUVOIP_DISCORD_BRIDGE_CHANNEL` con el nombre exacto del canal de radio que desea conectar (por ejemplo, `General`, `Bravo`, `Alpha`, etc.). ¡Cualquier audio transmitido en la frecuencia de radio de este servidor Go se transmitirá bidireccionalmente al canal de voz de Discord!
+
+### Construyendo el servidor desde la fuente
+
+####Linux```bash
 cd server
+
+
 GOOS="linux" GOARCH="amd64" go build .
+# a "server" linux binary will be created in the current directory
 ```
+#### ventanas```powershell
+cd server 
 
-#### Windows
-```powershell
-cd server
 $env:GOOS="windows"
 $env:GOARCH="amd64"
 go build .
+# a "server.exe" windows binary will be created in the current directory
 ```
+### Ejecutando el servidor
 
-### Ejecución del Servidor
-
-#### Desde el código fuente:
-```bash
+#### De la fuente:```bash
 cd server
 go run .
 ```
-
-#### Desde el binario:
-##### Windows
-```powershell
+#### Desde binario:
+##### Ventanas```powershell
 .\server.exe
 ```
-
-##### Linux
-```bash
+#####Linux```bash
 ./server
 ```
+### 🖥️ Configuración e implementación del servidor sin cabeza
 
-### 🖥️ Configuración y Despliegue del Servidor sin Cabecera (Headless)
+Para instalaciones headless permanentes y listas para producción, el servidor debe ejecutarse como un demonio/servicio del sistema en segundo plano que se inicia automáticamente al arrancar y se reinicia en caso de falla.
 
-Para servidores de producción headless permanentes, se recomienda configurar el servidor para que se ejecute en segundo plano como un servicio del sistema.
-
-#### 1. Configuración de Red y Cortafuegos
-Asegúrese de abrir los puertos TCP configurados en el archivo `.env` (puertos 8888 y 8889 por defecto) en el cortafuegos de su sistema:
-* **Linux (UFW):**
-  ```bash
+#### 1. Configuración de red y firewall
+Asegúrese de que los puertos TCP entrantes definidos en su archivo `.env` (los valores predeterminados son `8888` para posiciones/portal de administración y `8889` para audio espacial) estén abiertos en su firewall host:
+* **Linux (UFW):**  ```bash
   sudo ufw allow 8888/tcp
   sudo ufw allow 8889/tcp
   sudo ufw reload
   ```
-* **Linux (firewalld):**
-  ```bash
+* **Linux (cortafuegos):**  ```bash
   sudo firewall-cmd --zone=public --add-port=8888/tcp --permanent
   sudo firewall-cmd --zone=public --add-port=8889/tcp --permanent
   sudo firewall-cmd --reload
   ```
-
 ---
 
-#### 2. Despliegue en Linux (systemd)
+#### 2. Implementación de Linux (systemd)
 
-Siga estos pasos para desplegar el servidor en Go como un servicio de systemd:
+Siga estos pasos para implementar el servidor Go como un servicio systemd:
 
-##### Paso A: Crear Directorios y Permisos
-Cree un usuario de sistema dedicado y un directorio de trabajo para aislar la seguridad:
-```bash
-# Crear un usuario de sistema sin permisos de inicio de sesión
+##### Paso A: Configurar directorio y permisos
+Cree un usuario del sistema dedicado y un directorio de trabajo para el aislamiento de seguridad:```bash
+# Create a system user without login privileges
 sudo useradd -r -s /bin/false xuruvoip
 
-# Crear el directorio de instalación y copiar el binario
+# Create installation directory and copy the binary
 sudo mkdir -p /opt/xuruvoip
 sudo cp xuruvoip-server-linux-x64 /opt/xuruvoip/xuruvoip-server
 sudo chmod +x /opt/xuruvoip/xuruvoip-server
 
-# Establecer la propiedad al usuario del sistema
+# Set ownership to the system user
 sudo chown -R xuruvoip:xuruvoip /opt/xuruvoip
 ```
-
-##### Paso B: Inicializar y Configurar `.env`
-Ejecute el servidor una vez bajo el usuario del sistema para generar el archivo `.env` y la base de datos por defecto:
-```bash
+##### Paso B: Generar y configurar `.env`
+Ejecute el servidor una vez bajo el usuario del sistema para generar el archivo de configuración y la base de datos predeterminados `.env`:```bash
 sudo -u xuruvoip /opt/xuruvoip/xuruvoip-server -port 8888 -audio-port 8889
 ```
-*Presione `Ctrl+C` después de que la consola imprima los tokens generados.* Luego, edite el archivo `.env`:
-```bash
+*Presione `Ctrl+C` después de que la consola imprima las contraseñas generadas.* Luego, edite el archivo `.env` generado para personalizar la configuración (por ejemplo, contraseñas, IP vinculante, alternancia de audio espacial):```bash
 sudo nano /opt/xuruvoip/.env
 ```
-
-##### Paso C: Crear el archivo de servicio de systemd
-Copie el archivo de servicio del repositorio `server/xuruvoip.service` a `/etc/systemd/system/xuruvoip-server.service` o créelo con el siguiente contenido:
-```ini
+##### Paso C: Crear el archivo de servicio systemd
+Copie el archivo de servicio del repositorio `server/xuruvoip.service` a `/etc/systemd/system/xuruvoip-server.service` o cree un nuevo archivo de configuración de servicio `/etc/systemd/system/xuruvoip-server.service` con el siguiente contenido:```ini
 [Unit]
 Description=XuruVoip Star Citizen Spatial VOIP Server
 After=network.target
@@ -391,87 +427,125 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 ```
-
-##### Paso D: Habilitar y Iniciar el servicio
-```bash
+##### Paso D: habilitar e iniciar el servicio```bash
+# Reload systemd daemon to pick up the new unit file
 sudo systemctl daemon-reload
+
+# Enable the service to run on startup
 sudo systemctl enable xuruvoip-server
+
+# Start the service immediately
 sudo systemctl start xuruvoip-server
 ```
-
-##### Paso E: Monitoreo y Registros
-```bash
-# Comprobar el estado del servicio
+##### Paso E: Monitoreo y registros
+Para verificar el estado del servicio y los registros de transmisión:```bash
+# Check status
 sudo systemctl status xuruvoip-server
 
-# Monitorear los registros del servicio en tiempo real
+# Stream log files in real-time
 journalctl -u xuruvoip-server -f -n 100
 ```
-
 ---
 
-#### 3. Despliegue en Windows (NSSM)
+#### 3. Implementación de Windows (NSSM)
 
-Para ejecutar el servidor como un servicio de Windows en segundo plano, se recomienda utilizar **NSSM (Non-Sucking Service Manager)**:
+Para ejecutar el servidor como un servicio nativo de Windows en modo sin cabeza, se recomienda utilizar **Administrador de servicios sin succión (NSSM)**:
 
-##### Paso A: Configurar el Directorio
-Mueva el archivo `xuruvoip-server-windows-x64.exe` a una carpeta dedicada (ej. `C:\XuruVoipServer`).
+##### Paso A: Configurar directorios
+Extraiga/copie `xuruvoip-server-windows-x64.exe` a una carpeta de servidor dedicada (por ejemplo, `C:\XuruVoipServer`).
 
-##### Paso B: Configuración Inicial
-Ejecute el archivo una vez en PowerShell para generar los archivos de configuración iniciales, deténgalo con `Ctrl+C` y edite el archivo `.env`.
+##### Paso B: Inicializar la configuración
+Abra una terminal de PowerShell como administrador y ejecute el binario una vez para generar archivos:```powershell
+cd C:\XuruVoipServer
+.\xuruvoip-server-windows-x64.exe
+```
+*Presione `Ctrl+C` una vez que finalice el inicio.* Personalice el archivo `.env` generado según sea necesario.
 
-##### Paso C: Instalar el Servicio con NSSM
-```powershell
+##### Paso C: Instalar el servicio a través de NSSM
+Descargue NSSM e instale el servicio ejecutando:```powershell
+# Open NSSM GUI installer
 .\nssm.exe install XuruVoipServer "C:\XuruVoipServer\xuruvoip-server-windows-x64.exe"
 ```
-Defina el directorio de trabajo como `C:\XuruVoipServer` e instale el servicio.
+En la ventana emergente NSSM, configure:
+* **Ruta:** `C:\XuruVoipServer\xuruvoip-server-windows-x64.exe`
+* **Directorio de inicio:** `C:\XuruVoipServer`
+* Haga clic en **Instalar servicio**.
 
-##### Paso D: Iniciar el Servicio
-```powershell
+##### Paso D: Iniciar el servicio
+Inicie el servicio usando PowerShell o Administrador de servicios (`services.msc`):```powershell
 Start-Service -Name XuruVoipServer
 ```
-
 ---
 
-## 🎮 Pestañas de Ajustes de XuruVoip Client
-
-El panel de configuración incluye seis secciones:
-1. **General**: Selección de idioma, ruta del archivo `Game.log` de Star Citizen y activación del registro local.
-2. **Connection**: Dirección IP del servidor, puertos de audio y posición, nombre de usuario, contraseña del perfil y contraseña del servidor.
-3. **Position**: Elección de la fuente de posición ("Escáner de Pantalla OCR" vs. "Lector Game.log (GRTPR)"), selección del monitor, frecuencia de escaneo (ms), definición del área de escaneo de pantalla y vista previa del texto parseado (las opciones OCR se ocultan cuando GRTPR está activo).
-4. **Audio**: Dispositivos de audio, ajuste de ganancias de volumen, modo de transmisión (PTT / VAD), sensibilidad del VAD, activación de **3D Spatial Audio**, así como opciones avanzadas de degradación de radio y tonos PTT de micro.
-5. **Hotkeys**: Registro de las teclas de atajo de teclado para el PTT, silenciar canales de transmisión y silenciar canales de audio recibidos.
-6. **Overlay**: Activación de la superposición HUD transparente y configuración de la ubicación en pantalla (ej. Arriba a la izquierda, Arriba a la derecha).
-
-### Compilación y Ejecución del Cliente
+### Construyendo y ejecutando el cliente
 
 #### Requisitos
-- Windows 10 o Windows 11
-- .NET 9.0 SDK (con componentes WPF)
+-Windows 10/11
+- SDK .NET 9.0 (soporte WPF)
 
-#### Compilar y ejecutar:
-```powershell
+#### Compilar y ejecutar:```powershell
 cd client
 dotnet run
 ```
+### Instalación del paquete de lanzamiento
 
-### Instalación del Paquete de Lanzamiento (Release)
+Dado que el instalador y los ejecutables no están firmados digitalmente, Windows SmartScreen puede bloquearlos inicialmente. Puedes desbloquearlos fácilmente usando el menú de propiedades.
 
-Debido a que el instalador y ejecutables no están firmados digitalmente, Windows SmartScreen los bloqueará en su primera ejecución. Puede desbloquearlos en sus propiedades.
+* **Opción A: Instalador MSI (recomendado)**
+  1. Descargue `XuruVoipClient-win-x64.msi` desde la [página de lanzamientos](https://github.com/XuruDragon/XuruVOIP/releases).
+  2. Para evitar que Windows SmartScreen bloquee la instalación:
+     - Haga clic derecho en el archivo `XuruVoipClient-win-x64.msi` descargado y seleccione **Propiedades**.
+     - En la ventana de propiedades en la pestaña *General*, marque la casilla **Desbloquear** en la parte inferior.
+     - Haga clic en **Aplicar** y luego cierre la ventana Propiedades.
+  3. Haga doble clic en el archivo para ejecutar el instalador y siga las instrucciones.
+     *(Nota: verá el mensaje estándar "Editor desconocido" del Control de cuentas de usuario de Windows; simplemente haga clic en **Sí** o **Ejecutar** para continuar).*
 
-* **Opción A: Instalador MSI (Recomendado)**
-  1. Descargue `XuruVoipClient-win-x64.msi` de la [página de versiones (releases)](https://github.com/XuruDragon/XuruVOIP/releases).
-  2. Haga clic derecho sobre el archivo `.msi` y seleccione **Propiedades**.
-  3. En la pestaña *General* marque la casilla **Desbloquear** en la parte inferior y haga clic en **Aplicar**.
-  4. Inicie el instalador y siga las instrucciones del asistente.
-
-* **Opción B: Versión Portable (ZIP)**
-  1. Descargue `XuruVoipClient-win-x64.zip` de la [página de versiones (releases)](https://github.com/XuruDragon/XuruVOIP/releases).
-  2. Extraiga los archivos del paquete ZIP en cualquier carpeta de su elección (ej. `C:\Games\XuruVoip`).
-  3. Luego, haga clic derecho en el archivo `XuruVoipClient.exe` extraído y seleccione **Propiedades**.
-     - En la ventana de propiedades, en la pestaña *General*, marque la casilla **Desbloquear** en la parte inferior.
-     - Haga clic en **Aplicar** y luego cierre la ventana de propiedades.
+* **Opción B: Versión ZIP portátil**
+  1. Descargue `XuruVoipClient-win-x64.zip` desde la [página de lanzamientos](https://github.com/XuruDragon/XuruVOIP/releases).
+  2. Extraiga los archivos del paquete ZIP a cualquier carpeta de su elección (por ejemplo, `C:\Games\XuruVoip`):
+  3. Luego haga clic derecho en el archivo extraído `XuruVoipClient.exe` y seleccione **Propiedades**.
+     - En la ventana de propiedades en la pestaña *General*, marque la casilla **Desbloquear** en la parte inferior.
+     - Haga clic en **Aplicar** y luego cierre la ventana Propiedades.
   4. Haga doble clic en `XuruVoipClient.exe` para ejecutar el cliente directamente sin instalarlo.
+
+## 📱 Integración de aplicación complementaria y plataforma de transmisión
+
+XuruVOIP incluye un servicio web de aplicación complementaria integrado y un complemento Stream Deck oficial que le permite monitorear y activar acciones de voz directamente desde dispositivos secundarios o claves físicas.
+
+### 1. Habilitación de la aplicación complementaria
+De forma predeterminada, el servidor HTTP local de la aplicación complementaria está deshabilitado para ahorrar recursos del sistema. Para habilitarlo:
+1. Abra el cliente XuruVOIP y haga clic en el icono **Configuración**.
+2. En la pestaña **General**, marque la casilla **Habilitar servidor HTTP complementario**.
+3. En **Puerto del servidor complementario**, puede personalizar el número de puerto (predeterminado: `8891`).
+4. Haga clic en **Guardar y cerrar** para aplicar. El servidor HTTP ahora se iniciará localmente. Puede abrir `http://localhost:8891` en cualquier navegador de su PC o dispositivo móvil para acceder al panel del controlador web.
+
+---
+
+### 2. Instalación del complemento Stream Deck
+El paquete de lanzamiento incluye el archivo `.streamDeckPlugin` preempaquetado.
+1. Descargue `com.xuru.voip.streamDeckPlugin` desde la [página de lanzamientos](https://github.com/XuruDragon/XuruVOIP/releases).
+2. Haga doble clic en el archivo para instalarlo directamente en su software Elgato Stream Deck. 
+   *(Como alternativa, puede extraer y copiar manualmente la carpeta `com.xuru.voip.sdPlugin` a `%appdata%\Elgato\StreamDeck\Plugins\`)*
+3. Una vez instalada, aparecerá una nueva categoría de acción llamada **XuruVOIP** en la lista del lado derecho de su aplicación de escritorio Stream Deck.
+
+---
+
+### 3. Agregar y configurar acciones
+Puedes arrastrar y soltar cualquiera de las siguientes 8 acciones en las teclas de tu Stream Deck:
+* 🎤 **Silenciamiento de proximidad**: alterna el silenciamiento del micrófono de proximidad saliente.
+* 📻 **Silenciar radio**: alterna el silenciamiento del micrófono de radio saliente.
+* 👤 **Silenciar perfil**: alterna el silenciamiento del micrófono del perfil saliente.
+* 🔊 **Silenciamiento de proximidad de audio**: alterna el silenciamiento de la reproducción de proximidad entrante.
+* 🔊 **Silenciar audio de radio**: alterna el silenciamiento de la reproducción de radio entrante.
+* 🔊 **Silenciar perfil de audio**: alterna el silenciamiento de la reproducción del perfil entrante.
+* 🪖 **Alternar casco**: alterna la visera del casco de tu traje espacial hacia abajo o hacia arriba.
+* 🔄 **Ciclo de radio**: recorre los canales de radio disponibles.
+
+#### Configuración (inspector de propiedades):
+Para cada acción que arrastre a una tecla, haga clic en ella y configure el puerto de destino en el panel **Inspector de propiedades** en la parte inferior:
+* Configure **Puerto complementario** para que coincida con el puerto configurado en la configuración de su cliente WPF (predeterminado: `8891`).
+* **Comentarios dinámicos:** Los conmutadores (como Proximity Mute) actualizan automáticamente su ícono en tiempo real en su dispositivo para mostrar si el estado está activo (ícono con brillo cian) o silenciado (ícono tachado en ámbar).
+* **Visualización de frecuencia en vivo:** La tecla **Cycle Radio** mostrará dinámicamente el nombre de la frecuencia actualmente activa (por ejemplo, `120.5` o `General`) directamente en el botón físico en tiempo real.
 
 ---
 

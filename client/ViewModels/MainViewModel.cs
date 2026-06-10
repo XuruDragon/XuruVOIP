@@ -30,6 +30,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly DispatcherTimer _ocrTimer = new();
     private readonly GameDetectionService _gameDetector = new();
     public GameDetectionService GameDetector => _gameDetector;
+    private CompanionAppService? _companionApp;
 
     public PlayerPosition LastSentPos => _lastSentPos;
     public Dictionary<string, PlayerPosition> RemotePositions => _remotePositions;
@@ -42,8 +43,10 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     // ─── Observable state ────────────────────────────────────────────────────
     private readonly Dictionary<string, bool> _remoteHelmets = [];
     private readonly Dictionary<string, PlayerPosition> _remotePositions = [];
+    private readonly Dictionary<string, string> _remoteChannels = [];
     private bool _wasRadioTransmitting = false;
     private readonly List<string> _availableChannels = [];
+    public IReadOnlyList<string> AvailableChannels => _availableChannels;
     private string _activeChannel = "";
 
     private bool _posConnected;
@@ -317,6 +320,13 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _gameDetector.CustomGameLogPath = Config.Config.CustomGameLogPath;
         _gameDetector.Start();
 
+        // Companion App
+        if (Config.Config.EnableCompanionApp)
+        {
+            _companionApp = new CompanionAppService(this);
+            _companionApp.Start();
+        }
+
         // Position tracking setup
         _ocrTimer.Tick += OnOcrTick;
         ApplyTrackingSource();
@@ -364,6 +374,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             _activeChannel = activeChan;
             ActiveChannelName = string.IsNullOrEmpty(activeChan) ? "General" : activeChan;
             UpdateDiscordPresence();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AvailableChannels)));
 
             IsSpatialAudioSupportedByServer = _posWs.IsSpatialAudioSupportedByServer;
             if (!IsSpatialAudioSupportedByServer)
@@ -402,7 +413,25 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                         double y = posEl.GetProperty("y").GetDouble();
                         double z = posEl.GetProperty("z").GetDouble();
                         string zone = posEl.GetProperty("zone").GetString() ?? "";
-                        _remotePositions[remoteName] = new PlayerPosition { X = x, Y = y, Z = z, Zone = zone };
+                        string containerId = "";
+                        if (posEl.TryGetProperty("container_id", out var cIdEl))
+                        {
+                            containerId = cIdEl.GetString() ?? "";
+                        }
+                        string containerName = "";
+                        if (posEl.TryGetProperty("container_name", out var cNameEl))
+                        {
+                            containerName = cNameEl.GetString() ?? "";
+                        }
+                        _remotePositions[remoteName] = new PlayerPosition 
+                        { 
+                            X = x, 
+                            Y = y, 
+                            Z = z, 
+                            Zone = zone,
+                            ContainerID = containerId,
+                            ContainerName = containerName
+                        };
                     }
                 }
                 else if (type == "leave")
@@ -412,6 +441,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                         string remoteName = nameEl.GetString() ?? "";
                         _remoteHelmets.Remove(remoteName);
                         _remotePositions.Remove(remoteName);
+                        _remoteChannels.Remove(remoteName);
                         _playback.RemovePlayer(remoteName);
                     }
                 }
@@ -422,6 +452,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                     {
                         string name = nameEl.GetString() ?? "";
                         string channel = chanEl.GetString() ?? "";
+                        _remoteChannels[name] = channel;
                         if (name == Config.Config.Username)
                         {
                             _activeChannel = channel;
@@ -446,6 +477,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                             ActiveChannelName = string.IsNullOrEmpty(_activeChannel) ? "General" : _activeChannel;
                         }
                         LogService.Info($"Available channels list updated by server. Count: {_availableChannels.Count}");
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AvailableChannels)));
                     }
                 }
             }
@@ -502,7 +534,17 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             }
             string listenerZone = _lastSentPos.Zone ?? "";
 
-            _playback.ReceiveOpusFrame(name, opus, type, applyRadio, metadata, distance, speakerZone, listenerZone, seq);
+            bool isIntercom = false;
+            if (type == 0x01)
+            {
+                _remoteChannels.TryGetValue(name, out var remoteChan);
+                if (remoteChan != null && remoteChan.StartsWith("Intercom_"))
+                {
+                    isIntercom = true;
+                }
+            }
+
+            _playback.ReceiveOpusFrame(name, opus, type, applyRadio, metadata, distance, speakerZone, listenerZone, seq, isIntercom);
         };
 
         _playback.SttAudioChunkReady += (name, samples, type) =>
@@ -616,6 +658,16 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         ActiveChannelName = _activeChannel;
 
         await _posWs.SetChannelAsync(_activeChannel);
+        UpdateDiscordPresence();
+    }
+
+    public async Task ChangeRadioChannelAsync(string channel)
+    {
+        if (!_availableChannels.Contains(channel)) return;
+        _activeChannel = channel;
+        ActiveChannelName = channel;
+
+        await _posWs.SetChannelAsync(channel);
         UpdateDiscordPresence();
     }
 
@@ -735,6 +787,51 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     private async Task ProcessNewPositionAsync(PlayerPosition pos)
     {
+        // Parse ContainerID and ContainerName from Zone if inside a vehicle
+        string zone = pos.Zone;
+        if (!string.IsNullOrEmpty(zone))
+        {
+            int lastSep = Math.Max(zone.LastIndexOf('_'), zone.LastIndexOf(' '));
+            if (lastSep > 0)
+            {
+                string lastPart = zone.Substring(lastSep + 1);
+                if (int.TryParse(lastPart, out _))
+                {
+                    pos.ContainerName = zone.Substring(0, lastSep);
+                    pos.ContainerID = zone.Replace(' ', '_');
+                }
+            }
+        }
+
+        string oldContainerID = _lastSentPos.ContainerID;
+        string newContainerID = pos.ContainerID;
+        if (oldContainerID != newContainerID)
+        {
+            if (!string.IsNullOrEmpty(oldContainerID))
+            {
+                string oldIntercom = "Intercom_" + oldContainerID;
+                if (_availableChannels.Contains(oldIntercom))
+                {
+                    _availableChannels.Remove(oldIntercom);
+                    if (_activeChannel == oldIntercom)
+                    {
+                        _activeChannel = "General";
+                        ActiveChannelName = "General";
+                    }
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AvailableChannels)));
+                }
+            }
+            if (!string.IsNullOrEmpty(newContainerID))
+            {
+                string newIntercom = "Intercom_" + newContainerID;
+                if (!_availableChannels.Contains(newIntercom))
+                {
+                    _availableChannels.Add(newIntercom);
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AvailableChannels)));
+                }
+            }
+        }
+
         CurrentZone = pos.Zone;
         CurrentPos = $"{pos.X:F1}m  {pos.Y:F1}m  {pos.Z:F1}m";
 
@@ -932,6 +1029,31 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         // Sync position tracking source
         ApplyTrackingSource();
 
+        // Sync companion app state
+        if (Config.Config.EnableCompanionApp)
+        {
+            if (_companionApp != null && _companionApp.ActivePort != Config.Config.CompanionAppPort)
+            {
+                LogService.Info("Companion app port changed, restarting server...");
+                _companionApp.Stop();
+                _companionApp = null;
+            }
+
+            if (_companionApp == null)
+            {
+                _companionApp = new CompanionAppService(this);
+                _companionApp.Start();
+            }
+        }
+        else
+        {
+            if (_companionApp != null)
+            {
+                _companionApp.Stop();
+                _companionApp = null;
+            }
+        }
+
         if (AudioConnected)
         {
             LogService.Info("ApplySettings: Re-initializing audio devices with new parameters.");
@@ -1061,6 +1183,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _stt.Dispose();
         _ocr.Dispose();
         _discordRpc.Dispose();
+        _companionApp?.Dispose();
         await _posWs.DisposeAsync();
         await _audioWs.DisposeAsync();
     }

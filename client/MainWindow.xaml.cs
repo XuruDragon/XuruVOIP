@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     private readonly MainViewModel _vm;
     private readonly DispatcherTimer _vuTimer;
     private readonly OverlayWindow _overlayWindow;
+    private bool _canUseWinGetUpdate;
 
     // Cached brushes
     private static readonly SolidColorBrush BrushGreen = new(Color.FromRgb(0x3D, 0xDB, 0x85));
@@ -134,6 +135,17 @@ public partial class MainWindow : Window
         {
             _vm.IsUpdateAvailable = true;
             _vm.LatestVersion = latest;
+
+            if (UpdateService.IsInstalledVersion() && await UpdateService.IsVersionAvailableOnWinGetAsync(latest))
+            {
+                _canUseWinGetUpdate = true;
+                UpdateBtn.Content = FindResource("BtnUpdate") as string ?? "Update";
+            }
+            else
+            {
+                _canUseWinGetUpdate = false;
+                UpdateBtn.Content = FindResource("BtnDownload") as string ?? "Download";
+            }
         }
     }
 
@@ -141,16 +153,50 @@ public partial class MainWindow : Window
     {
         try
         {
-            var psi = new System.Diagnostics.ProcessStartInfo
+            if (_canUseWinGetUpdate)
             {
-                FileName = "https://github.com/XuruDragon/XuruVOIP/releases",
-                UseShellExecute = true
-            };
-            System.Diagnostics.Process.Start(psi);
+                // Run winget upgrade in a command window to let the user see progress and the UAC prompt
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = "/c winget upgrade XuruDragon.XuruVOIPClient && pause",
+                    UseShellExecute = true,
+                    CreateNoWindow = false
+                };
+                System.Diagnostics.Process.Start(psi);
+
+                // Shut down to release file locks on XuruVoipClient.exe before the installer runs
+                _vuTimer.Stop();
+                _overlayWindow.CloseOverlay();
+                Application.Current.Shutdown();
+            }
+            else
+            {
+                // Fallback to manual download for ZIP users or if WinGet PR is still merging
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "https://github.com/XuruDragon/XuruVOIP/releases",
+                    UseShellExecute = true
+                };
+                System.Diagnostics.Process.Start(psi);
+            }
         }
         catch (Exception ex)
         {
-            LogService.Error("Failed to open update URL", ex);
+            LogService.Error("Failed to perform update action", ex);
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "https://github.com/XuruDragon/XuruVOIP/releases",
+                    UseShellExecute = true
+                };
+                System.Diagnostics.Process.Start(psi);
+            }
+            catch (Exception fallbackEx)
+            {
+                LogService.Error("Failed fallback to release URL", fallbackEx);
+            }
         }
     }
 }

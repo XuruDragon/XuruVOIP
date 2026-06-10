@@ -648,11 +648,32 @@ func TestProximityFiltering(t *testing.T) {
 	// 2. Proximity range audit with ProxShort active
 	// Enable whisper mode (ProxShort=true) on Alice. Audible range drops to 5m.
 	// Bob (10m) is now outside of audible range.
-	testHub.Players["Alice"].ProxShort = true
+	// 3. Test EVA muting
+	// Reset Alice ProxShort
+	testHub.Players["Alice"].ProxShort = false
+	// Put Alice in space/vacuum (EVA zone)
+	testHub.Players["Alice"].Pos.Zone = "planetary_system_stanton"
 	players = testHub.GetAudioPlayersInProximity("Alice")
 	if len(players) != 0 {
-		t.Errorf("Expected 0 players in proximity under whisper mode, got %d", len(players))
+		t.Errorf("Expected 0 players in proximity when Alice is in planetary_system_stanton (EVA), got %d", len(players))
 	}
+
+	// Put Alice back in Lorville
+	testHub.Players["Alice"].Pos.Zone = "Lorville"
+	// Put Bob in space (EVA zone)
+	testHub.Players["Bob"].Pos.Zone = "stanton_space_void"
+	players = testHub.GetAudioPlayersInProximity("Alice")
+	if len(players) != 0 {
+		t.Errorf("Expected 0 players in proximity when Bob is in EVA zone, got %d", len(players))
+	}
+
+	// Disable EnableEvaMuting globally, verify they hear each other again
+	EnableEvaMuting = false
+	players = testHub.GetAudioPlayersInProximity("Alice")
+	if len(players) != 1 || players[0] != testHub.Players["Bob"] {
+		t.Errorf("Expected Alice to hear Bob when EnableEvaMuting is false, got %v", players)
+	}
+	EnableEvaMuting = true // restore
 }
 
 // BenchmarkProximityFiltering benchmarks GetAudioConnectionsInProximity under heavy player loads
@@ -928,5 +949,154 @@ func TestServerPasswordModes(t *testing.T) {
 	}
 	if ok {
 		t.Error("Expected AuthenticatePlayer to reject whitespace user password")
+	}
+}
+
+// TestShipIntercomLifecycle verifies automatic creation, subscription, and deletion cooldown of intercom channels.
+func TestShipIntercomLifecycle(t *testing.T) {
+	// Initialize standard Hub state
+	testHub := Hub{
+		Players: make(map[string]*ActivePlayer),
+		Admins:  make(map[*websocket.Conn]*AdminSession),
+	}
+
+	EnableIntercom = true
+	ServerConfig.ChannelsList = []string{"General", "Command"}
+
+	// 1. Player A joins the ship
+	pA := &ActivePlayer{
+		Name:          "Alice",
+		ActiveChannel: "General",
+		ListeningChannels: []string{"General"},
+	}
+	testHub.Players["Alice"] = pA
+
+	// Update position to Aegis Titan ship
+	testHub.UpdatePosition("Alice", Position{
+		X:           10.0,
+		Y:           20.0,
+		Z:           30.0,
+		Zone:        "Aegis_Avenger_Titan_01",
+		ContainerID: "Titan_999",
+	})
+
+	// Channel should be created automatically
+	chanName := "Intercom_Titan_999"
+	found := false
+	for _, ch := range ServerConfig.ChannelsList {
+		if ch == chanName {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatal("Expected ship intercom channel to be automatically created")
+	}
+
+	// Player A should be listening to the intercom channel
+	hasIntercom := false
+	for _, ch := range pA.ListeningChannels {
+		if ch == chanName {
+			hasIntercom = true
+			break
+		}
+	}
+	if !hasIntercom {
+		t.Error("Expected Alice to automatically listen to ship intercom channel")
+	}
+
+	// 2. Player B joins the same ship
+	pB := &ActivePlayer{
+		Name:          "Bob",
+		ActiveChannel: "General",
+		ListeningChannels: []string{"General"},
+	}
+	testHub.Players["Bob"] = pB
+
+	testHub.UpdatePosition("Bob", Position{
+		X:           11.0,
+		Y:           21.0,
+		Z:           30.0,
+		Zone:        "Aegis_Avenger_Titan_01",
+		ContainerID: "Titan_999",
+	})
+
+	// Player B should also listen
+	hasIntercomB := false
+	for _, ch := range pB.ListeningChannels {
+		if ch == chanName {
+			hasIntercomB = true
+			break
+		}
+	}
+	if !hasIntercomB {
+		t.Error("Expected Bob to automatically listen to ship intercom channel")
+	}
+
+	// 3. Bob leaves the ship
+	testHub.UpdatePosition("Bob", Position{
+		X:           500.0,
+		Y:           500.0,
+		Z:           100.0,
+		Zone:        "planetary_system_stanton",
+		ContainerID: "",
+	})
+
+	// Bob should no longer listen to the intercom channel
+	for _, ch := range pB.ListeningChannels {
+		if ch == chanName {
+			t.Error("Expected Bob to stop listening to intercom after leaving the ship")
+		}
+	}
+
+	// Intercom channel should NOT be deleted because Alice is still there
+	found = false
+	for _, ch := range ServerConfig.ChannelsList {
+		if ch == chanName {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("Expected intercom channel to remain active while Alice is still inside")
+	}
+
+	// 4. Alice leaves the ship
+	testHub.UpdatePosition("Alice", Position{
+		X:           0.0,
+		Y:           0.0,
+		Z:           0.0,
+		Zone:        "planetary_system_stanton",
+		ContainerID: "",
+	})
+
+	// Alice should no longer listen
+	for _, ch := range pA.ListeningChannels {
+		if ch == chanName {
+			t.Error("Expected Alice to stop listening to intercom after leaving the ship")
+		}
+	}
+
+	// ActiveIntercoms should have a pending deletion timer
+	ActiveIntercoms.mu.Lock()
+	timer, hasTimer := ActiveIntercoms.deletions[chanName]
+	ActiveIntercoms.mu.Unlock()
+	if !hasTimer || timer == nil {
+		t.Error("Expected intercom channel to have a pending deletion timer after last player left")
+	}
+
+	// Simulate countdown expiration directly
+	testHub.deleteIntercomChannel(chanName)
+
+	// Intercom channel should be deleted now
+	found = false
+	for _, ch := range ServerConfig.ChannelsList {
+		if ch == chanName {
+			found = true
+			break
+		}
+	}
+	if found {
+		t.Error("Expected intercom channel to be deleted after cooldown execution")
 	}
 }

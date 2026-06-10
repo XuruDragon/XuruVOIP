@@ -3,6 +3,9 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 using XuruVoipClient.Services;
+using XuruVoipClient.Models;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace XuruVoipClient.Tests;
 
@@ -101,5 +104,88 @@ public class AudioPlaybackServiceTests
         {
             Assert.InRange(sample, -1.0f, 1.0f);
         }
+    }
+
+    [Fact]
+    public void AudioPlaybackService_IntercomPriorityDucking_ShouldReduceProximityVolume()
+    {
+        // GIVEN
+        var service = new AudioPlaybackService();
+        var mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 2)) { ReadFully = true };
+        var mixerField = typeof(AudioPlaybackService).GetField("_mixer", BindingFlags.NonPublic | BindingFlags.Instance);
+        mixerField!.SetValue(service, mixer);
+
+        // Generate a valid silent Opus frame
+        var encoder = Concentus.OpusCodecFactory.CreateEncoder(48000, 1, Concentus.Enums.OpusApplication.OPUS_APPLICATION_VOIP);
+        var pcm = new short[960];
+        var outBuf = new byte[4000];
+        int encodedLen = encoder.Encode(pcm, pcm.Length, outBuf, outBuf.Length);
+        var validOpus = new byte[encodedLen];
+        Array.Copy(outBuf, validOpus, encodedLen);
+
+        // Track 1: Pilot transmitting on intercom channel
+        // Pilot is in a cockpit/seat
+        var pilotOpus = validOpus;
+
+        // Track 2: Other player in proximity speaking
+        var playerOpus = validOpus;
+        var metadata = new ProximityMetadata
+        {
+            SpeakerX = 0, SpeakerY = 0, SpeakerZ = 0,
+            Distance = 10f, MaxRange = 50f,
+            SpatialEnabled = false
+        };
+
+        // Enqueue 3 packets for both to fill TargetDelayFrames = 3 in JitterBuffer
+        for (ushort seq = 1; seq <= 3; seq++)
+        {
+            service.ReceiveOpusFrame(
+                playerName: "PilotJoe",
+                opusData: pilotOpus,
+                audioType: 0x01, // Radio (used for Intercom)
+                applyRadioEffect: true,
+                metadata: null,
+                distance: 5.0,
+                speakerZone: "Cockpit_Seat",
+                listenerZone: "Cargo_Bay",
+                seq: seq,
+                isIntercom: true
+            );
+
+            service.ReceiveOpusFrame(
+                playerName: "PlayerBob",
+                opusData: playerOpus,
+                audioType: 0x00, // Proximity
+                applyRadioEffect: false,
+                metadata: metadata,
+                distance: 10.0,
+                speakerZone: "Cargo_Bay",
+                listenerZone: "Cargo_Bay",
+                seq: seq,
+                isIntercom: false
+            );
+        }
+
+        // Track 3: We get the tracks via reflection
+        var tracksField = typeof(AudioPlaybackService).GetField("_tracks", BindingFlags.NonPublic | BindingFlags.Instance);
+        var tracks = (System.Collections.IDictionary)tracksField!.GetValue(service)!;
+        
+        var bobTrack = tracks["PlayerBob"]!;
+        var joeTrack = tracks["PilotJoe"]!;
+
+        var tickMethod = typeof(AudioPlaybackService).GetMethod("TickPlayback", BindingFlags.NonPublic | BindingFlags.Instance);
+        
+        // WHEN
+        tickMethod!.Invoke(service, null);
+
+        // THEN
+        // In Bob's Panning & Volume, Bob is proximity (audioType 0x00).
+        // Since PilotJoe is transmitting on intercom and has "Cockpit" in speakerZone, pilotIntercomActive is true.
+        // Therefore, Bob's track volume factor is multiplied by 0.15f (85% ducked).
+        // Bob's base distance attenuation factor for 10m is 0.8f, so 0.8f * 0.15f = 0.12f.
+        var volumeProp = bobTrack.GetType().GetProperty("Volume");
+        var volumeProvider = (VolumeSampleProvider)volumeProp!.GetValue(bobTrack)!;
+        
+        Assert.Equal(0.12f, volumeProvider.Volume, 3); // 0.8f * 0.15f = 0.12f
     }
 }

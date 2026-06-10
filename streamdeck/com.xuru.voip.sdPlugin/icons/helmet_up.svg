@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Outer Helmet Shell -->
+    <path d="M36 12C23 12 18 20 18 34V46C18 52 23 58 36 58C49 58 54 52 54 46V34C54 20 49 12 36 12Z" fill="none" stroke="#00f0ff" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M18 40H54" stroke="#00f0ff" stroke-width="2"/>
+    <!-- Visor Up / Open (A line outline of the visor pushed up above the forehead) -->
+    <path d="M22 26C25 21 30 19 36 19C42 19 47 21 50 26" fill="none" stroke="#00a2ff" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Face Area Open/Clear indicator (subtle face outline or arrows) -->
+    <path d="M31 38L36 33L41 38" fill="none" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

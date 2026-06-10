@@ -250,6 +250,20 @@
                                       IsChecked="{Binding Config.EnableDiscordRpc, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"/>
+
+                            <CheckBox x:Name="CbEnableCompanionApp"
+                                      Content="{DynamicResource LblEnableCompanionApp}"
+                                      IsChecked="{Binding Config.EnableCompanionApp, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
+                                      Checked="CompanionApp_ToggleChanged" Unchecked="CompanionApp_ToggleChanged"/>
+
+                            <StackPanel x:Name="CompanionPortPanel" Margin="16,4,0,0">
+                                <TextBlock Text="{DynamicResource LblCompanionAppPort}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="TxCompanionPort"
+                                         Text="{Binding Config.CompanionAppPort, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Radio Signal Waves -->
+    <path d="M16 26C19 22 24 19 36 19C48 19 53 22 56 26" fill="none" stroke="#552222" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M22 31C25 28 29 26 36 26C43 26 47 28 50 31" fill="none" stroke="#552222" stroke-width="2" stroke-linecap="round"/>
+    <!-- Mic icon -->
+    <rect x="31" y="32" width="10" height="15" rx="5" fill="#ff3b30" opacity="0.6"/>
+    <path d="M26 39V41C26 45.5 30.5 49 36 49C41.5 49 46 45.5 46 41V39" fill="none" stroke="#ff3b30" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <line x1="36" y1="49" x2="36" y2="55" stroke="#ff3b30" stroke-width="3" opacity="0.6"/>
+    <line x1="28" y1="55" x2="44" y2="55" stroke="#ff3b30" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <!-- Red Slash -->
+    <line x1="18" y1="18" x2="54" y2="54" stroke="#ff3b30" stroke-width="4.5" stroke-linecap="round"/>
+</svg>

@@ -92,6 +92,7 @@ func main() {
 
 	go position.StartPositionsServer(port, certPath, keyPath)
 	go audio.StartAudioServer(audioPort, certPath, keyPath)
+	go audio.StartDiscordBridge()
 
 	// 5. Start player timeout cleanup loop (timeout after 30s)
 	go func() {
@@ -117,6 +118,7 @@ func main() {
 	core.Log("Server shutdown requested...", core.ColorYellow)
 
 	// Close all connections cleanly
+	audio.CloseDiscordBridge()
 	core.ActiveHub.Shutdown()
 
 	core.Log("XuruVoip server stopped cleanly.", core.ColorGreen)

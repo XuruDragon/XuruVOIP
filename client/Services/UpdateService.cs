@@ -55,4 +55,91 @@ public class UpdateService
         }
         return false;
     }
+
+    /// <summary>
+    /// Checks if the application is running from the default Program Files directories,
+    /// indicating it was installed via the MSI installer.
+    /// </summary>
+    public static bool IsInstalledVersion()
+    {
+        try
+        {
+            string exePath = AppDomain.CurrentDomain.BaseDirectory;
+            string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
+            return exePath.StartsWith(programFiles, StringComparison.OrdinalIgnoreCase) ||
+                   exePath.StartsWith(programFilesX86, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            LogService.Error("Failed to check if app is installed version", ex);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Checks if the target version is live on the WinGet catalog.
+    /// </summary>
+    public static async Task<bool> IsVersionAvailableOnWinGetAsync(string versionStr)
+    {
+        try
+        {
+            string cleanVersion = versionStr.TrimStart('v').Trim();
+            
+            // Try with the clean version string first
+            if (await RunWinGetShowCheckAsync(cleanVersion))
+                return true;
+
+            // If it parses as a Version, try formatting it to 4 parts (e.g. 0.2.0 -> 0.2.0.0)
+            if (Version.TryParse(cleanVersion, out var parsedVersion))
+            {
+                string fourDigitVersion = $"{parsedVersion.Major}.{parsedVersion.Minor}.{parsedVersion.Build}.{Math.Max(0, parsedVersion.Revision)}";
+                if (fourDigitVersion != cleanVersion && await RunWinGetShowCheckAsync(fourDigitVersion))
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            LogService.Error("Error checking winget version availability", ex);
+        }
+        return false;
+    }
+
+    private static Task<bool> RunWinGetShowCheckAsync(string version)
+    {
+        var tcs = new TaskCompletionSource<bool>();
+        try
+        {
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "winget",
+                    Arguments = $"show XuruDragon.XuruVOIPClient --version {version}",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                },
+                EnableRaisingEvents = true
+            };
+
+            process.Exited += (sender, args) =>
+            {
+                tcs.SetResult(process.ExitCode == 0);
+                process.Dispose();
+            };
+
+            if (!process.Start())
+            {
+                tcs.SetResult(false);
+            }
+        }
+        catch (Exception)
+        {
+            tcs.SetResult(false);
+        }
+        return tcs.Task;
+    }
 }

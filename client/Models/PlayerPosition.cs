@@ -7,6 +7,8 @@ namespace XuruVoipClient.Models;
 public class PlayerPosition
 {
     public string Zone { get; set; } = "";
+    public string ContainerID { get; set; } = "";
+    public string ContainerName { get; set; } = "";
     public double X { get; set; }
     public double Y { get; set; }
     public double Z { get; set; }

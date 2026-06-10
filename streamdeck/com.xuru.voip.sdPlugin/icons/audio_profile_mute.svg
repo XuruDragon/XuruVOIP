@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- User Avatar Icon on the left -->
+    <circle cx="23" cy="28" r="7" fill="none" stroke="#552222" stroke-width="2"/>
+    <path d="M12 43C12 36 17 35 23 35C29 35 34 36 34 43" fill="none" stroke="#552222" stroke-width="2" stroke-linecap="round"/>
+    <!-- Speaker icon on the right -->
+    <path d="M48 25H44V33H48L53 37V21L48 25Z" fill="#ff3b30" opacity="0.6"/>
+    <path x="56" y="25" d="M56 25C58 27 58 29 58 29C58 29 58 31 56 33" fill="none" stroke="#ff3b30" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    <!-- Red Slash -->
+    <line x1="18" y1="18" x2="54" y2="54" stroke="#ff3b30" stroke-width="4.5" stroke-linecap="round"/>
+</svg>

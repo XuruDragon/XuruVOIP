@@ -3,7 +3,7 @@ name: Release Build
 on:
   workflow_dispatch:
   release:
-    types: [published]
+    types: [created]
 
 permissions:
   contents: write
@@ -88,6 +88,13 @@ jobs:
           if (Test-Path "client/XuruVoipClient-win-x64.zip") {
               Copy-Item "client/XuruVoipClient-win-x64.zip" -Destination release-binaries/XuruVoipClient-win-x64.zip
           }
+          
+          # Stage and package Stream Deck Plugin
+          New-Item -ItemType Directory -Force -Path plugin-staging
+          Copy-Item -Recurse -Path streamdeck/com.xuru.voip.sdPlugin -Destination plugin-staging/com.xuru.voip.sdPlugin
+          Compress-Archive -Path plugin-staging/com.xuru.voip.sdPlugin -DestinationPath release-binaries/com.xuru.voip.zip -Force
+          Rename-Item -Path release-binaries/com.xuru.voip.zip -NewName com.xuru.voip.streamDeckPlugin -Force
+          Remove-Item -Recurse -Force -Path plugin-staging
         shell: pwsh
 
       - name: Build Go Server (win-x64, linux-x64)
@@ -118,5 +125,15 @@ jobs:
           body: ${{ github.event.release.body }}
           files: |
             release-binaries/*
+          draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Publish to WinGet
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: XuruDragon.XuruVOIPClient # Your app package ID in winget format
+          installers-regex: '\.msi$' # Matches the .msi file built during release
+          token: ${{ secrets.GH_TOKEN }}
+          max-versions-to-keep: 5
+

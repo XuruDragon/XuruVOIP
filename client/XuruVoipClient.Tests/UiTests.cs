@@ -1,5 +1,6 @@
 using Xunit;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using XuruVoipClient.Views;
@@ -22,13 +23,14 @@ public class UiTests
             var app = new XuruVoipClient.App { ShutdownMode = ShutdownMode.OnExplicitShutdown };
             app.InitializeComponent();
         }
+        App.SetLanguage("en");
     }
 
     [StaFact]
-    public void SettingsWindow_TabNavigation_ShouldSelectTab()
+    public async Task SettingsWindow_TabNavigation_ShouldSelectTab()
     {
         // GIVEN
-        var vm = new MainViewModel();
+        await using var vm = new MainViewModel();
         var window = new SettingsWindow(vm);
 
         // WHEN
