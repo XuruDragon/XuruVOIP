@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using XuruVoipClient.Services;
@@ -17,6 +18,36 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += (s, args) => HandleCrash(args.ExceptionObject as Exception);
         DispatcherUnhandledException += (s, args) => { HandleCrash(args.Exception); args.Handled = true; };
         TaskScheduler.UnobservedTaskException += (s, args) => { HandleCrash(args.Exception); args.SetObserved(); };
+
+        // Register native DLL resolver for WebRtcVadSharp to support single-file publish
+        NativeLibrary.SetDllImportResolver(typeof(WebRtcVadSharp.WebRtcVad).Assembly, (libraryName, assembly, searchPath) =>
+        {
+            if (libraryName == "WebRtcVad" || libraryName == "WebRtcVad.dll")
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                
+                // 1. Try runtimes/win-x64/native/WebRtcVad.dll
+                string nativePath = Path.Combine(baseDir, "runtimes", "win-x64", "native", "WebRtcVad.dll");
+                if (File.Exists(nativePath))
+                {
+                    if (NativeLibrary.TryLoad(nativePath, out var handle))
+                    {
+                        return handle;
+                    }
+                }
+
+                // 2. Try app root
+                string rootPath = Path.Combine(baseDir, "WebRtcVad.dll");
+                if (File.Exists(rootPath))
+                {
+                    if (NativeLibrary.TryLoad(rootPath, out var handle))
+                    {
+                        return handle;
+                    }
+                }
+            }
+            return IntPtr.Zero;
+        });
 
         try
         {
