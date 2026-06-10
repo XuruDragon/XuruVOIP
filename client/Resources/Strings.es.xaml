@@ -38,6 +38,7 @@
     <sys:String x:Key="BtnConnect">Conectar</sys:String>
     <sys:String x:Key="BtnDisconnect">Desconectar</sys:String>
     <sys:String x:Key="BtnDownload">Descargar</sys:String>
+    <sys:String x:Key="BtnUpdate">Actualizar</sys:String>
     <sys:String x:Key="UpdateBannerText">Nueva versión disponible</sys:String>
 
     <!-- Ventana de Ajustes -->

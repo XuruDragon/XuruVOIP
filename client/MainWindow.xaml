@@ -379,7 +379,7 @@
                                    FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
                         <TextBlock Text=")" Foreground="{StaticResource TextSecondary}" FontSize="11" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <Button Grid.Column="1" Content="{DynamicResource BtnDownload}" 
+                    <Button x:Name="UpdateBtn" Grid.Column="1" Content="{DynamicResource BtnDownload}" 
                             Style="{StaticResource AccentButton}" Padding="10,2" Height="22" FontSize="10"
                             Click="DownloadUpdate_Click"/>
                 </Grid>

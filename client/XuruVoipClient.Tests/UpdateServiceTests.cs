@@ -49,4 +49,24 @@ public class UpdateServiceTests
         // THEN
         Assert.False(result);
     }
+
+    [Fact]
+    public void IsInstalledVersion_RunningFromTestFolder_ReturnsFalse()
+    {
+        // WHEN
+        bool result = UpdateService.IsInstalledVersion();
+
+        // THEN
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task IsVersionAvailableOnWinGetAsync_NonExistentVersion_ReturnsFalse()
+    {
+        // WHEN
+        bool result = await UpdateService.IsVersionAvailableOnWinGetAsync("9.9.9");
+
+        // THEN
+        Assert.False(result);
+    }
 }

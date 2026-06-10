@@ -38,6 +38,7 @@
     <sys:String x:Key="BtnConnect">接続</sys:String>
     <sys:String x:Key="BtnDisconnect">切断</sys:String>
     <sys:String x:Key="BtnDownload">ダウンロード</sys:String>
+    <sys:String x:Key="BtnUpdate">更新</sys:String>
     <sys:String x:Key="UpdateBannerText">新しいバージョンがあります</sys:String>
 
     <!-- Settings Window -->
