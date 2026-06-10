@@ -63,8 +63,9 @@ public class LogServiceTests
             // There should be exactly 5 rotated files
             Assert.Equal(5, files.Length);
 
-            // With 7 rotated files, pruning down to 5 will delete the two oldest files (i = 1 and i = 2)
-            DateTime oldestPermitted = DateTime.Today.AddDays(-10 + 3); // i = 3
+            // With 8 rotated files (6 past files + 1 from Scenario 3 + 1 from Scenario 4),
+            // pruning down to 5 will delete the three oldest files (i = 1, i = 2, and i = 3)
+            DateTime oldestPermitted = DateTime.Today.AddDays(-10 + 4); // i = 4
             string oldestPermittedPath = Path.Combine(tempDir, $"xuru_voip.{oldestPermitted:yyyy-MM-dd}.log");
             Assert.True(File.Exists(oldestPermittedPath));
 
@@ -77,6 +78,62 @@ public class LogServiceTests
             DateTime prunedDate2 = DateTime.Today.AddDays(-10 + 2); // i = 2
             string prunedPath2 = Path.Combine(tempDir, $"xuru_voip.{prunedDate2:yyyy-MM-dd}.log");
             Assert.False(File.Exists(prunedPath2));
+
+            // i = 3 should also be pruned
+            DateTime prunedDate3 = DateTime.Today.AddDays(-10 + 3); // i = 3
+            string prunedPath3 = Path.Combine(tempDir, $"xuru_voip.{prunedDate3:yyyy-MM-dd}.log");
+            Assert.False(File.Exists(prunedPath3));
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+        }
+    }
+
+    [Fact]
+    public void LogService_RotateActiveLog_ShouldHandleSizeBasedRotationAndSuffixes()
+    {
+        // GIVEN: Set up a temporary directory to act as the log folder
+        string tempDir = Path.Combine(Path.GetTempPath(), "XuruVoipSizeTests_" + Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempDir);
+
+        string testLogPath = Path.Combine(tempDir, "xuru_voip.log");
+        DateTime testDate = new DateTime(2026, 6, 10);
+
+        try
+        {
+            // First rotation: should create xuru_voip.2026-06-10.log
+            File.WriteAllText(testLogPath, "First chunk");
+            LogService.RotateActiveLog(tempDir, testLogPath, testDate);
+            Assert.False(File.Exists(testLogPath));
+            
+            string rotatedName1 = "xuru_voip.2026-06-10.log";
+            string rotatedPath1 = Path.Combine(tempDir, rotatedName1);
+            Assert.True(File.Exists(rotatedPath1));
+            Assert.Equal("First chunk", File.ReadAllText(rotatedPath1));
+
+            // Second rotation on the same day: should create xuru_voip.2026-06-10.1.log
+            File.WriteAllText(testLogPath, "Second chunk");
+            LogService.RotateActiveLog(tempDir, testLogPath, testDate);
+            Assert.False(File.Exists(testLogPath));
+
+            string rotatedName2 = "xuru_voip.2026-06-10.1.log";
+            string rotatedPath2 = Path.Combine(tempDir, rotatedName2);
+            Assert.True(File.Exists(rotatedPath2));
+            Assert.Equal("Second chunk", File.ReadAllText(rotatedPath2));
+
+            // Third rotation on the same day: should create xuru_voip.2026-06-10.2.log
+            File.WriteAllText(testLogPath, "Third chunk");
+            LogService.RotateActiveLog(tempDir, testLogPath, testDate);
+            Assert.False(File.Exists(testLogPath));
+
+            string rotatedName3 = "xuru_voip.2026-06-10.2.log";
+            string rotatedPath3 = Path.Combine(tempDir, rotatedName3);
+            Assert.True(File.Exists(rotatedPath3));
+            Assert.Equal("Third chunk", File.ReadAllText(rotatedPath3));
         }
         finally
         {
