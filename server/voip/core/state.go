@@ -2,6 +2,7 @@ package core
 
 import (
 	"math"
+	"net"
 	"strings"
 	"sync"
 	"time"
@@ -14,8 +15,8 @@ type ActivePlayer struct {
 	Name              string
 	PosConn           *websocket.Conn
 	PosMu             sync.Mutex
-	AudioConn         *websocket.Conn
-	AudioMu           sync.Mutex
+	UDPAddr           *net.UDPAddr
+	UDPAddrMu         sync.RWMutex
 	Pos               *Position
 	HelmetOn          bool
 	ActiveChannel     string
@@ -32,6 +33,20 @@ type ActivePlayer struct {
 	LastTalkTime      time.Time
 }
 
+// SafeGetUDPAddr returns the player's UDP address in a thread-safe manner
+func (p *ActivePlayer) SafeGetUDPAddr() *net.UDPAddr {
+	p.UDPAddrMu.RLock()
+	defer p.UDPAddrMu.RUnlock()
+	return p.UDPAddr
+}
+
+// SafeSetUDPAddr sets the player's UDP address in a thread-safe manner
+func (p *ActivePlayer) SafeSetUDPAddr(addr *net.UDPAddr) {
+	p.UDPAddrMu.Lock()
+	defer p.UDPAddrMu.Unlock()
+	p.UDPAddr = addr
+}
+
 // SafeWritePosJSON writes a JSON message to PosConn in a thread-safe manner
 func (p *ActivePlayer) SafeWritePosJSON(msg interface{}) error {
 	p.PosMu.Lock()
@@ -40,26 +55,6 @@ func (p *ActivePlayer) SafeWritePosJSON(msg interface{}) error {
 		return websocket.ErrCloseSent
 	}
 	return p.PosConn.WriteJSON(msg)
-}
-
-// SafeWriteAudioJSON writes a JSON message to AudioConn in a thread-safe manner
-func (p *ActivePlayer) SafeWriteAudioJSON(msg interface{}) error {
-	p.AudioMu.Lock()
-	defer p.AudioMu.Unlock()
-	if p.AudioConn == nil {
-		return websocket.ErrCloseSent
-	}
-	return p.AudioConn.WriteJSON(msg)
-}
-
-// SafeWriteAudioMessage writes a binary/text message to AudioConn in a thread-safe manner
-func (p *ActivePlayer) SafeWriteAudioMessage(messageType int, data []byte) error {
-	p.AudioMu.Lock()
-	defer p.AudioMu.Unlock()
-	if p.AudioConn == nil {
-		return websocket.ErrCloseSent
-	}
-	return p.AudioConn.WriteMessage(messageType, data)
 }
 
 // AdminSession represents a connected administrator connection
@@ -165,37 +160,7 @@ func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel s
 	return ticket
 }
 
-// BindAudioConn validates an audio ticket and binds the audio socket to the player
-func (h *Hub) BindAudioConn(name string, ticket string, conn *websocket.Conn) bool {
-	h.Mu.Lock()
-	defer h.Mu.Unlock()
-
-	p, exists := h.Players[name]
-	if !exists {
-		return false
-	}
-
-	// Validate ticket in constant time and check expiration
-	if p.AudioTicket == "" || time.Now().After(p.TicketExpires) {
-		return false
-	}
-
-	if !ConstantTimeCompare(p.AudioTicket, ticket) {
-		return false
-	}
-
-	// Ticket is valid, bind connection and revoke ticket (one-time use)
-	p.AudioMu.Lock()
-	if p.AudioConn != nil && p.AudioConn != conn {
-		_ = p.AudioConn.Close()
-	}
-	p.AudioConn = conn
-	p.AudioMu.Unlock()
-	p.AudioTicket = "" // Revoke
-	return true
-}
-
-// UnregisterPosConn unregisters a player's position socket and cleans up if both sockets are gone
+// UnregisterPosConn unregisters a player's position socket and cleans up
 func (h *Hub) UnregisterPosConn(conn *websocket.Conn) (string, bool) {
 	h.Mu.Lock()
 	defer h.Mu.Unlock()
@@ -208,41 +173,8 @@ func (h *Hub) UnregisterPosConn(conn *websocket.Conn) (string, bool) {
 		}
 		p.PosMu.Unlock()
 		if isMatch {
-			// If both sockets are gone, or if they haven't bound audio yet and pos is gone, cleanup
-			p.AudioMu.Lock()
-			hasAudio := (p.AudioConn != nil)
-			p.AudioMu.Unlock()
-			if !hasAudio {
-				delete(h.Players, name)
-				return name, true // Fully left
-			}
-			return name, false // Only position socket disconnected
-		}
-	}
-	return "", false
-}
-
-// UnregisterAudioConn unregisters a player's audio socket
-func (h *Hub) UnregisterAudioConn(conn *websocket.Conn) (string, bool) {
-	h.Mu.Lock()
-	defer h.Mu.Unlock()
-
-	for name, p := range h.Players {
-		p.AudioMu.Lock()
-		isMatch := (p.AudioConn == conn)
-		if isMatch {
-			p.AudioConn = nil
-		}
-		p.AudioMu.Unlock()
-		if isMatch {
-			p.PosMu.Lock()
-			hasPos := (p.PosConn != nil)
-			p.PosMu.Unlock()
-			if !hasPos {
-				delete(h.Players, name)
-				return name, true // Fully left
-			}
-			return name, false // Only audio socket disconnected
+			delete(h.Players, name)
+			return name, true // Fully left
 		}
 	}
 	return "", false
@@ -265,13 +197,6 @@ func (h *Hub) KickPlayer(name string) bool {
 	}
 	p.PosMu.Unlock()
 
-	p.AudioMu.Lock()
-	if p.AudioConn != nil {
-		_ = p.AudioConn.Close()
-		p.AudioConn = nil
-	}
-	p.AudioMu.Unlock()
-
 	delete(h.Players, name)
 	return true
 }
@@ -292,13 +217,6 @@ func (h *Hub) KickIP(ip string) {
 				p.PosConn = nil
 			}
 			p.PosMu.Unlock()
-
-			p.AudioMu.Lock()
-			if p.AudioConn != nil {
-				_ = p.AudioConn.Close()
-				p.AudioConn = nil
-			}
-			p.AudioMu.Unlock()
 			delete(h.Players, name)
 		}
 	}
@@ -320,13 +238,6 @@ func (h *Hub) KickHwid(hwid string) {
 				p.PosConn = nil
 			}
 			p.PosMu.Unlock()
-
-			p.AudioMu.Lock()
-			if p.AudioConn != nil {
-				_ = p.AudioConn.Close()
-				p.AudioConn = nil
-			}
-			p.AudioMu.Unlock()
 			delete(h.Players, name)
 		}
 	}
@@ -511,7 +422,7 @@ func (h *Hub) GetAudioPlayersInProximity(senderName string) []*ActivePlayer {
 
 	var players []*ActivePlayer
 	for name, p := range h.Players {
-		if name == senderName || p.AudioConn == nil || p.Pos == nil {
+		if name == senderName || p.SafeGetUDPAddr() == nil || p.Pos == nil {
 			continue
 		}
 
@@ -551,7 +462,7 @@ func (h *Hub) GetAudioPlayersInRadioChannel(senderName string) []*ActivePlayer {
 
 	var players []*ActivePlayer
 	for name, p := range h.Players {
-		if name == senderName || p.AudioConn == nil {
+		if name == senderName || p.SafeGetUDPAddr() == nil {
 			continue
 		}
 
@@ -584,7 +495,7 @@ func (h *Hub) GetAudioPlayersInProfile(senderName string) []*ActivePlayer {
 
 	var players []*ActivePlayer
 	for name, p := range h.Players {
-		if name == senderName || p.AudioConn == nil {
+		if name == senderName || p.SafeGetUDPAddr() == nil {
 			continue
 		}
 		if p.Profile == sender.Profile {
@@ -640,13 +551,6 @@ func (h *Hub) CleanupTimeouts(timeout time.Duration) []string {
 				p.PosConn = nil
 			}
 			p.PosMu.Unlock()
-
-			p.AudioMu.Lock()
-			if p.AudioConn != nil {
-				_ = p.AudioConn.Close()
-				p.AudioConn = nil
-			}
-			p.AudioMu.Unlock()
 			delete(h.Players, name)
 		}
 	}
@@ -735,13 +639,6 @@ func (h *Hub) Shutdown() {
 			p.PosConn = nil
 		}
 		p.PosMu.Unlock()
-
-		p.AudioMu.Lock()
-		if p.AudioConn != nil {
-			_ = p.AudioConn.Close()
-			p.AudioConn = nil
-		}
-		p.AudioMu.Unlock()
 	}
 	for conn := range h.Admins {
 		_ = conn.Close()

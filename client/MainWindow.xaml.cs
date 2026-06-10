@@ -32,8 +32,8 @@ public partial class MainWindow : Window
 
         // Set window title with version
         var version = typeof(MainWindow).Assembly.GetName().Version;
-        string versionStr = version != null ? (version.Revision > 0 ? $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}" : $"{version.Major}.{version.Minor}.{version.Build}") : "1.0.0";
-        string titleBase = FindResource("TitleMain") as string ?? "XuruVoip";
+        string versionStr = version != null ? (version.Revision > 0 ? $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}" : $"{version.Major}.{version.Minor}.{version.Build}") : "0.0.1";
+        string titleBase = FindResource("TitleMain") as string ?? "XuruVOIP";
         string titleText = $"{titleBase} - version {versionStr}";
         Title = titleText;
         WindowTitleText.Text = titleText;

@@ -2,27 +2,20 @@ package audio
 
 import (
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"math"
-	"net/http"
+	"net"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	"github.com/gorilla/websocket"
 	"xuruvoip/server/voip/core"
 )
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true // Allow all origins for local gaming networks
-	},
-}
-
 // Statistics counters (using atomic operations)
 var (
+	udpConn            *net.UDPConn
 	audioTotalBytes    uint64
 	audioTotalFrames   uint64
 	proxFramesTotal    uint64
@@ -35,27 +28,42 @@ var (
 
 // StartAudioServer starts the audio server on the specified port
 func StartAudioServer(port int, certFile, keyFile string) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", handleAudioWS)
-
-	server := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", core.BindIP, port),
-		Handler: mux,
+	// TLS certs are not used for raw UDP audio packets, but parameters are kept to preserve main.go interface
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", core.BindIP, port))
+	if err != nil {
+		core.Log(fmt.Sprintf("Failed to resolve UDP address: %v", err), core.ColorRed)
+		return
 	}
 
-	core.Log(fmt.Sprintf("Starting audio server on %s:%d (WSS)...", core.BindIP, port), core.ColorBlue)
+	conn, err := net.ListenUDP("udp", addr)
+	if err != nil {
+		core.Log(fmt.Sprintf("Failed to listen on UDP port %d: %v", port, err), core.ColorRed)
+		return
+	}
+	udpConn = conn
+	defer conn.Close()
+
+	core.Log(fmt.Sprintf("Starting UDP audio server on %s:%d...", core.BindIP, port), core.ColorBlue)
 	go reportStatsLoop()
 	go sweepTalkingLoop()
 
-	var err error
-	if certFile != "" && keyFile != "" {
-		err = server.ListenAndServeTLS(certFile, keyFile)
-	} else {
-		err = server.ListenAndServe()
-	}
+	buf := make([]byte, 65535)
+	for {
+		n, remoteAddr, err := conn.ReadFromUDP(buf)
+		if err != nil {
+			if strings.Contains(err.Error(), "use of closed network connection") {
+				break
+			}
+			continue
+		}
 
-	if err != nil {
-		core.Log(fmt.Sprintf("Audio server error: %v", err), core.ColorRed)
+		if n < 1 {
+			continue
+		}
+
+		packet := make([]byte, n)
+		copy(packet, buf[:n])
+		go handleUDPPacket(packet, remoteAddr)
 	}
 }
 
@@ -84,10 +92,7 @@ func reportStatsLoop() {
 		core.ActiveHub.Mu.RLock()
 		clientCount := 0
 		for _, p := range core.ActiveHub.Players {
-			p.AudioMu.Lock()
-			hasAudio := (p.AudioConn != nil)
-			p.AudioMu.Unlock()
-			if hasAudio {
+			if p.SafeGetUDPAddr() != nil {
 				clientCount++
 			}
 		}
@@ -153,286 +158,255 @@ func reportStatsLoop() {
 	}
 }
 
-func handleAudioWS(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
+func handleUDPPacket(packet []byte, remoteAddr *net.UDPAddr) {
+	ip := remoteAddr.IP.String()
+	packetType := packet[0]
+
+	// 1. Handshake & Registration packet: [0xFF] [NameLen] [Name (NameLen)] [AudioTicket (32)]
+	if packetType == 0xFF {
+		if len(packet) < 2 {
+			return
+		}
+		nameLen := int(packet[1])
+		if len(packet) < 2+nameLen+32 {
+			return
+		}
+		name := string(packet[2 : 2+nameLen])
+		ticket := string(packet[2+nameLen : 2+nameLen+32])
+
+		if core.AudioLockout.IsBanned(ip) {
+			core.Log(fmt.Sprintf("REJECT UDP Audio: IP %s temporarily banned", ip), core.ColorRed)
+			return
+		}
+
+		core.ActiveHub.Mu.RLock()
+		player, exists := core.ActiveHub.Players[name]
+		core.ActiveHub.Mu.RUnlock()
+
+		if !exists {
+			core.AudioLockout.RecordFailure(ip)
+			core.Log(fmt.Sprintf("REJECT UDP Audio: Invalid registration from %s (unknown client: %s)", ip, name), core.ColorRed)
+			return
+		}
+
+		// Validate ticket
+		if player.AudioTicket == "" || !core.ConstantTimeCompare(ticket, player.AudioTicket) {
+			core.AudioLockout.RecordFailure(ip)
+			core.Log(fmt.Sprintf("REJECT UDP Audio: Invalid/expired ticket from %s (client: %s). Got: '%s', Expected: '%s'", ip, name, ticket, player.AudioTicket), core.ColorRed)
+			return
+		}
+
+		core.AudioLockout.RecordSuccess(ip)
+		player.SafeSetUDPAddr(remoteAddr)
+		core.Log(fmt.Sprintf("JOIN UDP Audio: %s (%s)", name, ip), core.ColorGreen)
+
+		// Reply ACK: [0xFE]
+		if udpConn != nil {
+			_, _ = udpConn.WriteToUDP([]byte{0xFE}, remoteAddr)
+		}
 		return
 	}
-	defer conn.Close()
 
-	ip := core.ExtractIP(r.RemoteAddr)
-
-	// Check brute force lockout
-	if core.AudioLockout.IsBanned(ip) {
-		core.Log(fmt.Sprintf("REJECT Audio: IP %s temporarily banned", ip), core.ColorRed)
-		_ = conn.WriteControl(
-			websocket.CloseMessage,
-			websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "banned"),
-			time.Now().Add(time.Second),
-		)
+	// 2. Audio Processing (Rate Limited)
+	if !core.AudioLimit.Allow(ip) {
 		return
 	}
 
-	// 1. Read first authentication join message
-	_, payload, err := conn.ReadMessage()
-	if err != nil {
+	// Audio Format: [Seq (2)] [AudioType (1)] [OpusPayload]
+	if len(packet) < 3 {
 		return
 	}
 
-	var base core.MessageBase
-	if err := json.Unmarshal(payload, &base); err != nil {
+	seq := binary.BigEndian.Uint16(packet[0:2])
+	audioType := packet[2]
+	audioData := packet[3:]
+
+	// Resolve sender by UDP address
+	var senderName string
+	var sender *core.ActivePlayer
+
+	core.ActiveHub.Mu.RLock()
+	for name, p := range core.ActiveHub.Players {
+		addr := p.SafeGetUDPAddr()
+		if addr != nil && addr.String() == remoteAddr.String() {
+			senderName = name
+			sender = p
+			break
+		}
+	}
+	core.ActiveHub.Mu.RUnlock()
+
+	if sender == nil {
+		// Drop packets from unregistered UDP ports
 		return
 	}
 
-	if base.Type != "join" {
-		_ = conn.WriteControl(
-			websocket.CloseMessage,
-			websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "invalid_initial_message"),
-			time.Now().Add(time.Second),
-		)
-		return
+	// Update player talking state
+	core.ActiveHub.Mu.Lock()
+	var broadcastTalkingMsg bool
+	var isTalkingVal bool
+	if len(audioData) > 0 {
+		if !sender.IsTalking {
+			sender.IsTalking = true
+			broadcastTalkingMsg = true
+			isTalkingVal = true
+		}
+		sender.LastTalkTime = time.Now()
+	} else {
+		if sender.IsTalking {
+			sender.IsTalking = false
+			broadcastTalkingMsg = true
+			isTalkingVal = false
+		}
 	}
+	core.ActiveHub.Mu.Unlock()
 
-	var msg core.MsgJoin
-	if err := json.Unmarshal(payload, &msg); err != nil {
-		return
-	}
-
-	// Validate token
-	if !core.PublicServer && core.ServerConfig.ServerToken != "" && !core.ConstantTimeCompare(msg.Token, core.ServerConfig.ServerToken) {
-		core.AudioLockout.RecordFailure(ip)
-		core.Log(fmt.Sprintf("REJECT Audio: Invalid token from %s (client: %s)", ip, msg.Name), core.ColorRed)
-		_ = conn.WriteJSON(core.MsgError{
-			Type:    "error",
-			Reason:  "invalid_token",
-			Message: "Invalid server token",
+	if broadcastTalkingMsg {
+		core.ActiveHub.BroadcastToAdmins(core.MsgPlayerTalking{
+			Type:      "talking",
+			Name:      senderName,
+			IsTalking: isTalkingVal,
 		})
+	}
+
+	atomic.AddUint64(&audioTotalBytes, uint64(len(packet)))
+	atomic.AddUint64(&audioTotalFrames, 1)
+
+	// Resolve recipients
+	var targets []*core.ActivePlayer
+	switch audioType {
+	case core.AudioTypeProximity:
+		targets = core.ActiveHub.GetAudioPlayersInProximity(senderName)
+		if core.VerboseLogs >= 2 {
+			atomic.AddUint64(&proxFramesTotal, 1)
+		}
+	case core.AudioTypeRadio:
+		targets = core.ActiveHub.GetAudioPlayersInRadioChannel(senderName)
+		if core.VerboseLogs >= 2 {
+			atomic.AddUint64(&radioFramesTotal, 1)
+		}
+		if core.VerboseLogs >= 3 {
+			core.ActiveHub.Mu.RLock()
+			ch := sender.ActiveChannel
+			core.ActiveHub.Mu.RUnlock()
+			if ch != "" {
+				statsMu.Lock()
+				radioChannelFrames[ch]++
+				statsMu.Unlock()
+			}
+		}
+	case core.AudioTypeProfile:
+		targets = core.ActiveHub.GetAudioPlayersInProfile(senderName)
+		if core.VerboseLogs >= 2 {
+			atomic.AddUint64(&profileFramesTotal, 1)
+		}
+		if core.VerboseLogs >= 3 {
+			core.ActiveHub.Mu.RLock()
+			prof := sender.Profile
+			core.ActiveHub.Mu.RUnlock()
+			if prof != "" {
+				statsMu.Lock()
+				profileFrames[prof]++
+				statsMu.Unlock()
+			}
+		}
+	}
+
+	if len(targets) == 0 {
 		return
 	}
 
-	// Validate ticket and bind audio socket
-	name := strings.TrimSpace(msg.Name)
-	if ok := core.ActiveHub.BindAudioConn(name, msg.AudioTicket, conn); !ok {
-		core.AudioLockout.RecordFailure(ip)
-		core.Log(fmt.Sprintf("REJECT Audio: Invalid or expired ticket from %s (client: %s)", ip, name), core.ColorRed)
-		_ = conn.WriteJSON(core.MsgError{
-			Type:    "error",
-			Reason:  "invalid_ticket",
-			Message: "Invalid or expired ticket. Connect to the position server first.",
-		})
-		return
-	}
-
-	core.AudioLockout.RecordSuccess(ip)
-	core.Log(fmt.Sprintf("JOIN Audio: %s (%s)", name, ip), core.ColorGreen)
-
-	// Binary packet header buffer preparation
-	nameBytes := []byte(name)
+	nameBytes := []byte(senderName)
 	nameLen := len(nameBytes)
 	if nameLen > 255 {
 		nameBytes = nameBytes[:255]
 		nameLen = 255
 	}
 
-	// Audio message processing loop
-	for {
-		mt, payload, err := conn.ReadMessage()
-		if err != nil {
-			break
-		}
-
-		// Rate Limiting
-		if !core.AudioLimit.Allow(conn) {
-			continue
-		}
-
-		if mt == websocket.BinaryMessage {
-			if len(payload) < 2 {
-				continue
-			}
-
-			// Packet structure: [AudioType (1 byte)] + [AudioData]
-			audioType := payload[0]
-			audioData := payload[1:]
-
-			// Update player talking state
-			core.ActiveHub.Mu.Lock()
-			player, ok := core.ActiveHub.Players[name]
-			var broadcastTalkingMsg bool
-			var isTalkingVal bool
-			if ok {
-				if len(audioData) > 0 {
-					if !player.IsTalking {
-						player.IsTalking = true
-						broadcastTalkingMsg = true
-						isTalkingVal = true
-					}
-					player.LastTalkTime = time.Now()
-				} else {
-					if player.IsTalking {
-						player.IsTalking = false
-						broadcastTalkingMsg = true
-						isTalkingVal = false
-					}
-				}
-			}
-			core.ActiveHub.Mu.Unlock()
-
-			if broadcastTalkingMsg {
-				core.ActiveHub.BroadcastToAdmins(core.MsgPlayerTalking{
-					Type:      "talking",
-					Name:      name,
-					IsTalking: isTalkingVal,
-				})
-			}
-
-			atomic.AddUint64(&audioTotalBytes, uint64(len(payload)))
-			atomic.AddUint64(&audioTotalFrames, 1)
-
-			// Resolve recipient audio sockets based on transmission type
-			var targets []*core.ActivePlayer
-			switch audioType {
-			case core.AudioTypeProximity:
-				targets = core.ActiveHub.GetAudioPlayersInProximity(name)
-				if core.VerboseLogs >= 2 {
-					atomic.AddUint64(&proxFramesTotal, 1)
-				}
-			case core.AudioTypeRadio:
-				targets = core.ActiveHub.GetAudioPlayersInRadioChannel(name)
-				if core.VerboseLogs >= 2 {
-					atomic.AddUint64(&radioFramesTotal, 1)
-				}
-				if core.VerboseLogs >= 3 {
-					core.ActiveHub.Mu.RLock()
-					p, ok := core.ActiveHub.Players[name]
-					ch := ""
-					if ok {
-						ch = p.ActiveChannel
-					}
-					core.ActiveHub.Mu.RUnlock()
-					if ch != "" {
-						statsMu.Lock()
-						radioChannelFrames[ch]++
-						statsMu.Unlock()
-					}
-				}
-			case core.AudioTypeProfile:
-				targets = core.ActiveHub.GetAudioPlayersInProfile(name)
-				if core.VerboseLogs >= 2 {
-					atomic.AddUint64(&profileFramesTotal, 1)
-				}
-				if core.VerboseLogs >= 3 {
-					core.ActiveHub.Mu.RLock()
-					p, ok := core.ActiveHub.Players[name]
-					prof := ""
-					if ok {
-						prof = p.Profile
-					}
-					core.ActiveHub.Mu.RUnlock()
-					if prof != "" {
-						statsMu.Lock()
-						profileFrames[prof]++
-						statsMu.Unlock()
-					}
-				}
-			}
-
-			if len(targets) == 0 {
-				continue
-			}
-
-			if audioType == core.AudioTypeProximity {
-				// Proximity audio: send custom packet to each target with distance/maxRange/position metadata
-				core.ActiveHub.Mu.RLock()
-				sender, senderExists := core.ActiveHub.Players[name]
-				core.ActiveHub.Mu.RUnlock()
-				if !senderExists || sender.Pos == nil {
-					continue
-				}
-
-				// Metadata size: SpatialEnabled (1), Distance (4), MaxRange (4)
-				metaSize := 1 + 4 + 4
-				if core.SpatialAudioEnabled {
-					metaSize += 12 // SpeakerX, SpeakerY, SpeakerZ (float32)
-				}
-
-				for _, targetPlayer := range targets {
-					if targetPlayer.Pos == nil {
-						continue
-					}
-
-					dx := sender.Pos.X - targetPlayer.Pos.X
-					dy := sender.Pos.Y - targetPlayer.Pos.Y
-					dz := sender.Pos.Z - targetPlayer.Pos.Z
-					dist := math.Sqrt(dx*dx + dy*dy + dz*dz)
-
-					maxRange := 50.0
-					if sender.ProxShort || targetPlayer.ProxShort {
-						maxRange = 5.0
-					}
-
-					// Build custom packet
-					packet := make([]byte, 2+nameLen+metaSize+len(audioData))
-					packet[0] = core.AudioTypeProximity
-					packet[1] = byte(nameLen)
-					copy(packet[2:], nameBytes)
-
-					offset := 2 + nameLen
-					if core.SpatialAudioEnabled {
-						packet[offset] = 1
-					} else {
-						packet[offset] = 0
-					}
-
-					binary.LittleEndian.PutUint32(packet[offset+1:], math.Float32bits(float32(dist)))
-					binary.LittleEndian.PutUint32(packet[offset+5:], math.Float32bits(float32(maxRange)))
-
-					if core.SpatialAudioEnabled {
-						binary.LittleEndian.PutUint32(packet[offset+9:], math.Float32bits(float32(sender.Pos.X)))
-						binary.LittleEndian.PutUint32(packet[offset+13:], math.Float32bits(float32(sender.Pos.Y)))
-						binary.LittleEndian.PutUint32(packet[offset+17:], math.Float32bits(float32(sender.Pos.Z)))
-					}
-
-					copy(packet[2+nameLen+metaSize:], audioData)
-
-					_ = targetPlayer.SafeWriteAudioMessage(websocket.BinaryMessage, packet)
-				}
-			} else {
-				// Radio or Profile audio: send same broadcastPacket to all targets
-				broadcastPacket := make([]byte, 2+nameLen+len(audioData))
-				broadcastPacket[0] = audioType
-				broadcastPacket[1] = byte(nameLen)
-				copy(broadcastPacket[2:], nameBytes)
-				copy(broadcastPacket[2+nameLen:], audioData)
-
-				// Relaying audio packet to target clients
-				for _, targetPlayer := range targets {
-					_ = targetPlayer.SafeWriteAudioMessage(websocket.BinaryMessage, broadcastPacket)
-				}
-			}
-
-		} else if mt == websocket.TextMessage {
-			var m core.MessageBase
-			if err := json.Unmarshal(payload, &m); err == nil && m.Type == "ping" {
-				core.ActiveHub.Mu.RLock()
-				p, ok := core.ActiveHub.Players[name]
-				core.ActiveHub.Mu.RUnlock()
-				if ok {
-					_ = p.SafeWriteAudioJSON(core.MsgPong{Type: "pong"})
-				}
-			}
-		}
+	if udpConn == nil {
+		return
 	}
 
-	// Disconnection cleanup
-	if leftName, fullyLeft := core.ActiveHub.UnregisterAudioConn(conn); leftName != "" {
-		core.AudioLimit.Forget(conn)
-		if fullyLeft {
-			core.Log(fmt.Sprintf("LEAVE: %s (disconnected)", leftName), core.ColorOrange)
-			core.ActiveHub.BroadcastPosMessageToAll(core.MsgPlayerLeave{
-				Type: "leave",
-				Name: leftName,
-			})
+	if audioType == core.AudioTypeProximity {
+		// Proximity audio: package sender coordinates and relative distance
+		core.ActiveHub.Mu.RLock()
+		if sender.Pos == nil {
+			core.ActiveHub.Mu.RUnlock()
+			return
+		}
+		senderPos := *sender.Pos
+		senderProxShort := sender.ProxShort
+		core.ActiveHub.Mu.RUnlock()
+
+		metaSize := 1 + 4 + 4
+		if core.SpatialAudioEnabled {
+			metaSize += 12
+		}
+
+		for _, targetPlayer := range targets {
+			targetAddr := targetPlayer.SafeGetUDPAddr()
+			core.ActiveHub.Mu.RLock()
+			targetPos := targetPlayer.Pos
+			targetProxShort := targetPlayer.ProxShort
+			core.ActiveHub.Mu.RUnlock()
+
+			if targetAddr == nil || targetPos == nil {
+				continue
+			}
+
+			dx := senderPos.X - targetPos.X
+			dy := senderPos.Y - targetPos.Y
+			dz := senderPos.Z - targetPos.Z
+			dist := math.Sqrt(dx*dx + dy*dy + dz*dz)
+
+			maxRange := 50.0
+			if senderProxShort || targetProxShort {
+				maxRange = 5.0
+			}
+
+			// Format: [Seq (2)] [AudioType (1)] [NameLen (1)] [Name (NameLen)] [SpatialEnabled (1)] [Distance (4)] [MaxRange (4)] [SpeakerX/Y/Z (12 - optional)] [AudioData]
+			packetToSend := make([]byte, 2+1+1+nameLen+metaSize+len(audioData))
+			binary.BigEndian.PutUint16(packetToSend[0:2], seq)
+			packetToSend[2] = core.AudioTypeProximity
+			packetToSend[3] = byte(nameLen)
+			copy(packetToSend[4:], nameBytes)
+
+			offset := 4 + nameLen
+			if core.SpatialAudioEnabled {
+				packetToSend[offset] = 1
+			} else {
+				packetToSend[offset] = 0
+			}
+
+			binary.LittleEndian.PutUint32(packetToSend[offset+1:], math.Float32bits(float32(dist)))
+			binary.LittleEndian.PutUint32(packetToSend[offset+5:], math.Float32bits(float32(maxRange)))
+
+			if core.SpatialAudioEnabled {
+				binary.LittleEndian.PutUint32(packetToSend[offset+9:], math.Float32bits(float32(senderPos.X)))
+				binary.LittleEndian.PutUint32(packetToSend[offset+13:], math.Float32bits(float32(senderPos.Y)))
+				binary.LittleEndian.PutUint32(packetToSend[offset+17:], math.Float32bits(float32(senderPos.Z)))
+			}
+
+			copy(packetToSend[offset+metaSize:], audioData)
+
+			_, _ = udpConn.WriteToUDP(packetToSend, targetAddr)
+		}
+	} else {
+		// Radio / Profile audio: Broadcast directly
+		// Format: [Seq (2)] [AudioType (1)] [NameLen (1)] [Name (NameLen)] [AudioData]
+		packetToSend := make([]byte, 2+1+1+nameLen+len(audioData))
+		binary.BigEndian.PutUint16(packetToSend[0:2], seq)
+		packetToSend[2] = audioType
+		packetToSend[3] = byte(nameLen)
+		copy(packetToSend[4:], nameBytes)
+		copy(packetToSend[4+nameLen:], audioData)
+
+		for _, targetPlayer := range targets {
+			targetAddr := targetPlayer.SafeGetUDPAddr()
+			if targetAddr == nil {
+				continue
+			}
+			_, _ = udpConn.WriteToUDP(packetToSend, targetAddr)
 		}
 	}
 }

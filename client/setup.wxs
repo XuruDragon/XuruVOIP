@@ -5,13 +5,13 @@
     <?define GuidExecutable = "b4a7818a-7e3e-4f11-9a74-d4b9b9c9d4b9" ?>
     <?define GuidVad = "c3b8829b-8f4f-4e12-8b85-e5caba0aba0a" ?>
 
-    <Product Id="*" Name="XuruVoip Client" Language="1033" Version="$(var.Version)" Manufacturer="XuruDragon" UpgradeCode="a9f8f237-7756-4c4f-8321-7299a9b6c437">
+    <Product Id="*" Name="XuruVOIP Client" Language="1033" Version="$(var.Version)" Manufacturer="XuruDragon" UpgradeCode="a9f8f237-7756-4c4f-8321-7299a9b6c437">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
 
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <MediaTemplate EmbedCab="yes" />
 
-        <Feature Id="ProductFeature" Title="XuruVoip Client" Level="1">
+        <Feature Id="ProductFeature" Title="XuruVOIP Client" Level="1">
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="WebRtcVadDll" />
             <ComponentRef Id="TesseractDlls" />

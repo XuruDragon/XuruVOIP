@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <DebugType>embedded</DebugType>
-    <AssemblyName>XuruVoipClient</AssemblyName>
+    <AssemblyName>XuruVOIPClient</AssemblyName>
     <RootNamespace>XuruVoipClient</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- Publish settings for standalone single exe -->
