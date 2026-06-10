@@ -299,6 +299,33 @@ XURUVOIP_DISCORD_CHANNEL_ID=seu_id_do_canal_de_voz_do_discord
 XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
+### 🎛️ Guia de Configuração da Ponte de Voz do Discord
+
+Para interligar um canal de rádio do servidor Go local a um canal de voz do Discord, siga estes passos de configuração:
+
+1. **Criar uma Aplicação de Bot do Discord:**
+   * Visite o [Portal de Desenvolvedores do Discord](https://discord.com/developers/applications) e inicie sessão.
+   * Clique em **New Application**, dê-lhe um nome (ex. `XuruVOIP Bridge`) e clique em **Create**.
+   * Vá para o separador **Bot** no menu lateral esquerdo, clique em **Reset Token** e copie o **Token** gerado. Cole-o como `XURUVOIP_DISCORD_TOKEN` no ficheiro `.env` do seu servidor.
+   * Na secção **Privileged Gateway Intents** dessa mesma página, ative o **Message Content Intent** (necessário para ler comandos específicos).
+
+2. **Convidar o Bot para o seu Servidor do Discord:**
+   * Aceda ao separador **OAuth2** e selecione **URL Generator**.
+   * Em **Scopes**, selecione `bot` e `applications.commands`.
+   * Em **Bot Permissions**, selecione os seguintes privilégios:
+     * *Permissões Gerais:* `View Channels`
+     * *Permissões de Texto:* `Send Messages`
+     * *Permissões de Voz:* `Connect`, `Speak`, `Use Voice Activity`
+   * Copie o URL gerado no fundo da página, cole-o num navegador Web, selecione o seu servidor do Discord e clique em **Autorizar**.
+
+3. **Obter IDs do Servidor (Guild) e do Canal de Voz:**
+   * Abra o Discord, vá a **Definições de Utilizador** -> **Avançado** e ative o **Modo de Programador**.
+   * Clique com o botão direito do rato no ícone do seu servidor do Discord na lista de servidores e selecione **Copiar ID do servidor** (Guild ID). Cole como `XURUVOIP_DISCORD_GUILD_ID` no ficheiro `.env`.
+   * Clique com o botão direito do rato no canal de voz de destino e selecione **Copiar ID do canal**. Cole como `XURUVOIP_DISCORD_CHANNEL_ID` no ficheiro `.env`.
+
+4. **Mapear Canal de Rádio Go:**
+   * Configure `XURUVOIP_DISCORD_BRIDGE_CHANNEL` com o nome exato do canal de rádio Go que deseja interligar (ex. `General`, `Bravo`, `Alpha`, etc.). Qualquer áudio transmitido nesta frequência de rádio do Go será retransmitido bidirecionalmente para o canal de voz do Discord!
+
 ### Compilar o Servidor a partir das fontes
 
 #### Linux
@@ -489,6 +516,43 @@ Como os ficheiros não possuem assinatura digital comercial, o SmartScreen do Wi
 
 ---
 
-## 👥 Créditos
+## 📱 Integração com a Aplicação Companion e Stream Deck
+
+O XuruVOIP inclui um serviço Web local da aplicação Companion e um plugin oficial do Stream Deck que permitem monitorizar e acionar ações de voz diretamente a partir de dispositivos secundários ou teclas físicas.
+
+### 1. Ativar a Aplicação Companion
+Por predefinição, o servidor HTTP local da aplicação Companion está desativado para poupar recursos do sistema. Para o ativar:
+1. Abra o cliente XuruVOIP e clique no ícone **Definições** (Settings).
+2. No separador **Geral** (General), marque a caixa **Ativar servidor HTTP Companion** (Enable Companion HTTP Server).
+3. Em **Porta do servidor Companion** (Companion Server Port), pode personalizar o número da porta (predefinição: `8891`).
+4. Clique em **Guardar e Fechar** (ou Save & Close). O servidor HTTP será iniciado localmente. Pode abrir `http://localhost:8891` em qualquer navegador do seu PC ou dispositivo móvel para aceder ao painel de controlo.
+
+---
+
+### 2. Instalação do Plugin do Stream Deck
+O pacote de lançamento inclui o ficheiro `.streamDeckPlugin` pré-embalado.
+1. Transfira `com.xuru.voip.streamDeckPlugin` a partir da [página de lançamentos](https://github.com/XuruDragon/XuruVOIP/releases).
+2. Clique duas vezes no ficheiro para o instalar diretamente no seu software Elgato Stream Deck.
+   *(Em alternativa, pode extrair e copiar manualmente a pasta `com.xuru.voip.sdPlugin` para `%appdata%\Elgato\StreamDeck\Plugins\`)*
+3. Depois de instalado, uma nova categoria de ações chamada **XuruVOIP** aparecerá na lista do lado direito da sua aplicação de ambiente de trabalho Stream Deck.
+
+---
+
+### 3. Adicionar e Configurar Ações
+Pode arrastar e largar qualquer uma das seguintes 8 ações nas suas teclas do Stream Deck:
+* 🎤 **Proximity Mute**: Ativa/desativa o silenciamento do microfone de proximidade.
+* 📻 **Radio Mute**: Ativa/desavita o silenciamento do microfone de rádio.
+* 👤 **Profile Mute**: Ativa/desativa o silenciamento do microfone de perfil.
+* 🔊 **Audio Proximity Mute**: Ativa/desativa o silenciamento do áudio de proximidade recebido.
+* 🔊 **Audio Radio Mute**: Ativa/desativa o silenciamento do áudio de rádio recebido.
+* 🔊 **Audio Profile Mute**: Ativa/desativa o silenciamento do áudio de perfil recebido.
+* 🪖 **Toggle Helmet**: Abre ou fecha a viseira do seu capacete.
+* 🔄 **Cycle Radio**: Alterna entre os canais de rádio disponíveis.
+
+#### Configuração (Property Inspector):
+Para cada ação arrastada para uma tecla, clique nela e configure a porta de destino no painel **Property Inspector** na parte inferior:
+* Defina **Companion Port** para corresponder à porta configurada nas definições do seu cliente WPF (predefinição: `8891`).
+* **Feedback Dinâmico:** Os interruptores (como Proximity Mute) atualizam o seu ícone em tempo real no seu dispositivo para mostrar se o estado está ativo (ícone ciano brilhante) ou silenciado (ícone laranja riscado).
+* **Exibição de Frequência ao Vivo:** A tecla **Cycle Radio** apresentará dinamicamente o nome do canal de rádio ativo (ex. `120.5` o `General`) diretamente na tecla física em tempo real!## 👥 Créditos
 
 Desenvolvido por **[@XuruDragon](https://github.com/XuruDragon)** em colaboração com **Antigravity IDE**.

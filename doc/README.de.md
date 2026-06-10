@@ -316,6 +316,33 @@ XURUVOIP_DISCORD_CHANNEL_ID=ihr_discord_channel_id
 XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
+### 🎛️ Discord-Sprachbrücke Einrichtungsanleitung
+
+Gehen Sie wie folgt vor, um einen lokalen Go-Server-Funkkanal mit einem Discord-Sprachkanal zu verbinden:
+
+1. **Erstellen Sie eine Discord-Bot-Anwendung:**
+   * Besuchen Sie das [Discord Developer Portal](https://discord.com/developers/applications) und melden Sie sich an.
+   * Klicken Sie auf **New Application**, geben Sie einen Namen ein (z. B. `XuruVOIP Bridge`) und klicken Sie auf **Create**.
+   * Gehen Sie auf der linken Seite zum Reiter **Bot**, klicken Sie auf **Reset Token** und kopieren Sie das generierte **Bot-Token**. Fügen Sie dieses als `XURUVOIP_DISCORD_TOKEN` in Ihre `.env`-Datei ein.
+   * Aktivieren Sie auf derselben Bot-Seite unter **Privileged Gateway Intents** den **Message Content Intent** (erforderlich zum Lesen von Befehlen).
+
+2. **Laden Sie den Bot auf Ihren Discord-Server in:**
+   * Gehen Sie zum Reiter **OAuth2** und wählen Sie **URL Generator**.
+   * Wählen Sie unter **Scopes** die Optionen `bot` und `applications.commands`.
+   * Wählen Sie unter **Bot Permissions** die folgenden Berechtigungen:
+     * *Allgemeine Berechtigungen:* `View Channels`
+     * *Text-Berechtigungen:* `Send Messages`
+     * *Sprach-Berechtigungen:* `Connect`, `Speak`, `Use Voice Activity`
+   * Kopieren Sie die generierte URL am Ende der Seite, öffnen Sie sie im Webbrowser, wählen Sie Ihren Discord-Server aus und klicken Sie auf **Autorisieren**.
+
+3. **Server- (Guild) & Sprachkanal-IDs abrufen:**
+   * Öffnen Sie Discord, gehen Sie zu **Benutzereinstellungen** -> **Erweitert** und aktivieren Sie den **Entwicklermodus**.
+   * Klicken Sie mit der rechten Maustaste auf Ihr Discord-Server-Symbol in der Liste und wählen Sie **Server-ID kopieren** (dies ist die Guild-ID). Fügen Sie sie als `XURUVOIP_DISCORD_GUILD_ID` in `.env` ein.
+   * Klicken Sie mit der rechten Maustaste auf den Ziel-Sprachkanal und wählen Sie **Kanal-ID kopieren**. Fügen Sie sie als `XURUVOIP_DISCORD_CHANNEL_ID` in `.env` ein.
+
+4. **Go-Server-Funkkanal zuweisen:**
+   * Konfigurieren Sie `XURUVOIP_DISCORD_BRIDGE_CHANNEL` auf den genauen Namen des Funkkanals, den Sie verbinden möchten (z. B. `General`, `Bravo`, `Alpha` usw.). Jedes Audio, das auf dieser Funkfrequenz übertragen wird, wird bidirektional an den Discord-Sprachkanal übertragen!
+
 ### Server kompilieren
 
 #### Linux
@@ -492,6 +519,47 @@ Da die Installationsdateien und ausführbaren Dateien nicht digital signiert sin
      - Aktivieren Sie im Eigenschaftenfenster unter der Registerkarte *Allgemein* unten das Kontrollkästchen **Zulassen** (Sperre aufheben).
      - Klicken Sie auf **Übernehmen** und schließen Sie das Eigenschaftenfenster.
   4. Starten Sie das Programm direkt per Doppelklick auf `XuruVoipClient.exe`, ohne es zu installieren.
+
+---
+
+## 📱 Begleit-App & Stream-Deck-Integration
+
+XuruVOIP enthält einen integrierten Begleit-App-Webdienst und ein offizielles Stream-Deck-Plugin, mit dem Sie Sprachaktionen direkt von sekundären Geräten oder physischen Tasten aus überwachen und auslösen können.
+
+### 1. Aktivieren der Begleit-App
+Standardmäßig ist der lokale HTTP-Server der Begleit-App deaktiviert, um Systemressourcen zu sparen. So aktivieren Sie ihn:
+1. Öffnen Sie den XuruVOIP-Client und klicken Sie auf das **Einstellungen**-Symbol (Zahnrad).
+2. Aktivieren Sie im Reiter **Allgemein** das Kontrollkästchen **Begleit-App HTTP-Server aktivieren**.
+3. Unter **Begleit-Server Port** können Sie die Portnummer anpassen (Standard: `8891`).
+4. Klicken Sie auf **Sauvegarder & Fermer** (bzw. Speichern & Schließen), um die Einstellungen anzuwenden. Der HTTP-Server startet nun lokal. Sie können `http://localhost:8891` in jedem Browser auf Ihrem PC oder Mobilgerät öffnen, um auf das Web-Dashboard zuzugreifen.
+
+---
+
+### 2. Stream-Deck-Plugin-Installation
+Das Release-Paket enthält die vorkonfigurierte Datei `.streamDeckPlugin`.
+1. Laden Sie `com.xuru.voip.streamDeckPlugin` von der [Release-Seite](https://github.com/XuruDragon/XuruVOIP/releases) herunter.
+2. Doppelklicken Sie auf die Datei, um sie direkt in Ihrer Elgato Stream Deck-Software zu installieren.
+   *(Alternativ können Sie den Ordner `com.xuru.voip.sdPlugin` manuell extrahieren und in das Verzeichnis `%appdata%\Elgato\StreamDeck\Plugins\` kopieren)*
+3. Nach der Installation wird in der rechten Liste Ihrer Stream Deck Desktop-App eine neue Aktionskategorie namens **XuruVOIP** angezeigt.
+
+---
+
+### 3. Aktionen hinzufügen und konfigurieren
+Sie können jede der folgenden 8 Aktionen auf Ihre Stream Deck-Tasten ziehen:
+* 🎤 **Proximity Mute**: Schaltet die ausgehende Proximity-Mikrofonübertragung stumm/aktiv.
+* 📻 **Radio Mute**: Schaltet die ausgehende Radio-Mikrofonübertragung stumm/aktiv.
+* 👤 **Profile Mute**: Schaltet die ausgehende Profil-Mikrofonübertragung stumm/aktiv.
+* 🔊 **Audio Proximity Mute**: Schaltet das eingehende Proximity-Audio stumm/aktiv.
+* 🔊 **Audio Radio Mute**: Schaltet das eingehende Radio-Audio stumm/aktiv.
+* 🔊 **Audio Profile Mute**: Schaltet das eingehende Profil-Audio stumm/aktiv.
+* 🪖 **Toggle Helmet**: Öffnet oder schließt Ihr Anzugvisier.
+* 🔄 **Cycle Radio**: Wechselt durch die verfügbaren Funkfrequenzen/Kanäle.
+
+#### Konfiguration (Property Inspector):
+Klicken Sie auf die auf eine Taste gezogene Aktion und konfigurieren Sie den Ziel-Port im unteren Bereich **Property Inspector**:
+* Setzen Sie **Companion Port** auf den Port, der in Ihren WPF-Client-Einstellungen konfiguriert ist (Standard: `8891`).
+* **Dynamisches Feedback:** Umschalter (wie Proximity Mute) aktualisieren ihr Symbol auf Ihrem Gerät in Echtzeit, um anzuzeigen, ob der Status aktiv ist (cyan leuchtendes Symbol) oder stummgeschaltet ist (orange durchgestrichenes Symbol).
+* **Live-Frequenzanzeige:** Die Taste **Cycle Radio** zeigt den Namen des aktuell aktiven Funkkanals (z. B. `120.5` oder `General`) in Echtzeit direkt auf der physischen Taste an!
 
 ---
 

@@ -121,6 +121,8 @@
     <sys:String x:Key="OptBottomCenter">中下</sys:String>
     <sys:String x:Key="OptBottomRight">右下</sys:String>
     <sys:String x:Key="LblEnableDiscordRpc">启用 Discord 状态呈现 (Rich Presence)</sys:String>
+    <sys:String x:Key="LblEnableCompanionApp">启用 Companion HTTP 服务器</sys:String>
+    <sys:String x:Key="LblCompanionAppPort">Companion 服务器端口</sys:String>
     <sys:String x:Key="LblOverlayCapabilities">覆盖层功能介绍</sys:String>
     <sys:String x:Key="LblOverlayCapabilitiesDesc">当《星际公民》在“无边框窗口模式”下运行时，HUD 覆盖层完美兼容 Vulkan 和 DirectX。它能够实时显示游戏内 VoIP 连接状态、当前电台频率和说话状态指示器，无需注入游戏进程或产生任何封号风险。</sys:String>
 

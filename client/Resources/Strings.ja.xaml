@@ -121,6 +121,8 @@
     <sys:String x:Key="OptBottomCenter">中央下</sys:String>
     <sys:String x:Key="OptBottomRight">右下</sys:String>
     <sys:String x:Key="LblEnableDiscordRpc">Discord Rich Presenceを有効化</sys:String>
+    <sys:String x:Key="LblEnableCompanionApp">Companion HTTPサーバーを有効化</sys:String>
+    <sys:String x:Key="LblCompanionAppPort">Companion サーバーポート</sys:String>
     <sys:String x:Key="LblOverlayCapabilities">オーバーレイ機能について</sys:String>
     <sys:String x:Key="LblOverlayCapabilitiesDesc">HUDオーバーレイは、スターシチズンが「ボーダーレスウィンドウ」モードで実行されている場合、VulkanおよびDirectXと完全に互換性があります。ゲームのコードにインジェクションすることなく、安全にゲーム内のVoIP接続ステータス、アクティブな無線周波数、およびリアルタイムの発言中インジケーターを表示します。</sys:String>
 

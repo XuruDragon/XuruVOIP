@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Radio Tower Symbol in center -->
+    <line x1="36" y1="26" x2="36" y2="52" stroke="#00f0ff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M28 52L32 32H40L44 52" fill="none" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="36" cy="22" r="3" fill="#00f0ff"/>
+    <!-- Circular Arrows (Tuning/Cycling) -->
+    <path d="M22 36A14 14 0 1 1 50 36" fill="none" stroke="#00a2ff" stroke-width="2.5" stroke-dasharray="44,22"/>
+    <path d="M48 31L53 36L58 31" fill="none" stroke="#00a2ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

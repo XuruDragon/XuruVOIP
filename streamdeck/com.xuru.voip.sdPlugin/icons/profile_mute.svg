@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- User Avatar Icon on the left -->
+    <circle cx="23" cy="28" r="7" fill="none" stroke="#552222" stroke-width="2"/>
+    <path d="M12 43C12 36 17 35 23 35C29 35 34 36 34 43" fill="none" stroke="#552222" stroke-width="2" stroke-linecap="round"/>
+    <!-- Mic icon on the right -->
+    <rect x="44" y="20" width="8" height="15" rx="4" fill="#ff3b30" opacity="0.6"/>
+    <path d="M40 28V30C40 34 43.5 37 48 37C52.5 37 56 34 56 30V28" fill="none" stroke="#ff3b30" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <line x1="48" y1="37" x2="48" y2="44" stroke="#ff3b30" stroke-width="2.5" opacity="0.6"/>
+    <line x1="42" y1="44" x2="54" y2="44" stroke="#ff3b30" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <!-- Red Slash -->
+    <line x1="18" y1="18" x2="54" y2="54" stroke="#ff3b30" stroke-width="4.5" stroke-linecap="round"/>
+</svg>

@@ -55,3 +55,18 @@ jobs:
 
       - name: Run Client Tests
         run: dotnet test client/XuruVoipClient.Tests/XuruVoipClient.Tests.csproj -c Release
+
+  test-plugin:
+    name: Test Stream Deck Plugin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Plugin Validation Tests
+        run: node --test streamdeck/tests/validate.test.js

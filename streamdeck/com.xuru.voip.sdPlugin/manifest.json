@@ -1,0 +1,170 @@
+{
+  "SDKVersion": 2,
+  "Author": "XuruDragon",
+  "Description": "Control mutes, active channel, and helmet state for XuruVOIP",
+  "Name": "XuruVOIP Control",
+  "Icon": "icons/pluginIcon",
+  "Version": "1.0.0",
+  "Software": {
+    "MinimumVersion": "6.0"
+  },
+  "CodePath": "index.html",
+  "Category": "XuruVOIP",
+  "Actions": [
+    {
+      "UUID": "com.xuru.voip.action.proximity_mute",
+      "Name": "Proximity Mute",
+      "Icon": "icons/proximity_unmuted",
+      "States": [
+        {
+          "Image": "icons/proximity_unmuted",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/proximity_mute",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle proximity microphone mute"
+    },
+    {
+      "UUID": "com.xuru.voip.action.radio_mute",
+      "Name": "Radio Mute",
+      "Icon": "icons/radio_unmuted",
+      "States": [
+        {
+          "Image": "icons/radio_unmuted",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/radio_mute",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle radio microphone mute"
+    },
+    {
+      "UUID": "com.xuru.voip.action.profile_mute",
+      "Name": "Profile Mute",
+      "Icon": "icons/profile_unmuted",
+      "States": [
+        {
+          "Image": "icons/profile_unmuted",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/profile_mute",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle profile microphone mute"
+    },
+    {
+      "UUID": "com.xuru.voip.action.audio_proximity_mute",
+      "Name": "Audio Proximity Mute",
+      "Icon": "icons/audio_proximity_unmuted",
+      "States": [
+        {
+          "Image": "icons/audio_proximity_unmuted",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/audio_proximity_mute",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle hearing proximity mute"
+    },
+    {
+      "UUID": "com.xuru.voip.action.audio_radio_mute",
+      "Name": "Audio Radio Mute",
+      "Icon": "icons/audio_radio_unmuted",
+      "States": [
+        {
+          "Image": "icons/audio_radio_unmuted",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/audio_radio_mute",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle hearing radio mute"
+    },
+    {
+      "UUID": "com.xuru.voip.action.audio_profile_mute",
+      "Name": "Audio Profile Mute",
+      "Icon": "icons/audio_profile_unmuted",
+      "States": [
+        {
+          "Image": "icons/audio_profile_unmuted",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/audio_profile_mute",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle hearing profile mute"
+    },
+    {
+      "UUID": "com.xuru.voip.action.toggle_helmet",
+      "Name": "Toggle Helmet",
+      "Icon": "icons/helmet_up",
+      "States": [
+        {
+          "Image": "icons/helmet_up",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/helmet_down",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle helmet visor down/up"
+    },
+    {
+      "UUID": "com.xuru.voip.action.cycle_radio",
+      "Name": "Cycle Radio",
+      "Icon": "icons/cycle_radio",
+      "States": [
+        {
+          "Image": "icons/cycle_radio",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Cycle through radio frequencies/channels"
+    }
+  ]
+}

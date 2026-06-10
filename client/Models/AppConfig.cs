@@ -72,6 +72,7 @@ public class AppConfig
     public bool EnableDiscordRpc { get; set; } = true;
 
     // --- Companion App ---
-    public bool EnableCompanionApp { get; set; } = true;
+    public bool EnableCompanionApp { get; set; } = false;
+    public int CompanionAppPort { get; set; } = 8891;
 }
 

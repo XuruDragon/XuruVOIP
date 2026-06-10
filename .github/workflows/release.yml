@@ -88,6 +88,12 @@ jobs:
           if (Test-Path "client/XuruVoipClient-win-x64.zip") {
               Copy-Item "client/XuruVoipClient-win-x64.zip" -Destination release-binaries/XuruVoipClient-win-x64.zip
           }
+          
+          # Stage and package Stream Deck Plugin
+          New-Item -ItemType Directory -Force -Path plugin-staging
+          Copy-Item -Recurse -Path streamdeck/com.xuru.voip.sdPlugin -Destination plugin-staging/com.xuru.voip.sdPlugin
+          Compress-Archive -Path plugin-staging/com.xuru.voip.sdPlugin -DestinationPath release-binaries/com.xuru.voip.streamDeckPlugin -Force
+          Remove-Item -Recurse -Force -Path plugin-staging
         shell: pwsh
 
       - name: Build Go Server (win-x64, linux-x64)

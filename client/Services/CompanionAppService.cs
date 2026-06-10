@@ -18,6 +18,8 @@ public class CompanionAppService : IDisposable
     private readonly MainViewModel _viewModel;
     private bool _running;
 
+    public int ActivePort { get; private set; }
+
     public CompanionAppService(MainViewModel viewModel)
     {
         _viewModel = viewModel;
@@ -29,14 +31,18 @@ public class CompanionAppService : IDisposable
         _running = true;
         _cts = new CancellationTokenSource();
 
+        int port = _viewModel.Config.Config.CompanionAppPort;
+        if (port <= 0 || port > 65535) port = 8891;
+        ActivePort = port;
+
         _listener = new HttpListener();
-        _listener.Prefixes.Add("http://localhost:8891/");
-        _listener.Prefixes.Add("http://127.0.0.1:8891/");
+        _listener.Prefixes.Add($"http://localhost:{port}/");
+        _listener.Prefixes.Add($"http://127.0.0.1:{port}/");
 
         try
         {
             _listener.Start();
-            LogService.Info("Companion HTTP API Server started on http://localhost:8891/");
+            LogService.Info($"Companion HTTP API Server started on http://localhost:{port}/");
             Task.Run(() => ListenAsync(_cts.Token));
         }
         catch (Exception ex)

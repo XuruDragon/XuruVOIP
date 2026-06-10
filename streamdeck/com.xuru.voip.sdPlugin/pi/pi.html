@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>XuruVOIP Action Settings</title>
+    <style>
+        body {
+            background-color: #2d2d2d;
+            color: #d8d8d8;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            margin: 0;
+            padding: 10px;
+        }
+        .sdpi-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .sdpi-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sdpi-item-label {
+            font-weight: bold;
+            width: 40%;
+        }
+        .sdpi-item-value {
+            width: 55%;
+        }
+        input[type="number"] {
+            background-color: #1a1a1a;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 11px;
+            padding: 4px 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input[type="number"]:focus {
+            border-color: #0078d4;
+            outline: none;
+        }
+        .note {
+            color: #8c8c8c;
+            font-size: 9px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sdpi-wrapper">
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Companion Port</div>
+            <div class="sdpi-item-value">
+                <input type="number" id="port-input" min="1" max="65535" value="8891" />
+            </div>
+        </div>
+        <div class="note">
+            The local HTTP server port configured in your XuruVOIP client settings (default: 8891).
+        </div>
+    </div>
+
+    <script src="pi.js"></script>
+</body>
+</html>

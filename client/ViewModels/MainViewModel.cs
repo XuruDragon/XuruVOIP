@@ -1032,6 +1032,13 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         // Sync companion app state
         if (Config.Config.EnableCompanionApp)
         {
+            if (_companionApp != null && _companionApp.ActivePort != Config.Config.CompanionAppPort)
+            {
+                LogService.Info("Companion app port changed, restarting server...");
+                _companionApp.Stop();
+                _companionApp = null;
+            }
+
             if (_companionApp == null)
             {
                 _companionApp = new CompanionAppService(this);

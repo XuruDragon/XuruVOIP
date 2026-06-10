@@ -332,6 +332,33 @@ XURUVOIP_DISCORD_CHANNEL_ID=your_discord_channel_id
 XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
+### 🎛️ Discord Voice Bridge Setup Guide
+
+To bridge a local Go server radio channel to a Discord voice channel, follow these setup steps:
+
+1. **Create a Discord Bot Application:**
+   * Visit the [Discord Developer Portal](https://discord.com/developers/applications) and sign in.
+   * Click **New Application**, give it a name (e.g., `XuruVOIP Bridge`), and click **Create**.
+   * Navigate to the **Bot** tab on the left sidebar, click **Reset Token**, and copy the generated **Bot Token**. Paste this as `XURUVOIP_DISCORD_TOKEN` in your server's `.env` file.
+   * Under **Privileged Gateway Intents** on the same Bot page, enable the **Message Content Intent** (required for reading specific commands).
+
+2. **Invite the Bot to your Discord Server:**
+   * Go to the **OAuth2** tab, then select **URL Generator**.
+   * Under **Scopes**, check `bot` and `applications.commands`.
+   * Under **Bot Permissions**, select the following privileges:
+     * *General Permissions:* `View Channels`
+     * *Text Permissions:* `Send Messages`
+     * *Voice Permissions:* `Connect`, `Speak`, `Use Voice Activity`
+   * Copy the generated URL at the bottom of the page, paste it into a web browser, select your target Discord server (Guild), and click **Authorize**.
+
+3. **Get Server (Guild) & Voice Channel IDs:**
+   * Open Discord, go to **User Settings** -> **Advanced**, and toggle **Developer Mode** on.
+   * Right-click your Discord server icon in the server list and select **Copy Server ID** (this is your Guild ID). Paste it as `XURUVOIP_DISCORD_GUILD_ID` in `.env`.
+   * Right-click the target Discord Voice Channel where you want the bot to join, and select **Copy Channel ID**. Paste it as `XURUVOIP_DISCORD_CHANNEL_ID` in `.env`.
+
+4. **Map Go Server Radio Channel:**
+   * Configure `XURUVOIP_DISCORD_BRIDGE_CHANNEL` to the exact name of the radio channel you want to bridge (e.g. `General`, `Bravo`, `Alpha`, etc.). Any audio transmitted on this Go server radio frequency will be bidirectionally broadcasted to the Discord Voice Channel!
+
 ### Building the Server from source
 
 #### Linux
@@ -533,6 +560,45 @@ Since the installer and executables are not digitally signed, Windows SmartScree
      - In the properties window under the *General* tab, check the **Unblock** checkbox at the bottom.
      - Click **Apply**, then close the Properties window.
   4. Double-click `XuruVoipClient.exe` to run the client directly without installing it.
+
+## 📱 Companion App & Stream Deck Integration
+
+XuruVOIP includes a built-in Companion App web service and an official Stream Deck plugin allowing you to monitor and trigger voice actions directly from secondary devices or physical keys.
+
+### 1. Enabling the Companion App
+By default, the Companion App local HTTP server is disabled to save system resources. To enable it:
+1. Open the XuruVOIP client and click the **Settings** icon.
+2. In the **General** tab, check the box **Enable Companion HTTP Server**.
+3. Under **Companion Server Port**, you can customize the port number (default: `8891`).
+4. Click **Save & Close** to apply. The HTTP server will now start locally. You can open `http://localhost:8891` in any browser on your PC or mobile device to access the web controller dashboard.
+
+---
+
+### 2. Stream Deck Plugin Installation
+The release package includes the pre-packaged `.streamDeckPlugin` file.
+1. Download `com.xuru.voip.streamDeckPlugin` from the [releases page](https://github.com/XuruDragon/XuruVOIP/releases).
+2. Double-click the file to install it directly to your Elgato Stream Deck software. 
+   *(Alternatively, you can manually extract and copy the `com.xuru.voip.sdPlugin` folder to `%appdata%\Elgato\StreamDeck\Plugins\`)*
+3. Once installed, a new action category called **XuruVOIP** will appear in the right-side list of your Stream Deck desktop app.
+
+---
+
+### 3. Adding and Configuring Actions
+You can drag and drop any of the following 8 actions onto your Stream Deck keys:
+* 🎤 **Proximity Mute**: Toggles outgoing proximity microphone muting.
+* 📻 **Radio Mute**: Toggles outgoing radio microphone muting.
+* 👤 **Profile Mute**: Toggles outgoing profile microphone muting.
+* 🔊 **Audio Proximity Mute**: Toggles incoming proximity playback muting.
+* 🔊 **Audio Radio Mute**: Toggles incoming radio playback muting.
+* 🔊 **Audio Profile Mute**: Toggles incoming profile playback muting.
+* 🪖 **Toggle Helmet**: Toggles your space suit helmet visor down or up.
+* 🔄 **Cycle Radio**: Cycles through available radio channels.
+
+#### Configuration (Property Inspector):
+For each action you drag onto a key, click on it and configure the target port in the **Property Inspector** panel at the bottom:
+* Set **Companion Port** to match the port configured in your WPF client settings (default: `8891`).
+* **Dynamic Feedback:** Toggles (like Proximity Mute) automatically update their icon in real-time on your device to display whether the state is active (cyan glow icon) or muted (amber strike-through icon).
+* **Live Frequency Display:** The **Cycle Radio** key will dynamically display the currently active frequency name (e.g. `120.5` or `General`) directly on the physical button in real-time!
 
 ---
 

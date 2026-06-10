@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Proximity Rings -->
+    <circle cx="36" cy="32" r="18" fill="none" stroke="#00a2ff" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6"/>
+    <circle cx="36" cy="32" r="23" fill="none" stroke="#00f0ff" stroke-width="1" stroke-dasharray="2,2" opacity="0.4"/>
+    <!-- Speaker icon -->
+    <path d="M26 27H20V37H26L34 43V21L26 27Z" fill="#00f0ff"/>
+    <path d="M39 27C41 29 42 32 42 32C42 32 41 35 39 37" fill="none" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>
+    <path d="M44 23C48 26 49 32 49 32C49 32 48 38 44 41" fill="none" stroke="#00a2ff" stroke-width="2" stroke-linecap="round"/>
+</svg>

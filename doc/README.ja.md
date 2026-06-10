@@ -285,6 +285,33 @@ XURUVOIP_DISCORD_CHANNEL_ID=your_discord_channel_id
 XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
+### 🎛️ Discordボイスブリッジ設定ガイド
+
+ローカルのGoサーバー無線チャンネルをDiscordのボイスチャンネルにブリッジするには、以下の設定手順に従ってください。
+
+1. **Discordボットアプリケーションの作成:**
+   * [Discord Developer Portal](https://discord.com/developers/applications)にアクセスし、サインインします。
+   * **New Application**をクリックし、名前（例: `XuruVOIP Bridge`）を入力して**Create**をクリックします。
+   * 左メニューの**Bot**タブへ移動し、**Reset Token**をクリックして生成された**ボットトークン**をコピーします。これをサーバーの`.env`ファイルの`XURUVOIP_DISCORD_TOKEN`に貼り付けます。
+   * 同ページの**Privileged Gateway Intents**の下にある**Message Content Intent**を有効化します（特定のコマンドの読み取りに必要）。
+
+2. **ボットをDiscordサーバーに招待する:**
+   * **OAuth2**タブに移動し、**URL Generator**を選択します。
+   * **Scopes**の下にある`bot`と`applications.commands`をチェックします。
+   * **Bot Permissions**の下で、以下の権限を選択します。
+     * *全般権限:* `View Channels`
+     * *テキスト権限:* `Send Messages`
+     * *音声権限:* `Connect`, `Speak`, `Use Voice Activity`
+   * ページ最下部に生成されたURLをコピーし、ウェブブラウザに貼り付けて対象のDiscordサーバーを選択し、**認証**をクリックします。
+
+3. **サーバー（ギルド）およびボイスチャンネルのIDを取得する:**
+   * Discordを開き、**ユーザー設定** -> **詳細設定**に移動し、**開発者モード**をオンにします。
+   * サーバーリスト内のDiscordサーバーアイコンを右クリックし、**サーバーIDをコピー**（これがギルドIDになります）を選択し、`.env`の`XURUVOIP_DISCORD_GUILD_ID`に貼り付けます。
+   * 接続先となるDiscordボイスチャンネルを右クリックし、**チャンネルIDをコピー**を選択し、`.env`の`XURUVOIP_DISCORD_CHANNEL_ID`に貼り付けます。
+
+4. **Goサーバー無線チャンネルのマッピング:**
+   * `XURUVOIP_DISCORD_BRIDGE_CHANNEL`にブリッジしたい無線チャンネル名（例: `General`、`Bravo`、`Alpha`など）を正確に入力します。このGoサーバー無線周波数で送信された音声は、双方向でDiscordボイスチャンネルにブロードキャストされます！
+
 ### ソースからのコンパイル
 
 #### Linux
@@ -474,6 +501,43 @@ dotnet run
 
 ---
 
-## 👥 クレジット
+## 📱 CompanionアプリとStream Deckの統合
+
+XuruVOIPにはローカルのCompanionアプリWebサービスと公式のStream Deckプラグインが組み込まれており、セカンダリデバイスや物理キーから音声アクションを直接監視およびトリガーすることができます。
+
+### 1. Companionアプリの有効化
+デフォルトでは、システムリソースを節約するためにCompanionアプリのローカルHTTPサーバーは無効になっています。有効化するには：
+1. XuruVOIPクライアントを開き、**Settings**（設定）アイコンをクリックします。
+2. **General**タブで、**Enable Companion HTTP Server**（Companion HTTPサーバーを有効化）チェックボックスにチェックを入れます。
+3. **Companion Server Port**で、ポート番号をカスタマイズできます（デフォルト: `8891`）。
+4. **Save & Close**（保存して閉じる）をクリックして適用します。ローカルでHTTPサーバーが起動します。PCやモバイルデバイスのブラウザで`http://localhost:8891`を開くと、Webコントローラーのダッシュボードにアクセスできます。
+
+---
+
+### 2. Stream Deckプラグインのインストール
+リリースパッケージには、あらかじめパッケージ化された`.streamDeckPlugin`ファイルが含まれています。
+1. [リリースージ](https://github.com/XuruDragon/XuruVOIP/releases)から`com.xuru.voip.streamDeckPlugin`をダウンロードします。
+2. ファイルをダブルクリックして、Elgato Stream Deckソフトウェアに直接インストールします。
+   *(または、`com.xuru.voip.sdPlugin`フォルダを手動で解凍し、`%appdata%\Elgato\StreamDeck\Plugins\`にコピーすることもできます)*
+3. インストールされると、Stream Deckデスクトップアプリの右側のアクションリストに**XuruVOIP**という新しいアクションカテゴリが表示されます。
+
+---
+
+### 3. アクションの追加と設定
+以下の8つのアクションをStream Deckのキーにドラッグ＆ドロップできます。
+* 🎤 **Proximity Mute**: 送信近接マイクのミュートを切り替えます。
+* 📻 **Radio Mute**: 送信無線マイクのミュートを切り替えます。
+* 👤 **Profile Mute**: 送信プロファイルマイクのミュートを切り替えます。
+* 🔊 **Audio Proximity Mute**: 受信近接再生のミュートを切り替えます。
+* 🔊 **Audio Radio Mute**: 受信無線再生のミュートを切り替えます。
+* 🔊 **Audio Profile Mute**: 受信プロファイル再生のミュートを切り替えます。
+* 🪖 **Toggle Helmet**: 宇宙服ヘルメットのバイザーの開閉を切り替えます。
+* 🔄 **Cycle Radio**: 利用可能な無線チャンネルを順番に切り替えます。
+
+#### 設定（Property Inspector）:
+キーに配置した各アクションについて、クリックして最下部の**Property Inspector**パネルでターゲットポートを設定します：
+* **Companion Port**に、WPFクライアントの設定で構成したポートを指定します（デフォルト: `8891`）。
+* **ダイナミックフィードバック:** ミュートのトグル（例: Proximity Mute）は、デバイス上のアイコンをリアルタイムに更新して、アクティブ状態（水色に光るアイコン）かミュート状態（オレンジ色の斜線付きアイコン）かを表示します。
+* **ライブ周波数表示:** **Cycle Radio**キーは、現在アクティブな無線周波数名（例: `120.5`または`General`）をリアルタイムに物理キー上に動的に表示します！## 👥 クレジット
 
 **[@XuruDragon](https://github.com/XuruDragon)** が **Antigravity IDE** と共同で開発しました。

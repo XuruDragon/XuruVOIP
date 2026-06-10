@@ -278,6 +278,33 @@ XURUVOIP_DISCORD_CHANNEL_ID=your_discord_channel_id
 XURUVOIP_DISCORD_BRIDGE_CHANNEL=General
 ```
 
+### 🎛️ Discord 语音桥接器设置指南
+
+要将本地 Go 服务器的无线电频道与 Discord 语音频道进行桥接，请遵循以下配置步骤：
+
+1. **创建 Discord 机器人应用：**
+   * 访问 [Discord 开发者门户](https://discord.com/developers/applications) 并登录。
+   * 点击 **New Application**，为其命名（例如 `XuruVOIP Bridge`），然后点击 **Create**。
+   * 在左侧边栏中导航到 **Bot** 选项卡，点击 **Reset Token** 并复制生成的 **Bot Token**。将其粘贴到服务器 `.env` 文件中的 `XURUVOIP_DISCORD_TOKEN`。
+   * 在同一页面上的 **Privileged Gateway Intents** 下，启用 **Message Content Intent**（读取特定命令所需）。
+
+2. **邀请机器人加入您的 Discord 服务器：**
+   * 转到 **OAuth2** 选项卡，然后选择 **URL Generator**。
+   * 在 **Scopes** 下，勾选 `bot` 和 `applications.commands`。
+   * 在 **Bot Permissions** 下，选择以下权限：
+     * *通用权限：* `View Channels`
+     * *文本权限：* `Send Messages`
+     * *语音权限：* `Connect`、`Speak`、`Use Voice Activity`
+   * 复制页面底部生成的 URL，粘贴到 Web 浏览器中，选择目标 Discord 服务器（Guild），然后点击 **Authorize**。
+
+3. **获取服务器（Guild）和语音频道 ID：**
+   * 打开 Discord，转到 **用户设置** -> **高级**，然后开启 **开发者模式**。
+   * 在服务器列表中右键点击您的 Discord 服务器图标，选择 **复制服务器 ID**（此为 Guild ID）。将其作为 `XURUVOIP_DISCORD_GUILD_ID` 粘贴到 `.env`。
+   * 右键点击目标 Discord 语音频道，选择 **复制频道 ID**。将其作为 `XURUVOIP_DISCORD_CHANNEL_ID` 粘贴到 `.env` 文件中。
+
+4. **映射 Go 服务器电台频道：**
+   * 将 `XURUVOIP_DISCORD_BRIDGE_CHANNEL` 配置为您想要桥接的 Go 服务器电台频道的准确名称（例如 `General`、`Bravo`、`Alpha` 等）。在此 Go 服务器无线电频率上传输的任何音频都将双向广播到 Discord 语音频道！
+
 ### 从源码编译
 
 #### Linux
@@ -465,6 +492,47 @@ dotnet run
      - 在属性窗口的 *常规* 选项卡最底部，勾选 **解除锁定** 选框。
      - 点击 **应用**，然后关闭属性窗口。
   4. 双击 `XuruVoipClient.exe` 直接运行客户端，无需安装。
+
+---
+
+## 📱 Companion 应用和 Stream Deck 集成
+
+XuruVOIP 包含内置的 Companion 本地 Web 服务和官方 Stream Deck 插件，允许您直接从副设备或物理按键监控并触发语音操作。
+
+### 1. 启用 Companion 应用
+默认情况下，Companion 应用本地 HTTP 服务器处于禁用状态，以节省系统资源。要启用它：
+1. 打开 XuruVOIP 客户端并点击 **Settings**（设置）图标。
+2. 在 **General** 选项卡中，勾选 **Enable Companion HTTP Server**（启用 Companion HTTP 服务器）复选框。
+3. 在 **Companion Server Port**（Companion 服务器端口）下，您可以自定义端口号（默认：`8891`）。
+4. 点击 **Save & Close**（保存并关闭）以应用。HTTP 服务器将在本地启动。您可以在 PC 或移动设备的任何浏览器中打开 `http://localhost:8891` 以访问控制面板。
+
+---
+
+### 2. Stream Deck 插件安装
+发布包中包含了预打包的 `.streamDeckPlugin` 文件。
+1. 从 [发布页面](https://github.com/XuruDragon/XuruVOIP/releases) 下载 `com.xuru.voip.streamDeckPlugin`。
+2. 双击该文件直接安装到您的 Elgato Stream Deck 软件中。
+   *(或者，您可以手动解压并将 `com.xuru.voip.sdPlugin` 文件夹复制到 `%appdata%\Elgato\StreamDeck\Plugins\`)*
+3. 安装完成后，Stream Deck 桌面应用的右侧操作列表中将出现一个名为 **XuruVOIP** 的新操作分类。
+
+---
+
+### 3. 添加与配置操作
+您可以将以下 8 个操作中的任何一个拖放到 Stream Deck 按键上：
+* 🎤 **Proximity Mute**：切换发送近接麦克风静音。
+* 📻 **Radio Mute**：切换发送电台麦克风静音。
+* 👤 **Profile Mute**：切换发送配置文件麦克风静音。
+* 🔊 **Audio Proximity Mute**：切换接收近接播放静音。
+* 🔊 **Audio Radio Mute**：切换接收电台播放静音。
+* 🔊 **Audio Profile Mute**：切换接收配置文件播放静音。
+* 🪖 **Toggle Helmet**：开启或关闭太空服头盔面罩。
+* 🔄 **Cycle Radio**：循环切换可用的无线电频道。
+
+#### 配置 (Property Inspector)：
+对于拖放到按键上的每个操作，点击它并在底部的 **Property Inspector** 面板中配置目标端口：
+* 将 **Companion Port** 设置为与您的 WPF 客户端设置中配置的端口相匹配（默认：`8891`）。
+* **动态反馈**：静音切换（如 Proximity Mute）会自动在您的设备上实时更新其图标，以显示状态是激活（青色发光图标）还是静音（橙色划线图标）。
+* **实时频道显示**：**Cycle Radio** 按键将直接在物理按键上实时动态显示当前激活的电台频道名称（例如 `120.5` 或 `General`）！
 
 ---
 

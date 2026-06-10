@@ -23,6 +23,7 @@ public class UiTests
             var app = new XuruVoipClient.App { ShutdownMode = ShutdownMode.OnExplicitShutdown };
             app.InitializeComponent();
         }
+        App.SetLanguage("en");
     }
 
     [StaFact]
