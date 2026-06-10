@@ -19,6 +19,7 @@
     <sys:String x:Key="StatusConnecting">Connexion en cours...</sys:String>
     <sys:String x:Key="StatusConnected">Connecté</sys:String>
     <sys:String x:Key="StatusConnectionFailed">Échec de la connexion : {0}</sys:String>
+    <sys:String x:Key="StatusReconnectingIn">Reconnexion dans {0}s...</sys:String>
     <sys:String x:Key="StatusMuted">MUET</sys:String>
     <sys:String x:Key="StatusActive">ACTIF</sys:String>
     <sys:String x:Key="PanelMuteStatus">Statut des Sourdines</sys:String>

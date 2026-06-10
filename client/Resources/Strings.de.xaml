@@ -19,6 +19,7 @@
     <sys:String x:Key="StatusConnecting">Verbindung wird hergestellt...</sys:String>
     <sys:String x:Key="StatusConnected">Verbunden</sys:String>
     <sys:String x:Key="StatusConnectionFailed">Verbindung fehlgeschlagen: {0}</sys:String>
+    <sys:String x:Key="StatusReconnectingIn">Wiederverbindung in {0}s...</sys:String>
     <sys:String x:Key="StatusMuted">STUMM</sys:String>
     <sys:String x:Key="StatusActive">AKTIV</sys:String>
     <sys:String x:Key="PanelMuteStatus">Kanal-Stummschaltungsstatus</sys:String>
