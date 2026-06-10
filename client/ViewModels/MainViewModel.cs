@@ -44,6 +44,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly Dictionary<string, bool> _remoteHelmets = [];
     private readonly Dictionary<string, PlayerPosition> _remotePositions = [];
     private readonly Dictionary<string, string> _remoteChannels = [];
+    private readonly Dictionary<string, bool> _remoteRepeaters = [];
     private bool _wasRadioTransmitting = false;
     private readonly List<string> _availableChannels = [];
     public IReadOnlyList<string> AvailableChannels => _availableChannels;
@@ -385,6 +386,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             await ConnectAudioAsync();
             // Ensure server is synchronized with local Helmet Mode (OFF on start)
             await _posWs.SetHelmetAsync(IsHelmetOn);
+            await _posWs.SendToggleRepeaterAsync(Config.Config.IsRadioRepeater);
         });
         _posWs.Disconnected += msg => Application.Current.Dispatcher.Invoke(() =>
         {
@@ -421,7 +423,84 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                 if (!doc.RootElement.TryGetProperty("type", out var typeEl)) return;
                 string type = typeEl.GetString() ?? "";
 
-                if (type == "helmet")
+                if (type == "welcome")
+                {
+                    if (doc.RootElement.TryGetProperty("players", out var playersEl) && playersEl.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var player in playersEl.EnumerateArray())
+                        {
+                            string name = player.GetProperty("name").GetString() ?? "";
+                            if (name == Config.Config.Username) continue;
+
+                            if (player.TryGetProperty("pos", out var posEl) && posEl.ValueKind == JsonValueKind.Object)
+                            {
+                                double x = posEl.GetProperty("x").GetDouble();
+                                double y = posEl.GetProperty("y").GetDouble();
+                                double z = posEl.GetProperty("z").GetDouble();
+                                string zone = posEl.GetProperty("zone").GetString() ?? "";
+                                string containerId = "";
+                                if (posEl.TryGetProperty("container_id", out var cIdEl))
+                                {
+                                    containerId = cIdEl.GetString() ?? "";
+                                }
+                                string containerName = "";
+                                if (posEl.TryGetProperty("container_name", out var cNameEl))
+                                {
+                                    containerName = cNameEl.GetString() ?? "";
+                                }
+                                _remotePositions[name] = new PlayerPosition 
+                                { 
+                                    X = x, 
+                                    Y = y, 
+                                    Z = z, 
+                                    Zone = zone,
+                                    ContainerID = containerId,
+                                    ContainerName = containerName
+                                };
+                            }
+
+                            if (player.TryGetProperty("helmet_on", out var helmEl))
+                            {
+                                _remoteHelmets[name] = helmEl.GetBoolean();
+                            }
+
+                            if (player.TryGetProperty("active_channel", out var chanEl))
+                            {
+                                _remoteChannels[name] = chanEl.GetString() ?? "";
+                            }
+
+                            if (player.TryGetProperty("is_radio_repeater", out var repEl))
+                            {
+                                _remoteRepeaters[name] = repEl.GetBoolean();
+                            }
+                        }
+                    }
+                }
+                else if (type == "join")
+                {
+                    if (doc.RootElement.TryGetProperty("name", out var nameEl))
+                    {
+                        string remoteName = nameEl.GetString() ?? "";
+                        if (doc.RootElement.TryGetProperty("active_channel", out var chanEl))
+                        {
+                            _remoteChannels[remoteName] = chanEl.GetString() ?? "";
+                        }
+                        if (doc.RootElement.TryGetProperty("is_radio_repeater", out var repEl))
+                        {
+                            _remoteRepeaters[remoteName] = repEl.GetBoolean();
+                        }
+                    }
+                }
+                else if (type == "player_repeater")
+                {
+                    if (doc.RootElement.TryGetProperty("name", out var nameEl) &&
+                        doc.RootElement.TryGetProperty("active", out var actEl))
+                    {
+                        string remoteName = nameEl.GetString() ?? "";
+                        _remoteRepeaters[remoteName] = actEl.GetBoolean();
+                    }
+                }
+                else if (type == "helmet")
                 {
                     if (doc.RootElement.TryGetProperty("name", out var nameEl) &&
                         doc.RootElement.TryGetProperty("helmet_on", out var helmEl))
@@ -470,6 +549,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                         _remoteHelmets.Remove(remoteName);
                         _remotePositions.Remove(remoteName);
                         _remoteChannels.Remove(remoteName);
+                        _remoteRepeaters.Remove(remoteName);
                         _playback.RemovePlayer(remoteName);
                     }
                 }
@@ -541,17 +621,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             {
                 if (_remotePositions.TryGetValue(name, out var remotePos))
                 {
-                    if (remotePos.Zone != _lastSentPos.Zone)
-                    {
-                        distance = 99999.0; // Out of range (different zones)
-                    }
-                    else
-                    {
-                        double dx = remotePos.X - _lastSentPos.X;
-                        double dy = remotePos.Y - _lastSentPos.Y;
-                        double dz = remotePos.Z - _lastSentPos.Z;
-                        distance = Math.Sqrt(dx * dx + dy * dy + dz * dz);
-                    }
+                    distance = CalculateEffectiveRadioDistance(name, remotePos);
                 }
             }
 
@@ -1057,6 +1127,12 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         // Sync position tracking source
         ApplyTrackingSource();
 
+        // Sync repeater state to server
+        if (PosConnected)
+        {
+            _ = _posWs.SendToggleRepeaterAsync(Config.Config.IsRadioRepeater);
+        }
+
         // Sync companion app state
         if (Config.Config.EnableCompanionApp)
         {
@@ -1214,6 +1290,104 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _companionApp?.Dispose();
         await _posWs.DisposeAsync();
         await _audioWs.DisposeAsync();
+    }
+
+    public double CalculateEffectiveRadioDistance(string senderName, PlayerPosition senderPos)
+    {
+        // 1. If radio repeaters are disabled globally or on client, or if sender/receiver in different zones, return direct distance or infinity
+        if (!Config.Config.EnableRadioRepeaters || senderPos.Zone != _lastSentPos.Zone)
+        {
+            if (senderPos.Zone != _lastSentPos.Zone) return 99999.0;
+            double dx = senderPos.X - _lastSentPos.X;
+            double dy = senderPos.Y - _lastSentPos.Y;
+            double dz = senderPos.Z - _lastSentPos.Z;
+            return Math.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
+
+        // 2. Identify all possible node positions in the same zone
+        var nodes = new List<(string Name, PlayerPosition Pos)>();
+        nodes.Add((senderName, senderPos));
+        
+        foreach (var kvp in _remotePositions)
+        {
+            string name = kvp.Key;
+            PlayerPosition pos = kvp.Value;
+            if (name == senderName) continue;
+            
+            // Check if this player is a repeater in the same zone
+            _remoteRepeaters.TryGetValue(name, out bool isRep);
+            if (isRep && pos.Zone == senderPos.Zone)
+            {
+                nodes.Add((name, pos));
+            }
+        }
+        
+        // Add local player (destination)
+        string localName = Config.Config.Username;
+        nodes.Add((localName, _lastSentPos));
+
+        int n = nodes.Count;
+        
+        // Find a path from sender (index 0) to local player (index n-1)
+        // that minimizes the maximum hop distance along the path.
+        double[] maxHopDist = new double[n];
+        for (int i = 0; i < n; i++) maxHopDist[i] = double.MaxValue;
+        maxHopDist[0] = 0;
+
+        bool[] visited = new bool[n];
+
+        for (int step = 0; step < n; step++)
+        {
+            // Find unvisited node with minimum maxHopDist
+            int u = -1;
+            double minDist = double.MaxValue;
+            for (int i = 0; i < n; i++)
+            {
+                if (!visited[i] && maxHopDist[i] < minDist)
+                {
+                    minDist = maxHopDist[i];
+                    u = i;
+                }
+            }
+
+            if (u == -1) break;
+            visited[u] = true;
+
+            if (u == n - 1) break;
+
+            // Relax neighbors
+            for (int v = 0; v < n; v++)
+            {
+                if (visited[v]) continue;
+
+                double dx = nodes[u].Pos.X - nodes[v].Pos.X;
+                double dy = nodes[u].Pos.Y - nodes[v].Pos.Y;
+                double dz = nodes[u].Pos.Z - nodes[v].Pos.Z;
+                double edgeDist = Math.Sqrt(dx * dx + dy * dy + dz * dz);
+
+                // Hops must be under 8000m
+                if (edgeDist <= 8000.0)
+                {
+                    double currentMaxHop = Math.Max(maxHopDist[u], edgeDist);
+                    if (currentMaxHop < maxHopDist[v])
+                    {
+                        maxHopDist[v] = currentMaxHop;
+                    }
+                }
+            }
+        }
+
+        double routedMaxHop = maxHopDist[n - 1];
+        if (routedMaxHop > 8000.0)
+        {
+            // No path under 8000m exists
+            double directDx = senderPos.X - _lastSentPos.X;
+            double directDy = senderPos.Y - _lastSentPos.Y;
+            double directDz = senderPos.Z - _lastSentPos.Z;
+            return Math.Sqrt(directDx * directDx + directDy * directDy + directDz * directDz);
+        }
+
+        return routedMaxHop;
     }
 
     private void UpdateDiscordPresence()

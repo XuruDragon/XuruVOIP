@@ -97,6 +97,7 @@ type PlayerState struct {
 	ProxShort         bool      `json:"prox_short"`
 	ScOnline          bool      `json:"sc_online"`
 	IsTalking         bool      `json:"is_talking"`
+	IsRadioRepeater   bool      `json:"is_radio_repeater"`
 }
 
 type MsgPlayerTalking struct {
@@ -127,6 +128,7 @@ type MsgPlayerJoin struct {
 	ListeningChannels []string `json:"listening_channels"`
 	Profile           string   `json:"profile"`
 	ProxShort         bool     `json:"prox_short"`
+	IsRadioRepeater   bool     `json:"is_radio_repeater"`
 }
 
 // MsgPlayerPos broadcasts an updated player position
@@ -175,6 +177,19 @@ type MsgPlayerListening struct {
 type MsgPlayerProxShort struct {
 	Type   string `json:"type"`
 	Name   string `json:"name"`
+	Active bool   `json:"active"`
+}
+
+// MsgPlayerRepeater broadcasts a player's repeater mode change
+type MsgPlayerRepeater struct {
+	Type   string `json:"type"`
+	Name   string `json:"name"`
+	Active bool   `json:"active"`
+}
+
+// MsgToggleRepeater is sent by the client to enable/disable repeater mode
+type MsgToggleRepeater struct {
+	Type   string `json:"type"`
 	Active bool   `json:"active"`
 }
 

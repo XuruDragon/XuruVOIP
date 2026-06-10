@@ -302,7 +302,10 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg core.MsgJoin) {
 		}
 	}
 
-	// Notify other players and admins
+	var isRepeater bool
+	if myPlayerExists {
+		isRepeater = myPlayer.GetIsRadioRepeater()
+	}
 	joinMsg := core.MsgPlayerJoin{
 		Type:              "join",
 		Name:              name,
@@ -310,6 +313,7 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg core.MsgJoin) {
 		ListeningChannels: myListeningChs,
 		Profile:           myProfile,
 		ProxShort:         false,
+		IsRadioRepeater:   isRepeater,
 	}
 	core.ActiveHub.BroadcastPosMessage(name, joinMsg)
 	core.ActiveHub.BroadcastToAdmins(joinMsg)
@@ -470,6 +474,26 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg core.MsgJoin) {
 					Name:   name,
 					Active: m.Active,
 				})
+			}
+
+		case "toggle_repeater":
+			var m core.MsgToggleRepeater
+			if err := json.Unmarshal(payload, &m); err != nil {
+				continue
+			}
+			if core.EnableRadioRepeaters {
+				if ok := core.ActiveHub.UpdateRadioRepeater(name, m.Active); ok {
+					status := "OFF"
+					if m.Active {
+						status = "ON"
+					}
+					core.Log(fmt.Sprintf("%s: Repeater %s", name, status), core.ColorBlue)
+					core.ActiveHub.BroadcastPosMessageToAll(core.MsgPlayerRepeater{
+						Type:   "player_repeater",
+						Name:   name,
+						Active: m.Active,
+					})
+				}
 			}
 		}
 	}
