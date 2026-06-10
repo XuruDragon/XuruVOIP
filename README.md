@@ -134,11 +134,13 @@ graph TD
 ### 1. Audio Capture, VAD, and Compression
 * **Audio Capture:** The client captures microphone audio using the **NAudio** API at a high-fidelity rate of 48,000 Hz, 16-bit mono.
 * **Voice Activity Detection (VAD):** Captured audio buffers are evaluated using the native **WebRtcVad** wrapper. If the speech confidence level falls below the configured VAD threshold, transmission halts, avoiding broadcasting ambient keyboard clicks or fan noise.
+* **Single-File Native Resolution:** The client uses custom assembly resolution callbacks to load the native `WebRtcVad.dll` from the `runtimes\win-x64\native` subdirectory at runtime, solving DLL loading issues for single-file published packages.
 * **Compression:** Active speech buffers are encoded into highly compressed **Opus** frames (using the **Concentus** C# wrapper) and transmitted immediately as binary WebSocket frames to the Go Audio Server.
 
 ### 2. Location Tracking and Heading Estimation
 * **Position Source Toggle:** Players can choose between two positioning methodologies in the client settings:
   * **OCR Screen Scanner:** Periodically takes a screenshot of the configured screen region (where `/showlocations` or `r_DisplaySessionInfo` renders coordinate text), preprocesses the image, and feeds it to the **Tesseract OCR** engine.
+  * **Single-File Native Resolution:** Tesseract's native binaries (`tesseract50.dll` and `leptonica-1.82.0.dll`) are programmatically resolved from the `x64` subdirectory at runtime, ensuring robust OCR operation when deployed as a self-contained single-file executable.
   * **Game.log Reader (GRTPR):** Tail-scans the Star Citizen `Game.log` file directly for coordinates logged by the game. To enable this, players must add `r_DisplaySessionInfo = 3` (or `1`) to their `user.cfg` file. Selecting GRTPR completely shuts down and disposes the Tesseract OCR engine, saving substantial CPU and RAM resources on the host machine.
 * **Hierarchical Zone Filtering:** The parsed position text contains multiple hierarchical lines of player coordinates (e.g. planetary coordinates, ship compartments, elevators). The client parses these lines and dynamically filters out sub-zones (like `elevator`, `transit`, `seat`) and system-wide zones (like `solarsystem`, `Stanton`). This ensures players inside a ship compartment can hear players in the adjacent corridor without audio cutting off due to minor sub-zone differences.
 * **Heading Estimation:** Since Star Citizen does not output player orientation, the client tracks coordinate displacement ($Position_{current} - Position_{previous}$). If the player moves more than 0.5 meters, the client calculates the movement direction vector as the estimated look heading. When the player is stationary, the last calculated heading is preserved.
@@ -184,11 +186,15 @@ graph TD
   * *Hangars:* 35% wet, 150ms delay, 0.5 feedback.
 
 ### 8. Zero-Dependency Discord Rich Presence (RPC)
-* **Named Pipe Connection:** The client integrates with Discord via local Windows named pipes (`\\.\pipe\discord-ipc-0`) without requiring heavy external dependencies.
+* **Robust Named Pipe Connection:** The client integrates with Discord without requiring heavy external dependencies. To ensure robust connectivity across different Discord configurations or multiple instances, it scans and attempts connection on all named pipe indexes from `discord-ipc-0` through `discord-ipc-9`.
 * **Dynamic Activity Updates:** Instantly updates your Discord presence with:
   * **Details:** Current in-game location zone (e.g. `"At MicroTech Cave"`).
   * **State:** Connected channel and state (e.g. `"On Radio: Bravo Channel (Helmet On)"` or `"In Proximity"`).
   * **Time Elapsed:** Displays elapsed time since the server connection was established.
+
+### 9. Startup Log Rotation
+* **Daily Log Rotation:** At startup, the client checks the active log file's date. If it was modified on a previous day, it is archived as `xuru_voip.YYYY-MM-DD.log`.
+* **Pruning and Retention:** To limit disk space consumption, the client scans the log directory and retains only the 5 most recent rotated log files, deleting older ones.
 
 ---
 
@@ -206,6 +212,7 @@ The server coordinates player positions, handles secure authentication, and dyna
 * **Anti-Bypass Security**: Bans troublemakers by Username, IP, and hardware fingerprint (HWID/MachineGuid) to prevent ban-dodging.
 * **Web Administration Portal**: Secure web interface (HTTPS/WebSockets) for real-time dashboards, log streaming, channel/profile configuration, and ban management.
 * **Server Admin Radar Map**: 2D HTML5 Canvas real-time player radar integrated into the admin dashboard, supporting click-and-drag panning, mouse-wheel zoom, active zone filtering, historical player walking trails (breadcrumbs), and live pulsating concentric soundwave rings around talking players.
+* **Startup Log Rotation**: Checks the server log (`xuruvoip.log`) at startup. If the log file contains entries from a previous day, it is rotated to `xuruvoip.YYYY-MM-DD.log`. The server retains only the 5 most recent rotated files and deletes older ones to prevent excessive disk usage.
 
 ### Server Configuration (`.env`)
 

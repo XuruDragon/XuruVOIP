@@ -134,11 +134,13 @@ graph TD
 ### 1. Capture Audio, VAD et Compression
 * **Capture Audio :** Le client capture le microphone en utilisant l'API **NAudio** à un taux de 48 000 Hz, 16 bits mono.
 * **Détection d'Activité Vocale (VAD) :** Les tampons audio sont évalués par le wrapper natif **WebRtcVad**. Si la confiance vocale descend sous le seuil configuré, la transmission s'arrête pour éviter de diffuser le bruit du clavier ou des ventilateurs.
+* **Résolution native d'exécutable unique :** Le client utilise des rappels de résolution d'assembly personnalisés pour charger la DLL native `WebRtcVad.dll` depuis le sous-répertoire `runtimes\win-x64\native` au démarrage, résolvant ainsi les problèmes de chargement de DLL pour les packages publiés en fichier unique.
 * **Compression :** Les voix actives sont encodées en paquets **Opus** compressés (via le wrapper C# **Concentus**) et transmises directement via WebSocket au serveur audio.
 
 ### 2. Suivi de Localisation et Orientation
 * **Sélecteur de Source de Position :** Les joueurs peuvent choisir entre deux méthodes de positionnement dans les paramètres :
   * **Scanner d'Écran OCR :** Capture régulièrement la zone configurée de l'écran (affichant les coordonnées de session `/showlocations` ou `r_DisplaySessionInfo`), prétraite l'image et la transmet au moteur **Tesseract OCR**.
+  * **Résolution native d'exécutable unique :** Les binaires natifs de Tesseract (`tesseract50.dll` et `leptonica-1.82.0.dll`) sont résolus par programme à partir du sous-répertoire `x64` au démarrage, garantissant un fonctionnement robuste de l'OCR lorsqu'il est déployé sous forme d'exécutable autonome.
   * **Lecteur Game.log (GRTPR) :** Analyse en continu le fichier `Game.log` de Star Citizen pour y lire les coordonnées. Pour activer cette méthode, les joueurs doivent ajouter `r_DisplaySessionInfo = 3` (ou `1`) à leur fichier `user.cfg`. Choisir GRTPR désactive et libère complètement le moteur Tesseract OCR, économisant les ressources CPU et RAM de la machine hôte.
 * **Filtrage de Zone Hiérarchique :** Les lignes de coordonnées contiennent des zones (compartiments de vaisseaux, ascenseurs, planètes). Le client filtre dynamiquement les sous-zones (comme `elevator`, `transit`, `seat`) et les zones globales (`solarsystem`, `Stanton`) pour éviter les coupures de voix intempestives entre joueurs proches.
 * **Estimation de l'Orientation :** Comme Star Citizen ne fournit pas l'orientation, le client calcule le vecteur de déplacement. Si le joueur bouge de plus de 0,5 mètre, l'orientation estimée est mise à jour.
@@ -157,6 +159,18 @@ graph TD
   * **Dégradation Radio Dynamique :** Si elle est activée, le filtre DSP rétrécit dynamiquement les fréquences de coupure passe-haut et passe-bas et mélange du bruit blanc filtré lorsque la distance entre les joueurs approche de la portée maximale, simulant la perte de signal radio.
   * **Bruits de Micro PTT Réalistes :** NAudio synthétise des bruits de micro lors de l'activation/désactivation de la transmission. L'activation joue un chirp de 50 ms (balayage de fréquence 900 Hz à 700 Hz). La désactivation déclenche un bruit de squelch (bruit blanc filtré de 180 ms) lors de la réception d'une frame Opus vide de 0 octet. Une option de retour local permet d'entendre ses propres bruitages.
 
+### 5. États Micro Dynamiques & Contrôles de Sourdine
+* **Affichage Dynamique du Microphone :** L'étiquette de statut du microphone dans la fenêtre principale se met à jour en temps réel pour afficher l'état exact de votre émetteur :
+  * `Proximity PTT (Off)` / `Proximity PTT (On)` (Canal de proximité Push-To-Talk)
+  * `Proximity VAD (OFF)` / `Proximity VAD (ON)` (Mode d'activation vocale, passe à ON lorsque la parole est détectée)
+  * `Radio Channel PTT (ON)` (Transmission sur le canal radio actif)
+  * `Profile PTT (ON)` (Transmission sur le canal de profil)
+  * `(Muted)` (ex. `Proximity PTT (Muted)`) quand le microphone du canal actif est coupé.
+* **Tableau de Statut des Sourdines de Canaux :** Sous le canal actif et le statut du casque, la fenêtre principale contient un tableau structuré résumant le statut actif/coupé du microphone (sortant) et de l'audio (entrant) pour les trois canaux de communication (Proximité, Radio et Profil). Les statuts sont colorés (Vert pour ACTIF, Rouge pour COUPÉ) et mis à jour de manière dynamique.
+* **Raccourcis Clavier Séparés pour Sourdine Micro et Audio :**
+  * **Sourdine Microphone (Sortant) :** Active/désactive le micro pour chaque canal. Raccourcis par défaut : Proximité (`M`), Radio (`,`), Profil (`.`). En mode muet, les pressions PTT et la parole VAD ne transmettent pas d'audio au serveur, et la LED de la fenêtre principale reste orange.
+  * **Sourdine Audio (Entrant) :** Active/désactive le son des autres joueurs pour chaque canal. Les valeurs par défaut ne sont pas assignées (`Aucun`) et peuvent être configurées dans la fenêtre des paramètres.
+
 ### 6. Incrustation HUD (Overlay) Compatible Vulkan et DirectX
 * **Fenêtre d'Incrustation HUD** : Le client fournit un overlay WPF optionnel et léger qui s'affiche au premier plan. Il indique le statut de la VoIP, la fréquence active et la liste des interlocuteurs qui parlent avec des indicateurs de signal radio.
 * **Intégration Transparente Win32** : Grâce aux styles de fenêtre Win32 (`WS_EX_TRANSPARENT` et `WS_EX_NOACTIVATE`), l'incrustation ne vole pas le focus et laisse passer tous les clics de souris vers le jeu.
@@ -170,11 +184,15 @@ graph TD
   * *Hangars :* 35 % wet, 150 ms de délai, 0.5 de feedback.
 
 ### 8. Discord Rich Presence Sans Dépendance (RPC)
-* **Connexion par Pipe Nommé :** Le client se connecte à Discord via le protocole local des pipes nommés Windows (`\\.\pipe\discord-ipc-0`) sans nécessiter de bibliothèque NuGet lourde.
+* **Connexion par Pipe Nommé Robuste :** Le client s'intègre à Discord sans nécessiter de dépendances externes lourdes. Pour assurer une connectivité robuste à travers différentes configurations Discord ou plusieurs instances, il analyse et tente la connexion sur tous les index de canaux nommés de `discord-ipc-0` à `discord-ipc-9`.
 * **Mise à Jour Dynamique de l'Activité :** Met à jour en temps réel votre présence Discord :
   * **Détails :** Zone de position en jeu (ex. `"Dans une grotte sur MicroTech"`).
   * **État :** Canal actif et état du casque (ex. `"Sur la radio : Canal Bravo (Casque équipé)"` ou `"En proximité"`).
   * **Temps Écoulé :** Affiche le chronomètre depuis la connexion au serveur VoIP.
+
+### 9. Rotation des journaux au démarrage
+* **Rotation quotidienne des journaux :** Au démarrage, le client vérifie la date du fichier journal actif. S'il a été modifié un jour précédent, il est archivé sous le nom `xuru_voip.YYYY-MM-DD.log`.
+* **Nettoyage et conservation :** Pour limiter la consommation d'espace disque, le client analyse le répertoire des journaux et conserve uniquement les 5 fichiers de journaux rotatifs les plus récents, en supprimant les plus anciens.
 
 ---
 
@@ -191,6 +209,7 @@ Le serveur gère la position des joueurs, l'authentification et route dynamiquem
 * **Sécurité Anti-Contournement** : Bannissement par nom d'utilisateur, adresse IP et empreinte matérielle (HWID/MachineGuid).
 * **Portail Web d'Administration** : Interface sécurisée en HTTPS/WebSockets avec journalisation en temps réel et gestion des bannissements.
 * **Carte Radar d'Administration** : Une carte radar 2D Canvas HTML5 en temps réel intégrée au tableau de bord pour suivre les positions des joueurs, avec défilement par clic-glissé, zoom à la molette, filtrage par zone, tracé des déplacements récents (breadcrumbs) et ondes sonores concentriques pulsées autour des joueurs qui parlent.
+* **Rotation des journaux au démarrage :** Vérifie le journal du serveur (`xuruvoip.log`) au démarrage. Si le fichier journal contient des entrées d'un jour précédent, il est basculé vers `xuruvoip.YYYY-MM-DD.log`. Le serveur conserve uniquement les 5 fichiers rotatifs les plus récents et supprime les plus anciens pour éviter une utilisation excessive de l'espace disque.
 
 ### Configuration du Serveur (`.env`)
 Au premier démarrage, le serveur génère un fichier `.env` avec ces valeurs :

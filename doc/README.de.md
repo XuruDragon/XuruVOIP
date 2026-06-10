@@ -134,11 +134,13 @@ graph TD
 ### 1. Audioerfassung, VAD und Komprimierung
 * **Audioerfassung:** Der Client erfasst Mikrofon-Audio über die **NAudio**-API mit 48.000 Hz, 16-Bit Mono.
 * **Sprachaktivierungserkennung (VAD):** Audiodaten werden mittels des nativen **WebRtcVad** bewertet. Sinkt die Sprachkonfidenz unter den Schwellenwert, stoppt die Übertragung. So werden Tastaturgeräusche oder Lüfterrauschen ausgefiltert.
+* **Kompilierungsfreie native Auflösung:** Der Client lädt die native Bibliothek `WebRtcVad.dll` beim Start über einen benutzerdefinierten Auflösungs-Callback direkt aus dem Unterverzeichnis `runtimes\win-x64\native`, was Ladeprobleme bei als Einzeldatei veröffentlichten Paketen behebt.
 * **Komprimierung:** Aktive Audiodaten werden in hochkomprimierte **Opus**-Frames codiert (über **Concentus** C#) und direkt als binäre WebSocket-Frames an den Server gesendet.
 
 ### 2. Positionsverfolgung und Richtungsbestimmung
 * **Positionsquellen-Umschalter:** Spieler können in den Client-Einstellungen zwischen zwei Methoden wählen:
   * **OCR-Bildschirmscanner:** Erstellt regelmäßig ein Foto des konfigurierten Bildschirmbereichs (auf dem die Koordinaten per `/showlocations` oder `r_DisplaySessionInfo` angezeigt werden), verarbeitet das Bild vor und leitet es an die **Tesseract OCR**-Engine weiter.
+  * **Kompilierungsfreie native Auflösung:** Die nativen Binärdateien von Tesseract (`tesseract50.dll` und `leptonica-1.82.0.dll`) werden zur Laufzeit programmgesteuert aus dem Unterverzeichnis `x64` geladen, um einen fehlerfreien Betrieb bei der Ausführung als eigenständige Einzeldatei sicherzustellen.
   * **Game.log-Leser (GRTPR):** Scannt die Star Citizen `Game.log`-Datei direkt nach vom Spiel ausgegebenen Koordinaten. Hierfür muss `r_DisplaySessionInfo = 3` (oder `1`) in der Datei `user.cfg` eingetragen sein. Die Auswahl von GRTPR stoppt und deinitialisiert die Tesseract OCR-Engine vollständig, um wertvolle CPU- und RAM-Ressourcen des Hostsystems freizusetzen.
 * **Hierarchischer Zonenfilter:** Die Koordinaten enthalten hierarchische Zonen (z.B. Planeten, Raumschiffe). Der Client filtert Zonenunterschiede (wie Aufzüge, Sitze) heraus, damit sich Spieler in angrenzenden Zonen unterbrechungsfrei hören.
 * **Richtungsbestimmung:** Da Star Citizen die Blickrichtung nicht ausgibt, errechnet der Client die Bewegungsrichtung aus der Positionsänderung ($Position_{aktuell} - Position_{vorherig$). Im Stillstand bleibt der letzte Wert erhalten.
@@ -158,6 +160,18 @@ graph TD
   * **Dynamische Funkverschlechterung:** Falls aktiviert, verengt der DSP-Filter die Hoch- und Tiefpass-Grenzfrequenzen und mischt bandpassgefiltertes weißes Rauschen hinzu, wenn sich Spieler der maximalen Funkreichweite nähern, um Funksignalschwankungen zu simulieren.
   * **Authentische PTT- & Funktöne:** NAudio erzeugt Synthesizer-Töne für Sendeaktivierungen. Der Sendestart spielt einen 50ms pitch-sweep **Mic Key Chirp** (900Hz bis 700Hz). Das Sendeende löst ein 180ms **Squelch-Rauschen** (Squelch Tail) aus, sobald ein leeres 0-Byte-Opus-Frame empfangen wird. Ein lokaler Loopback-Ton ermöglicht das Hören der eigenen Funktöne.
 
+### 5. Dynamische Mikrofonzustände & Stummschaltungssteuerung
+* **Dynamische Mikrofonanzeige:** Die Mikrofonstatusanzeige im Hauptfenster aktualisiert sich in Echtzeit, um den genauen Zustand Ihres Senders anzuzeigen:
+  * `Proximity PTT (Aus)` / `Proximity PTT (An)` (Push-To-Talk für den Proximity-Kanal)
+  * `Proximity VAD (AUS)` / `Proximity VAD (AN)` (Sprachaktivierungsmodus, wechselt auf AN, wenn Sprache erkannt wird)
+  * `Radio Channel PTT (AN)` (Übertragung auf dem aktiven Funkkanal)
+  * `Profile PTT (AN)` (Übertragung auf dem Profilkanal)
+  * `(Stummgeschaltet)` (z. B. `Proximity PTT (Stummgeschaltet)`), wenn das Mikrofon für den aktuellen Kanal stummgeschaltet ist.
+* **Stummschaltungsstatustabelle:** Unterhalb des aktiven Kanals und Helmstatus enthält das Hauptfenster eine strukturierte Tabelle, die den Aktivierungs-/Stummschaltungsstatus sowohl des Mikrofons (ausgehend) als auch des Audios (eingehend) für alle drei Kommunikationskanäle (Proximity, Radio und Profile) zusammenfasst. Statuswerte sind farblich gekennzeichnet (Grün für AKTIV, Rot für STUMM) und aktualisieren sich dynamisch.
+* **Getrennte Hotkeys für Mikrofon- und Audio-Stummschaltung:**
+  * **Mikrofon-Stummschaltung (Ausgehend):** Schaltet die Mikrofonübertragung für jeden Kanal stumm. Standardbelegungen: Proximity (`M`), Radio (`,`), Profile (`.`). Im stummgeschalteten Zustand übertragen PTT-Tastendrücke und VAD-Sprache kein Audio an den Server, und die LED im Hauptfenster bleibt orange.
+  * **Audio-Stummschaltung (Eingehend):** Schaltet die Wiedergabe der Stimmen anderer Spieler auf dem jeweiligen Kanal stumm. Die Standardbelegungen sind nicht zugewiesen (`Keine`) und können im Einstellungsfenster frei konfiguriert werden.
+
 ### 6. Vulkan-kompatibles rahmenloses HUD-Overlay
 * **HUD-Overlay-Fenster**: Der Client bietet ein optionales, transparentes WPF-Overlay, das im Vordergrund läuft. Es zeigt den VoIP-Status, die aktive Funkfrequenz und eine Echtzeitliste der aktiven Sprecher mit Funksignalsymbolen.
 * **Win32-Durchklick-Integration**: Durch Win32-Window-Styles (`WS_EX_TRANSPARENT` und `WS_EX_NOACTIVATE`) stiehlt das Overlay keinen Fokus und lässt Mausereignisse direkt zum Spiel durch.
@@ -171,11 +185,15 @@ graph TD
   * *Hangars:* 35% Wet-Mix, 150ms Verzögerung, 0.5 Feedback.
 
 ### 8. Discord Rich Presence ohne externe Abhängigkeiten (RPC)
-* **Named Pipe Verbindung:** Der Client verbindet sich ohne schwere externe NuGet-Bibliotheken über lokale Windows Named Pipes (`\\.\pipe\discord-ipc-0`) direkt mit Discord.
+* **Robuste Named-Pipe-Verbindung:** Der Client verbindet sich ohne schwere externe NuGet-Bibliotheken direkt mit Discord. Um eine robuste Konnektivität bei unterschiedlichen Discord-Konfigurationen oder mehreren Instanzen zu gewährleisten, sucht und versucht der Client Verbindungen auf allen Named-Pipe-Indizes von `discord-ipc-0` bis `discord-ipc-9`.
 * **Dynamische Status-Updates:** Aktualisiert die Discord-Aktivität in Echtzeit:
   * **Details:** Aktuelle In-Game-Zone (z. B. `"In einer Höhle auf MicroTech"`).
   * **Status:** Aktiver Funkkanal und Helm-Status (z. B. `"Auf Funkkanal: Bravo (Helm auf)"` oder `"In der Nähe"`).
   * **Vergangene Zeit:** Zeigt die Dauer seit dem Verbindungsaufbau zum VoIP-Server an.
+
+### 9. Log-Rotation beim Start
+* **Tägliche Log-Rotation:** Beim Start überprüft der Client das Datum der aktiven Logdatei. Wenn diese an einem vorherigen Tag geändert wurde, wird sie als `xuru_voip.YYYY-MM-DD.log` archiviert.
+* **Bereinigung und Aufbewahrung:** Um den Speicherplatzbedarf zu begrenzen, scannt der Client das Log-Verzeichnis und bewahrt nur die 5 neuesten rotierten Logdateien auf. Ältere werden gelöscht.
 
 ---
 
@@ -192,6 +210,7 @@ Der Server koordiniert die Positionen, authentifiziert Verbindungen und leitet A
 * **Sicherheitssystem**: Sperrt (bannt) Störenfriede nach Benutzername, IP-Adresse und Hardware-Fingerabdruck (HWID/MachineGuid).
 * **Webportal für Admins**: Sichere Weboberfläche (HTTPS/WebSockets) mit Echtzeit-Logs, Dashboard und Ban-Verwaltung.
 * **Server-Admin-Radarkarte**: Echtzeit-2D-Radarkarte über HTML5-Canvas im Admin-Dashboard zur Verfolgung von Spielerpositionen mit Zoom per Mausrad, Panning per Klick-und-Drag, Zonenfilterung, Verfolgung historischer Gehpfade (Breadcrumbs) und konzentrisch pulsierenden Schallwellenringen um aktive Sprecher.
+* **Log-Rotation beim Start**: Überprüft das Server-Log (`xuruvoip.log`) beim Start. Wenn die Logdatei Einträge von einem vorherigen Tag enthält, wird sie in `xuruvoip.YYYY-MM-DD.log` rotiert. Der Server behält nur die letzten 5 rotierten Dateien und löscht ältere, um übermäßigen Speicherplatzverbrauch zu verhindern.
 
 ### Server-Konfiguration (`.env`)
 Beim ersten Start wird eine Standard-`.env`-Datei generiert:
