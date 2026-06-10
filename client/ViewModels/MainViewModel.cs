@@ -18,7 +18,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     public ConfigService Config { get; } = new();
     private readonly OcrService _ocr = new();
     private readonly PositionWebSocketService _posWs = new();
-    private readonly AudioWebSocketService _audioWs = new();
+    private readonly AudioUdpService _audioWs = new();
     private readonly AudioCaptureService _capture = new();
     private readonly AudioPlaybackService _playback = new();
     public AudioPlaybackService Playback => _playback;
@@ -457,7 +457,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             UpdateDiscordPresence();
         });
 
-        _audioWs.AudioPacketReceived += (name, type, opus, metadata) =>
+        _audioWs.AudioPacketReceived += (name, type, opus, metadata, seq) =>
         {
             bool localHelmet = IsHelmetOn;
             _remoteHelmets.TryGetValue(name, out bool remoteHelmet);
@@ -490,7 +490,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             }
             string listenerZone = _lastSentPos.Zone ?? "";
 
-            _playback.ReceiveOpusFrame(name, opus, type, applyRadio, metadata, distance, speakerZone, listenerZone);
+            _playback.ReceiveOpusFrame(name, opus, type, applyRadio, metadata, distance, speakerZone, listenerZone, seq);
         };
 
         _capture.EncodedFrameReady += async (frame, txType) =>

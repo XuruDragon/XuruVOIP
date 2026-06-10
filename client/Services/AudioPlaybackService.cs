@@ -117,6 +117,9 @@ public class AudioPlaybackService : IDisposable
         provider.AddSamples(bytes, 0, bytes.Length);
     }
 
+    private System.Threading.CancellationTokenSource? _loopCts;
+    private System.Threading.Tasks.Task? _loopTask;
+
     public void Start(int deviceIndex, double outputGainPercent)
     {
         Stop();
@@ -128,6 +131,10 @@ public class AudioPlaybackService : IDisposable
         _waveOut = new WaveOutEvent { DeviceNumber = deviceIndex, DesiredLatency = 100 };
         _waveOut.Init(_mixer);
         _waveOut.Play();
+
+        // Start high-precision playback tick loop (20ms interval)
+        _loopCts = new System.Threading.CancellationTokenSource();
+        _loopTask = System.Threading.Tasks.Task.Run(() => PlaybackLoopAsync(_loopCts.Token));
     }
 
     /// <summary>Calculates the pan and volume factor for 3D spatial audio.</summary>
@@ -179,8 +186,17 @@ public class AudioPlaybackService : IDisposable
         return (currentPan, distanceVolumeFactor);
     }
 
-    /// <summary>Called from AudioWebSocketService when a binary packet arrives.</summary>
-    public void ReceiveOpusFrame(string playerName, byte[] opusData, byte audioType, bool applyRadioEffect, ProximityMetadata? metadata, double distance = -1.0, string speakerZone = "", string listenerZone = "")
+    /// <summary>Called from AudioUdpService when a binary packet arrives.</summary>
+    public void ReceiveOpusFrame(
+        string playerName,
+        byte[] opusData,
+        byte audioType,
+        bool applyRadioEffect,
+        ProximityMetadata? metadata,
+        double distance = -1.0,
+        string speakerZone = "",
+        string listenerZone = "",
+        ushort seq = 0)
     {
         if (_mixer == null) return;
 
@@ -198,91 +214,169 @@ public class AudioPlaybackService : IDisposable
             }
         }
 
-        // 1. Process end-of-transmission or PTT chimes triggers
-        if (opusData.Length == 0)
-        {
-            if (track.IsTransmitting)
-            {
-                track.IsTransmitting = false;
-                if (EnablePttChimes && applyRadioEffect)
-                {
-                    WriteFloatBuffer(track.Buffer, KeyUpChime);
-                }
-            }
-            return;
-        }
-
-        if (!track.IsTransmitting)
-        {
-            track.IsTransmitting = true;
-            if (EnablePttChimes && applyRadioEffect)
-            {
-                WriteFloatBuffer(track.Buffer, KeyDownChime);
-            }
-        }
-
         // Track last active time
         track.LastReceivedTime = DateTime.UtcNow;
 
-        // 2. 3D Spatial Audio calculations (for proximity)
-        float currentPan = 0.0f;
-        float distanceVolumeFactor = 1.0f;
-
-        if (audioType == 0x00 && metadata != null)
+        // Enqueue into Jitter Buffer
+        track.Jitter.Enqueue(new AudioPacket
         {
-            var (pan, volume) = CalculateSpatialParams(
-                ListenerX, ListenerY, ListenerZ,
-                ListenerHeadingX, ListenerHeadingY,
-                metadata.SpeakerX, metadata.SpeakerY, metadata.SpeakerZ,
-                metadata.Distance, metadata.MaxRange,
-                metadata.SpatialEnabled, EnableSpatialAudio);
-            currentPan = pan;
-            distanceVolumeFactor = volume;
-        }
+            SequenceNumber = seq,
+            AudioType = audioType,
+            OpusData = opusData,
+            ApplyRadioEffect = applyRadioEffect,
+            Metadata = metadata,
+            Distance = distance,
+            SpeakerZone = speakerZone,
+            ListenerZone = listenerZone
+        });
+    }
 
-        // Apply pan and volume to track providers
-        track.Panning.Pan = currentPan;
-        track.Volume.Volume = distanceVolumeFactor;
-
-        // Calculate dynamic radio degradation
-        double deg = 0.0;
-        if (applyRadioEffect && EnableRadioDegradation && distance >= 0)
+    private async System.Threading.Tasks.Task PlaybackLoopAsync(System.Threading.CancellationToken ct)
+    {
+        using var timer = new System.Threading.PeriodicTimer(TimeSpan.FromMilliseconds(20));
+        try
         {
-            if (distance > 1500)
+            while (await timer.WaitForNextTickAsync(ct))
             {
-                // Scale linearly from 1.5km (clean) to 8km (full static)
-                deg = (distance - 1500) / (8000 - 1500);
-                if (deg > 1.0) deg = 1.0;
+                TickPlayback();
             }
         }
-        track.DspFilter.DegradationFactor = deg;
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            LogService.Error("Exception in PlaybackLoopAsync", ex);
+        }
+    }
 
-        // 3. Decode
+    private void TickPlayback()
+    {
+        lock (_lock)
+        {
+            foreach (var kvp in _tracks)
+            {
+                var playerName = kvp.Key;
+                var track = kvp.Value;
+                if (playerName == "__local_chime") continue;
+
+                var packet = track.Jitter.Dequeue(out bool isPlcNeeded);
+
+                if (packet != null)
+                {
+                    // 1. Process end-of-transmission or PTT chimes triggers
+                    if (packet.OpusData.Length == 0)
+                    {
+                        if (track.IsTransmitting)
+                        {
+                            track.IsTransmitting = false;
+                            if (EnablePttChimes && packet.ApplyRadioEffect)
+                            {
+                                WriteFloatBuffer(track.Buffer, KeyUpChime);
+                            }
+                        }
+                        continue;
+                    }
+
+                    if (!track.IsTransmitting)
+                    {
+                        track.IsTransmitting = true;
+                        if (EnablePttChimes && packet.ApplyRadioEffect)
+                        {
+                            WriteFloatBuffer(track.Buffer, KeyDownChime);
+                        }
+                    }
+
+                    // 2. 3D Spatial Audio calculations (for proximity)
+                    float currentPan = 0.0f;
+                    float distanceVolumeFactor = 1.0f;
+
+                    if (packet.AudioType == 0x00 && packet.Metadata != null)
+                    {
+                        var (pan, volume) = CalculateSpatialParams(
+                            ListenerX, ListenerY, ListenerZ,
+                            ListenerHeadingX, ListenerHeadingY,
+                            packet.Metadata.SpeakerX, packet.Metadata.SpeakerY, packet.Metadata.SpeakerZ,
+                            packet.Metadata.Distance, packet.Metadata.MaxRange,
+                            packet.Metadata.SpatialEnabled, EnableSpatialAudio);
+                        currentPan = pan;
+                        distanceVolumeFactor = volume;
+                    }
+
+                    track.Panning.Pan = currentPan;
+                    track.Volume.Volume = distanceVolumeFactor;
+
+                    // Calculate dynamic radio degradation
+                    double deg = 0.0;
+                    if (packet.ApplyRadioEffect && EnableRadioDegradation && packet.Distance >= 0)
+                    {
+                        if (packet.Distance > 1500)
+                        {
+                            deg = (packet.Distance - 1500) / (8000 - 1500);
+                            if (deg > 1.0) deg = 1.0;
+                        }
+                    }
+                    track.DspFilter.DegradationFactor = deg;
+
+                    // Cache zones for potential PLC
+                    track.LastSpeakerZone = packet.SpeakerZone;
+                    track.LastListenerZone = packet.ListenerZone;
+
+                    // 3. Decode frame
+                    DecodeAndWriteToBuffer(track, packet.OpusData, packet.ApplyRadioEffect, packet.SpeakerZone, packet.ListenerZone);
+                }
+                else if (isPlcNeeded)
+                {
+                    // Trigger PLC (Packet Loss Concealment)
+                    DecodeAndWriteToBuffer(track, null, track.DspFilter.DegradationFactor > 0, track.LastSpeakerZone, track.LastListenerZone);
+                }
+                else
+                {
+                    // Underflow: play silence / stop transmission
+                    if (track.IsTransmitting)
+                    {
+                        track.IsTransmitting = false;
+                        if (EnablePttChimes)
+                        {
+                            WriteFloatBuffer(track.Buffer, KeyUpChime);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void DecodeAndWriteToBuffer(PlayerAudioTrack track, byte[]? opusData, bool applyRadioEffect, string speakerZone, string listenerZone)
+    {
         Span<short> pcm = stackalloc short[FrameSamples];
-        int decoded = track.Decoder.Decode(opusData, pcm, FrameSamples, false);
+        int decoded;
+        
+        if (opusData == null || opusData.Length == 0)
+        {
+            decoded = track.Decoder.Decode(null, pcm, FrameSamples, false);
+        }
+        else
+        {
+            decoded = track.Decoder.Decode(opusData, pcm, FrameSamples, false);
+        }
+
         if (decoded <= 0) return;
 
-        // Convert short PCM to float
         var floatBuf = new float[decoded];
         for (int i = 0; i < decoded; i++)
         {
             floatBuf[i] = pcm[i] / 32768f;
         }
 
-        // Apply Environmental Acoustics (Occlusion & Reverb) if enabled
         if (EnableEnvironmentalAcoustics)
         {
             track.AcousticFilter.UpdateZoneInfo(speakerZone, listenerZone);
             track.AcousticFilter.Process(floatBuf, decoded);
         }
- 
-        // Apply Radio DSP Effect if helmet or channel dictates it
+
         if (applyRadioEffect)
         {
             track.DspFilter.Process(floatBuf, decoded);
         }
 
-        // Convert back and write to buffer (with volume adjustments)
         var byteBuf = new byte[decoded * 4];
         for (int i = 0; i < decoded; i++)
         {
@@ -352,10 +446,27 @@ public class AudioPlaybackService : IDisposable
 
     public void Stop()
     {
+        _loopCts?.Cancel();
+        try
+        {
+            _loopTask?.GetAwaiter().GetResult();
+        }
+        catch { }
+        _loopCts?.Dispose();
+        _loopCts = null;
+        _loopTask = null;
+
         _waveOut?.Stop();
         _waveOut?.Dispose();
         _waveOut = null;
-        lock (_lock) { _tracks.Clear(); }
+        lock (_lock)
+        {
+            foreach (var track in _tracks.Values)
+            {
+                track.Jitter.Clear();
+            }
+            _tracks.Clear();
+        }
         _mixer = null;
     }
 
@@ -398,5 +509,151 @@ public class AudioPlaybackService : IDisposable
         public EnvironmentalAcousticFilter AcousticFilter { get; } = new();
         public bool IsTransmitting { get; set; } = false;
         public DateTime LastReceivedTime { get; set; } = DateTime.MinValue;
+        public JitterBuffer Jitter { get; } = new();
+        public string LastSpeakerZone { get; set; } = string.Empty;
+        public string LastListenerZone { get; set; } = string.Empty;
+    }
+}
+
+internal class AudioPacket
+{
+    public ushort SequenceNumber { get; set; }
+    public byte AudioType { get; set; }
+    public byte[] OpusData { get; set; } = Array.Empty<byte>();
+    public bool ApplyRadioEffect { get; set; }
+    public ProximityMetadata? Metadata { get; set; }
+    public double Distance { get; set; }
+    public string SpeakerZone { get; set; } = string.Empty;
+    public string ListenerZone { get; set; } = string.Empty;
+}
+
+internal class JitterBuffer
+{
+    private readonly SortedList<ushort, AudioPacket> _packets = new(new SequenceNumberComparer());
+    private readonly object _lock = new();
+    private ushort? _expectedSeq;
+    private bool _isBuffering = true;
+    private const int MaxBufferSize = 50;
+    private const int TargetDelayFrames = 3;
+
+    public int Count
+    {
+        get { lock (_lock) return _packets.Count; }
+    }
+
+    public void Enqueue(AudioPacket packet)
+    {
+        lock (_lock)
+        {
+            if (_packets.ContainsKey(packet.SequenceNumber))
+            {
+                return;
+            }
+
+            if (_packets.Count >= MaxBufferSize)
+            {
+                _packets.RemoveAt(0);
+            }
+
+            _packets.Add(packet.SequenceNumber, packet);
+        }
+    }
+
+    public AudioPacket? Dequeue(out bool isPlcNeeded)
+    {
+        isPlcNeeded = false;
+        lock (_lock)
+        {
+            if (_packets.Count == 0)
+            {
+                _expectedSeq = null;
+                _isBuffering = true;
+                return null;
+            }
+
+            if (_isBuffering)
+            {
+                if (_packets.Count >= TargetDelayFrames)
+                {
+                    _isBuffering = false;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            if (!_expectedSeq.HasValue)
+            {
+                _expectedSeq = _packets.Keys[0];
+            }
+
+            ushort currentExpected = _expectedSeq.Value;
+
+            if (_packets.TryGetValue(currentExpected, out var packet))
+            {
+                _packets.Remove(currentExpected);
+                _expectedSeq = (ushort)(currentExpected + 1);
+                if (_packets.Count == 0)
+                {
+                    _expectedSeq = null;
+                    _isBuffering = true;
+                }
+                return packet;
+            }
+
+            // Check if we have any newer packets to decide if we should do PLC
+            bool hasNewer = false;
+            foreach (var seq in _packets.Keys)
+            {
+                if (CompareSequenceNumbers(seq, currentExpected) > 0)
+                {
+                    hasNewer = true;
+                    break;
+                }
+            }
+
+            if (hasNewer)
+            {
+                isPlcNeeded = true;
+                _expectedSeq = (ushort)(currentExpected + 1);
+                return null;
+            }
+            else
+            {
+                // Underflow, wait for next packets
+                _expectedSeq = null;
+                _isBuffering = true;
+                return null;
+            }
+        }
+    }
+
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            _packets.Clear();
+            _expectedSeq = null;
+            _isBuffering = true;
+        }
+    }
+
+    public static int CompareSequenceNumbers(ushort a, ushort b)
+    {
+        if (a == b) return 0;
+        ushort diff = (ushort)(a - b);
+        if (diff < 32768)
+            return 1;
+        else
+            return -1;
+    }
+
+    private class SequenceNumberComparer : IComparer<ushort>
+    {
+        public int Compare(ushort x, ushort y)
+        {
+            return CompareSequenceNumbers(x, y);
+        }
     }
 }
