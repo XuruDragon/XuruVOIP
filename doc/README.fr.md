@@ -36,6 +36,7 @@ L'objectif de XuruVoip est de fournir aux événements de jeu Star Citizen, aux 
 
 | Rubrique | Descriptif |
 | :--- | :--- |
+| [📖 Guides de l'utilisateur non techniques](#-guides-dutilisation-non-techniques) | Guides étape par étape faciles à comprendre pour le client, le serveur et Stream Deck. |
 | [📸 Captures d'écran et interface utilisateur](#-captures-décran-et-interface-utilisateur) | Vitrine visuelle des écrans clients, du portail d'administration et des paramètres. |
 | [🗂️ Structure du projet](#️-project-structure) | Disposition du référentiel et répartition des dossiers. |
 | [⚙️Architecture système](#️-system-architecture) | Le diagramme de flux de travail complet du client WPF, du serveur Go et des périphériques externes. |
@@ -44,6 +45,16 @@ L'objectif de XuruVoip est de fournir aux événements de jeu Star Citizen, aux 
 | [🎛️ Pont vocal Discord](#️-discord-voice-bridge-setup-guide) | Connexion des chaînes radio du serveur Go à une chaîne vocale Discord. |
 | [📱 Application compagnon et Stream Deck](#-intégration-de-lapplication-companion-et-du-stream-deck) | Contrôle des appareils à distance et configuration des touches physiques du Stream Deck. |
 | [🛠️Client WPF (C#)](#-building--running-the-client) | Exigences du client, compilation et guides d'installation MSI/Portable. |
+
+---
+
+## 📖 Guides d'utilisation non techniques
+
+Si vous n'avez pas de formation en informatique, nous avons rédigé des guides simples, étape par étape, pour vous aider à tout configurer et à tout faire fonctionner facilement :
+
+* 🎮 **[Guide de l'utilisateur client](doc/client_guide.md)** : guide convivial sur le choix des microphones/haut-parleurs, la configuration de Push-to-Talk, l'utilisation de casques de combinaison spatiale et l'activation des effets vocaux d'effort.
+* 🖥️ **[Guide de configuration du serveur](doc/server_guide.md)** : Explique comment héberger un serveur, ajuster les mots de passe/paramètres dans le fichier de paramètres `.env` et configurer le Discord Voice Bridge.
+* 🎛️ **[Stream Deck Plugin Guide](doc/streamdeck_guide.md)** : Procédure pas à pas sur l'installation de boutons physiques pour la mise en sourdine, le basculement de la visière et l'affichage des canaux radio actifs.
 
 ---
 
@@ -75,6 +86,7 @@ L'objectif de XuruVoip est de fournir aux événements de jeu Star Citizen, aux 
 
 ### 8. Page de connexion au portail Web d'administration
 ![Page de connexion au portail Web d'administration](/screenshots/admin_login.png)
+
 ### 9. Tableau de bord du portail Web d'administration
 ![Tableau de bord du portail Web d'administration](/screenshots/admin_dashboard.png)
 

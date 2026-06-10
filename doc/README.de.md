@@ -36,6 +36,7 @@ Das Ziel von XuruVoip ist es, Star Citizen-Gaming-Events, Rollenspiel-Organisati
 
 | Abschnitt | Beschreibung |
 | :--- | :--- |
+| [📖 Nichttechnische Benutzerhandbücher](#-nichttechnische-benutzerhandbücher) | Leicht verständliche Schritt-für-Schritt-Anleitungen für Client, Server und Stream Deck. |
 | [📸 Screenshots und Benutzeroberfläche](#-screenshots-und-benutzeroberfläche) | Visuelle Darstellung der Kundenbildschirme, des Admin-Portals und der Einstellungen. |
 | [🗂️ Projektstruktur](#️-project-structure) | Repository-Layout und Ordneraufteilung. |
 | [⚙️ Systemarchitektur](#️-system-architecture) | Das vollständige tatsächliche Workflow-Diagramm des WPF-Clients, des Go-Servers und externer Geräte. |
@@ -44,6 +45,16 @@ Das Ziel von XuruVoip ist es, Star Citizen-Gaming-Events, Rollenspiel-Organisati
 | [🎛️ Discord Voice Bridge](#️-discord-voice-bridge-setup-guide) | Verbinden von Go-Server-Funkkanälen mit einem Discord-Sprachkanal. |
 | [📱 Companion App & Stream Deck](#-companion-app--stream-deck-integration) | Fernsteuerung des Geräts und Einrichtung der physischen Tasten des Stream Decks. |
 | [🛠️ WPF-Client (C#)](#-building--running-the-client) | Client-Anforderungen, Kompilierung und MSI/Portable-Installationshandbücher. |
+
+---
+
+## 📖 Nichttechnische Benutzerhandbücher
+
+Wenn Sie keine Informatikkenntnisse haben, haben wir einfache Schritt-für-Schritt-Anleitungen geschrieben, die Ihnen dabei helfen, alles einfach zu konfigurieren und zum Laufen zu bringen:
+
+* 🎮 **[Client-Benutzerhandbuch](doc/client_guide.md)**: Freundliche Anleitung zur Auswahl von Mikrofonen/Lautsprechern, zur Einrichtung von Push-to-Talk, zur Verwendung von Raumanzughelmen und zum Einschalten von Spracheffekten bei Anstrengung.
+* 🖥️ **[Server-Konfigurationshandbuch](doc/server_guide.md)**: Erklärt, wie man einen Server hostet, Passwörter/Einstellungen in der „.env“-Einstellungsdatei anpasst und die Discord Voice Bridge einrichtet.
+* 🎛️ **[Stream Deck Plugin-Anleitung](doc/streamdeck_guide.md)**: Exemplarische Vorgehensweise zum Installieren physischer Tasten zum Stummschalten, Umschalten des Visiers und Anzeigen aktiver Radiokanäle.
 
 ---
 
@@ -75,11 +86,12 @@ Das Ziel von XuruVoip ist es, Star Citizen-Gaming-Events, Rollenspiel-Organisati
 
 ### 8. Anmeldeseite des Admin-Webportals
 ![Anmeldeseite des Admin-Webportals](/screenshots/admin_login.png)
+
 ### 9. Admin-Webportal-Dashboard
 ![Admin-Webportal-Dashboard](/screenshots/admin_dashboard.png)
 
 ### 10. Spieler des Admin-Webportals
-![Admin-Webportal-Spieler](/screenshots/admin_players_list.png)
+![Administrator-Webportal-Spieler](/screenshots/admin_players_list.png)
 
 ### 11. Admin-Webportal-Administratorliste
 ![Admin-Webportal-Administratorliste](/screenshots/admin_admin_list.png)

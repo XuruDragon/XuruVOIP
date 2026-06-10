@@ -36,6 +36,7 @@ The goal of XuruVoip is to provide Star Citizen gaming events, roleplay organiza
 
 | Section | Description |
 | :--- | :--- |
+| [📖 Non-Technical User Guides](#-non-technical-user-guides) | Easy-to-understand step-by-step guides for Client, Server, and Stream Deck. |
 | [📸 Screenshots & UI](#-screenshots--ui) | Visual showcase of client screens, admin portal, and settings. |
 | [🗂️ Project Structure](#️-project-structure) | Repository layout and folder breakdown. |
 | [⚙️ System Architecture](#️-system-architecture) | The complete actual workflow diagram of the WPF client, Go server, and external devices. |
@@ -44,6 +45,16 @@ The goal of XuruVoip is to provide Star Citizen gaming events, roleplay organiza
 | [🎛️ Discord Voice Bridge](#️-discord-voice-bridge-setup-guide) | Connecting Go server radio channels to a Discord Voice Channel. |
 | [📱 Companion App & Stream Deck](#-companion-app--stream-deck-integration) | Remote device control and Stream Deck physical keys setup. |
 | [🛠️ WPF Client (C#)](#-building--running-the-client) | Client requirements, compilation, and MSI/Portable installation guides. |
+
+---
+
+## 📖 Non-Technical User Guides
+
+If you do not have a background in computer science, we have written simple, step-by-step guides to help you get everything configured and running easily:
+
+* 🎮 **[Client User Guide](doc/client_guide.md)**: Friendly guide on choosing microphones/speakers, setting up Push-to-Talk, using space suit helmets, and turning on exertion voice effects.
+* 🖥️ **[Server Configuration Guide](doc/server_guide.md)**: Explains how to host a server, adjust passwords/settings in the `.env` settings file, and set up the Discord Voice Bridge.
+* 🎛️ **[Stream Deck Plugin Guide](doc/streamdeck_guide.md)**: Walkthrough on installing physical buttons for muting, visor toggling, and displaying active radio channels.
 
 ---
 
