@@ -22,12 +22,17 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly AudioCaptureService _capture = new();
     private readonly AudioPlaybackService _playback = new();
     public AudioPlaybackService Playback => _playback;
+    private readonly SpeechToTextService _stt = new();
+    public SpeechToTextService Stt => _stt;
     private readonly DiscordRpcService _discordRpc = new();
     private readonly GlobalKeyHook _keyHook = new();
     public GlobalKeyHook KeyHook => _keyHook;
     private readonly DispatcherTimer _ocrTimer = new();
     private readonly GameDetectionService _gameDetector = new();
     public GameDetectionService GameDetector => _gameDetector;
+
+    public PlayerPosition LastSentPos => _lastSentPos;
+    public Dictionary<string, PlayerPosition> RemotePositions => _remotePositions;
 
     private bool _isManualDisconnect = true;
     private bool _isReconnecting = false;
@@ -500,6 +505,14 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             _playback.ReceiveOpusFrame(name, opus, type, applyRadio, metadata, distance, speakerZone, listenerZone, seq);
         };
 
+        _playback.SttAudioChunkReady += (name, samples, type) =>
+        {
+            if (Config.Config.EnableStt)
+            {
+                _stt.QueueTranscription(name, samples, type, Config.Config.Language);
+            }
+        };
+
         _capture.EncodedFrameReady += async (frame, txType) =>
         {
             await _audioWs.SendAudioFrameAsync(txType, frame);
@@ -670,6 +683,8 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableRadioDegradation = cfg.EnableRadioDegradation;
         _playback.EnablePttChimes = cfg.EnablePttChimes;
         _playback.EnableEnvironmentalAcoustics = cfg.EnableEnvironmentalAcoustics;
+        _playback.EnableHelmetModulator = cfg.EnableHelmetModulator;
+        _playback.EnableStt = cfg.EnableStt;
         _playback.Start(cfg.OutputDeviceIndex, cfg.OutputGainPercent);
         
         // Synchronize mute states
@@ -901,6 +916,8 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableRadioDegradation = Config.Config.EnableRadioDegradation;
         _playback.EnablePttChimes = Config.Config.EnablePttChimes;
         _playback.EnableEnvironmentalAcoustics = Config.Config.EnableEnvironmentalAcoustics;
+        _playback.EnableHelmetModulator = Config.Config.EnableHelmetModulator;
+        _playback.EnableStt = Config.Config.EnableStt;
         _discordRpc.Enabled = Config.Config.EnableDiscordRpc;
 
         // Sync position tracking source
@@ -1032,6 +1049,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _gameDetector.Dispose();
         _capture.Dispose();
         _playback.Dispose();
+        _stt.Dispose();
         _ocr.Dispose();
         _discordRpc.Dispose();
         await _posWs.DisposeAsync();

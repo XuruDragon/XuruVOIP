@@ -1,19 +1,32 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using XuruVoipClient.ViewModels;
+using XuruVoipClient.Models;
 
 namespace XuruVoipClient.Views;
+
+public class HudCaptionItem
+{
+    public string ChannelTag { get; set; } = "";
+    public string SpeakerName { get; set; } = "";
+    public string Text { get; set; } = "";
+    public Brush ChannelBrush { get; set; } = Brushes.White;
+    public DateTime Timestamp { get; set; }
+}
 
 public partial class OverlayWindow : Window
 {
     private readonly MainViewModel _vm;
     private readonly DispatcherTimer _timer;
     private readonly ObservableCollection<string> _speakers = new();
+    private readonly ObservableCollection<HudCaptionItem> _captions = new();
 
     // Win32 APIs for click-through window
     [DllImport("user32.dll")]
@@ -36,11 +49,14 @@ public partial class OverlayWindow : Window
         _vm = vm;
         
         LstSpeakers.ItemsSource = _speakers;
+        LstCaptions.ItemsSource = _captions;
 
         // Set up refresh timer (100ms interval for positioning and speaker polling)
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
         _timer.Tick += Timer_Tick;
         _timer.Start();
+
+        _vm.Stt.CaptionDecoded += OnCaptionDecoded;
 
         Loaded += OverlayWindow_Loaded;
     }
@@ -131,6 +147,216 @@ public partial class OverlayWindow : Window
 
         // 5. Update active speakers list
         UpdateActiveSpeakers();
+
+        // 6. Update HUD captions / subtitles
+        UpdateCaptions(cfg);
+
+        // 7. Update Tactical Radar Overlay
+        UpdateRadar(cfg);
+    }
+
+    private void OnCaptionDecoded(string playerName, string text, byte channelType)
+    {
+        if (!_vm.Config.Config.EnableStt) return;
+
+        Dispatcher.Invoke(() =>
+        {
+            string channelTag = channelType switch
+            {
+                0x00 => "[Prox]",
+                0x01 => "[Radio]",
+                0x02 => "[Squad]",
+                _ => "[Voip]"
+            };
+
+            Brush channelBrush = channelType switch
+            {
+                0x00 => BrushGreen,
+                0x01 => new SolidColorBrush(Color.FromRgb(0x4E, 0x9F, 0xFF)),
+                0x02 => new SolidColorBrush(Color.FromRgb(0xD8, 0x00, 0x64)),
+                _ => Brushes.White
+            };
+
+            _captions.Add(new HudCaptionItem
+            {
+                ChannelTag = channelTag,
+                SpeakerName = playerName + ":",
+                Text = $"\"{text}\"",
+                ChannelBrush = channelBrush,
+                Timestamp = DateTime.UtcNow
+            });
+
+            while (_captions.Count > 4)
+            {
+                _captions.RemoveAt(0);
+            }
+        });
+    }
+
+    private void UpdateCaptions(AppConfig cfg)
+    {
+        if (!cfg.EnableStt)
+        {
+            if (LstCaptions.Visibility != Visibility.Collapsed)
+            {
+                LstCaptions.Visibility = Visibility.Collapsed;
+                _captions.Clear();
+            }
+            return;
+        }
+
+        if (LstCaptions.Visibility != Visibility.Visible)
+        {
+            LstCaptions.Visibility = Visibility.Visible;
+        }
+
+        // If Whisper model is currently downloading, display status message
+        if (_vm.Stt.IsDownloading)
+        {
+            _captions.Clear();
+            _captions.Add(new HudCaptionItem
+            {
+                ChannelTag = "[System]",
+                SpeakerName = "Speech-to-Text:",
+                Text = _vm.Stt.DownloadStatusText,
+                ChannelBrush = BrushOrange,
+                Timestamp = DateTime.UtcNow.AddSeconds(10) // prevent immediate expiration
+            });
+            return;
+        }
+
+        // Expire captions older than 5 seconds
+        var expired = new List<HudCaptionItem>();
+        foreach (var cap in _captions)
+        {
+            if (cap.ChannelTag != "[System]" && (DateTime.UtcNow - cap.Timestamp).TotalSeconds > 5.0)
+            {
+                expired.Add(cap);
+            }
+        }
+        foreach (var cap in expired)
+        {
+            _captions.Remove(cap);
+        }
+    }
+
+    private void UpdateRadar(AppConfig cfg)
+    {
+        if (!cfg.EnableRadar)
+        {
+            if (RadarPanel.Visibility != Visibility.Collapsed)
+            {
+                RadarPanel.Visibility = Visibility.Collapsed;
+            }
+            return;
+        }
+
+        if (RadarPanel.Visibility != Visibility.Visible)
+        {
+            RadarPanel.Visibility = Visibility.Visible;
+        }
+
+        double range = cfg.RadarRange;
+        if (range <= 0) range = 50.0;
+
+        TxtRadarRange.Text = $"{range:F0}m";
+        RadarCanvas.Children.Clear();
+
+        // Draw local player center arrow (pointing straight up)
+        var centerArrow = new System.Windows.Shapes.Path
+        {
+            Fill = BrushGreen,
+            Data = Geometry.Parse("M 0 -7 L -4 4 L 0 1 L 4 4 Z")
+        };
+        Canvas.SetLeft(centerArrow, 80);
+        Canvas.SetTop(centerArrow, 80);
+        RadarCanvas.Children.Add(centerArrow);
+
+        var localPos = _vm.LastSentPos;
+        if (localPos == null || localPos.IsEmpty)
+        {
+            return;
+        }
+
+        var activeSpeakers = _vm.Playback.GetActiveSpeakers(400);
+
+        // Get listener heading vector
+        double hx = _vm.Playback.ListenerHeadingX;
+        double hy = _vm.Playback.ListenerHeadingY;
+        if (hx == 0 && hy == 0)
+        {
+            hy = 1.0;
+        }
+
+        foreach (var kvp in _vm.RemotePositions)
+        {
+            string remoteName = kvp.Key;
+            var remotePos = kvp.Value;
+
+            // Only show players in the same zone/compartment layout
+            if (remotePos.Zone != localPos.Zone) continue;
+
+            double dx = remotePos.X - localPos.X;
+            double dy = remotePos.Y - localPos.Y;
+            double dist = Math.Sqrt(dx * dx + dy * dy);
+
+            if (dist > range) continue; // Out of radar range
+
+            // Rotate coordinates relative to local player heading (heading-up display)
+            double yLocal = dx * hx + dy * hy;
+            double xLocal = dx * hy - dy * hx;
+
+            // Scale coordinates to fit 160x160 canvas (80px radius)
+            double scale = 80.0 / range;
+            double cx = 80.0 + xLocal * scale;
+            double cy = 80.0 - yLocal * scale; // Invert Y for canvas
+
+            // Boundary clipping (ensure blip stays within radar circle)
+            if (Math.Sqrt((cx - 80) * (cx - 80) + (cy - 80) * (cy - 80)) > 78) continue;
+
+            bool isSpeaking = activeSpeakers.Contains(remoteName);
+            Brush blipBrush = isSpeaking ? BrushGreen : Brushes.White;
+
+            if (isSpeaking)
+            {
+                // Speaking indicator pulsating ring
+                var ring = new System.Windows.Shapes.Ellipse
+                {
+                    Width = 14,
+                    Height = 14,
+                    Stroke = BrushGreen,
+                    StrokeThickness = 1,
+                    Opacity = 0.6
+                };
+                Canvas.SetLeft(ring, cx - 7);
+                Canvas.SetTop(ring, cy - 7);
+                RadarCanvas.Children.Add(ring);
+            }
+
+            // Draw blip dot
+            var blip = new System.Windows.Shapes.Ellipse
+            {
+                Width = 6,
+                Height = 6,
+                Fill = blipBrush
+            };
+            Canvas.SetLeft(blip, cx - 3);
+            Canvas.SetTop(blip, cy - 3);
+            RadarCanvas.Children.Add(blip);
+
+            // Draw player name tag
+            var nameText = new TextBlock
+            {
+                Text = remoteName,
+                Foreground = Brushes.White,
+                FontSize = 8.5,
+                FontWeight = FontWeights.SemiBold,
+                Opacity = 0.85
+            };
+            Canvas.SetLeft(nameText, cx + 5);
+            Canvas.SetTop(nameText, cy - 6);
+            RadarCanvas.Children.Add(nameText);
+        }
     }
 
     private void UpdateOverlayPosition()
@@ -214,6 +440,7 @@ public partial class OverlayWindow : Window
     public void CloseOverlay()
     {
         _timer.Stop();
+        _vm.Stt.CaptionDecoded -= OnCaptionDecoded;
         Close();
     }
 }

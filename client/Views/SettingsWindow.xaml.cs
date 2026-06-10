@@ -12,7 +12,7 @@ public partial class SettingsWindow : Window
 {
     private readonly MainViewModel _vm;
     public MainViewModel ViewModel => _vm;
-    private AppConfig Cfg => _vm.Config.Config;
+    private AppConfig Cfg => _vm?.Config?.Config;
 
     public SettingsWindow(MainViewModel vm)
     {
@@ -24,6 +24,11 @@ public partial class SettingsWindow : Window
         LoadMonitors();
         LoadLanguages();
         LoadCurrentValues();
+
+        if (_vm?.Stt != null)
+        {
+            _vm.Stt.DownloadCompleted += OnSttDownloadCompleted;
+        }
     }
 
     private void LoadLanguages()
@@ -120,6 +125,32 @@ public partial class SettingsWindow : Window
         CbOverlayPosition.DisplayMemberPath = "Name";
         CbOverlayPosition.SelectedValuePath = "Code";
         CbOverlayPosition.SelectedValue = Cfg.OverlayPosition;
+
+        // Voice Changer settings
+        CbVoiceChangerType.Items.Clear();
+        CbVoiceChangerType.Items.Add(new { Code = "None", Name = "None" });
+        CbVoiceChangerType.Items.Add(new { Code = "Alien", Name = "Alien Presets" });
+        CbVoiceChangerType.Items.Add(new { Code = "Cyborg", Name = "Cyborg Modulator" });
+        CbVoiceChangerType.Items.Add(new { Code = "Robotic", Name = "Robotic Synthesis" });
+        CbVoiceChangerType.Items.Add(new { Code = "PitchShift", Name = "Custom Pitch Shift" });
+        CbVoiceChangerType.DisplayMemberPath = "Name";
+        CbVoiceChangerType.SelectedValuePath = "Code";
+        CbVoiceChangerType.SelectedValue = Cfg.VoiceChangerType ?? "None";
+
+        CbEnableVoiceChanger.IsChecked = Cfg.EnableVoiceChanger;
+        SlVoicePitch.Value = Cfg.VoicePitchFactor;
+        VoicePitchLabel.Text = $"{Cfg.VoicePitchFactor:F1}x";
+        VoiceChangerControlsPanel.Visibility = Cfg.EnableVoiceChanger ? Visibility.Visible : Visibility.Collapsed;
+
+        // Radar settings
+        CbEnableRadar.IsChecked = Cfg.EnableRadar;
+        SlRadarRange.Value = Cfg.RadarRange;
+        RadarRangeLabel.Text = $"{Cfg.RadarRange:F0}m";
+        RadarControlsPanel.Visibility = Cfg.EnableRadar ? Visibility.Visible : Visibility.Collapsed;
+
+        // STT settings
+        CbEnableStt.IsChecked = Cfg.EnableStt;
+        SttWarningPanel.Visibility = (_vm?.Stt != null && !_vm.Stt.IsModelReady) ? Visibility.Visible : Visibility.Collapsed;
 
         // OCR region display
         UpdateRegionDisplay();
@@ -274,5 +305,72 @@ public partial class SettingsWindow : Window
     {
         // Display last OCR raw text from the service (via ViewModel)
         TbOcrPreview.Text = "(reconnect OCR service to preview)";
+    }
+
+    private void VoiceChanger_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || VoiceChangerControlsPanel == null) return;
+        bool enabled = CbEnableVoiceChanger.IsChecked == true;
+        Cfg.EnableVoiceChanger = enabled;
+        VoiceChangerControlsPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void CbVoiceChangerType_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (Cfg == null || CbVoiceChangerType.SelectedValue == null) return;
+        Cfg.VoiceChangerType = (string)CbVoiceChangerType.SelectedValue;
+    }
+
+    private void SlVoicePitch_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (VoicePitchLabel != null) VoicePitchLabel.Text = $"{e.NewValue:F1}x";
+        if (Cfg != null) Cfg.VoicePitchFactor = (float)e.NewValue;
+    }
+
+    private void Radar_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || RadarControlsPanel == null) return;
+        bool enabled = CbEnableRadar.IsChecked == true;
+        Cfg.EnableRadar = enabled;
+        RadarControlsPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void SlRadarRange_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (RadarRangeLabel != null) RadarRangeLabel.Text = $"{e.NewValue:F0}m";
+        if (Cfg != null) Cfg.RadarRange = e.NewValue;
+    }
+
+    private void Stt_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || SttWarningPanel == null) return;
+        bool enabled = CbEnableStt.IsChecked == true;
+        Cfg.EnableStt = enabled;
+        SttWarningPanel.Visibility = (_vm?.Stt != null && !_vm.Stt.IsModelReady) ? Visibility.Visible : Visibility.Collapsed;
+
+        if (enabled && _vm?.Stt != null && !_vm.Stt.IsModelReady)
+        {
+            _ = _vm.Stt.EnsureModelDownloadedAsync();
+        }
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        if (_vm?.Stt != null)
+        {
+            _vm.Stt.DownloadCompleted -= OnSttDownloadCompleted;
+        }
+    }
+
+    private void OnSttDownloadCompleted()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (SttWarningPanel != null)
+            {
+                SttWarningPanel.Visibility = Visibility.Collapsed;
+            }
+        });
     }
 }
