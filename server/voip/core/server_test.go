@@ -648,11 +648,32 @@ func TestProximityFiltering(t *testing.T) {
 	// 2. Proximity range audit with ProxShort active
 	// Enable whisper mode (ProxShort=true) on Alice. Audible range drops to 5m.
 	// Bob (10m) is now outside of audible range.
-	testHub.Players["Alice"].ProxShort = true
+	// 3. Test EVA muting
+	// Reset Alice ProxShort
+	testHub.Players["Alice"].ProxShort = false
+	// Put Alice in space/vacuum (EVA zone)
+	testHub.Players["Alice"].Pos.Zone = "planetary_system_stanton"
 	players = testHub.GetAudioPlayersInProximity("Alice")
 	if len(players) != 0 {
-		t.Errorf("Expected 0 players in proximity under whisper mode, got %d", len(players))
+		t.Errorf("Expected 0 players in proximity when Alice is in planetary_system_stanton (EVA), got %d", len(players))
 	}
+
+	// Put Alice back in Lorville
+	testHub.Players["Alice"].Pos.Zone = "Lorville"
+	// Put Bob in space (EVA zone)
+	testHub.Players["Bob"].Pos.Zone = "stanton_space_void"
+	players = testHub.GetAudioPlayersInProximity("Alice")
+	if len(players) != 0 {
+		t.Errorf("Expected 0 players in proximity when Bob is in EVA zone, got %d", len(players))
+	}
+
+	// Disable EnableEvaMuting globally, verify they hear each other again
+	EnableEvaMuting = false
+	players = testHub.GetAudioPlayersInProximity("Alice")
+	if len(players) != 1 || players[0] != testHub.Players["Bob"] {
+		t.Errorf("Expected Alice to hear Bob when EnableEvaMuting is false, got %v", players)
+	}
+	EnableEvaMuting = true // restore
 }
 
 // BenchmarkProximityFiltering benchmarks GetAudioConnectionsInProximity under heavy player loads

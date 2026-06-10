@@ -414,6 +414,23 @@ func (h *Hub) GetAllPlayerStates() []PlayerState {
 	return states
 }
 
+func isEvaZone(zone string) bool {
+	lower := strings.ToLower(zone)
+	if lower == "planetary_system_stanton" {
+		return true
+	}
+	if strings.Contains(lower, "space") || strings.Contains(lower, "orbit") || strings.Contains(lower, "void") {
+		excluded := []string{"ship", "facility", "station", "hangar", "interior", "cabin", "deck", "chamber", "room", "corridor", "airlock", "cockpit", "habitation", "hab"}
+		for _, ex := range excluded {
+			if strings.Contains(lower, ex) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 // GetAudioPlayersInProximity returns the players within proximity of sender
 func (h *Hub) GetAudioPlayersInProximity(senderName string) []*ActivePlayer {
 	h.Mu.RLock()
@@ -424,9 +441,17 @@ func (h *Hub) GetAudioPlayersInProximity(senderName string) []*ActivePlayer {
 		return nil
 	}
 
+	if EnableEvaMuting && isEvaZone(sender.Pos.Zone) {
+		return nil
+	}
+
 	var players []*ActivePlayer
 	for name, p := range h.Players {
 		if name == senderName || p.SafeGetUDPAddr() == nil || p.Pos == nil {
+			continue
+		}
+
+		if EnableEvaMuting && isEvaZone(p.Pos.Zone) {
 			continue
 		}
 
