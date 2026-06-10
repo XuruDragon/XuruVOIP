@@ -132,65 +132,84 @@ graph TD
 ```
 
 ### 1. Captura de Audio, VAD y Compresión
-* **Captura de Audio:** El cliente captura el micrófono usando la API **NAudio** a una frecuencia de 48,000 Hz, 16 bits mono.
+* **Captura de Audio:** El cliente captura el audio del micrófono utilizando la API **NAudio** a una tasa de alta fidelidad de 48,000 Hz, 16 bits mono.
 * **Detección de Actividad de Voz (VAD):** Los búferes de audio son evaluados por el wrapper nativo **WebRtcVad**. Si la confianza de voz cae por debajo del umbral, la transmisión se detiene para evitar emitir el ruido del teclado o ventiladores.
-* **Compresión:** La voz activa es codificada en paquetes **Opus** (usando la biblioteca C# **Concentus**) y se transmite por WebSockets al servidor.
+* **Resolución nativa de archivo único:** El cliente utiliza devoluciones de llamada de resolución de ensamblados personalizadas para cargar la biblioteca nativa `WebRtcVad.dll` desde el subdirectorio `runtimes\win-x64\native` en tiempo de ejecución, resolviendo problemas de carga de DLL para paquetes publicados como un solo archivo.
+* **Compresión:** Los búferes de voz activa se codifican en tramas **Opus** altamente comprimidas (utilizando el wrapper C# **Concentus**) y se transmiten inmediatamente como tramas WebSocket binarias al servidor de audio Go.
 
-### 2. Seguimiento de Ubicación y Orientación
-* **Selector de Fuente de Posición:** Los jugadores pueden elegir entre dos métodos de posicionamiento en la configuración:
+### 2. Seguimiento de Ubicación y Estimación de Orientación
+* **Alternar Fuente de Posición:** Los jugadores pueden elegir entre dos metodologías de posicionamiento en la configuración del cliente:
   * **Escáner de Pantalla OCR:** Realiza periódicamente capturas de pantalla de la región configurada (donde se muestran las coordenadas con `/showlocations` o `r_DisplaySessionInfo`), preprocesa la imagen y la envía al motor **Tesseract OCR**.
-  * **Lector Game.log (GRTPR):** Escanea directamente el archivo `Game.log` de Star Citizen para obtener las coordenadas registradas. Para habilitar esto, se debe añadir `r_DisplaySessionInfo = 3` (or `1`) al archivo `user.cfg` del juego. Al seleccionar GRTPR, el motor Tesseract OCR se detiene y se libera por completo, reduciendo sustancialmente el uso de CPU y RAM del equipo.
-* **Filtro de Zona Jerárquico:** El texto parseado contiene jerarquías (ej. planetas, naves, ascensores). El cliente filtra variaciones menores (como ascensores o asientos) para que los jugadores en zonas adyacentes se escuchen de forma fluida.
-* **Estimación de la Orientación:** El cliente calcula el vector de movimiento entre coordenadas consecutivas ($Posición_{actual} - Posición_{anterior}$). Si el desplazamiento supera los 0,5 metros, actualiza la dirección estimada.
+  * **Resolución nativa de archivo único:** Los binarios nativos de Tesseract (`tesseract50.dll` y `leptonica-1.82.0.dll`) se resuelven mediante programación desde el subdirectorio `x64` en tiempo de ejecución, lo que garantiza un funcionamiento robusto de OCR cuando se implementa como un ejecutable independiente de un solo archivo.
+  * **Lector Game.log (GRTPR):** Escanea directamente el archivo `Game.log` de Star Citizen para obtener las coordenadas registradas. Para habilitar esto, se debe añadir `r_DisplaySessionInfo = 3` (o `1`) al archivo `user.cfg` del juego. Al seleccionar GRTPR, el motor Tesseract OCR se detiene y se libera por completo, reduciendo sustancialmente el uso de CPU y RAM del equipo.
+* **Filtrado de Zona Jerárquico:** El texto de posición analizado contiene múltiples líneas de coordenadas jerárquicas (por ejemplo, planetas, compartimentos, ascensores). El cliente filtra dinámicamente las diferencias de subzonas (como ascensores, asientos) para que los jugadores en zonas adyacentes se escuchen sin interrupciones.
+* **Estimación de Orientación:** Dado que Star Citizen no proporciona orientación, el cliente calcula la dirección de movimiento a partir del cambio de posición ($Position_{actual} - Position_{anterior}$). En parada, se mantiene el último valor.
 
 ### 3. Detección de Casco en Tiempo Real
-* **Tail Scanner (Lectura en Continuo):** Un hilo en segundo plano escanea el archivo `Game.log` de Star Citizen.
-* **Monitoreo de Accesorios:** Busca las líneas de equipamiento del casco (`FP_Visor`, `helmethook_attach`) y sincroniza el estado (Casco Puesto/Quitado) de manera instantánea.
+* **Escáner del Log:** Un proceso en segundo plano lee en tiempo real el archivo `Game.log` de Star Citizen.
+* **Seguimiento de Accesorios:** El escáner busca líneas de equipamiento de cascos/visores (`FP_Visor`, `helmethook_attach`). El modo casco (Activo/Inactivo) se sincroniza automáticamente de manera instantánea.
 
-### 4. Mezcla Espacial Estéreo 3D & DSP
-* **Recepción:** El cliente recibe audio de Opus junto con metadatos de proximidad (distancia, rango, coordenadas).
-* **Cálculos Espaciales:** Proyecta la posición del emisor sobre los vectores del oyente:
-  * **Balance Estéreo (Pan):** Distribuye el volumen de `-1.0` (izquierda) a `+1.0` (derecha).
-  * **Atenuación Trasera:** Si el emisor está detrás, el volumen disminuye hasta un 25% para resolver la ambigüedad espacial.
-  * **Atenuación por Distancia:** Disminuye el volumen linealmente hasta llegar a cero en la distancia máxima.
-* **Reproducción & DSP de Radio:** El flujo decodificado pasa por un **filtro DSP de radio** (si alguno de los jugadores usa casco o está en un canal de radio), se balancea, atenúa y mezcla.
-  * **Degradación de Radio Dinámica:** Si está habilitada, el filtro DSP reduce dinámicamente las frecuencias de corte paso-alto y paso-bajo y mezcla ruido blanco filtrado a medida que la distancia entre los jugadores se aproxima al rango máximo de comunicación, simulando interferencias y pérdida de señal de radio.
-  * **Tonos de Radio PTT Realistas:** NAudio sintetiza tonos de radio para la activación y desactivación de la transmisión. El inicio de la transmisión reproduce un chirp de 50ms (barrido de frecuencia de 900Hz a 700Hz). El fin de la transmisión activa una cola de squelch (ruido estático de 180ms) al recibir una trama Opus vacía (0 bytes). Un tono de retorno local opcional permite a los jugadores escuchar sus propios tonos.
+### 4. Mezcla Espacial Estéreo 3D y DSP
+* **Bucle de Recepción:** El cliente recibe paquetes Opus con metadatos de proximidad (distancia, rango máximo y coordenadas del emisor).
+* **Cálculos Espaciales:** La señal se proyecta sobre los vectores del oyente:
+  * **Paneo Estéreo (Pan):** Controla el balance izquierdo/derecho desde `-1.0` (izquierdo completo) hasta `+1.0` (derecho completo).
+  * **Resolución de la Ambigüedad Delante-Atrás:** Si el emisor está detrás, se aplica una atenuación de volumen de hasta 25% para ayudar a la localización auditiva.
+  * **Atenuación por Distancia:** El volumen disminuye linealmente y se reduce a cero al alcanzar el rango máximo (50m por defecto).
+* **Reproducción y DSP de Radio:** Las tramas Opus decodificadas pasan por un **filtro DSP de radio** (si alguno de los jugadores tiene el casco puesto o habla por un canal de radio), se espacializan, se ajustan en volumen y se mezclan.
+  * **Degradación Dinámica de la Señal de Radio:** Si está activada, el filtro DSP reduce las frecuencias de corte de paso alto/bajo y mezcla ruido blanco filtrado a medida que se acerca al rango máximo, simulando la degradación de la señal de radio.
+  * **Efectos PTT y Tonos de Radio Realistas:** NAudio sintetiza tonos de radio para la activación de transmisiones. Al iniciar la transmisión, se produce un mic-key chirp de 50ms (barrido de frecuencia de 900Hz a 700Hz). Al finalizar la transmisión, se desencadena un ruido de squelch de 180ms al recibir una trama Opus vacía de 0 bytes. Una opción de retorno local permite escuchar sus propios efectos de sonido.
 
-### 6. Superposición HUD (Overlay) Sin Bordes Compatible con Vulkan y DirectX
-* **Superposición HUD**: El cliente proporciona una ventana de superposición WPF transparente y siempre visible que muestra el estado de VoIP, la frecuencia del canal y los hablantes activos con indicadores de señal.
-* **Integración Transparente Win32**: Utilizando estilos de ventana Win32 (`WS_EX_TRANSPARENT` y `WS_EX_NOACTIVATE`), la superposición no captura el enfoque y permite que los clics del mouse pasen directamente al juego.
-* **Renderizado Independiente de la API**: Debido a que las ventanas transparentes de WPF dependen del compositor DWM (Desktop Window Manager) de Windows, el overlay no se inyecta en el pipeline gráfico del juego. Esto garantiza compatibilidad absoluta con **Vulkan** y **DirectX**, siempre que el juego se ejecute en modo **"Ventana sin Bordes"** (Borderless Windowed).
+### 5. Estados de Micrófono Dinámicos y Controles de Silenciamiento
+* **Pantalla de Micrófono Dinámico:** La etiqueta de estado del micrófono en la ventana principal se actualiza en tiempo real para mostrar el estado exacto de su transmisor:
+  * `Proximity PTT (Off)` / `Proximity PTT (On)` (Canal de proximidad Push-To-Talk)
+  * `Proximity VAD (OFF)` / `Proximity VAD (ON)` (Modo de activación por voz, cambia a ON cuando se detecta voz)
+  * `Radio Channel PTT (ON)` (Transmitiendo en el canal de radio activo)
+  * `Profile PTT (ON)` (Transmitiendo en el canal de perfil)
+  * `(Muted)` (ej. `Proximity PTT (Muted)`) cuando el micrófono para el canal actual está silenciado.
+* **Tabla de Estado de Silenciamiento de Canales:** Debajo del canal activo y el estado del casco, la ventana principal incluye una tabla estructurada que resume el estado activo/silenciado tanto del micrófono (saliente) como del audio (entrante) para los tres canales de comunicación (Proximidad, Radio y Perfil). Los estados están codificados por colores (Verde para ACTIVO, Rojo para SILENCIADO) y se actualizan dinámicamente.
+* **Raccourcis de Teclado Separados para Silenciar Micrófono y Audio:**
+  * **Silenciar Micrófono (Saliente):** Alterna el silencio del micrófono para cada canal. Por defecto: Proximidad (`M`), Radio (`,`), Perfil (`.`). Cuando está silenciado, las presiones PTT y el habla VAD no transmitirán audio al servidor, y el LED de la ventana principal permanece naranja.
+  * **Silenciar Audio (Entrante):** Alterna el silencio de la reproducción de la voz de otros jugadores en cada canal. Los valores predeterminados no están asignados (`Ninguno`) y se pueden personalizar en la ventana de configuración.
+
+### 6. Incrustación HUD (Overlay) Compatible con Vulkan y DirectX
+* **Ventana de Incrustación HUD**: El cliente proporciona un overlay WPF opcional y ligero que se muestra en primer plano. Indica el estado de la VoIP, la frecuencia activa y la lista de interlocutores que hablan con indicadores de señal de radio.
+* **Integración Transparente Win32**: Gracias a los estilos de ventana Win32 (`WS_EX_TRANSPARENT` y `WS_EX_NOACTIVATE`), la incrustación no roba el foco y permite que todos los clics del mouse pasen directamente al juego.
+* **Rendimiento Independiente de la API**: Dado que las ventanas transparentes WPF se basan en la composición del Desktop Window Manager (DWM) de Windows, el overlay no se inyecta en el pipeline gráfico del juego. Esto garantiza una compatibilidad total tanto con **Vulkan** como con **DirectX**, siempre que el juego se ejecute en modo **"Ventana sin Bordes"** (Borderless Windowed).
 
 ### 7. Acústica Ambiental (Oclusión y Reverberación)
-* **Filtro de oclusión:** Si el emisor y el receptor están en diferentes zonas o compartimentos, el cliente aplica automáticamente un filtro de paso bajo (frecuencia de corte de 600 Hz, volumen al 65%) para simular la obstrucción física. La frecuencia de corte realiza una transición suave para evitar chasquidos.
-* **Reverberación inteligente:** Si el receptor se encuentra en un entorno específico (cuevas, búnkeres o hangares), un filtro de peine de línea de retardo con retroalimentación aplica parámetros de reverberación específicos:
-  * *Cuevas / Túneles:* 45% wet, 100 ms de retardo, 0.6 de retroalimentación.
-  * *Búnkeres / Estaciones:* 25% wet, 50 ms de retardo, 0.4 de retroalimentación.
-  * *Hangares:* 35% wet, 150 ms de retardo, 0.5 de retroalimentación.
+* **Filtro de Oclusión:** Si el hablante y el oyente están en compartimentos diferentes, el cliente aplica automáticamente un filtro de paso bajo (corte a 600 Hz, volumen al 65%) para simular la obstrucción física. La transición es suave para evitar clics.
+* **Reverberación Inteligente:** Si el oyente se encuentra en una cueva, bunker o hangar, un filtro en peine de línea de retardo aplica parámetros específicos:
+  * *Cuevas / Túneles:* 45% wet, 100ms de retraso, 0.6 de feedback.
+  * *Bunkers / Estaciones:* 25% wet, 50ms de retraso, 0.4 de feedback.
+  * *Hangares:* 35% wet, 150ms de retraso, 0.5 de feedback.
 
-### 8. Discord Rich Presence sin Dependencias (RPC)
-* **Conexión por tubería con nombre:** El cliente se conecta directamente a Discord a través de tuberías con nombre de Windows (`\\.\pipe\discord-ipc-0`) sin requerir bibliotecas NuGet externas pesadas.
-* **Actualización dinámica de actividad:** Actualiza tu presencia en Discord en tiempo real con:
-  * **Detalles:** Zona de ubicación actual en el juego (ej. `"En una cueva en MicroTech"`).
-  * **Estado:** Canal activo y estado del casco (ej. `"En radio: Canal Bravo (Casco equipado)"` o `"En proximidad"`).
-  * **Tiempo transcurrido:** Muestra el tiempo transcurrido desde que se conectó al servidor VoIP.
+### 8. Discord Rich Presence sin Dependencias Externas (RPC)
+* **Conexión de tubería nombrada robusta:** El cliente se integra con Discord sin requerir dependencias externas pesadas. Para garantizar una conectividad sólida en diferentes configuraciones de Discord o múltiples instancias, escanea e intenta la conexión en todos los índices de tuberías nombradas desde `discord-ipc-0` hasta `discord-ipc-9`.
+* **Actualizaciones de Actividad Dinámica:** Actualiza en tiempo real su presencia en Discord:
+  * **Detalles:** Zona de ubicación en juego (ej. `"En una cueva de MicroTech"`).
+  * **Estado:** Canal activo y estado del casco (ej. `"En la radio: Canal Bravo (Casco puesto)"` o `"En proximidad"`).
+  * **Tiempo Transcurrido:** Muestra el cronómetro desde la conexión al servidor VoIP.
+
+### 9. Rotación de registros al inicio
+* **Rotación diaria de registros:** Al iniciar, el cliente verifica la fecha del archivo de registro activo. Si se modificó un día anterior, se archiva como `xuru_voip.YYYY-MM-DD.log`.
+* **Depuración y retención:** Para limitar el consumo de espacio en disco, el cliente escanea el directorio de registros y conserva solo los 5 archivos de registro rotados más recientes, eliminando los más antiguos.
 
 ---
 
 ## 🖥️ Servidor XuruVoip (Go)
 
-El servidor gestiona la posición de los jugadores, la autenticación y enruta paquetes de audio basándose en la distancia espacial y los canales de radio.
+El servidor coordina las posiciones, autentica conexiones y enruta los paquetes de audio según las distancias y los canales de radio.
 
-### Características Clave
-* **Control de Proximidad en Servidor**: Envía audio de proximidad solo a jugadores dentro del rango (50m por defecto).
-* **Modo Espacial**: Variable `.env` (`XURUVOIP_SPATIAL_AUDIO`) que decide si se envían coordenadas reales o solo la distancia al cliente.
-* **Enrutamiento de Radio Multicanal**: Permite escuchar múltiples canales de radio a la vez mientras se habla por el canal activo.
-* **Sistema de Perfiles de Audio**: Aplica filtros de audio (efecto de radio, eco) a los perfiles de los jugadores.
-* **Persistencia SQLite**: Guarda los canales y perfiles de los jugadores permanentemente.
-* **Seguridad Avanzada**: Bloquea y banea usuarios por Username, IP y huella de hardware (HWID/MachineGuid).
-* **Portal de Administración Web**: Interfaz web segura bajo HTTPS/WebSockets para monitoreo en tiempo real y administración.
-* **Mapa de Radar para Administradores**: Un mapa de radar 2D Canvas HTML5 integrado en el panel de control web, con soporte para arrastrar, zoom con rueda del mouse, filtros de zona, trazado de rutas históricas (breadcrumbs) y anillos concéntricos de ondas sonoras pulsantes alrededor de los jugadores activos.
+### Características Claves
+* **Control de Proximidad Codo Servidor** : Transmite el audio de proximidad solo a los jugadores dentro del rango (50m por defecto).
+* **Configuración del Modo de Spatialización** : Opción `XURUVOIP_SPATIAL_AUDIO` en el archivo `.env` para activar o desactivar el envío de coordenadas reales a los clientes.
+* **Enrutamiento de Radio Multicanal** : Permite escuchar múltiples canales de radio a la vez mientras se transmite en el canal activo.
+* **Sistema de Perfiles de Audio** : Asigna efectos (ej. radio, eco) a los perfiles de los jugadores.
+* **Base de Datos SQLite** : Almacena canales y perfiles de forma permanente.
+* **Seguridad Anti-Evasión** : Bloquea por nombre de usuario, dirección IP y huella de hardware (HWID/MachineGuid).
+* **Portal de Administración Web** : Interfaz web segura en HTTPS/WebSockets con registros en tiempo real y gestión de baneos.
+* **Mapa de Radar de Administración** : Un mapa de radar 2D Canvas HTML5 en tiempo real en el panel de control para seguir a los jugadores, con desplazamiento de clic y arrastre, zoom de rueda de mouse, filtrado por zona y visualización de ondas concéntricas animadas alrededor de los hablantes.
+* **Rotación de registros al inicio**: Verifica el registro del servidor (`xuruvoip.log`) al iniciar. Si el archivo de registro contiene entradas de un día anterior, se rota a `xuruvoip.YYYY-MM-DD.log`. El servidor conserva solo los 5 archivos rotados más recientes y elimina los más antiguos para evitar un uso excesivo del espacio en disco.
 
 ### Configuración del Servidor (`.env`)
 En su primera ejecución, el servidor autogenera un archivo `.env`:
