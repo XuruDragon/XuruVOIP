@@ -38,6 +38,7 @@ func main() {
 
 	// 1. Initialize environments and logs
 	core.LoadEnv()
+	core.RotateLogs()
 	core.InitLogger()
 	defer core.CloseLogger()
 

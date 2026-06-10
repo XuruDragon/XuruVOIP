@@ -52,19 +52,22 @@ XuruVoip is a high-performance, secure, and dynamically spatialized **3D voice c
 ### 6. Overlay Settings Tab (Vulkan & DirectX HUD)
 ![Overlay Settings Tab](/screenshots/overlay.png)
 
-### 7. Admin Web Portal Login Page
+### 7. OCR Settings Tab (Tesseract OCR)
+![OCR Settings Tab](/screenshots/ocr.png)
+
+### 8. Admin Web Portal Login Page
 ![Admin Web Portal Login Page](/screenshots/admin_login.png)
 
-### 8. Admin Web Portal Dashboard
+### 9. Admin Web Portal Dashboard
 ![Admin Web Portal Dashboard](/screenshots/admin_dashboard.png)
 
-### 9. Admin Web Portal Players
+### 10. Admin Web Portal Players
 ![Admin Web Portal Players](/screenshots/admin_players_list.png)
 
-### 10. Admin Web Portal Admin List
+### 11. Admin Web Portal Admin List
 ![Admin Web Portal Admin List](/screenshots/admin_admin_list.png)
 
-### 11. Admin Web Portal Ban List
+### 12. Admin Web Portal Ban List
 ![Admin Web Portal Ban List](/screenshots/admin_ban_list.png)
 
 </details>

@@ -19,6 +19,9 @@ public partial class App : Application
         DispatcherUnhandledException += (s, args) => { HandleCrash(args.Exception); args.Handled = true; };
         TaskScheduler.UnobservedTaskException += (s, args) => { HandleCrash(args.Exception); args.SetObserved(); };
 
+        // Perform log rotation at application startup
+        LogService.RotateLogs();
+
         // Register native DLL resolver for WebRtcVadSharp to support single-file publish
         NativeLibrary.SetDllImportResolver(typeof(WebRtcVadSharp.WebRtcVad).Assembly, (libraryName, assembly, searchPath) =>
         {
