@@ -56,10 +56,17 @@ public class AppConfig
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
     public bool EnableEnvironmentalAcoustics { get; set; } = true;
+    public bool EnableHelmetModulator { get; set; } = true;
+    public bool EnableVoiceChanger { get; set; } = false;
+    public string VoiceChangerType { get; set; } = "None"; // None, Alien, Cyborg, Robotic, PitchShift
+    public float VoicePitchFactor { get; set; } = 1.0f;
 
     // --- Borderless Overlay ---
     public bool EnableOverlay { get; set; } = false;
     public string OverlayPosition { get; set; } = "TopLeft";
+    public bool EnableRadar { get; set; } = true;
+    public double RadarRange { get; set; } = 50.0;
+    public bool EnableStt { get; set; } = false;
 
     // --- Discord RPC ---
     public bool EnableDiscordRpc { get; set; } = true;

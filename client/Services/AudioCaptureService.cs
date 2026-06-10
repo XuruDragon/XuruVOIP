@@ -24,6 +24,7 @@ public class AudioCaptureService : IDisposable
     private WaveInEvent? _waveIn;
     private IOpusEncoder? _encoder;
     private WebRtcVad? _vad;
+    private readonly VoiceModulator _voiceModulator = new();
 
     // Rolling buffer to accumulate exactly one Opus frame worth of PCM
     private readonly short[] _frameBuffer = new short[FrameSamples];
@@ -209,6 +210,24 @@ public class AudioCaptureService : IDisposable
                 EncodedFrameReady?.Invoke(new byte[0], txType);
             }
             return;
+        }
+
+        // Apply Voice Changer effects if enabled
+        var config = App.ViewModel?.Config?.Config;
+        if (config != null && config.EnableVoiceChanger && shouldTransmit)
+        {
+            float[] floatBuf = new float[FrameSamples];
+            for (int i = 0; i < FrameSamples; i++)
+            {
+                floatBuf[i] = pcmFrame[i] / 32768f;
+            }
+
+            _voiceModulator.Process(floatBuf, FrameSamples, config.VoiceChangerType, config.VoicePitchFactor);
+
+            for (int i = 0; i < FrameSamples; i++)
+            {
+                pcmFrame[i] = (short)Math.Clamp(floatBuf[i] * 32768f, short.MinValue, short.MaxValue);
+            }
         }
 
         // Encode with Opus

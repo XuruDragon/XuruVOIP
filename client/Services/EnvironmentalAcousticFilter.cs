@@ -34,22 +34,116 @@ public class EnvironmentalAcousticFilter
     }
 
     /// <summary>
-    /// Evaluates zones to set target acoustic parameter presets.
+    /// Evaluates zones and positions to set target acoustic parameter presets.
+    /// Supports compartment and deck-level occlusion based on local ship and bunker coordinates.
     /// </summary>
-    public void UpdateZoneInfo(string speakerZone, string listenerZone)
+    public void UpdateZoneInfo(string speakerZone, string listenerZone, double lx = 0, double ly = 0, double lz = 0, double sx = 0, double sy = 0, double sz = 0)
     {
-        // 1. Determine Occlusion (muffled audio if players are in different sub-zones)
-        bool occluded = false;
-        if (!string.IsNullOrEmpty(speakerZone) && !string.IsNullOrEmpty(listenerZone))
+        // 1. Determine Occlusion (muffled audio if players are in different sub-zones or separated by bulkheads/walls)
+        double volumeFactor = 1.0;
+        double cutoff = 20000.0;
+
+        string szLower = (speakerZone ?? "").ToLowerInvariant();
+        string lzLower = (listenerZone ?? "").ToLowerInvariant();
+
+        bool hasCoordinates = (lx != 0 || ly != 0 || lz != 0) && (sx != 0 || sy != 0 || sz != 0);
+
+        if (hasCoordinates && speakerZone == listenerZone && !string.IsNullOrEmpty(speakerZone))
+        {
+            // Inside the same zone, check if we are in a known ship or bunker compartment layout
+            if (lzLower.Contains("carrack"))
+            {
+                // Z levels: Command Deck (Top: Z > 5), Habitation (Middle: -5 to 5), Technical (Bottom: Z < -5)
+                int lDeck = lz > 5 ? 3 : (lz < -5 ? 1 : 2);
+                int sDeck = sz > 5 ? 3 : (sz < -5 ? 1 : 2);
+
+                if (lDeck != sDeck)
+                {
+                    cutoff = 350.0;
+                    volumeFactor = 0.35;
+                }
+                else
+                {
+                    // Same deck, check compartment partitions (using Y coordinate)
+                    // Cockpit: Y > 15, Habitation: -10 to 15, Engines: Y < -10
+                    int lComp = ly > 15 ? 3 : (ly < -10 ? 1 : 2);
+                    int sComp = sy > 15 ? 3 : (sy < -10 ? 1 : 2);
+
+                    if (lComp != sComp)
+                    {
+                        cutoff = 900.0;
+                        volumeFactor = 0.65;
+                    }
+                }
+            }
+            else if (lzLower.Contains("bunker") || lzLower.Contains("facility") || lzLower.Contains("ugf"))
+            {
+                // Z levels: Lobby/Elevator (Z > 8), Intermediate (-5 to 8), Main level (Z <= -5)
+                int lLevel = lz > 8 ? 3 : (lz < -5 ? 1 : 2);
+                int sLevel = sz > 8 ? 3 : (sz < -5 ? 1 : 2);
+
+                if (lLevel != sLevel)
+                {
+                    cutoff = 300.0;
+                    volumeFactor = 0.30;
+                }
+                else
+                {
+                    // Same level, check room divisions (using X coordinate)
+                    int lRoom = lx > 10 ? 2 : 1;
+                    int sRoom = sx > 10 ? 2 : 1;
+
+                    if (lRoom != sRoom)
+                    {
+                        cutoff = 800.0;
+                        volumeFactor = 0.60;
+                    }
+                }
+            }
+            else if (lzLower.Contains("hercules"))
+            {
+                // Hercules Starlifter: Habitation (Top: Z > 3), Cargo (Bottom: Z <= 3)
+                bool lTop = lz > 3;
+                bool sTop = sz > 3;
+                if (lTop != sTop)
+                {
+                    cutoff = 400.0;
+                    volumeFactor = 0.45;
+                }
+            }
+            else if (lzLower.Contains("cutlass"))
+            {
+                // Cutlass Black: Cockpit (Y > 8), Cargo (Y <= 8)
+                bool lCockpit = ly > 8;
+                bool sCockpit = sy > 8;
+                if (lCockpit != sCockpit)
+                {
+                    cutoff = 1000.0;
+                    volumeFactor = 0.70;
+                }
+            }
+            else
+            {
+                // General elevation heuristic: if height difference is > 4.5m, assume floor/ceiling occlusion
+                double heightDiff = Math.Abs(lz - sz);
+                if (heightDiff > 4.5)
+                {
+                    cutoff = 500.0;
+                    volumeFactor = 0.45;
+                }
+            }
+        }
+        else
         {
             if (speakerZone != listenerZone)
             {
-                occluded = true;
+                cutoff = 600.0;
+                volumeFactor = 0.65;
             }
         }
 
-        _targetVolumeFactor = occluded ? 0.65f : 1.0f;
-        _targetCutoff = occluded ? 600.0 : 20000.0;
+        _targetVolumeFactor = (float)volumeFactor;
+        _targetCutoff = cutoff;
 
         // 2. Determine Reverb Presets based on listener's zone
         string zoneLower = (listenerZone ?? "").ToLowerInvariant();

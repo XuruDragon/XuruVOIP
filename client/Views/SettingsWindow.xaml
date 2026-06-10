@@ -377,7 +377,38 @@
                             <CheckBox Content="{DynamicResource LblEnableEnvironmentalAcoustics}"
                                       IsChecked="{Binding Config.EnableEnvironmentalAcoustics, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,16"/>
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
+                            <!-- Helmet/Suit modulator toggle -->
+                            <CheckBox x:Name="CbEnableHelmetModulator"
+                                      Content="Enable Helmet/Suit Comms Modulator"
+                                      IsChecked="{Binding Config.EnableHelmetModulator, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
+                            <!-- Voice Changer toggle -->
+                            <CheckBox x:Name="CbEnableVoiceChanger"
+                                      Content="Enable Voice Changer (Modulates your voice)"
+                                      IsChecked="{Binding Config.EnableVoiceChanger, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                      Checked="VoiceChanger_ToggleChanged" Unchecked="VoiceChanger_ToggleChanged"/>
+
+                            <!-- Voice Changer Controls -->
+                            <StackPanel x:Name="VoiceChangerControlsPanel" Margin="16,0,0,12" Visibility="Collapsed">
+                                <TextBlock Text="Voice Changer Preset" Style="{StaticResource LabelStyle}" Margin="0,0,0,2"/>
+                                <ComboBox x:Name="CbVoiceChangerType" Style="{StaticResource ComboStyle}" Margin="0,0,0,8"
+                                          SelectionChanged="CbVoiceChangerType_SelectionChanged"/>
+
+                                <TextBlock Style="{StaticResource LabelStyle}">
+                                    <Run Text="Voice Pitch Shift: "/>
+                                    <Run x:Name="VoicePitchLabel" Text="1.0x"/>
+                                </TextBlock>
+                                <Slider x:Name="SlVoicePitch" Minimum="0.5" Maximum="2.0"
+                                        TickFrequency="0.1" IsSnapToTickEnabled="True"
+                                        Foreground="{StaticResource Accent}"
+                                        ValueChanged="SlVoicePitch_Changed" Margin="0,0,0,16"/>
+                            </StackPanel>
 
                             <!-- Input device -->
                             <TextBlock Text="{DynamicResource LblInputDevice}" Style="{StaticResource LabelStyle}"/>
@@ -464,6 +495,43 @@
                             <TextBlock Text="{DynamicResource LblOverlayPosition}" Style="{StaticResource LabelStyle}"/>
                             <ComboBox x:Name="CbOverlayPosition" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
                                       SelectionChanged="CbOverlayPosition_SelectionChanged"/>
+
+                             <!-- Tactical Radar Toggle -->
+                             <CheckBox x:Name="CbEnableRadar"
+                                       Content="Enable Tactical HUD Mini-Radar"
+                                       IsChecked="{Binding Config.EnableRadar, UpdateSourceTrigger=PropertyChanged}"
+                                       Foreground="{StaticResource TextPrimary}"
+                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                       Checked="Radar_ToggleChanged" Unchecked="Radar_ToggleChanged"/>
+
+                             <!-- Radar Range Slider -->
+                             <StackPanel x:Name="RadarControlsPanel" Margin="16,0,0,12" Visibility="Collapsed">
+                                 <TextBlock Style="{StaticResource LabelStyle}">
+                                     <Run Text="Radar Maximum Range: "/>
+                                     <Run x:Name="RadarRangeLabel" Text="50m"/>
+                                 </TextBlock>
+                                 <Slider x:Name="SlRadarRange" Minimum="10" Maximum="200"
+                                         TickFrequency="10" IsSnapToTickEnabled="True"
+                                         Foreground="{StaticResource Accent}"
+                                         ValueChanged="SlRadarRange_Changed" Margin="0,0,0,12"/>
+                             </StackPanel>
+
+                             <!-- Speech-to-Text Captions Toggle -->
+                             <CheckBox x:Name="CbEnableStt"
+                                       Content="Enable Real-Time HUD Captions (Speech-to-Text)"
+                                       IsChecked="{Binding Config.EnableStt, UpdateSourceTrigger=PropertyChanged}"
+                                       Foreground="{StaticResource TextPrimary}"
+                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                       Checked="Stt_ToggleChanged" Unchecked="Stt_ToggleChanged"/>
+
+                             <!-- STT Download Warning Message -->
+                             <Border x:Name="SttWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="16,4,0,16" Visibility="Collapsed">
+                                 <StackPanel>
+                                     <TextBlock Text="⚠️ Speech-to-Text Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
+                                     <TextBlock Text="Enabling HUD Captions will automatically download a lightweight 75MB speech recognition model (ggml-tiny.bin) on first use. The download occurs in the background, and progress is shown directly on the HUD. Internet connection is required for initial setup." 
+                                                Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
+                                 </StackPanel>
+                             </Border>
 
                             <!-- Overlay Capabilities Info -->
                             <TextBlock Text="{DynamicResource LblOverlayCapabilities}" Style="{StaticResource LabelStyle}" FontWeight="Bold" Margin="0,12,0,4"/>

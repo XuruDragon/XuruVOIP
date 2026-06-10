@@ -43,11 +43,15 @@ public class AudioPlaybackService : IDisposable
     public bool RadioMuted { get; set; } = false;
     public bool ProfileMuted { get; set; } = false;
 
-    // Spatial Audio Listener State
+    // Spatial Audio & Modulation State
     public bool EnableSpatialAudio { get; set; } = true;
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
     public bool EnableEnvironmentalAcoustics { get; set; } = true;
+    public bool EnableHelmetModulator { get; set; } = true;
+    public bool EnableStt { get; set; } = false;
+
+    public event Action<string, float[], byte>? SttAudioChunkReady;
 
     public double ListenerX { get; set; }
     public double ListenerY { get; set; }
@@ -268,6 +272,10 @@ public class AudioPlaybackService : IDisposable
                         if (track.IsTransmitting)
                         {
                             track.IsTransmitting = false;
+                            if (EnableStt)
+                            {
+                                FlushSttBuffer(track, packet.AudioType);
+                            }
                             if (EnablePttChimes && packet.ApplyRadioEffect)
                             {
                                 WriteFloatBuffer(track.Buffer, KeyUpChime);
@@ -279,10 +287,15 @@ public class AudioPlaybackService : IDisposable
                     if (!track.IsTransmitting)
                     {
                         track.IsTransmitting = true;
+                        track.LastAudioType = packet.AudioType;
                         if (EnablePttChimes && packet.ApplyRadioEffect)
                         {
                             WriteFloatBuffer(track.Buffer, KeyDownChime);
                         }
+                    }
+                    else
+                    {
+                        track.LastAudioType = packet.AudioType;
                     }
 
                     // 2. 3D Spatial Audio calculations (for proximity)
@@ -321,12 +334,12 @@ public class AudioPlaybackService : IDisposable
                     track.LastListenerZone = packet.ListenerZone;
 
                     // 3. Decode frame
-                    DecodeAndWriteToBuffer(track, packet.OpusData, packet.ApplyRadioEffect, packet.SpeakerZone, packet.ListenerZone);
+                    DecodeAndWriteToBuffer(track, packet.OpusData, packet.ApplyRadioEffect, packet.SpeakerZone, packet.ListenerZone, packet.Metadata);
                 }
                 else if (isPlcNeeded)
                 {
                     // Trigger PLC (Packet Loss Concealment)
-                    DecodeAndWriteToBuffer(track, null, track.DspFilter.DegradationFactor > 0, track.LastSpeakerZone, track.LastListenerZone);
+                    DecodeAndWriteToBuffer(track, null, track.DspFilter.DegradationFactor > 0, track.LastSpeakerZone, track.LastListenerZone, null);
                 }
                 else
                 {
@@ -334,6 +347,10 @@ public class AudioPlaybackService : IDisposable
                     if (track.IsTransmitting)
                     {
                         track.IsTransmitting = false;
+                        if (EnableStt)
+                        {
+                            FlushSttBuffer(track, track.LastAudioType);
+                        }
                         if (EnablePttChimes)
                         {
                             WriteFloatBuffer(track.Buffer, KeyUpChime);
@@ -344,7 +361,24 @@ public class AudioPlaybackService : IDisposable
         }
     }
 
-    private void DecodeAndWriteToBuffer(PlayerAudioTrack track, byte[]? opusData, bool applyRadioEffect, string speakerZone, string listenerZone)
+    private void FlushSttBuffer(PlayerAudioTrack track, byte audioType)
+    {
+        float[]? samples = null;
+        lock (track.SttLock)
+        {
+            if (track.SttSampleBuffer.Count > 0)
+            {
+                samples = track.SttSampleBuffer.ToArray();
+                track.SttSampleBuffer.Clear();
+            }
+        }
+        if (samples != null && samples.Length > 8000) // Minimum 0.5s of audio to trigger transcription
+        {
+            SttAudioChunkReady?.Invoke(track.PlayerName, samples, audioType);
+        }
+    }
+
+    private void DecodeAndWriteToBuffer(PlayerAudioTrack track, byte[]? opusData, bool applyRadioEffect, string speakerZone, string listenerZone, ProximityMetadata? metadata)
     {
         Span<short> pcm = stackalloc short[FrameSamples];
         int decoded;
@@ -368,13 +402,52 @@ public class AudioPlaybackService : IDisposable
 
         if (EnableEnvironmentalAcoustics)
         {
-            track.AcousticFilter.UpdateZoneInfo(speakerZone, listenerZone);
+            if (metadata != null && metadata.SpatialEnabled)
+            {
+                track.AcousticFilter.UpdateZoneInfo(
+                    speakerZone, 
+                    listenerZone, 
+                    ListenerX, 
+                    ListenerY, 
+                    ListenerZ, 
+                    metadata.SpeakerX, 
+                    metadata.SpeakerY, 
+                    metadata.SpeakerZ);
+            }
+            else
+            {
+                track.AcousticFilter.UpdateZoneInfo(speakerZone, listenerZone, 0, 0, 0, 0, 0, 0);
+            }
             track.AcousticFilter.Process(floatBuf, decoded);
         }
 
         if (applyRadioEffect)
         {
+            track.DspFilter.EnableHelmetModulator = EnableHelmetModulator;
             track.DspFilter.Process(floatBuf, decoded);
+        }
+
+        // Downsample to 16kHz for STT if enabled
+        if (EnableStt)
+        {
+            lock (track.SttLock)
+            {
+                for (int i = 0; i < decoded; i += 3)
+                {
+                    if (i + 2 < decoded)
+                    {
+                        float avg = (floatBuf[i] + floatBuf[i + 1] + floatBuf[i + 2]) / 3.0f;
+                        track.SttSampleBuffer.Add(avg);
+                    }
+                }
+
+                if (track.SttSampleBuffer.Count >= 80000)
+                {
+                    var chunk = track.SttSampleBuffer.ToArray();
+                    track.SttSampleBuffer.Clear();
+                    SttAudioChunkReady?.Invoke(track.PlayerName, chunk, track.LastAudioType);
+                }
+            }
         }
 
         var byteBuf = new byte[decoded * 4];
@@ -441,7 +514,7 @@ public class AudioPlaybackService : IDisposable
         var panning = new PanningSampleProvider(buffer.ToSampleProvider()) { Pan = 0f };
         var volume = new VolumeSampleProvider(panning) { Volume = 1.0f };
         _mixer!.AddMixerInput(volume);
-        return new PlayerAudioTrack(decoder, buffer, panning, volume);
+        return new PlayerAudioTrack(playerName, decoder, buffer, panning, volume);
     }
 
     public void Stop()
@@ -495,11 +568,13 @@ public class AudioPlaybackService : IDisposable
     }
 
     private sealed class PlayerAudioTrack(
+        string playerName,
         IOpusDecoder decoder,
         BufferedWaveProvider buffer,
         PanningSampleProvider panning,
         VolumeSampleProvider volume)
     {
+        public string PlayerName { get; } = playerName;
         public IOpusDecoder Decoder { get; } = decoder;
         public BufferedWaveProvider Buffer { get; } = buffer;
         public PanningSampleProvider Panning { get; } = panning;
@@ -512,6 +587,10 @@ public class AudioPlaybackService : IDisposable
         public JitterBuffer Jitter { get; } = new();
         public string LastSpeakerZone { get; set; } = string.Empty;
         public string LastListenerZone { get; set; } = string.Empty;
+
+        public byte LastAudioType { get; set; } = 0x00;
+        public List<float> SttSampleBuffer { get; } = new();
+        public readonly object SttLock = new();
     }
 }
 

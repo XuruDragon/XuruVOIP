@@ -86,5 +86,77 @@
                            FontStyle="Italic"/>
             </StackPanel>
         </Border>
+
+        <!-- Tactical Mini-Radar (Top Right corner by default) -->
+        <Border x:Name="RadarPanel"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="20"
+                Width="180"
+                Height="180"
+                CornerRadius="90"
+                Background="#B80E1116"
+                BorderThickness="2"
+                BorderBrush="#803DDB85">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="15" ShadowDepth="3" Opacity="0.5"/>
+            </Border.Effect>
+            <Grid>
+                <!-- Compass / Orientation ticks -->
+                <Ellipse Width="160" Height="160" Stroke="#203DDB85" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Ellipse Width="80" Height="80" Stroke="#103DDB85" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Line X1="80" Y1="0" X2="80" Y2="160" Stroke="#153DDB85" StrokeThickness="0.5"/>
+                <Line X1="0" Y1="80" X2="160" Y2="80" Stroke="#153DDB85" StrokeThickness="0.5"/>
+                
+                <!-- Range Text indicator -->
+                <TextBlock x:Name="TxtRadarRange" Text="50m" Foreground="#803DDB85" FontSize="9" FontWeight="Bold"
+                           HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,6,0,0"/>
+
+                <!-- Dynamic Blip Canvas -->
+                <Canvas x:Name="RadarCanvas" Width="160" Height="160" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Real-time HUD Subtitles / Captions (Bottom Center) -->
+        <ItemsControl x:Name="LstCaptions"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Bottom"
+                      Margin="0,0,0,100"
+                      MaxWidth="600">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="#D80E1116" 
+                            CornerRadius="6" 
+                            Padding="10,6" 
+                            Margin="0,3"
+                            BorderThickness="1" 
+                            BorderBrush="#15FFFFFF"
+                            HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <!-- Channel/Frequency indicator -->
+                            <TextBlock Text="{Binding ChannelTag}" 
+                                       Foreground="{Binding ChannelBrush}" 
+                                       FontWeight="Bold" 
+                                       FontSize="11" 
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center"/>
+                            <!-- Speaking Player Name -->
+                            <TextBlock Text="{Binding SpeakerName}" 
+                                       Foreground="#FFB0B3B8" 
+                                       FontWeight="SemiBold" 
+                                       FontSize="11" 
+                                       Margin="0,0,5,0"
+                                       VerticalAlignment="Center"/>
+                            <!-- Subtitle text content -->
+                            <TextBlock Text="{Binding Text}" 
+                                       Foreground="#FFFFFFFF" 
+                                       FontSize="11.5" 
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </Window>
