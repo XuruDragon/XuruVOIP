@@ -19,6 +19,7 @@
     <sys:String x:Key="StatusConnecting">Conectando...</sys:String>
     <sys:String x:Key="StatusConnected">Conectado</sys:String>
     <sys:String x:Key="StatusConnectionFailed">Falha na conexão: {0}</sys:String>
+    <sys:String x:Key="StatusReconnectingIn">Reconectando em {0}s...</sys:String>
     <sys:String x:Key="StatusMuted">MUTADO</sys:String>
     <sys:String x:Key="StatusActive">ATIVO</sys:String>
     <sys:String x:Key="PanelMuteStatus">Status do Mudo dos Canais</sys:String>
