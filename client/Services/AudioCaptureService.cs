@@ -33,6 +33,11 @@ public class AudioCaptureService : IDisposable
     private double _humPhase100 = 0;
     private readonly Random _random = new();
 
+    // G-Force & Exertion state
+    private double _tremoloPhase = 0;
+    private double _exertionBreathPhase = 0;
+    private readonly PitchShifter _gforcePitchShifter = new();
+
     public AudioCaptureService()
     {
         _breathHp.SetHpCoefficients(650, SampleRate);
@@ -238,27 +243,56 @@ public class AudioCaptureService : IDisposable
                 floatBuf[i] = pcmFrame[i] / 32768f;
             }
 
-            if (isHelmetOn && enableHelmetMod)
+            double gforce = App.ViewModel?.GForce ?? 0.0;
+            double exertion = App.ViewModel?.Exertion ?? 0.0;
+            bool applyExertionDist = config?.EnableExertionDistortion ?? false;
+
+            for (int i = 0; i < FrameSamples; i++)
             {
-                double cycleSamples = 4.5 * SampleRate;
-                for (int i = 0; i < FrameSamples; i++)
+                // 1. Suit hum (only if helmet is on)
+                if (isHelmetOn && enableHelmetMod)
                 {
-                    // 1. Suit vent hum (50Hz and 100Hz sine waves)
                     double hum50 = Math.Sin(_humPhase50);
                     double hum100 = Math.Sin(_humPhase100);
                     _humPhase50 += 2.0 * Math.PI * 50.0 / SampleRate;
                     _humPhase100 += 2.0 * Math.PI * 100.0 / SampleRate;
-                    
                     if (_humPhase50 > 2.0 * Math.PI) _humPhase50 -= 2.0 * Math.PI;
                     if (_humPhase100 > 2.0 * Math.PI) _humPhase100 -= 2.0 * Math.PI;
-
-                    // Mix hum (subtle)
                     floatBuf[i] += (float)(hum50 * 0.005 + hum100 * 0.0025);
+                }
 
-                    // 2. Respirator breathing noise
+                // 2. Breathing overlay (either standard helmet breathing, or exertion heavy panting)
+                if (applyExertionDist && exertion > 0.1)
+                {
+                    double cycleExertion = (4.5 - exertion * 2.5) * SampleRate;
+                    double exertionBreathAmp = exertion * 0.08;
+                    double phaseEx = _exertionBreathPhase % cycleExertion;
+                    _exertionBreathPhase = (_exertionBreathPhase + 1) % cycleExertion;
+                    double secEx = phaseEx / SampleRate;
+                    double lenSecEx = cycleExertion / SampleRate;
+                    double halfEx = lenSecEx * 0.4;
+                    double exAmp = 0;
+                    if (secEx < halfEx)
+                    {
+                        exAmp = Math.Sin((secEx / halfEx) * Math.PI);
+                    }
+                    else if (secEx >= halfEx + 0.2 && secEx < lenSecEx - 0.2)
+                    {
+                        exAmp = 0.75 * Math.Sin(((secEx - (halfEx + 0.2)) / (lenSecEx - halfEx - 0.4)) * Math.PI);
+                    }
+                    if (exAmp > 0)
+                    {
+                        float breathNoise = (float)(_random.NextDouble() * 2.0 - 1.0);
+                        breathNoise = _breathHp.Process(breathNoise);
+                        breathNoise = _breathLp.Process(breathNoise);
+                        floatBuf[i] += (float)(breathNoise * exAmp * exertionBreathAmp);
+                    }
+                }
+                else if (isHelmetOn && enableHelmetMod)
+                {
+                    double cycleSamples = 4.5 * SampleRate;
                     double phase = _breathPhase % cycleSamples;
                     _breathPhase = (_breathPhase + 1) % cycleSamples;
-
                     double seconds = phase / SampleRate;
                     double breathAmp = 0;
                     if (seconds < 1.8)
@@ -269,7 +303,6 @@ public class AudioCaptureService : IDisposable
                     {
                         breathAmp = 0.75 * Math.Sin(((seconds - 2.3) / 1.7) * Math.PI);
                     }
-
                     if (breathAmp > 0)
                     {
                         float breathNoise = (float)(_random.NextDouble() * 2.0 - 1.0);
@@ -278,6 +311,25 @@ public class AudioCaptureService : IDisposable
                         floatBuf[i] += (float)(breathNoise * breathAmp * 0.035f);
                     }
                 }
+
+                // 3. Tremolo voice distortion
+                if (applyExertionDist && (gforce > 0.05 || exertion > 0.05))
+                {
+                    double tremoloDepth = Math.Max(gforce * 0.4, exertion * 0.3);
+                    double tremoloRate = gforce > exertion ? 4.0 + gforce * 3.0 : 6.0 + exertion * 4.0;
+                    double lfo = Math.Sin(_tremoloPhase);
+                    _tremoloPhase += 2.0 * Math.PI * tremoloRate / SampleRate;
+                    if (_tremoloPhase > 2.0 * Math.PI) _tremoloPhase -= 2.0 * Math.PI;
+                    float mod = 1.0f - (float)(tremoloDepth * (0.5 * (lfo + 1.0)));
+                    floatBuf[i] *= mod;
+                }
+            }
+
+            // 4. Pitch shift (G-force compression)
+            if (applyExertionDist && gforce > 0.05)
+            {
+                float gforcePitchFactor = 1.0f - (float)(gforce * 0.15f);
+                _gforcePitchShifter.Process(floatBuf, FrameSamples, gforcePitchFactor);
             }
 
             // Apply Voice Changer effects if enabled

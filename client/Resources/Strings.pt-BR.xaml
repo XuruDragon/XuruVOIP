@@ -123,6 +123,11 @@
     <sys:String x:Key="LblEnableDiscordRpc">Habilitar Discord Rich Presence</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Habilitar servidor HTTP Companion</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Porta do servidor Companion</sys:String>
+    <sys:String x:Key="LblEnableExertionDistortion">Ativar distorção de voz de Força-G e esforço</sys:String>
+    <sys:String x:Key="LblEnableRadioRepeaters">Ativar repetidores de rádio (roteamento multi-salto)</sys:String>
+    <sys:String x:Key="LblIsRadioRepeater">Agir como sinalizador repetidor de rádio</sys:String>
+    <sys:String x:Key="LblEnableShipPa">Ativar sistema de som (PA) da nave</sys:String>
+    <sys:String x:Key="LblPttPaKey">Tecla de transmissão do PA</sys:String>
     <sys:String x:Key="LblOverlayCapabilities">Recursos do Overlay</sys:String>
     <sys:String x:Key="LblOverlayCapabilitiesDesc">O overlay HUD é totalmente compatível com Vulkan e DirectX quando o Star Citizen é executado em modo "Janela sem Bordas". Exibe o status da conexão VoIP no jogo, a frequência de rádio ativa e os indicadores de fala em tempo real sem se injetar no código do jogo ou arriscar banimentos.</sys:String>
 

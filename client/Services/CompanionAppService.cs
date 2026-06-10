@@ -134,7 +134,10 @@ public class CompanionAppService : IDisposable
                     voiceChangerType = _viewModel.Config.Config.VoiceChangerType,
                     voiceChangerEnabled = _viewModel.Config.Config.EnableVoiceChanger,
                     posConnected = _viewModel.PosConnected,
-                    audioConnected = _viewModel.AudioConnected
+                    audioConnected = _viewModel.AudioConnected,
+                    gforce = _viewModel.GForce,
+                    exertion = _viewModel.Exertion,
+                    enableExertionDistortion = _viewModel.Config.Config.EnableExertionDistortion
                 };
 
                 string json = JsonSerializer.Serialize(status);
@@ -221,6 +224,20 @@ public class CompanionAppService : IDisposable
                     _viewModel.Config.Config.VoiceChangerType = type;
                     _viewModel.SaveConfig();
                 }
+                break;
+            case "set_exertion":
+                if (root.TryGetProperty("gforce", out var gfProp) && gfProp.ValueKind == JsonValueKind.Number)
+                {
+                    _viewModel.GForce = gfProp.GetDouble();
+                }
+                if (root.TryGetProperty("exertion", out var exProp) && exProp.ValueKind == JsonValueKind.Number)
+                {
+                    _viewModel.Exertion = exProp.GetDouble();
+                }
+                break;
+            case "toggle_exertion_distortion":
+                _viewModel.Config.Config.EnableExertionDistortion = !_viewModel.Config.Config.EnableExertionDistortion;
+                _viewModel.SaveConfig();
                 break;
         }
     }
@@ -503,6 +520,29 @@ public class CompanionAppService : IDisposable
                     <option value="PitchShift">PitchShift</option>
                 </select>
             </div>
+            <div class="control-row" style="margin-top:12px;">
+                <div class="section-title">Immersive Distortion</div>
+                <button class="btn" id="btn-exertion-dist" onclick="postAction('toggle_exertion_distortion')" style="width:100%; margin-bottom:12px; flex-direction:row; padding:12px;">
+                    <span class="icon">🎚️</span>
+                    <span>Enable Exertion & G-Force</span>
+                </button>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <div>
+                        <label style="font-size:12px; color:rgba(255,255,255,0.6); display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <span>Mock G-Force:</span>
+                            <span id="val-gforce" style="color:var(--primary); font-weight:600;">0.0G</span>
+                        </label>
+                        <input type="range" id="slide-gforce" min="0" max="1" step="0.05" value="0" style="width:100%; accent-color:var(--primary); cursor:pointer;" oninput="updateMockExertion()"/>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; color:rgba(255,255,255,0.6); display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <span>Mock Exertion:</span>
+                            <span id="val-exertion" style="color:var(--primary); font-weight:600;">0.0</span>
+                        </label>
+                        <input type="range" id="slide-exertion" min="0" max="1" step="0.05" value="0" style="width:100%; accent-color:var(--primary); cursor:pointer;" oninput="updateMockExertion()"/>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="section-title">Active Speakers</div>
@@ -512,6 +552,9 @@ public class CompanionAppService : IDisposable
     </div>
 
     <script>
+        let isDraggingGForce = false;
+        let isDraggingExertion = false;
+
         async function fetchStatus() {
             try {
                 const res = await fetch('/api/status');
@@ -558,6 +601,24 @@ public class CompanionAppService : IDisposable
                 const selVoice = document.getElementById('sel-voice');
                 selVoice.value = data.voiceChangerType || 'None';
 
+                // Update voice distortion
+                const btnEx = document.getElementById('btn-exertion-dist');
+                if (data.enableExertionDistortion) {
+                    btnEx.classList.add('active');
+                } else {
+                    btnEx.classList.remove('active');
+                }
+                
+                // If not actively dragging, update mock sliders from status
+                if (!isDraggingGForce) {
+                    document.getElementById('slide-gforce').value = data.gforce;
+                    document.getElementById('val-gforce').textContent = (data.gforce * 9.0).toFixed(1) + 'G';
+                }
+                if (!isDraggingExertion) {
+                    document.getElementById('slide-exertion').value = data.exertion;
+                    document.getElementById('val-exertion').textContent = data.exertion.toFixed(2);
+                }
+
                 // Update Active Speakers
                 const list = document.getElementById('list-speakers');
                 list.innerHTML = '';
@@ -578,19 +639,21 @@ public class CompanionAppService : IDisposable
 
         function setButtonState(id, isMutedOrActive, isMuteBtn) {
             const btn = document.getElementById(id);
-            if (isMuteBtn) {
-                if (isMutedOrActive) {
-                    btn.classList.add('muted');
-                    btn.classList.remove('active');
+            if (btn) {
+                if (isMuteBtn) {
+                    if (isMutedOrActive) {
+                        btn.classList.add('muted');
+                        btn.classList.remove('active');
+                    } else {
+                        btn.classList.add('active');
+                        btn.classList.remove('muted');
+                    }
                 } else {
-                    btn.classList.add('active');
-                    btn.classList.remove('muted');
-                }
-            } else {
-                if (isMutedOrActive) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
+                    if (isMutedOrActive) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
                 }
             }
         }
@@ -607,6 +670,25 @@ public class CompanionAppService : IDisposable
                 console.error(err);
             }
         }
+
+        function updateMockExertion() {
+            const gf = parseFloat(document.getElementById('slide-gforce').value);
+            const ex = parseFloat(document.getElementById('slide-exertion').value);
+            document.getElementById('val-gforce').textContent = (gf * 9.0).toFixed(1) + 'G';
+            document.getElementById('val-exertion').textContent = ex.toFixed(2);
+            postAction('set_exertion', { gforce: gf, exertion: ex });
+        }
+
+        // Add event listeners for dragging
+        document.getElementById('slide-gforce').addEventListener('mousedown', () => isDraggingGForce = true);
+        document.getElementById('slide-gforce').addEventListener('mouseup', () => { isDraggingGForce = false; updateMockExertion(); });
+        document.getElementById('slide-gforce').addEventListener('touchstart', () => isDraggingGForce = true);
+        document.getElementById('slide-gforce').addEventListener('touchend', () => { isDraggingGForce = false; updateMockExertion(); });
+
+        document.getElementById('slide-exertion').addEventListener('mousedown', () => isDraggingExertion = true);
+        document.getElementById('slide-exertion').addEventListener('mouseup', () => { isDraggingExertion = false; updateMockExertion(); });
+        document.getElementById('slide-exertion').addEventListener('touchstart', () => isDraggingExertion = true);
+        document.getElementById('slide-exertion').addEventListener('touchend', () => { isDraggingExertion = false; updateMockExertion(); });
 
         // Poll every 500ms
         setInterval(fetchStatus, 500);

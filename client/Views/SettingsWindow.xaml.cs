@@ -162,6 +162,16 @@ public partial class SettingsWindow : Window
             CompanionPortPanel.Visibility = Cfg.EnableCompanionApp ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        // Ship PA settings
+        if (CbEnableShipPa != null)
+        {
+            CbEnableShipPa.IsChecked = Cfg.EnableShipPa;
+        }
+        if (ShipPaPanel != null)
+        {
+            ShipPaPanel.Visibility = Cfg.EnableShipPa ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         // OCR region display
         UpdateRegionDisplay();
     }
@@ -370,6 +380,14 @@ public partial class SettingsWindow : Window
         bool enabled = CbEnableCompanionApp.IsChecked == true;
         Cfg.EnableCompanionApp = enabled;
         CompanionPortPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void ShipPa_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || ShipPaPanel == null) return;
+        bool enabled = CbEnableShipPa.IsChecked == true;
+        Cfg.EnableShipPa = enabled;
+        ShipPaPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
     }
 
     protected override void OnClosed(EventArgs e)

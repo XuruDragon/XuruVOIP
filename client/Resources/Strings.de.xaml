@@ -123,6 +123,11 @@
     <sys:String x:Key="LblEnableDiscordRpc">Discord Rich Presence aktivieren</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Begleit-App HTTP-Server aktivieren</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Begleit-Server Port</sys:String>
+    <sys:String x:Key="LblEnableExertionDistortion">G-Force- &amp; Belastungs-Stimmverzerrung aktivieren</sys:String>
+    <sys:String x:Key="LblEnableRadioRepeaters">Funk-Repeater aktivieren (Multi-Hop-Routing)</sys:String>
+    <sys:String x:Key="LblIsRadioRepeater">Als Funk-Repeater-Bake fungieren</sys:String>
+    <sys:String x:Key="LblEnableShipPa">Schiffs-PA-System aktivieren</sys:String>
+    <sys:String x:Key="LblPttPaKey">PA-Sende-Taste</sys:String>
     <sys:String x:Key="LblOverlayCapabilities">Overlay-Funktionen</sys:String>
     <sys:String x:Key="LblOverlayCapabilitiesDesc">Das HUD-Overlay ist vollständig kompatibel mit Vulkan und DirectX, wenn Star Citizen im Modus "Rahmenloses Fenster" ausgeführt wird. Es zeigt den VoIP-Verbindungsstatus im Spiel, die aktive Funkfrequenz und Echtzeit-Sprechanzeigen an, ohne in den Spielcode einzugreifen oder ein Ban-Risiko darzustellen.</sys:String>
 

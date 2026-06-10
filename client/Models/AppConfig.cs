@@ -74,5 +74,12 @@ public class AppConfig
     // --- Companion App ---
     public bool EnableCompanionApp { get; set; } = false;
     public int CompanionAppPort { get; set; } = 8891;
+
+    // --- Immersive Features ---
+    public bool EnableExertionDistortion { get; set; } = false;
+    public bool EnableRadioRepeaters { get; set; } = false;
+    public bool IsRadioRepeater { get; set; } = false;
+    public bool EnableShipPa { get; set; } = false;
+    public string PttPaKey { get; set; } = "P";
 }
 
