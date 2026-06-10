@@ -30,6 +30,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly DispatcherTimer _ocrTimer = new();
     private readonly GameDetectionService _gameDetector = new();
     public GameDetectionService GameDetector => _gameDetector;
+    private CompanionAppService? _companionApp;
 
     public PlayerPosition LastSentPos => _lastSentPos;
     public Dictionary<string, PlayerPosition> RemotePositions => _remotePositions;
@@ -318,6 +319,13 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _gameDetector.PositionReceived += OnGrtprPositionReceived;
         _gameDetector.CustomGameLogPath = Config.Config.CustomGameLogPath;
         _gameDetector.Start();
+
+        // Companion App
+        if (Config.Config.EnableCompanionApp)
+        {
+            _companionApp = new CompanionAppService(this);
+            _companionApp.Start();
+        }
 
         // Position tracking setup
         _ocrTimer.Tick += OnOcrTick;
@@ -650,6 +658,16 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         ActiveChannelName = _activeChannel;
 
         await _posWs.SetChannelAsync(_activeChannel);
+        UpdateDiscordPresence();
+    }
+
+    public async Task ChangeRadioChannelAsync(string channel)
+    {
+        if (!_availableChannels.Contains(channel)) return;
+        _activeChannel = channel;
+        ActiveChannelName = channel;
+
+        await _posWs.SetChannelAsync(channel);
         UpdateDiscordPresence();
     }
 
@@ -1011,6 +1029,24 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         // Sync position tracking source
         ApplyTrackingSource();
 
+        // Sync companion app state
+        if (Config.Config.EnableCompanionApp)
+        {
+            if (_companionApp == null)
+            {
+                _companionApp = new CompanionAppService(this);
+                _companionApp.Start();
+            }
+        }
+        else
+        {
+            if (_companionApp != null)
+            {
+                _companionApp.Stop();
+                _companionApp = null;
+            }
+        }
+
         if (AudioConnected)
         {
             LogService.Info("ApplySettings: Re-initializing audio devices with new parameters.");
@@ -1140,6 +1176,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _stt.Dispose();
         _ocr.Dispose();
         _discordRpc.Dispose();
+        _companionApp?.Dispose();
         await _posWs.DisposeAsync();
         await _audioWs.DisposeAsync();
     }
