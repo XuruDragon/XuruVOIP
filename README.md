@@ -177,13 +177,29 @@ graph TD
 * **HUD Overlay Window**: The client provides an optional, lightweight WPF overlay window that renders topmost. It displays client VoIP status, current communication frequency, and an active speaker list with visual radio signal indicators.
 * **Win32 Click-Through Integration**: By using Win32 API window styles (`WS_EX_TRANSPARENT` and `WS_EX_NOACTIVATE`), the overlay does not steal focus and allows mouse clicks to pass directly through to the game.
 * **API Agnostic Rendering**: Since standard transparent WPF windows rely on Windows Desktop Window Manager (DWM) composition, the overlay does not hook the graphics pipeline. This guarantees full rendering compatibility with both **Vulkan** and **DirectX**, provided the game is run in **"Borderless Windowed"** mode.
+* **📡 Tactical HUD Mini-Radar**: Renders player locations on a circular mini-radar drawn on the overlay.
+  * **Heading-Up Alignment**: The radar automatically rotates based on the player's movement direction vector (look heading).
+  * **Relative Projection**: Projects coordinates of nearby speaking players in proximity. Active speakers display pulsating sound rings.
+  * **Configurability**: Can be toggled on/off in Settings, with maximum range adjustable from 10m to 200m.
+* **💬 Real-Time HUD Subtitles (Speech-to-Text)**: Automatically transcribes voice communications in real-time and displays them as subtitles on the overlay.
+  * **Offline Transcription**: Uses an offline, lightweight Whisper model (`ggml-tiny.bin`) run locally (via Whisper.net).
+  * **Dynamic Language Adaptation**: Matches the speech recognition parameters dynamically to the user's selected interface language.
+  * **On-Demand Background Setup**: Only downloads the 75MB model from Huggingface on first activation. Background download progress is displayed directly on the HUD.
 
 ### 7. Environmental Acoustics (Occlusion & Reverb)
-* **Occlusion Filter:** If the speaker and listener are in different zones or compartments, the client automatically applies a low-pass filter (cutoff 600Hz, volume 65%) to simulate physical obstruction/occlusion. The cutoff frequency transitions smoothly to prevent clicks.
+* **Occlusion Filter:** If the speaker and listener are in different zones or compartments, the client automatically applies a low-pass filter to simulate physical obstruction/occlusion. The cutoff frequency transitions smoothly to prevent audio clicks.
 * **Location-Aware Reverb:** If the listener is located in a specific environment (Caves, Bunkers, or Hangars), a feedback delay-line comb filter applies environment-specific wet mix, delay, and feedback parameters:
   * *Caves / Tunnels:* 45% wet, 100ms delay, 0.6 feedback.
   * *Bunkers / Stations:* 25% wet, 50ms delay, 0.4 feedback.
   * *Hangars:* 35% wet, 150ms delay, 0.5 feedback.
+* **🗺️ Compartment-Specific and Deck Occlusion**: Supports specific ship layouts and facilities, separating audio based on internal physical boundaries:
+  * *Carrack Decks:* Z-coordinate divisions (Command vs Habitation vs Technical deck) apply low-pass filtering (cutoff 350Hz, volume 35%).
+  * *Carrack Compartments:* Y-coordinate divisions (Cockpit vs Habitation vs Engine room) filter audio (cutoff 900Hz, volume 65%).
+  * *Bunker Levels:* Z-coordinate divisions (Elevator lobby vs Intermediate level vs Main level) filter audio (cutoff 300Hz, volume 30%).
+  * *Bunker Rooms:* X-coordinate divisions filter audio (cutoff 800Hz, volume 60%).
+  * *Hercules Decks:* Z-coordinate divisions (Habitation vs Cargo hold) filter audio (cutoff 400Hz, volume 45%).
+  * *Cutlass Compartments:* Y-coordinate divisions (Cockpit vs Cargo hold) filter audio (cutoff 1000Hz, volume 70%).
+  * *Elevation Heuristic:* Any height difference greater than 4.5m between players in the same zone automatically triggers floor/ceiling occlusion (cutoff 500Hz, volume 45%).
 
 ### 8. Zero-Dependency Discord Rich Presence (RPC)
 * **Robust Named Pipe Connection:** The client integrates with Discord without requiring heavy external dependencies. To ensure robust connectivity across different Discord configurations or multiple instances, it scans and attempts connection on all named pipe indexes from `discord-ipc-0` through `discord-ipc-9`.
@@ -195,6 +211,30 @@ graph TD
 ### 9. Startup Log Rotation
 * **Daily Log Rotation:** At startup, the client checks the active log file's date. If it was modified on a previous day, it is archived as `xuru_voip.YYYY-MM-DD.log`.
 * **Pruning and Retention:** To limit disk space consumption, the client scans the log directory and retains only the 5 most recent rotated log files, deleting older ones.
+
+### 10. 🎙️ Real-time Voice Changer & Suit Modulators
+* **Voice Modulator DSP**: Applies real-time digital signal processing effects to outgoing microphone audio prior to Opus compression:
+  * **Pitch Shifter**: Real-time time-domain pitch shifter using two overlapping cross-fading delay lines.
+  * **Ring Modulator**: Multiplies the audio signal by a carrier wave to produce metallic, robotic sci-fi tones.
+  * **Flanger**: Comb filter with an LFO-modulated delay line to produce sweeping, space-like swoosh effects.
+* **Voice Changer Presets**:
+  * *Alien*: Deep pitch shift (0.65x) combined with ring modulation (85Hz) and flanger.
+  * *Cyborg*: Metallic shift (0.82x), ring modulation (65Hz), soft tanh saturation, and 8-bit bitcrushing.
+  * *Robotic*: High pitch shift (1.25x), ring modulation (140Hz), and flanger.
+  * *Custom Pitch Shift*: Manually adjustable pitch factor (0.5x to 2.0x).
+* **Helmet/Suit Comms Modulator**: When enabled, overlays an authentic respirator breathing hiss and key chime tones on transmission start/end (hiss and chimes are fully toggleable).
+
+---
+
+## 🎮 XuruVoip Client Settings Tab Breakdown
+
+The settings window is divided into six specialized tabs:
+1. **General**: Select client language, configure the custom Star Citizen `Game.log` file path, and toggle general log file writing.
+2. **Connection**: Configure the Server IP address, Position & Audio ports, Username, User Password, and Server Token/Password.
+3. **Position**: Toggle the coordinates source ("OCR Screen Scanner" vs "Game.log Reader (GRTPR)"), select monitor, scan interval (ms), crop region bounding box, and preview real-time OCR results (OCR settings are hidden when GRTPR is active).
+4. **Audio**: Choose input/output devices, adjust gains, select transmission mode (PTT / VAD), configure VAD threshold, toggle **Enable 3D Spatial Audio**, configure distance-based radio degradation and synthesized PTT mic chimes, toggle helmet/suit modulator, and choose/configure **Voice Changer** presets (Alien, Cyborg, Robotic, PitchShift).
+5. **Hotkeys**: Record keys for Proximity PTT, Radio PTT, Profile PTT, Helmet toggle, Radio channel cycle, muting outgoing microphone channels, and muting incoming audio channels.
+6. **Overlay**: Toggle the borderless HUD overlay window, configure the screen corner placement, enable the **Tactical Mini-Radar** (with configurable maximum range), and toggle real-time **Speech-to-Text captions** (including the HuggingFace model download notice).
 
 ---
 

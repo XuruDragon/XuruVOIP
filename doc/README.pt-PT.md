@@ -174,8 +174,16 @@ graph TD
 
 ### 6. Overlay HUD Sem Bordas Compatível com Vulkan e DirectX
 * **Janela de Overlay HUD**: O cliente fornece uma janela de overlay WPF opcional e leve que é exibida em primeiro plano. Ela mostra o status do VoIP, a frequência do canal ativo e a lista de interlocutores ativos com ícones de sinal de rádio.
-* **Integração Transparente Win32**: Através dos estilos de janela Win32 (`WS_EX_TRANSPARENT` e `WS_EX_NOACTIVATE`), o overlay não rouba o foco do jogo e permite que os cliques do mouse pasem diretamente para o jogo.
+* **Integração Transparente Win32**: Através dos estilos de janela Win32 (`WS_EX_TRANSPARENT` e `WS_EX_NOACTIVATE`), o overlay não rouba o foco do jogo e permite que os cliques do rato passem diretamente para o jogo.
 * **Renderização Independente de API**: Como as janelas transparentes do WPF dependem da composição do Desktop Window Manager (DWM) do Windows, o overlay não se injeta na pipeline gráfica do jogo. Isso garante compatibilidade total tanto com **Vulkan** quanto com **DirectX**, desde que o jogo seja executado no modo **"Janela sem Bordas"** (Borderless Windowed).
+* **📡 Mini-Radar HUD Tático**: Renderiza as posições dos utilizadores num mini-radar circular desenhado no overlay.
+  * **Alinhamento Heading-Up**: O radar gira automaticamente com base no vetor da direção de movimento do utilizador.
+  * **Projeção Relativa**: Projeta as coordenadas de utilizadores próximos enquanto falam em proximidade.
+  * **Configuração**: Pode ser ligado/desligado nas Definições, com alcance máximo ajustável de 10m a 200m.
+* **💬 Legendas HUD em Tempo Real (Speech-to-Text)**: Transcreve comunicações de voz automaticamente em tempo real e as exibe como legendas no overlay.
+  * **Transcrição Offline**: Utiliza um modelo Whisper leve e offline (`ggml-tiny.bin`) executado localmente (via Whisper.net).
+  * **Adaptação de Idioma Dinâmica**: Sincroniza o idioma do reconhecimento de fala com o idioma da interface selecionado pelo utilizador.
+  * **Instalação Sob Demanda**: Baixa o modelo de 75MB do Huggingface apenas no primeiro acionamento. O progresso do download é exibido no HUD.
 
 ### 7. Acústica Ambiental (Oclusão e Reverberação)
 * **Filtro de Oclusão:** Se o interlocutor e o ouvinte estiverem em compartimentos diferentes, o cliente aplica automaticamente um filtro passa-baixas (corte de 600 Hz, volume em 65%) para simular a obstrução física. A transição é suave para evitar cliques.
@@ -183,6 +191,14 @@ graph TD
   * *Cavernas / Túneis:* 45% wet, 100ms de atraso, 0.6 de feedback.
   * *Bunkers / Estações:* 25% wet, 50ms de atraso, 0.4 de feedback.
   * *Hangares:* 35% wet, 150ms de atraso, 0.5 de feedback.
+* **🗺️ Oclusão Específica de Compartimentos e Decks**: Suporta layouts internos de naves e instalações para atenuar o áudio com base em barreiras físicas reais:
+  * *Decks de Carrack*: Divisões em Z aplicam filtro passa-baixas acentuado (corte de 350 Hz, volume em 35%).
+  * *Compartimentos de Carrack*: Divisões em Y (cockpit, habitação, engenharia) filtram o áudio (corte de 900 Hz, volume em 65%).
+  * *Níveis de Bunkers*: Divisões em Z (lobby do elevador, nível intermediário, nível principal) filtram o áudio (corte de 300 Hz, volume em 30%).
+  * *Salas de Bunkers*: Divisões em X filtram o áudio (corte de 800 Hz, volume em 60%).
+  * *Decks de Hercules*: Divisões em Z (habitação, compartimento de carga) filtram o áudio (corte de 400 Hz, volume em 45%).
+  * *Compartimentos de Cutlass*: Divisões em Y (cockpit, compartimento de carga) filtram o áudio (corte de 1000 Hz, volume em 70%).
+  * *Heurística de Elevação Geral*: Diferenças de altura maiores que 4,5m entre utilizadores na mesma zona ativam a oclusão de piso/teto.
 
 ### 8. Discord Rich Presence Sem Dependências (RPC)
 * **Conexão de pipe nomeado robusta:** O cliente integra-se com o Discord sem a necessidade de dependências NuGet externas pesadas. Para garantir uma conectividade robusta em diferentes configurações do Discord ou em várias instâncias, ele varre e tenta ligação em todos os índices de pipes nomeados de `discord-ipc-0` a `discord-ipc-9`.
@@ -194,6 +210,18 @@ graph TD
 ### 9. Rotação de logs na inicialização
 * **Rotação diária de logs:** Na inicialização, o cliente verifica a data do arquivo de log ativo. Se ele tiver sido modificado em um dia anterior, será arquivado como `xuru_voip.YYYY-MM-DD.log`.
 * **Limpeza e retenção:** Para limitar o consumo de espaço em disco, o cliente varre o diretório de logs e retém apenas os 5 arquivos de log rotacionados mais recentes, excluindo os mais antigos.
+
+### 10. 🎙️ Moduladores de Voz e de Traje em Tempo Real
+* **DSP do Modulador de Voz**: Aplica efeitos de processamento digital de sinal em tempo real ao microfone de saída antes da compressão Opus:
+  * **Pitch Shifter**: Deslocamento de tom no domínio do tempo usando duas linhas de atraso sobrepostas com atenuação cruzada.
+  * **Ring Modulator**: Multiplica o sinal por uma onda portadora para gerar tons metálicos e robóticos de ficção científica.
+  * **Flanger**: Filtro pente com linha de atraso modulada por LFO para criar efeitos de varredura espacial.
+* **Predefinições do Modulador**:
+  * *Alien*: Modulação grave (0.65x) combinada com Ring Modulator (85 Hz) e Flanger.
+  * *Cyborg*: Tom metálico (0.82x), Ring Modulator (65 Hz), saturação suave de tanh e redução de bits (bitcrushing) equivalente a 8 bits.
+  * *Robotic*: Tom agudo (1.25x), Ring Modulator (140 Hz) e Flanger.
+  * *Ajuste de Tom Personalizado*: Fator de tom ajustável manualmente de 0.5x a 2.0x.
+* **Modulador de Capacete e Traje**: Superpõe um som realista de respiração e chimes nas bordas de transmissão (a respiração e os chimes são totalmente desativáveis).
 
 ---
 
@@ -388,9 +416,9 @@ A janela de definições está dividida em 6 secções principais:
 1. **General**: Defina o idioma, informe o caminho do ficheiro `Game.log` do Star Citizen e ative gravações locais de log do cliente.
 2. **Connection**: Configura IP do servidor, portas de áudio/posição, utilizador, palavras-passe da conta e do servidor.
 3. **Position**: Escolha a fonte de posição ("Scanner de Ecrã OCR" vs. "Leitor de Game.log (GRTPR)"), selecciona monitor, frequência de varrimento (ms), delimita a região de leitura e visualiza a última extração de texto (opções de OCR são ocultadas se o GRTPR estiver activo).
-4. **Audio**: Escolhe os dispositivos de áudio, ganhos, modo de ativação de voz (PTT / VAD), limiar de ruído, ativação de **3D Spatial Audio**, bem como configurações avançadas de degradação de rádio e chimes de microfone PTT.
+4. **Audio**: Escolhe os dispositivos de áudio, ganhos, modo de ativação de voz (PTT / VAD), limiar de ruído, ativação de **3D Spatial Audio**, bem como configurações avançadas de degradação de rádio, chimes de microfone PTT, ligar/desligar modulador de traje, e escolher/configurar **predefinições do modulador de voz** (Alien, Cyborg, Robotic, PitchShift).
 5. **Hotkeys**: Regista as teclas físicas para falar no PTT, alternar capacete, mudar canal activo de rádio e as teclas de mute.
-6. **Overlay (Incrustação)**: Ativação do HUD overlay transparente e configuração do canto do ecrã para posicionamento (ex. Superior esquerdo, Superior direito).
+6. **Overlay (Incrustação)**: Ativação do HUD overlay transparente, configuração do canto do ecrã para posicionamento, habilitar o **Mini-Radar HUD Tático** (com limite ajustável) e habilitar **legendas em tempo real** (com aviso de download do modelo Whisper).
 
 ### Compilar e Executar o Cliente
 

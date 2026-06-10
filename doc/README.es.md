@@ -175,6 +175,14 @@ graph TD
 * **Ventana de Incrustación HUD**: El cliente proporciona un overlay WPF opcional y ligero que se muestra en primer plano. Indica el estado de la VoIP, la frecuencia activa y la lista de interlocutores que hablan con indicadores de señal de radio.
 * **Integración Transparente Win32**: Gracias a los estilos de ventana Win32 (`WS_EX_TRANSPARENT` y `WS_EX_NOACTIVATE`), la incrustación no roba el foco y permite que todos los clics del mouse pasen directamente al juego.
 * **Rendimiento Independiente de la API**: Dado que las ventanas transparentes WPF se basan en la composición del Desktop Window Manager (DWM) de Windows, el overlay no se inyecta en el pipeline gráfico del juego. Esto garantiza una compatibilidad total tanto con **Vulkan** como con **DirectX**, siempre que el juego se ejecute en modo **"Ventana sin Bordes"** (Borderless Windowed).
+* **📡 Mini-Radar Táctico HUD**: Muestra las posiciones de los jugadores en un mini-radar circular incrustado en el HUD.
+  * **Alineación de Orientación (Heading-Up)**: El radar gira automáticamente según la dirección de movimiento del jugador (vector de desplazamiento).
+  * **Proyección Relativa**: Proyecta las coordenadas de los jugadores cercanos cuando hablan en proximidad. Los interlocutores activos muestran ondas de sonido concéntricas pulsadas.
+  * **Configurabilidad**: Puede activarse/desactivarse en los ajustes, con un rango máximo ajustable de 10m a 200m.
+* **💬 Subtítulos HUD en Tiempo Real (Speech-to-Text)**: Transcribe automáticamente las comunicaciones de voz en tiempo real y las muestra como subtítulos en la superposición del HUD.
+  * **Transcripción Sin Conexión**: Utiliza un modelo Whisper ligero y local (`ggml-tiny.bin`) que se ejecuta de forma completamente local (mediante Whisper.net).
+  * **Adaptación de Idioma Dinámica**: Sincroniza dinámicamente el idioma de reconocimiento de voz con el idioma de interfaz de usuario seleccionado por el usuario.
+  * **Instalación en Segundo Plano**: Descarga el modelo de 75 MB desde HuggingFace solo tras la primera activación de la función. El progreso de descarga se muestra directamente en el HUD.
 
 ### 7. Acústica Ambiental (Oclusión y Reverberación)
 * **Filtro de Oclusión:** Si el hablante y el oyente están en compartimentos diferentes, el cliente aplica automáticamente un filtro de paso bajo (corte a 600 Hz, volumen al 65%) para simular la obstrucción física. La transición es suave para evitar clics.
@@ -182,6 +190,14 @@ graph TD
   * *Cuevas / Túneles:* 45% wet, 100ms de retraso, 0.6 de feedback.
   * *Bunkers / Estaciones:* 25% wet, 50ms de retraso, 0.4 de feedback.
   * *Hangares:* 35% wet, 150ms de retraso, 0.5 de feedback.
+* **🗺️ Oclusión Específica de Compartimentos y Cubiertas**: Admite el diseño interno de naves y búnkeres para atenuar el audio en función de las paredes y cubiertas físicas:
+  * *Cubiertas de Carrack*: Las divisiones de coordenadas Z (cubierta de mando, cubierta de habitáculo, cubierta técnica) aplican un filtro de paso bajo pronunciado (corte a 350 Hz, volumen al 35%).
+  * *Compartimentos de Carrack*: Las divisiones de coordenadas Y (cabina, habitáculo, motores) atenúan el sonido (corte a 900 Hz, volumen al 65%).
+  * *Niveles de Búnker*: Las divisiones de coordenadas Z (vestíbulo del ascensor, nivel intermedio, nivel principal) atenúan el sonido (corte a 300 Hz, volumen al 30%).
+  * *Salas de Búnker*: Las divisiones de coordenadas X atenúan el sonido (corte a 800 Hz, volumen al 60%).
+  * *Cubiertas de Hercules*: Las divisiones de coordenadas Z (habitáculo, bodega de carga) atenúan el sonido (corte a 400 Hz, volumen al 45%).
+  * *Compartimentos de Cutlass*: Las divisiones de coordenadas Y (cabina, bodega de carga) atenúan el sonido (corte a 1000 Hz, volumen al 70%).
+  * *Heurística de Elevación General*: Cualquier diferencia de altura mayor a 4.5m entre jugadores en la misma zona activa automáticamente la oclusión de suelo/techo (corte a 500 Hz, volumen al 45%).
 
 ### 8. Discord Rich Presence sin Dependencias Externas (RPC)
 * **Conexión de tubería nombrada robusta:** El cliente se integra con Discord sin requerir dependencias externas pesadas. Para garantizar una conectividad sólida en diferentes configuraciones de Discord o múltiples instancias, escanea e intenta la conexión en todos los índices de tuberías nombradas desde `discord-ipc-0` hasta `discord-ipc-9`.
@@ -193,6 +209,35 @@ graph TD
 ### 9. Rotación de registros al inicio
 * **Rotación diaria de registros:** Al iniciar, el cliente verifica la fecha del archivo de registro activo. Si se modificó un día anterior, se archiva como `xuru_voip.YYYY-MM-DD.log`.
 * **Depuración y retención:** Para limitar el consumo de espacio en disco, el cliente escanea el directorio de registros y conserva solo los 5 archivos de registro rotados más recientes, eliminando los más antiguos.
+
+### 10. 🎙️ Moduladores de Voz y de Traje en Tiempo Real
+* **DSP de Modulación de Voz**: Aplica efectos de procesamiento de señal digital en tiempo real al audio del micrófono antes de la compresión Opus:
+  * **Pitch Shifter**: Desplazamiento de tono en tiempo real utilizando dos líneas de retraso superpuestas con atenuación cruzada.
+  * **Ring Modulator**: Multiplica la señal de audio por una onda portadora para crear sonidos metálicos y robóticos de ciencia ficción.
+  * **Flanger**: Filtro de peine con una línea de retraso modulada por LFO para crear un efecto de barrido espacial.
+* **Ajustes Preestablecidos del Modulador**:
+  * *Alien*: Modulación grave (0.65x) con Ring Modulator (85 Hz) y Flanger.
+  * *Cyborg*: Tono metálico (0.82x), Ring Modulator (65 Hz), saturación suave de tanh y reducción de resolución (bitcrushing) a un equivalente de 8 bits.
+  * *Robotic*: Modulación aguda (1.25x), Ring Modulator (140 Hz) y Flanger.
+  * *Desplazamiento de Tono Personalizado*: Ajuste manual del factor de tono de 0.5x a 2.0x.
+* **Modulador de Casco y Traje**: Superpone un sonido de respiración de respirador realista y tonos de timbre al activar/desactivar la transmisión (totalmente configurables de forma independiente).
+
+---
+
+## 🎮 Pestañas de Ajustes de XuruVoip Client
+
+El panel de configuración incluye seis secciones:
+1. **General**: Selección de idioma, ruta del archivo `Game.log` de Star Citizen y activación del registro local.
+2. **Connection**: Dirección IP del servidor, puertos de audio y posición, nombre de usuario, contraseña del perfil y contraseña del servidor.
+3. **Position**: Elección de la fuente de posición ("Escáner de Pantalla OCR" vs. "Lector Game.log (GRTPR)"), selección del monitor, frecuencia de escaneo (ms), definición del área de escaneo de pantalla y vista previa del texto parseado (las opciones OCR se ocultan cuando GRTPR está activo).
+4. **Audio**: Dispositivos de audio, ajuste de ganancias de volumen, modo de transmisión (PTT / VAD), sensibilidad del VAD, activación de **3D Spatial Audio**, degradación de radio y tonos PTT de micro, activar modulador de traje y elegir/configurar **ajustes preestablecidos del modulador de voz** (Alien, Cyborg, Robotic, PitchShift).
+5. **Hotkeys**: Registro de las teclas de atajo de teclado para el PTT, silenciar canales de transmisión y silenciar canales de audio recibidos.
+6. **Overlay**: Activación de la superposición HUD transparente, configuración de la ubicación en pantalla, activar el **Mini-Radar Táctico** (con rango máximo configurable) y activar los **subtítulos en tiempo real** (con aviso de descarga del modelo Whisper).
+
+### Compilación y Ejecución del Cliente
+
+#### Requisitos
+- Windows 10 o Windows 11
 
 ---
 

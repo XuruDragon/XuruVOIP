@@ -175,6 +175,14 @@ graph TD
 * **Fenêtre d'Incrustation HUD** : Le client fournit un overlay WPF optionnel et léger qui s'affiche au premier plan. Il indique le statut de la VoIP, la fréquence active et la liste des interlocuteurs qui parlent avec des indicateurs de signal radio.
 * **Intégration Transparente Win32** : Grâce aux styles de fenêtre Win32 (`WS_EX_TRANSPARENT` et `WS_EX_NOACTIVATE`), l'incrustation ne vole pas le focus et laisse passer tous les clics de souris vers le jeu.
 * **Rendu Indépendant de l'API** : Étant donné que les fenêtres transparentes WPF s'appuient sur la composition du Desktop Window Manager (DWM) de Windows, l'overlay ne s'injecte pas dans le pipeline graphique du jeu. Cela garantit une compatibilité totale avec **Vulkan** comme **DirectX**, à condition de lancer le jeu en mode **"Fenêtré Sans Bordure"** (Borderless Windowed).
+* **📡 Mini-Radar Tactique HUD** : Affiche les positions des joueurs sur un mini-radar circulaire incrusté sur le HUD.
+  * **Alignement d'orientation (Heading-Up)** : Le radar tourne automatiquement en fonction de la direction de mouvement du joueur (vecteur de déplacement).
+  * **Projection relative** : Projette les coordonnées des joueurs proches lorsqu'ils parlent en proximité. Les interlocuteurs actifs affichent des ondes sonores concentriques pulsées.
+  * **Configuration** : Peut être activé/désactivé dans les paramètres, avec une portée maximale réglable de 10m à 200m.
+* **💬 Sous-titres HUD en temps réel (Speech-to-Text)** : Transcrit automatiquement les communications vocales en temps réel et les affiche sous forme de sous-titres sur l'overlay.
+  * **Transcription hors ligne** : Utilise un modèle Whisper léger et local (`ggml-tiny.bin`) s'exécutant entièrement hors ligne (via Whisper.net).
+  * **Adaptation linguistique dynamique** : Aligne dynamiquement la langue de reconnaissance vocale avec celle choisie pour l'interface utilisateur du client.
+  * **Téléchargement à la demande** : Télécharge le modèle de 75 Mo depuis Huggingface uniquement lors de la première activation de la fonctionnalité. La progression du téléchargement en arrière-plan est affichée directement sur le HUD.
 
 ### 7. Acoustique Environnementale (Occlusion & Réverbération)
 * **Filtre d'Occlusion :** Si le locuteur et l'auditeur sont dans des sous-zones ou compartiments différents, le client applique automatiquement un filtre passe-bas (coupure à 600 Hz, volume à 65 %) pour simuler l'obstruction physique. La transition se fait en douceur pour éviter les clics.
@@ -182,6 +190,14 @@ graph TD
   * *Grottes / Tunnels :* 45 % wet, 100 ms de délai, 0.6 de feedback.
   * *Bunkers / Stations :* 25 % wet, 50 ms de délai, 0.4 de feedback.
   * *Hangars :* 35 % wet, 150 ms de délai, 0.5 de feedback.
+* **🗺️ Occlusion spécifique par compartiment et par pont** : Prend en charge la structure interne des vaisseaux et des bunkers pour séparer l'audio selon les cloisons physiques :
+  * *Ponts du Carrack* : Séparations selon l'axe Z (pont de commandement, pont d'habitation, pont technique) appliquant un filtre passe-bas prononcé (coupure à 350 Hz, volume à 35 %).
+  * *Compartiments du Carrack* : Séparations selon l'axe Y (cockpit, habitation, moteurs) atténuant le son (coupure à 900 Hz, volume à 65 %).
+  * *Niveaux de Bunkers* : Séparations selon l'axe Z (hall d'ascenseur, niveau intermédiaire, niveau principal) atténuant le son (coupure à 300 Hz, volume à 30 %).
+  * *Pièces de Bunkers* : Séparations selon l'axe X (coupure à 800 Hz, volume à 60 %).
+  * *Ponts du Hercules* : Séparations selon l'axe Z (habitation, soute à cargaison) atténuant le son (coupure à 400 Hz, volume à 45 %).
+  * *Compartiments du Cutlass* : Séparations selon l'axe Y (cockpit, soute à cargaison) atténuant le son (coupure à 1000 Hz, volume à 70 %).
+  * *Heuristique d'élévation générale* : Toute différence d'altitude supérieure à 4,5 m entre les joueurs dans une même zone déclenche automatiquement une occlusion de plafond/plancher (coupure à 500 Hz, volume à 45 %).
 
 ### 8. Discord Rich Presence Sans Dépendance (RPC)
 * **Connexion par Pipe Nommé Robuste :** Le client s'intègre à Discord sans nécessiter de dépendances externes lourdes. Pour assurer une connectivité robuste à travers différentes configurations Discord ou plusieurs instances, il analyse et tente la connexion sur tous les index de canaux nommés de `discord-ipc-0` à `discord-ipc-9`.
@@ -193,6 +209,40 @@ graph TD
 ### 9. Rotation des journaux au démarrage
 * **Rotation quotidienne des journaux :** Au démarrage, le client vérifie la date du fichier journal actif. S'il a été modifié un jour précédent, il est archivé sous le nom `xuru_voip.YYYY-MM-DD.log`.
 * **Nettoyage et conservation :** Pour limiter la consommation d'espace disque, le client analyse le répertoire des journaux et conserve uniquement les 5 fichiers de journaux rotatifs les plus récents, en supprimant les plus anciens.
+
+### 10. 🎙️ Modulateurs de Voix & de Combinaison en Temps Réel
+* **DSP de modulation vocale** : Applique des effets de traitement numérique du signal en temps réel sur le flux sortant du microphone avant compression Opus :
+  * **Pitch Shifter** : Décale la hauteur de la voix dans le domaine temporel en utilisant deux lignes de retard qui se chevauchent avec fondu enchaîné.
+  * **Ring Modulator** : Multiplies le signal audio par une onde porteuse pour créer des sonorités métalliques, robotiques et de science-fiction.
+  * **Flanger** : Filtre en peigne avec une ligne de retard modulée par LFO pour créer un effet de balayage spatial caractéristique.
+* **Préréglages du changeur de voix** :
+  * *Alien* : Voix très grave (0.65x) combinée avec un modulateur en anneau (85 Hz) et un flanger.
+  * *Cyborg* : Voix métallique (0.82x), modulateur en anneau (65 Hz), saturation douce en tanh, et réduction de résolution (bitcrushing) équivalente à du 8 bits.
+  * *Robotic* : Voix aiguë (1.25x), modulateur en anneau (140 Hz), et flanger.
+  * *Pitch Shift personnalisé* : Hauteur réglable manuellement de 0.5x à 2.0x.
+* **Modulateur de casque/combinaison** : Lorsque cette option est activée, elle superpose un sifflement de respiration réaliste et des tonalités de fin de transmission (le sifflement et les tonalités sont entièrement désactivables).
+
+---
+
+## 🎮 Détail des paramètres du Client
+
+La fenêtre des paramètres comporte six onglets :
+1. **Général** : Choix de la langue, chemin du fichier `Game.log` et activation de la journalisation locale.
+2. **Connexion** : Adresse IP du serveur, ports audio et position, nom d'utilisateur, mot de passe de compte et mot de passe serveur.
+3. **Position** : Choix de la source de position ("Scanner d'Écran OCR" vs "Lecteur Game.log (GRTPR)"), sélection du moniteur, intervalle de capture (ms), définition de la région de scan et prévisualisation du texte capturé (les options OCR sont masquées si GRTPR est actif).
+4. **Audio** : Sélection des périphériques, réglage des gains de volume, mode de transmission (PTT / VAD), réglage du seuil de détection, activation de l'audio spatial 3D, options de dégradation radio et de bruitages micro PTT, activation du modulateur de combinaison et choix/configuration des **préréglages du changeur de voix** (Alien, Cyborg, Robotic, PitchShift).
+5. **Raccourcis** : Enregistrement des touches de raccourci clavier pour le PTT, le casque, le changement de canal et les fonctions de coupure audio (muet).
+6. **Incrustation (Overlay)** : Activation de l'overlay HUD transparent, configuration de son emplacement à l'écran, activation du **Mini-Radar Tactique** (avec portée maximale réglable) et activation des **sous-titres en temps réel** (avec message de téléchargement du modèle Whisper).
+
+### Compilation & Lancement du Client
+
+#### Configuration requise
+- Windows 10 ou Windows 11
+- SDK .NET 9.0 (Support WPF)
+
+#### Compiler et exécuter :
+```powershell
+```
 
 ---
 
