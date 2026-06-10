@@ -117,7 +117,8 @@ graph TB
         subgraph CAPT ["Microphone Capture & DSP"]
             MIC["Mic Input"] --> VAD["WebRTC VAD"]
             VAD -->|Speech Detected| VC["Voice Changer (Alien/Cyborg/Robot)"]
-            VC -->|Modulated PCM| HELM_OSC["Helmet Breathing & Vent Hum Overlay"]
+            VC -->|Modulated PCM| GF_FIL["G-Force Pitch & Tremolo / Exertion Panting Injection"]
+            GF_FIL --> HELM_OSC["Helmet Breathing & Vent Hum Overlay"]
             HELM_OSC --> OPUS_ENC["Opus Encoder"]
         end
 
@@ -125,18 +126,23 @@ graph TB
             LOGS -->|Tail Scanner| LOG_PAR["Game.log Parser"]
             SCREEN -->|showlocations Capture| OCR["Tesseract OCR Engine"]
             LOG_PAR -->|Equip/Visor Events| HELM_DET["Visor State Auto-Sync"]
+            LOG_PAR -->|G-Force & Stamina Values| GF_DET["G-Force & Exertion Tracker"]
             OCR -->|Coords| POS_SEL{"Source Selector"}
             LOG_PAR -->|Coords & ContainerID| POS_SEL
         end
 
         subgraph PLAY ["Spatial Playback & DSP"]
-            OPUS_DEC["Opus Decoder"] --> OCC_FIL["Carrack/Hercules Deck & Room Occlusion"]
+            OPUS_DEC["Opus Decoder"] --> PKT_TYPE{"Packet Type?"}
+            PKT_TYPE -->|PA 0x03| PA_FIL["Megaphone DSP (HP/LP, tanh Distortion, Ship Reverb)"]
+            PKT_TYPE -->|Proximity/Radio| OCC_FIL["Carrack/Hercules Deck & Room Occlusion"]
             OCC_FIL --> REV_FIL["Location-Aware Reverb (Caves/Bunkers/Hangars)"]
-            REV_FIL --> RAD_FIL["Radio bandpass & Long-Range Degradation"]
+            REV_FIL --> RAD_FIL["Radio bandpass & Long-Range Multi-Hop Routing (Dijkstra)"]
             RAD_FIL --> CHIMES["PTT Mic Chirps & Squelch Tail Generator"]
             CHIMES --> PAN["Spatial 3D Panning Math"]
             PAN --> VOL["Spatial Distance Attenuation"]
-            VOL --> MIXER["NAudio Mixer"] --> SPK["Audio Output Devices"]
+            VOL --> MIXER["NAudio Mixer"]
+            PA_FIL --> MIXER
+            MIXER --> SPK["Audio Output Devices"]
         end
 
         subgraph HUD ["HUD Overlay (Win32 Click-Through)"]
@@ -153,6 +159,7 @@ graph TB
 
         POS_SEL -->|Coordinates & Zone| POS_WS["Position WS Client"]
         HELM_DET -->|Visor State| POS_WS
+        GF_DET -->|G-Force / Exertion| GF_FIL
         OPUS_ENC -->|Audio Packets| AUD_WS["Audio WS Client"]
     end
 
@@ -234,6 +241,20 @@ graph TB
 * **Daily Log Rotation:** Startup log archiver retaining only the 5 most recent logs.
 * **Admin Dashboard:** Real-time web admin panel with lockout security, rate-limiting, and an interactive 2D HTML5 Canvas Live Radar map allowing administrators to zoom, pan, and trace historical player trails.
 
+### 12. 🤢 G-Force & Physical Exertion Voice Distortion
+* **Tremolo & Pitch Shifting:** Under high G-forces, outgoing microphone audio is dynamically modulated with a tremolo LFO (4-10Hz, up to 40% depth) and pitched down (factor: 1.0 down to 0.85) to simulate physical strain, blackout, or redout states.
+* **Heavy Breathing Overlay:** Automatically overlays randomized panting/breathing noise, scaling respiration cycle speed based on player stamina levels parsed in real-time from `Game.log`.
+* **Manual / API Controls:** Toggleable via client Settings and Companion App Web UI sliders for roleplay or mock testing.
+
+### 13. 📡 Tactical Radio Relay & Multi-Hop Repeater Beacons
+* **Multi-Hop Signal Routing:** Players can toggle "Beacon Mode" to act as a Radio Repeater Beacon. If two players are out of direct radio range (beyond 1500m), the receiver client executes Dijkstra's shortest-path algorithm over all active repeaters in the zone.
+* **Worst-Hop Quality Degradation:** If a multi-hop path exists under the 8000m single-hop limit, the system routes the communication and applies the worst-hop's degradation factor (signal quality) instead of total straight-line distance, enabling long-range planetary/orbital radio networks.
+* **Dynamic WebSocket State:** Active repeater states are synchronized in real-time via the server's WebSocket control channel.
+
+### 14. 📢 Ship Public Address (PA) Broadcast System
+* **Ship-Wide Audio Broadcast:** Pilots or captains of multi-crew ships can broadcast voice announcements to all crew members sharing the same `ContainerID` (ship) in the same Zone.
+* **PA DSP & Klaxon Chime:** PA transmissions bypass local proximity and radio mutes (except master volume/mute), play mono center-panned, prepend a Sci-Fi dual-tone chime/klaxon alert, and apply a megaphone bandpass & reverberation filter simulating hollow ship interior acoustics.
+
 ---
 
 ## 🎮 XuruVoip Client Settings Tab Breakdown
@@ -307,6 +328,8 @@ XURUVOIP_LOCKOUT_DURATION=600
 # Dynamic Intercom and Immersion features (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_INTERCOM=1
 XURUVOIP_ENABLE_EVA_MUTING=1
+XURUVOIP_ENABLE_RADIO_REPEATERS=1
+XURUVOIP_ENABLE_SHIP_PA=1
 
 # Discord Voice Bridge Settings (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_DISCORD_BRIDGE=1

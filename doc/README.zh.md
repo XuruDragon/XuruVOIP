@@ -10,14 +10,14 @@
 </p>
 
 <p align="center">
-  <b>翻译：</b><br/>
-  <a href="../README.md">英语</a> •
-  <a href="README.fr.md">法语</a> •
-  <a href="README.de.md">德语</a> •
-  <a href="README.es.md">西班牙语</a> •
-  <a href="README.pt-BR.md">葡萄牙语（巴西）</a> •
-  <a href="README.pt-PT.md">Português（葡萄牙）</a> •
-  <a href="README.ja.md">日本语</a> •
+  <b>翻译:</b><br/>
+  <a href="../README.md">English</a> •
+  <a href="README.fr.md">Français</a> •
+  <a href="README.de.md">Deutsch</a> •
+  <a href="README.es.md">Español</a> •
+  <a href="README.pt-BR.md">Português (Brasil)</a> •
+  <a href="README.pt-PT.md">Português (Portugal)</a> •
+  <a href="README.ja.md">日本語</a> •
   <a href="README.zh.md">简体中文</a>
 </p>
 
@@ -114,7 +114,8 @@ graph TB
         subgraph CAPT ["麦克风采集和 DSP"]
             MIC["麦克风输入"] --> VAD["WebRTC VAD"]
             VAD -->|Speech Detected| VC["变声器（外星人/机器人/机器人）"]
-            VC -->|Modulated PCM| HELM_OSC["头盔呼吸和通风嗡嗡声覆盖"]
+            VC -->|Modulated PCM| GF_FIL["G-Force Pitch & Tremolo / Exertion Panting 注射"]
+            GF_FIL --> HELM_OSC["头盔呼吸和通风嗡嗡声覆盖"]
             HELM_OSC --> OPUS_ENC["作品编码器"]
         end
 
@@ -122,18 +123,23 @@ graph TB
             LOGS -->|Tail Scanner| LOG_PAR["游戏日志解析器"]
             SCREEN -->|showlocations Capture| OCR["Tesseract OCR 引擎"]
             LOG_PAR -->|Equip/Visor Events| HELM_DET["遮阳板状态自动同步"]
+            LOG_PAR -->|G-Force & Stamina Values| GF_DET["G 力和运动追踪器"]
             OCR -->|Coords| POS_SEL{"源选择器"}
             LOG_PAR -->|Coords & ContainerID| POS_SEL
         end
 
         subgraph PLAY ["空间播放和 DSP"]
-            OPUS_DEC["作品解码器"] --> OCC_FIL["卡拉克/大力士甲板和房间遮挡"]
+            OPUS_DEC["作品解码器"] --> PKT_TYPE{"数据包类型？"}
+            PKT_TYPE -->|PA 0x03| PA_FIL["扩音器 DSP（HP/LP、tanh 失真、船舶混响）"]
+            PKT_TYPE -->|Proximity/Radio| OCC_FIL["卡拉克/大力士甲板和房间遮挡"]
             OCC_FIL --> REV_FIL["位置感知混响（洞穴/掩体/机库）"]
-            REV_FIL --> RAD_FIL["无线电带通和远距离衰减"]
+            REV_FIL --> RAD_FIL["无线电带通和远程多跳路由 (Dijkstra)"]
             RAD_FIL --> CHIMES["PTT 麦克风线性调频声和静噪尾音发生器"]
             CHIMES --> PAN["空间 3D 平移数学"]
             PAN --> VOL["空间距离衰减"]
-            VOL --> MIXER["NA音频调音台"] --> SPK["音频输出设备"]
+            VOL --> MIXER["NA音频调音台"]
+            PA_FIL --> MIXER
+            MIXER --> SPK["音频输出设备"]
         end
 
         subgraph HUD ["HUD 覆盖（Win32 点击通过）"]
@@ -150,6 +156,7 @@ graph TB
 
         POS_SEL -->|Coordinates & Zone| POS_WS["职位 WS 客户"]
         HELM_DET -->|Visor State| POS_WS
+        GF_DET -->|G-Force / Exertion| GF_FIL
         OPUS_ENC -->|Audio Packets| AUD_WS["音频 WS 客户端"]
     end
 
@@ -230,6 +237,20 @@ graph TB
 * **每日日志轮换：** 启动日志归档程序仅保留 5 个最新日志。
 * **管理仪表板：** 实时 Web 管理面板，具有锁定安全性、速率限制和交互式 2D HTML5 Canvas 实时雷达地图，允许管理员缩放、平移和跟踪历史玩家轨迹。
 
+### 12. 🤢 G 力和体力消耗声音失真
+* **颤音和音调变换：** 在高 G 力下，传出的麦克风音频通过颤音 LFO（4-10Hz，高达 40% 深度）进行动态调制并降低音调（因子：1.0 降至 0.85）以模拟物理应变、停电或红停状态。
+* **重呼吸覆盖：** 自动覆盖随机的喘气/呼吸噪音，根据从“Game.log”实时解析的玩家耐力水平缩放呼吸周期速度。
+* **手动/API 控制：** 可通过客户端设置和配套应用程序 Web UI 滑块进行切换，以进行角色扮演或模拟测试。
+
+### 13. 📡 战术无线电中继和多跳中继器信标
+* **多跳信号路由：** 玩家可以切换“信标模式”以充当无线电中继器信标。如果两个玩家超出直接无线电范围（超过 1500m），接收器客户端会对该区域中的所有活动中继器执行 Dijkstra 的最短路径算法。
+* **最差跳点质量下降：** 如果在 8000m 单跳限制下存在多跳路径，系统将路由通信并应用最差跳点的下降系数（信号质量）而不是总直线距离，从而实现远程行星/轨道无线电网络。
+* **动态 WebSocket 状态：** 活动转发器状态通过服务器的 WebSocket 控制通道实时同步。
+
+### 14. 📢 船舶公共广播 (PA) 广播系统
+* **全船音频广播：** 多船员船舶的飞行员或船长可以向同一区域中共享相同“ContainerID”（船舶）的所有船员广播语音公告。
+* **PA DSP 和高音喇叭编钟：** PA 传输绕过本地邻近和无线电静音（主音量/静音除外），播放单声道中心声像，前置科幻双音编钟/高音喇叭警报，并应用扩音器带通和混响滤波器模拟空心船内部声学。
+
 ---
 
 ## 🎮 XuruVoip 客户端设置选项卡细分
@@ -301,6 +322,8 @@ XURUVOIP_LOCKOUT_DURATION=600
 # Dynamic Intercom and Immersion features (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_INTERCOM=1
 XURUVOIP_ENABLE_EVA_MUTING=1
+XURUVOIP_ENABLE_RADIO_REPEATERS=1
+XURUVOIP_ENABLE_SHIP_PA=1
 
 # Discord Voice Bridge Settings (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_DISCORD_BRIDGE=1

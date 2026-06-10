@@ -11,12 +11,12 @@
 
 <p align="center">
   <b>翻訳:</b><br/>
-  <a href="../README.md">英語</a> •
-  <a href="README.fr.md">フランセ</a> •
-  <a href="README.de.md">ドイツ語</a> •
-  <a href="README.es.md">スペイン語</a> •
-  <a href="README.pt-BR.md">ポルトガル語 (ブラジル)</a> •
-  <a href="README.pt-PT.md">Português (ポルトガル)</a> •
+  <a href="../README.md">English</a> •
+  <a href="README.fr.md">Français</a> •
+  <a href="README.de.md">Deutsch</a> •
+  <a href="README.es.md">Español</a> •
+  <a href="README.pt-BR.md">Português (Brasil)</a> •
+  <a href="README.pt-PT.md">Português (Portugal)</a> •
   <a href="README.ja.md">日本語</a> •
   <a href="README.zh.md">简体中文</a>
 </p>
@@ -114,7 +114,8 @@ graph TB
         subgraph CAPT ["マイクキャプチャとDSP"]
             MIC["マイク入力"] --> VAD["WebRTC VAD"]
             VAD -->|Speech Detected| VC["ボイスチェンジャー（エイリアン/サイボーグ/ロボット）"]
-            VC -->|Modulated PCM| HELM_OSC["ヘルメット呼吸とベントハムオーバーレイ"]
+            VC -->|Modulated PCM| GF_FIL["G-Force ピッチ & トレモロ / 激しい喘ぎ噴射"]
+            GF_FIL --> HELM_OSC["ヘルメット呼吸とベントハムオーバーレイ"]
             HELM_OSC --> OPUS_ENC["オーパスエンコーダー"]
         end
 
@@ -122,18 +123,23 @@ graph TB
             LOGS -->|Tail Scanner| LOG_PAR["Game.log パーサー"]
             SCREEN -->|showlocations Capture| OCR["Tesseract OCR エンジン"]
             LOG_PAR -->|Equip/Visor Events| HELM_DET["バイザー状態の自動同期"]
+            LOG_PAR -->|G-Force & Stamina Values| GF_DET["G フォースと運動トラッカー"]
             OCR -->|Coords| POS_SEL{"ソースセレクター"}
             LOG_PAR -->|Coords & ContainerID| POS_SEL
         end
 
         subgraph PLAY ["空間再生とDSP"]
-            OPUS_DEC["オーパスデコーダー"] --> OCC_FIL["キャラック/ヘラクレス デッキとルーム オクルージョン"]
+            OPUS_DEC["オーパスデコーダー"] --> PKT_TYPE{"パケットタイプ?"}
+            PKT_TYPE -->|PA 0x03| PA_FIL["メガホン DSP (HP/LP、タンディストーション、シップリバーブ)"]
+            PKT_TYPE -->|Proximity/Radio| OCC_FIL["キャラック/ヘラクレス デッキとルーム オクルージョン"]
             OCC_FIL --> REV_FIL["位置認識リバーブ (洞窟/バンカー/格納庫)"]
-            REV_FIL --> RAD_FIL["無線帯域通過と長距離の劣化"]
+            REV_FIL --> RAD_FIL["無線バンドパスと長距離マルチホップ ルーティング (ダイクストラ)"]
             RAD_FIL --> CHIMES["PTTマイクチャープ&スケルチテールジェネレーター"]
             CHIMES --> PAN["空間 3D パン演算"]
             PAN --> VOL["空間距離減衰"]
-            VOL --> MIXER["Nオーディオミキサー"] --> SPK["オーディオ出力デバイス"]
+            VOL --> MIXER["Nオーディオミキサー"]
+            PA_FIL --> MIXER
+            MIXER --> SPK["オーディオ出力デバイス"]
         end
 
         subgraph HUD ["HUD オーバーレイ (Win32 クリックスルー)"]
@@ -150,6 +156,7 @@ graph TB
 
         POS_SEL -->|Coordinates & Zone| POS_WS["WSクライアントの位置"]
         HELM_DET -->|Visor State| POS_WS
+        GF_DET -->|G-Force / Exertion| GF_FIL
         OPUS_ENC -->|Audio Packets| AUD_WS["オーディオ WS クライアント"]
     end
 
@@ -230,6 +237,20 @@ graph TB
 * **毎日のログ ローテーション:** 最新の 5 つのログのみを保持する起動ログ アーカイバ。
 * **管理者ダッシュボード:** ロックアウト セキュリティ、レート制限、およびインタラクティブな 2D HTML5 キャンバス ライブ レーダー マップを備えたリアルタイム Web 管理パネルにより、管理者はプレイヤーの軌跡をズーム、パン、トレースできます。
 
+### 12. 🤢 G フォースと身体的運動による音声の歪み
+* **トレモロとピッチシフト:** 高い重力加速度の下では、送信マイクオーディオはトレモロ LFO (4 ～ 10Hz、最大 40% の深さ) で動的に変調され、ピッチダウン (係数: 1.0 から 0.85 まで) され、物理的な緊張、ブラックアウト、またはリアウト状態をシミュレートします。
+* **激しい呼吸オーバーレイ:** ランダム化された喘ぎ/呼吸ノイズを自動的にオーバーレイし、「Game.log」からリアルタイムで解析されたプレイヤーのスタミナ レベルに基づいて呼吸サイクル速度を調整します。
+* **手動/API コントロール:** ロールプレイまたは模擬テスト用に、クライアント設定およびコンパニオン アプリの Web UI スライダーを介して切り替えることができます。
+
+### 13. 📡 戦術無線リレーおよびマルチホップリピータービーコン
+* **マルチホップ信号ルーティング:** プレーヤーは「ビーコン モード」を切り替えて、無線リピーター ビーコンとして機能できます。 2 人のプレーヤーが直接の無線範囲外 (1500 m を超える) にある場合、受信側クライアントはゾーン内のすべてのアクティブなリピーターに対してダイクストラの最短パス アルゴリズムを実行します。
+* **最悪ホップの品質低下:** マルチホップ パスが 8000 メートルのシングルホップ制限未満に存在する場合、システムは通信をルーティングし、総直線距離ではなく最悪ホップの劣化係数 (信号品質) を適用し、長距離の惑星/軌道無線ネットワークを可能にします。
+* **動的 WebSocket 状態:** アクティブなリピーターの状態は、サーバーの WebSocket 制御チャネルを介してリアルタイムで同期されます。
+
+### 14. 📢 船舶のパブリック アドレス (PA) ブロードキャスト システム
+* **船全体の音声ブロードキャスト:** 複数乗組員の船のパイロットまたは船長は、同じゾーン内で同じ「ContainerID」(船)を共有するすべての乗組員に音声アナウンスをブロードキャストできます。
+* **PA DSP と Klaxon チャイム:** PA 送信は、ローカル近接およびラジオのミュート (マスター ボリューム/ミュートを除く) をバイパスし、モノラル センター パンを再生し、SF デュアルトーン チャイム/クラクション アラートを先頭に追加し、中空船の内部音響をシミュレートするメガホン バンドパスと残響フィルターを適用します。
+
 ---
 
 ## 🎮 XuruVoip クライアント設定タブの内訳
@@ -301,6 +322,8 @@ XURUVOIP_LOCKOUT_DURATION=600
 # Dynamic Intercom and Immersion features (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_INTERCOM=1
 XURUVOIP_ENABLE_EVA_MUTING=1
+XURUVOIP_ENABLE_RADIO_REPEATERS=1
+XURUVOIP_ENABLE_SHIP_PA=1
 
 # Discord Voice Bridge Settings (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_DISCORD_BRIDGE=1

@@ -114,7 +114,8 @@ graph TB
         subgraph CAPT ["Capture de microphone et DSP"]
             MIC["Entrée micro"] --> VAD["WebRTC VAD"]
             VAD -->|Speech Detected| VC["Changeur de voix (Alien/Cyborg/Robot)"]
-            VC -->|Modulated PCM| HELM_OSC["Respiration du casque et superposition de bourdonnement d'aération"]
+            VC -->|Modulated PCM| GF_FIL["G-Force Pitch & Tremolo / Injection d'haleine d'effort"]
+            GF_FIL --> HELM_OSC["Respiration du casque et superposition de bourdonnement d'aération"]
             HELM_OSC --> OPUS_ENC["Encodeur Opus"]
         end
 
@@ -122,18 +123,23 @@ graph TB
             LOGS -->|Tail Scanner| LOG_PAR["Analyseur Game.log"]
             SCREEN -->|showlocations Capture| OCR["Moteur OCR Tesseract"]
             LOG_PAR -->|Equip/Visor Events| HELM_DET["Synchronisation automatique de l'état de la visière"]
+            LOG_PAR -->|G-Force & Stamina Values| GF_DET["Suivi de la force G et de l'effort"]
             OCR -->|Coords| POS_SEL{"Sélecteur de source"}
             LOG_PAR -->|Coords & ContainerID| POS_SEL
         end
 
         subgraph PLAY ["Lecture spatiale et DSP"]
-            OPUS_DEC["Décodeur d'opus"] --> OCC_FIL["Occlusion du pont et de la pièce de Carrack/Hercules"]
+            OPUS_DEC["Décodeur d'opus"] --> PKT_TYPE{"Type de paquet ?"}
+            PKT_TYPE -->|PA 0x03| PA_FIL["Megaphone DSP (HP/LP, distorsion tanh, réverbération navale)"]
+            PKT_TYPE -->|Proximity/Radio| OCC_FIL["Occlusion du pont et de la pièce de Carrack/Hercules"]
             OCC_FIL --> REV_FIL["Réverbération géolocalisée (grottes/bunkers/hangars)"]
-            REV_FIL --> RAD_FIL["Passe-bande radio et dégradation à longue portée"]
+            REV_FIL --> RAD_FIL["Passe-bande radio et routage multi-sauts longue portée (Dijkstra)"]
             RAD_FIL --> CHIMES["Générateur de gazouillis de micro PTT et de queue de silencieux"]
             CHIMES --> PAN["Mathématiques de panoramique spatial 3D"]
             PAN --> VOL["Atténuation de la distance spatiale"]
-            VOL --> MIXER["NMixeur audio"] --> SPK["Périphériques de sortie audio"]
+            VOL --> MIXER["NMixeur audio"]
+            PA_FIL --> MIXER
+            MIXER --> SPK["Périphériques de sortie audio"]
         end
 
         subgraph HUD ["Superposition HUD (clic Win32)"]
@@ -150,6 +156,7 @@ graph TB
 
         POS_SEL -->|Coordinates & Zone| POS_WS["Positionner le client WS"]
         HELM_DET -->|Visor State| POS_WS
+        GF_DET -->|G-Force / Exertion| GF_FIL
         OPUS_ENC -->|Audio Packets| AUD_WS["Client WS audio"]
     end
 
@@ -230,6 +237,20 @@ graph TB
 * **Rotation quotidienne des journaux :** L'archiveur de journaux de démarrage ne conserve que les 5 journaux les plus récents.
 * **Tableau de bord d'administration :** Panneau d'administration Web en temps réel avec sécurité de verrouillage, limitation de débit et carte interactive 2D HTML5 Canvas Live Radar permettant aux administrateurs de zoomer, de faire un panoramique et de tracer l'historique des traces des joueurs.
 
+### 12. 🤢 Distorsion vocale due à la force G et à l'effort physique
+* **Tremolo et Pitch Shifting :** Sous des forces G élevées, le son du microphone sortant est modulé dynamiquement avec un trémolo LFO (4-10 Hz, jusqu'à 40 % de profondeur) et diminué (facteur : 1,0 jusqu'à 0,85) pour simuler une contrainte physique, une panne d'électricité ou des états de redout.
+* **Superposition de respiration lourde :** Superpose automatiquement les bruits de respiration/halètement aléatoires, ajustant la vitesse du cycle de respiration en fonction des niveaux d'endurance du joueur analysés en temps réel à partir de « Game.log ».
+* **Contrôles manuels/API :** Basculable via les paramètres du client et les curseurs de l'interface utilisateur Web de l'application Companion pour le jeu de rôle ou les tests simulés.
+
+### 13. 📡 Relais radio tactique et balises répéteurs multi-sauts
+* **Routage du signal multi-sauts :** Les joueurs peuvent activer le « Mode balise » pour agir comme une balise de répéteur radio. Si deux joueurs sont hors de portée radio directe (au-delà de 1 500 m), le client récepteur exécute l'algorithme du chemin le plus court de Dijkstra sur tous les répéteurs actifs de la zone.
+* **Dégradation de la qualité du pire saut :** Si un chemin multi-sauts existe en dessous de la limite de 8 000 m pour un seul saut, le système achemine la communication et applique le facteur de dégradation du pire saut (qualité du signal) au lieu de la distance totale en ligne droite, permettant ainsi des réseaux radio planétaires/orbitaux à longue portée.
+* **État WebSocket dynamique :** Les états des répéteurs actifs sont synchronisés en temps réel via le canal de contrôle WebSocket du serveur.
+
+### 14. 📢 Expédier le système de diffusion de sonorisation publique (PA)
+* **Diffusion audio à l'échelle du navire :** Les pilotes ou capitaines de navires à équipage multiple peuvent diffuser des annonces vocales à tous les membres d'équipage partageant le même « ContainerID » (navire) dans la même zone.
+* **PA DSP et Klaxon Chime :** Les transmissions PA contournent la proximité locale et les sourdines de la radio (sauf le volume principal/la sourdine), jouent en mono avec panoramique central, ajoutent une alerte carillon/klaxon bicolore de science-fiction et appliquent un filtre passe-bande et de réverbération pour mégaphone simulant l'acoustique intérieure d'un navire creux.
+
 ---
 
 ## 🎮 Répartition de l'onglet Paramètres du client XuruVoip
@@ -301,6 +322,8 @@ XURUVOIP_LOCKOUT_DURATION=600
 # Dynamic Intercom and Immersion features (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_INTERCOM=1
 XURUVOIP_ENABLE_EVA_MUTING=1
+XURUVOIP_ENABLE_RADIO_REPEATERS=1
+XURUVOIP_ENABLE_SHIP_PA=1
 
 # Discord Voice Bridge Settings (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_DISCORD_BRIDGE=1

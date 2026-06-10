@@ -11,10 +11,10 @@
 
 <p align="center">
   <b>Traduções:</b><br/>
-  <a href="../README.md">Inglês</a> •
+  <a href="../README.md">English</a> •
   <a href="README.fr.md">Français</a> •
-  <a href="README.de.md">Alemão</a> •
-  <a href="README.es.md">Espanhol</a> •
+  <a href="README.de.md">Deutsch</a> •
+  <a href="README.es.md">Español</a> •
   <a href="README.pt-BR.md">Português (Brasil)</a> •
   <a href="README.pt-PT.md">Português (Portugal)</a> •
   <a href="README.ja.md">日本語</a> •
@@ -114,7 +114,8 @@ graph TB
         subgraph CAPT ["Captura de microfone e DSP"]
             MIC["Entrada de microfone"] --> VAD["WebRTC VAD"]
             VAD -->|Speech Detected| VC["Trocador de voz (alienígena/ciborgue/robô)"]
-            VC -->|Modulated PCM| HELM_OSC["Sobreposição de respiração e zumbido do capacete"]
+            VC -->|Modulated PCM| GF_FIL["Injeção de pitch e tremolo / esforço ofegante G-Force"]
+            GF_FIL --> HELM_OSC["Sobreposição de respiração e zumbido do capacete"]
             HELM_OSC --> OPUS_ENC["Codificador Opus"]
         end
 
@@ -122,18 +123,23 @@ graph TB
             LOGS -->|Tail Scanner| LOG_PAR["Analisador Game.log"]
             SCREEN -->|showlocations Capture| OCR["Mecanismo de OCR Tesseract"]
             LOG_PAR -->|Equip/Visor Events| HELM_DET["Sincronização automática do estado da viseira"]
+            LOG_PAR -->|G-Force & Stamina Values| GF_DET["Rastreador de força G e esforço"]
             OCR -->|Coords| POS_SEL{"Seletor de Fonte"}
             LOG_PAR -->|Coords & ContainerID| POS_SEL
         end
 
         subgraph PLAY ["Reprodução Espacial e DSP"]
-            OPUS_DEC["Decodificador Opus"] --> OCC_FIL["Convés de Carraca/Hércules e Oclusão de Sala"]
+            OPUS_DEC["Decodificador Opus"] --> PKT_TYPE{"Tipo de pacote?"}
+            PKT_TYPE -->|PA 0x03| PA_FIL["Megafone DSP (HP/LP, distorção tanh, reverberação de navio)"]
+            PKT_TYPE -->|Proximity/Radio| OCC_FIL["Convés de Carraca/Hércules e Oclusão de Sala"]
             OCC_FIL --> REV_FIL["Reverberação com reconhecimento de localização (cavernas/bunkers/hangares)"]
-            REV_FIL --> RAD_FIL["Passagem de banda de rádio e degradação de longo alcance"]
+            REV_FIL --> RAD_FIL["Passagem de banda de rádio e roteamento multi-hop de longo alcance (Dijkstra)"]
             RAD_FIL --> CHIMES["PTT Mic Chirps e gerador de cauda silenciadora"]
             CHIMES --> PAN["Matemática panorâmica 3D espacial"]
             PAN --> VOL["Atenuação de distância espacial"]
-            VOL --> MIXER["Mixer de áudio"] --> SPK["Dispositivos de saída de áudio"]
+            VOL --> MIXER["Mixer de áudio"]
+            PA_FIL --> MIXER
+            MIXER --> SPK["Dispositivos de saída de áudio"]
         end
 
         subgraph HUD ["Sobreposição de HUD (clique em Win32)"]
@@ -150,6 +156,7 @@ graph TB
 
         POS_SEL -->|Coordinates & Zone| POS_WS["Posição do cliente WS"]
         HELM_DET -->|Visor State| POS_WS
+        GF_DET -->|G-Force / Exertion| GF_FIL
         OPUS_ENC -->|Audio Packets| AUD_WS["Cliente WS de áudio"]
     end
 
@@ -230,6 +237,20 @@ graph TB
 * **Rotação diária de logs:** Arquivador de logs de inicialização que retém apenas os 5 logs mais recentes.
 * **Painel de administração:** Painel de administração da Web em tempo real com segurança de bloqueio, limitação de taxa e um mapa interativo de radar ao vivo em tela HTML5 2D que permite aos administradores ampliar, deslocar e rastrear trilhas históricas de jogadores.
 
+### 12. 🤢 Distorção de voz por força G e esforço físico
+* **Tremolo e mudança de tom:** Sob altas forças G, o áudio de saída do microfone é modulado dinamicamente com um tremolo LFO (4-10 Hz, até 40% de profundidade) e afinado (fator: 1,0 até 0,85) para simular tensão física, blecaute ou estados de redout.
+* **Sobreposição de respiração pesada:** Sobrepõe automaticamente ruídos aleatórios de respiração ofegante/respiratória, aumentando a velocidade do ciclo respiratório com base nos níveis de resistência do jogador analisados ​​em tempo real no `Game.log`.
+* **Controles manuais/API:** Alternáveis ​​por meio das configurações do cliente e dos controles deslizantes da interface da Web do aplicativo complementar para roleplay ou testes simulados.
+
+### 13. 📡 Relé de rádio tático e sinalizadores repetidores multi-hop
+* **Roteamento de sinal multi-hop:** Os jogadores podem alternar o "Modo Beacon" para atuar como um farol repetidor de rádio. Se dois jogadores estiverem fora do alcance direto do rádio (além de 1.500 m), o cliente receptor executa o algoritmo de caminho mais curto de Dijkstra em todos os repetidores ativos na zona.
+* **Degradação da qualidade do pior salto:** Se existir um caminho de vários saltos abaixo do limite de salto único de 8.000 m, o sistema roteia a comunicação e aplica o fator de degradação do pior salto (qualidade do sinal) em vez da distância total em linha reta, permitindo redes de rádio planetárias/orbitais de longo alcance.
+* **Estado WebSocket dinâmico:** Os estados do repetidor ativo são sincronizados em tempo real por meio do canal de controle WebSocket do servidor.
+
+### 14. 📢 Sistema de transmissão de endereço público (PA) do navio
+* **Transmissão de áudio para todo o navio:** Pilotos ou capitães de navios com tripulação múltipla podem transmitir anúncios de voz para todos os membros da tripulação que compartilham o mesmo `ContainerID` (navio) na mesma Zona.
+* **PA DSP e campainha de buzina:** As transmissões de PA ignoram a proximidade local e os mudos de rádio (exceto volume/mudo principal), reproduzem panorâmica central mono, acrescentam um alerta de buzina/carrilhão de tom duplo Sci-Fi e aplicam um passa-banda de megafone e filtro de reverberação simulando a acústica interior de um navio oco.
+
 ---
 
 ## 🎮 Detalhamento da guia de configurações do cliente XuruVoip
@@ -301,6 +322,8 @@ XURUVOIP_LOCKOUT_DURATION=600
 # Dynamic Intercom and Immersion features (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_INTERCOM=1
 XURUVOIP_ENABLE_EVA_MUTING=1
+XURUVOIP_ENABLE_RADIO_REPEATERS=1
+XURUVOIP_ENABLE_SHIP_PA=1
 
 # Discord Voice Bridge Settings (1 = enabled, 0 = disabled)
 XURUVOIP_ENABLE_DISCORD_BRIDGE=1
