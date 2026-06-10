@@ -89,13 +89,14 @@ Der C# WPF-Client läuft parallel zu Star Citizen und führt Audioerfassung, Spr
 graph TD
     subgraph Audioerfassung & Übertragung
         Mic[Mikrofoneingang] -->|PCM-Audio| VAD[WebRTC Sprachaktivierung]
-        VAD -->|Aktive Sprache| OpusEnc[Opus-Codierer]
+        VAD -->|Aktive Sprache| VoiceChanger[Stimmenverzerrer & Raumfahrtdsp]
+        VoiceChanger -->|PCM-Audio| OpusEnc[Opus-Codierer]
         OpusEnc -->|Opus-Pakete| AudioWS[Audio-WebSocket-Client]
         AudioWS -->|WebSocket-Port 8889| Server[Go-Server]
     end
 
     subgraph Positionsbestimmung & Helmerkennung
-        SC[Star Citizen-Prozess] -->|r_DisplaySessionInfo| Screen[Bildschirmaufnahme]
+        SC[Star Citizen-Prozess] -->|r_DisplaySessionInfo/r_DisplayInfo| Screen[Bildschirmaufnahme]
         Screen -->|Vorverarbeitung| Tess[Tesseract OCR-Engine]
         
         SC -->|Echtzeit-Logfile| GameLog[Game.log-Datei]
@@ -113,9 +114,10 @@ graph TD
     end
 
     subgraph Stereo-3D-Raumklang-Mischung & DSP
-        Server -->|Proximity-Audio + Metadaten| AudioWS
-        AudioWS -->|Opus-Frame + ProximityMetadata| Decoder[Opus-Decodierer]
-        Decoder -->|Mono-Float-PCM| DSP[Radio-DSP-Filter & Signalverschlechterung]
+        Server -->|Ziel-Proximity-Audio + Metadaten| AudioWS
+        AudioWS -->|Opus-Frame + Proximity-Metadaten| Decoder[Opus-Decodierer]
+        Decoder -->|Mono-Float-PCM| OcclusionFilter[Deck- & Kabinen-Dämpfungsfilter]
+        OcclusionFilter -->|Muffled PCM| DSP[Radio-DSP-Filter & Signalverschlechterung]
         DSP -->|Mono| Panner[PanningSampleProvider]
         Panner -->|Stereo| Volume[VolumeSampleProvider]
         
@@ -127,20 +129,26 @@ graph TD
         MixerMath -->|Verschlechterungsfaktor| DSP
         
         Volume -->|Links/Rechts Stereo| Mixer[MixingSampleProvider]
-        Mixer -->|Audiowiedergabe| Speakers[Audiowiedergabegerät]
+        Mixer -->|Wiedergabe| Speakers[Audiowiedergabegerät]
+    end
+
+    subgraph HUD-Overlay & STT
+        Decoder -->|Mono-Float-PCM| STT[Speech-to-Text Whisper.net]
+        STT -->|Transkribierter Text| Overlay[HUD-Overlay-Fenster]
+        Zone -.->|Hörerposition| Overlay
+        AudioWS -.->|Gegenstellen-Koordinaten| Overlay
+        Overlay -->|Dynamische Untertitel & 2D-Mini-Radar| ScreenOverlay[Bildschirmanzeige]
     end
 ```
 
 ### 1. Audioerfassung, VAD und Komprimierung
 * **Audioerfassung:** Der Client erfasst Mikrofon-Audio über die **NAudio**-API mit 48.000 Hz, 16-Bit Mono.
 * **Sprachaktivierungserkennung (VAD):** Audiodaten werden mittels des nativen **WebRtcVad** bewertet. Sinkt die Sprachkonfidenz unter den Schwellenwert, stoppt die Übertragung. So werden Tastaturgeräusche oder Lüfterrauschen ausgefiltert.
-* **Kompilierungsfreie native Auflösung:** Der Client lädt die native Bibliothek `WebRtcVad.dll` beim Start über einen benutzerdefinierten Auflösungs-Callback direkt aus dem Unterverzeichnis `runtimes\win-x64\native`, was Ladeprobleme bei als Einzeldatei veröffentlichten Paketen behebt.
 * **Komprimierung:** Aktive Audiodaten werden in hochkomprimierte **Opus**-Frames codiert (über **Concentus** C#) und direkt als binäre WebSocket-Frames an den Server gesendet.
 
 ### 2. Positionsverfolgung und Richtungsbestimmung
 * **Positionsquellen-Umschalter:** Spieler können in den Client-Einstellungen zwischen zwei Methoden wählen:
   * **OCR-Bildschirmscanner:** Erstellt regelmäßig ein Foto des konfigurierten Bildschirmbereichs (auf dem die Koordinaten per `/showlocations` oder `r_DisplaySessionInfo` angezeigt werden), verarbeitet das Bild vor und leitet es an die **Tesseract OCR**-Engine weiter.
-  * **Kompilierungsfreie native Auflösung:** Die nativen Binärdateien von Tesseract (`tesseract50.dll` und `leptonica-1.82.0.dll`) werden zur Laufzeit programmgesteuert aus dem Unterverzeichnis `x64` geladen, um einen fehlerfreien Betrieb bei der Ausführung als eigenständige Einzeldatei sicherzustellen.
   * **Game.log-Leser (GRTPR):** Scannt die Star Citizen `Game.log`-Datei direkt nach vom Spiel ausgegebenen Koordinaten. Hierfür muss `r_DisplaySessionInfo = 3` (oder `1`) in der Datei `user.cfg` eingetragen sein. Die Auswahl von GRTPR stoppt und deinitialisiert die Tesseract OCR-Engine vollständig, um wertvolle CPU- und RAM-Ressourcen des Hostsystems freizusetzen.
 * **Hierarchischer Zonenfilter:** Die Koordinaten enthalten hierarchische Zonen (z.B. Planeten, Raumschiffe). Der Client filtert Zonenunterschiede (wie Aufzüge, Sitze) heraus, damit sich Spieler in angrenzenden Zonen unterbrechungsfrei hören.
 * **Richtungsbestimmung:** Da Star Citizen die Blickrichtung nicht ausgibt, errechnet der Client die Bewegungsrichtung aus der Positionsänderung ($Position_{aktuell} - Position_{vorherig$). Im Stillstand bleibt der letzte Wert erhalten.

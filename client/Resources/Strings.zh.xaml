@@ -67,7 +67,7 @@
     <sys:String x:Key="OptOcr">OCR 屏幕扫描器</sys:String>
     <sys:String x:Key="OptGrtpr">Game.log 日志读取器 (GRTPR)</sys:String>
     <sys:String x:Key="LblGrtprActive">Game.log 读取器 (GRTPR) 已激活</sys:String>
-    <sys:String x:Key="LblGrtprDesc">位置坐标将直接从星际公民 (Star Citizen) 的 Game.log 文件中读取。请确保在您的 user.cfg 中设置了 "r_DisplaySessionInfo = 3" (或 1) 以在游戏内启用坐标日志输出。此时 Tesseract OCR 引擎已被完全禁用以节省系统资源。</sys:String>
+    <sys:String x:Key="LblGrtprDesc">位置坐标将直接从星际公民 (Star Citizen) 的 Game.log 文件中读取。这需要您在“常规 (General)”设置选项卡中填入 Game.log 路径，并在游戏内启用调试功能 "r_DisplayInfo 1" (或 3) 或 "r_DisplaySessionInfo = 3" (或 1)（可在 user.cfg 或游戏控制台中设置）。此时 Tesseract OCR 引擎已被完全禁用以节省系统资源。</sys:String>
     <sys:String x:Key="LblMonitor">显示器</sys:String>
     <sys:String x:Key="LblOcrInterval">OCR 扫描间隔 (毫秒)</sys:String>
     <sys:String x:Key="BtnDefineRegion">📐  定义扫描区域</sys:String>
@@ -167,4 +167,8 @@
     <sys:String x:Key="TitleSettingsSaved">成功</sys:String>
     <sys:String x:Key="MsgInvalidServerAddress">服务器地址必须是有效的 IP 地址 (例如: 127.0.0.1)。</sys:String>
     <sys:String x:Key="TitleInvalidServerAddress">无效的服务器地址</sys:String>
+
+    <!-- 连接警告 -->
+    <sys:String x:Key="WarningGrtprNoPath">Game.log 日志读取器 (GRTPR) 已启用，但未设置 Game.log 文件路径。请在尝试连接服务器之前，在“常规 (General)”设置选项卡中填入您的星际公民 Game.log 路径。</sys:String>
+    <sys:String x:Key="TitleWarning">警告</sys:String>
 </ResourceDictionary>

@@ -87,60 +87,68 @@ El cliente C# WPF se ejecuta en paralelo con Star Citizen y realiza captura de a
 
 ```mermaid
 graph TD
-    subgraph Captura de Audio, VAD y Compresión
-        Mic[Micrófono] -->|Audio PCM| VAD[Detección de Actividad de Voz VAD]
-        VAD -->|Voz Activa| OpusEnc[Codificador Opus]
+    subgraph Captura & Transmisión
+        Mic[Entrada de Micrófono] -->|Audio PCM| VAD[Detección de Actividad de Voz WebRTC]
+        VAD -->|Voz Activa| VoiceChanger[Modulador de Voz & DSP de Traje]
+        VoiceChanger -->|PCM Modificado| OpusEnc[Codificador Opus]
         OpusEnc -->|Paquetes Opus| AudioWS[Cliente WebSocket de Audio]
         AudioWS -->|Puerto WebSocket 8889| Server[Servidor Go]
     end
 
-    subgraph Posicionamiento & Detección de Casque
-        SC[Proceso Star Citizen] -->|r_DisplaySessionInfo| Screen[Captura de Pantalla]
+    subgraph Posicionamiento & Sincronización de Casco
+        SC[Proceso Star Citizen] -->|r_DisplaySessionInfo/r_DisplayInfo| Screen[Captura de Pantalla]
         Screen -->|Preprocesamiento| Tess[Motor OCR Tesseract]
         
         SC -->|Log en Tiempo Real| GameLog[Archivo Game.log]
-        GameLog -->|Analizador de logs| LogParser[Analizador de logs]
+        GameLog -->|Escáner del Log| LogParser[Analizador del Servicio de Logs]
         
-        Tess -->|Coordenadas| PosSelector{Selector de Fuente}
-        LogParser -->|Coordenadas| PosSelector
+        Tess -->|Coordenadas Analizadas| PosSelector{Selector de Fuente}
+        LogParser -->|Coordenadas Analizadas| PosSelector
         
         PosSelector -->|Coordenadas Seleccionadas| Zone[Filtro Jerárquico de Zona]
-        Zone -->|Coordonadas & Zona del Oyente| PosWS[Cliente WebSocket de Posición]
+        Zone -->|Coordenadas & Zona del Oyente| PosWS[Cliente WebSocket de Posición]
         PosWS -->|Puerto WebSocket 8888| Server
 
         LogParser -->|Equipar/Quitar casco| Helmet[Sincronización de Casco]
-        Helmet -->|Paquete de Estado del Casco| PosWS
+        Helmet -->|Paquete de estado del casco| PosWS
     end
 
-    subgraph Mezcla Espacial Stéréo 3D & DSP
+    subgraph Reproducción & Mezcla Espacial
         Server -->|Audio Proximidad + Metadatos| AudioWS
         AudioWS -->|Trama Opus + Metadatos| Decoder[Decodificador Opus]
-        Decoder -->|Mono Float PCM| DSP[Filtro DSP de Radio & Degradación]
+        Decoder -->|Mono Float PCM| OcclusionFilter[Filtro de Oclusión de Cubierta & Compartimento]
+        OcclusionFilter -->|PCM Atenuado| DSP[Filtro DSP de Radio & Degradación]
         DSP -->|Mono| Panner[PanningSampleProvider]
         Panner -->|Estéreo| Volume[VolumeSampleProvider]
         
         LogParser -.->|Estado local del casco| DSP
-        Zone -.->|Posición & orientación del oyente| MixerMath[Matemáticas de Spatialización & Degradación]
+        Zone -.->|Posición & orientación del oyente| MixerMath[Matemáticas de Espacialización & Degradación]
         
         MixerMath -->|Parámetro Balance Pan| Panner
         MixerMath -->|Atenuación por Distancia & Trasera| Volume
         MixerMath -->|Factor de Degradación| DSP
         
         Volume -->|Estéreo Izquierda/Derecha| Mixer[MixingSampleProvider]
-        Mixer -->|Reproducción de Audio| Speakers[Dispositivo de Salida Audio]
+        Mixer -->|Reproducción de Audio| Speakers[Dispositivo de Salida de Audio]
+    end
+
+    subgraph Superposición HUD & STT
+        Decoder -->|Mono Float PCM| STT[Speech-to-Text Whisper.net]
+        STT -->|Texto Transcrito| Overlay[Ventana de Superposición HUD]
+        Zone -.->|Posición del Oyente| Overlay
+        AudioWS -.->|Coordenadas del Emisor Remoto| Overlay
+        Overlay -->|Subtítulos Dinámicos & Mini-Radar 2D| ScreenOverlay[Pantalla de Superposición]
     end
 ```
 
 ### 1. Captura de Audio, VAD y Compresión
 * **Captura de Audio:** El cliente captura el audio del micrófono utilizando la API **NAudio** a una tasa de alta fidelidad de 48,000 Hz, 16 bits mono.
 * **Detección de Actividad de Voz (VAD):** Los búferes de audio son evaluados por el wrapper nativo **WebRtcVad**. Si la confianza de voz cae por debajo del umbral, la transmisión se detiene para evitar emitir el ruido del teclado o ventiladores.
-* **Resolución nativa de archivo único:** El cliente utiliza devoluciones de llamada de resolución de ensamblados personalizadas para cargar la biblioteca nativa `WebRtcVad.dll` desde el subdirectorio `runtimes\win-x64\native` en tiempo de ejecución, resolviendo problemas de carga de DLL para paquetes publicados como un solo archivo.
 * **Compresión:** Los búferes de voz activa se codifican en tramas **Opus** altamente comprimidas (utilizando el wrapper C# **Concentus**) y se transmiten inmediatamente como tramas WebSocket binarias al servidor de audio Go.
 
 ### 2. Seguimiento de Ubicación y Estimación de Orientación
 * **Alternar Fuente de Posición:** Los jugadores pueden elegir entre dos metodologías de posicionamiento en la configuración del cliente:
   * **Escáner de Pantalla OCR:** Realiza periódicamente capturas de pantalla de la región configurada (donde se muestran las coordenadas con `/showlocations` o `r_DisplaySessionInfo`), preprocesa la imagen y la envía al motor **Tesseract OCR**.
-  * **Resolución nativa de archivo único:** Los binarios nativos de Tesseract (`tesseract50.dll` y `leptonica-1.82.0.dll`) se resuelven mediante programación desde el subdirectorio `x64` en tiempo de ejecución, lo que garantiza un funcionamiento robusto de OCR cuando se implementa como un ejecutable independiente de un solo archivo.
   * **Lector Game.log (GRTPR):** Escanea directamente el archivo `Game.log` de Star Citizen para obtener las coordenadas registradas. Para habilitar esto, se debe añadir `r_DisplaySessionInfo = 3` (o `1`) al archivo `user.cfg` del juego. Al seleccionar GRTPR, el motor Tesseract OCR se detiene y se libera por completo, reduciendo sustancialmente el uso de CPU y RAM del equipo.
 * **Filtrado de Zona Jerárquico:** El texto de posición analizado contiene múltiples líneas de coordenadas jerárquicas (por ejemplo, planetas, compartimentos, ascensores). El cliente filtra dinámicamente las diferencias de subzonas (como ascensores, asientos) para que los jugadores en zonas adyacentes se escuchen sin interrupciones.
 * **Estimación de Orientación:** Dado que Star Citizen no proporciona orientación, el cliente calcula la dirección de movimiento a partir del cambio de posición ($Position_{actual} - Position_{anterior}$). En parada, se mantiene el último valor.

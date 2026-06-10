@@ -22,7 +22,7 @@ public class AppConfig
     public string CustomGameLogPath { get; set; } = "";
 
     // --- OCR ---
-    public bool UseGrtpr { get; set; } = false;
+    public bool UseGrtpr { get; set; } = true;
     public int OcrMonitorIndex { get; set; } = 0;
     public Rect OcrRegion { get; set; } = new Rect(0, 0, 900, 200);
     public int OcrIntervalMs { get; set; } = 500;
