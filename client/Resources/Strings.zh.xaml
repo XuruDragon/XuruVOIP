@@ -19,6 +19,7 @@
     <sys:String x:Key="StatusConnecting">正在连接...</sys:String>
     <sys:String x:Key="StatusConnected">已连接</sys:String>
     <sys:String x:Key="StatusConnectionFailed">连接失败: {0}</sys:String>
+    <sys:String x:Key="StatusReconnectingIn">{0}秒后重新连接...</sys:String>
     <sys:String x:Key="StatusMuted">已静音</sys:String>
     <sys:String x:Key="StatusActive">已开启</sys:String>
     <sys:String x:Key="PanelMuteStatus">通道静音状态</sys:String>

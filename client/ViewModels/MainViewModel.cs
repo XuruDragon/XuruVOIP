@@ -29,6 +29,11 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly GameDetectionService _gameDetector = new();
     public GameDetectionService GameDetector => _gameDetector;
 
+    private bool _isManualDisconnect = true;
+    private bool _isReconnecting = false;
+    private readonly object _reconnectLock = new();
+    private CancellationTokenSource? _reconnectCts;
+
     // ─── Observable state ────────────────────────────────────────────────────
     private readonly Dictionary<string, bool> _remoteHelmets = [];
     private readonly Dictionary<string, PlayerPosition> _remotePositions = [];
@@ -345,6 +350,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             IsSpatialAudioSupportedByServer = true; // Reset to true for offline configuration editing
             string format = Application.Current.TryFindResource("StatusConnectionFailed") as string ?? "Connection failed: {0}";
             StatusMessage = string.Format(format, msg);
+            HandleUnexpectedDisconnect("Position Server");
         });
         _posWs.WelcomeReceived += (channels, activeChan) => Application.Current.Dispatcher.Invoke(() =>
         {
@@ -455,6 +461,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             string format = Application.Current.TryFindResource("StatusConnectionFailed") as string ?? "Connection failed: {0}";
             StatusMessage = string.Format(format, msg);
             UpdateDiscordPresence();
+            HandleUnexpectedDisconnect("Audio Server");
         });
 
         _audioWs.AudioPacketReceived += (name, type, opus, metadata, seq) =>
@@ -601,11 +608,14 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     public async Task ConnectAsync()
     {
+        _isManualDisconnect = false;
+        _reconnectCts?.Cancel();
         StatusMessage = Application.Current.TryFindResource("StatusConnecting") as string ?? "Connecting...";
         LogService.Info("ConnectAsync triggered. Connecting to Position Server...");
         var ok = await _posWs.ConnectAsync(Config.Config);
         if (!ok)
         {
+            _isManualDisconnect = true;
             string errorKey = "ErrorUnknown";
             if (!string.IsNullOrEmpty(_posWs.WelcomeErrorReason))
             {
@@ -746,6 +756,8 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     public void Disconnect()
     {
+        _isManualDisconnect = true;
+        _reconnectCts?.Cancel();
         LogService.Info("Disconnect: Shutting down all network and audio services.");
         _posWs.Disconnect();
         _audioWs.Disconnect();
@@ -755,6 +767,95 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         AudioConnected = false;
         StatusMessage = Application.Current.TryFindResource("StatusDisconnected") as string ?? "Disconnected";
         UpdateDiscordPresence();
+    }
+
+    private void HandleUnexpectedDisconnect(string source)
+    {
+        if (_isManualDisconnect) return;
+
+        lock (_reconnectLock)
+        {
+            if (_isReconnecting) return;
+            _isReconnecting = true;
+        }
+
+        LogService.Info($"Unexpected disconnect from {source}. Initiating full disconnect and auto-reconnect...");
+
+        // Perform full clean up on the dispatcher thread
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            // Disconnect both services cleanly
+            _posWs.Disconnect();
+            _audioWs.Disconnect();
+            _capture.Stop();
+            _playback.Stop();
+            PosConnected = false;
+            AudioConnected = false;
+        });
+
+        // Cancel any pending reconnect attempt
+        _reconnectCts?.Cancel();
+        _reconnectCts = new CancellationTokenSource();
+        var token = _reconnectCts.Token;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                int delaySeconds = 3;
+                while (!token.IsCancellationRequested && !_isManualDisconnect)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        string format = Application.Current.TryFindResource("StatusReconnectingIn") as string ?? "Reconnecting in {0}s...";
+                        StatusMessage = string.Format(format, delaySeconds);
+                    });
+
+                    await Task.Delay(1000, token);
+                    delaySeconds--;
+
+                    if (delaySeconds <= 0)
+                    {
+                        if (token.IsCancellationRequested || _isManualDisconnect) break;
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            StatusMessage = Application.Current.TryFindResource("StatusConnecting") as string ?? "Connecting...";
+                        });
+
+                        LogService.Info("Auto-reconnect: Attempting to reconnect to Position Server...");
+                        var ok = await _posWs.ConnectAsync(Config.Config);
+                        if (ok)
+                        {
+                            LogService.Info("Auto-reconnect: Position Server connection succeeded.");
+                            // ConnectAudioAsync will be triggered automatically by _posWs.Connected event
+                            lock (_reconnectLock)
+                            {
+                                _isReconnecting = false;
+                            }
+                            return; // Reconnection succeeded/initiated
+                        }
+                        else
+                        {
+                            LogService.Error("Auto-reconnect: Position Server connection failed. Retrying...");
+                            delaySeconds = 5; // Wait 5 seconds before next retry if it failed
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                LogService.Error("Error in auto-reconnect loop", ex);
+            }
+            finally
+            {
+                lock (_reconnectLock)
+                {
+                    _isReconnecting = false;
+                }
+            }
+        });
     }
 
     public void SaveConfig() => Config.Save();

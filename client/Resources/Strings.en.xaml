@@ -19,6 +19,7 @@
     <sys:String x:Key="StatusConnecting">Connecting...</sys:String>
     <sys:String x:Key="StatusConnected">Connected</sys:String>
     <sys:String x:Key="StatusConnectionFailed">Connection failed: {0}</sys:String>
+    <sys:String x:Key="StatusReconnectingIn">Reconnecting in {0}s...</sys:String>
     <sys:String x:Key="StatusMuted">MUTED</sys:String>
     <sys:String x:Key="StatusActive">ACTIVE</sys:String>
     <sys:String x:Key="PanelMuteStatus">Channel Muting Status</sys:String>
