@@ -1,5 +1,6 @@
 using Xunit;
 using System.Windows.Input;
+using System.Threading.Tasks;
 using XuruVoipClient.ViewModels;
 using XuruVoipClient.Models;
 
@@ -13,10 +14,10 @@ public class HotkeyTests
     }
 
     [StaFact]
-    public void Hotkey_ToggleHelmet_ShouldToggleHelmetState()
+    public async Task Hotkey_ToggleHelmet_ShouldToggleHelmetState()
     {
         // GIVEN
-        var vm = new MainViewModel();
+        await using var vm = new MainViewModel();
         vm.Config.Config.PttProximityKey = "CapsLock";
         vm.Config.Config.PttRadioKey = "NumPad1";
         vm.Config.Config.PttProfileKey = "NumPad2";
@@ -41,10 +42,10 @@ public class HotkeyTests
     }
 
     [StaFact]
-    public void Hotkey_MuteMicProximity_ShouldMuteMicrophone()
+    public async Task Hotkey_MuteMicProximity_ShouldMuteMicrophone()
     {
         // GIVEN
-        var vm = new MainViewModel();
+        await using var vm = new MainViewModel();
         vm.Config.Config.MuteProximityKey = "M";
         
         // WHEN (Default MuteProximityKey is "M")
@@ -63,10 +64,10 @@ public class HotkeyTests
     }
 
     [StaFact]
-    public void Hotkey_MuteAudioProximity_ShouldMutePlayback()
+    public async Task Hotkey_MuteAudioProximity_ShouldMutePlayback()
     {
         // GIVEN
-        var vm = new MainViewModel();
+        await using var vm = new MainViewModel();
         vm.Config.Config.MuteAudioProximityKey = "K";
         Assert.False(vm.AudioProximityMuted);
         
@@ -86,10 +87,10 @@ public class HotkeyTests
     }
 
     [StaFact]
-    public void Hotkey_MuteAudioRadio_ShouldMutePlayback()
+    public async Task Hotkey_MuteAudioRadio_ShouldMutePlayback()
     {
         // GIVEN
-        var vm = new MainViewModel();
+        await using var vm = new MainViewModel();
         vm.Config.Config.MuteAudioRadioKey = "L";
         Assert.False(vm.AudioRadioMuted);
         
@@ -109,10 +110,10 @@ public class HotkeyTests
     }
 
     [StaFact]
-    public void Hotkey_MuteAudioProfile_ShouldMutePlayback()
+    public async Task Hotkey_MuteAudioProfile_ShouldMutePlayback()
     {
         // GIVEN
-        var vm = new MainViewModel();
+        await using var vm = new MainViewModel();
         vm.Config.Config.MuteAudioProfileKey = "P";
         Assert.False(vm.AudioProfileMuted);
         
@@ -132,10 +133,10 @@ public class HotkeyTests
     }
 
     [StaFact]
-    public void MicModeText_ShouldChangeDynamically()
+    public async Task MicModeText_ShouldChangeDynamically()
     {
         // GIVEN
-        var vm = new MainViewModel();
+        await using var vm = new MainViewModel();
         vm.Config.Config.AudioMode = AudioMode.PTT;
         vm.Config.Config.PttProximityKey = "Capital";
         vm.Config.Config.PttRadioKey = "NumPad1";

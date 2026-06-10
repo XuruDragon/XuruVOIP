@@ -177,49 +177,46 @@ public class CompanionAppService : IDisposable
 
     private async Task ExecuteActionAsync(string action, JsonElement root)
     {
-        await Application.Current.Dispatcher.InvokeAsync(async () =>
+        switch (action)
         {
-            switch (action)
-            {
-                case "toggle_proximity_mute":
-                    _viewModel.MicProximityMuted = !_viewModel.MicProximityMuted;
-                    break;
-                case "toggle_radio_mute":
-                    _viewModel.MicRadioMuted = !_viewModel.MicRadioMuted;
-                    break;
-                case "toggle_profile_mute":
-                    _viewModel.MicProfileMuted = !_viewModel.MicProfileMuted;
-                    break;
-                case "toggle_audio_proximity_mute":
-                    _viewModel.AudioProximityMuted = !_viewModel.AudioProximityMuted;
-                    break;
-                case "toggle_audio_radio_mute":
-                    _viewModel.AudioRadioMuted = !_viewModel.AudioRadioMuted;
-                    break;
-                case "toggle_audio_profile_mute":
-                    _viewModel.AudioProfileMuted = !_viewModel.AudioProfileMuted;
-                    break;
-                case "toggle_helmet":
-                    _viewModel.ToggleHelmet();
-                    break;
-                case "set_channel":
-                    if (root.TryGetProperty("channel", out var chanProp))
-                    {
-                        string ch = chanProp.GetString() ?? "";
-                        await _viewModel.ChangeRadioChannelAsync(ch);
-                    }
-                    break;
-                case "set_voice_changer":
-                    if (root.TryGetProperty("type", out var typeProp))
-                    {
-                        string type = typeProp.GetString() ?? "None";
-                        _viewModel.Config.Config.EnableVoiceChanger = (type != "None");
-                        _viewModel.Config.Config.VoiceChangerType = type;
-                        _viewModel.SaveConfig();
-                    }
-                    break;
-            }
-        });
+            case "toggle_proximity_mute":
+                _viewModel.MicProximityMuted = !_viewModel.MicProximityMuted;
+                break;
+            case "toggle_radio_mute":
+                _viewModel.MicRadioMuted = !_viewModel.MicRadioMuted;
+                break;
+            case "toggle_profile_mute":
+                _viewModel.MicProfileMuted = !_viewModel.MicProfileMuted;
+                break;
+            case "toggle_audio_proximity_mute":
+                _viewModel.AudioProximityMuted = !_viewModel.AudioProximityMuted;
+                break;
+            case "toggle_audio_radio_mute":
+                _viewModel.AudioRadioMuted = !_viewModel.AudioRadioMuted;
+                break;
+            case "toggle_audio_profile_mute":
+                _viewModel.AudioProfileMuted = !_viewModel.AudioProfileMuted;
+                break;
+            case "toggle_helmet":
+                _viewModel.ToggleHelmet();
+                break;
+            case "set_channel":
+                if (root.TryGetProperty("channel", out var chanProp))
+                {
+                    string ch = chanProp.GetString() ?? "";
+                    await _viewModel.ChangeRadioChannelAsync(ch);
+                }
+                break;
+            case "set_voice_changer":
+                if (root.TryGetProperty("type", out var typeProp))
+                {
+                    string type = typeProp.GetString() ?? "None";
+                    _viewModel.Config.Config.EnableVoiceChanger = (type != "None");
+                    _viewModel.Config.Config.VoiceChangerType = type;
+                    _viewModel.SaveConfig();
+                }
+                break;
+        }
     }
 
     public void Dispose()
