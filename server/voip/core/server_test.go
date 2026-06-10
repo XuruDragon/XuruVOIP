@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 	"testing"
@@ -593,7 +594,7 @@ func TestProximityFiltering(t *testing.T) {
 			Z:           300.0,
 			ContainerID: "lorville_city_center",
 		},
-		AudioConn: &websocket.Conn{}, // dummy non-nil conn
+		UDPAddr: &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 	}
 
 	// Player B at 10m away from A in same container (within audible range)
@@ -605,7 +606,7 @@ func TestProximityFiltering(t *testing.T) {
 			Z:           300.0, // distance = sqrt(6^2 + 8^2 + 0^2) = 10m
 			ContainerID: "lorville_city_center",
 		},
-		AudioConn: &websocket.Conn{},
+		UDPAddr: &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 	}
 
 	// Player C at 60m away from A in same container (outside default 50m range)
@@ -617,7 +618,7 @@ func TestProximityFiltering(t *testing.T) {
 			Z:           300.0, // distance = 60m
 			ContainerID: "lorville_city_center",
 		},
-		AudioConn: &websocket.Conn{},
+		UDPAddr: &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 	}
 
 	// Player D at 5m away from A but in a DIFFERENT container (e.g. inside an elevator)
@@ -629,7 +630,7 @@ func TestProximityFiltering(t *testing.T) {
 			Z:           300.0, // distance = 5m
 			ContainerID: "elevator_cab_01",
 		},
-		AudioConn: &websocket.Conn{},
+		UDPAddr: &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 	}
 
 	// 1. Proximity range audit for Alice (default 50m range)
@@ -676,7 +677,7 @@ func BenchmarkProximityFiltering(b *testing.B) {
 					Z:           0.0,
 					ContainerID: "stanton_stanton",
 				},
-				AudioConn: &websocket.Conn{},
+				UDPAddr: &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 			}
 
 			// Generate other players
@@ -700,7 +701,7 @@ func BenchmarkProximityFiltering(b *testing.B) {
 						Z:           0.0,
 						ContainerID: containerID,
 					},
-					AudioConn: &websocket.Conn{},
+					UDPAddr: &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 				}
 			}
 
@@ -723,14 +724,14 @@ func TestMultiChannelRouting(t *testing.T) {
 	testHub.Players["Alice"] = &ActivePlayer{
 		Name:          "Alice",
 		ActiveChannel: "Command",
-		AudioConn:     &websocket.Conn{},
+		UDPAddr:       &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 	}
 
 	// Bob is active on Command
 	testHub.Players["Bob"] = &ActivePlayer{
 		Name:          "Bob",
 		ActiveChannel: "Command",
-		AudioConn:     &websocket.Conn{},
+		UDPAddr:       &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 	}
 
 	// Charlie is active on General, but listens to Command
@@ -738,14 +739,14 @@ func TestMultiChannelRouting(t *testing.T) {
 		Name:              "Charlie",
 		ActiveChannel:     "General",
 		ListeningChannels: []string{"Command", "Squad"},
-		AudioConn:         &websocket.Conn{},
+		UDPAddr:           &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 	}
 
 	// David is active on General, listens to nothing
 	testHub.Players["David"] = &ActivePlayer{
 		Name:          "David",
 		ActiveChannel: "General",
-		AudioConn:     &websocket.Conn{},
+		UDPAddr:       &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 12345},
 	}
 
 	players := testHub.GetAudioPlayersInRadioChannel("Alice")

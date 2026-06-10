@@ -2,9 +2,11 @@ package tests
 
 import (
 	"crypto/tls"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"math"
+	"net"
 	"os"
 	"path/filepath"
 	"sync"
@@ -66,11 +68,10 @@ func TestServerLoadSimulation(t *testing.T) {
 	time.Sleep(300 * time.Millisecond)
 
 	// 3. Spawning mock clients
-	numClients := 20 // 20 clients is plenty to test concurrency, message routing, and load simulation
+	numClients := 20
 	var wg sync.WaitGroup
 
-	posURL := fmt.Sprintf("wss://localhost:%d/", posPort)
-	audioURL := fmt.Sprintf("wss://localhost:%d/audio", audioPort)
+	posURL := fmt.Sprintf("wss://127.0.0.1:%d/", posPort)
 
 	dialer := websocket.Dialer{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -115,39 +116,63 @@ func TestServerLoadSimulation(t *testing.T) {
 
 			// Read Welcome response
 			var welcome core.MsgWelcome
-			_, welcomePayload, err := posConn.ReadMessage()
-			if err != nil {
-				t.Logf("[%s] Failed to read MsgWelcome: %v", clientName, err)
-				return
+			for {
+				_, payload, err := posConn.ReadMessage()
+				if err != nil {
+					t.Logf("[%s] Failed to read from Position WebSocket: %v", clientName, err)
+					return
+				}
+				var base core.MessageBase
+				if err := json.Unmarshal(payload, &base); err == nil && base.Type == "welcome" {
+					if err := json.Unmarshal(payload, &welcome); err != nil {
+						t.Logf("[%s] Failed to unmarshal MsgWelcome: %v", clientName, err)
+						return
+					}
+					break
+				}
 			}
-			if err := json.Unmarshal(welcomePayload, &welcome); err != nil {
-				t.Logf("[%s] Failed to unmarshal MsgWelcome: %v", clientName, err)
-				return
-			}
-
 			audioTicket := welcome.AudioTicket
 
-			// 3.2 Connect to Audio Server
-			audioConn, _, err := dialer.Dial(audioURL, nil)
+			// 3.2 Connect to Audio Server (UDP)
+			serverUDPAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("127.0.0.1:%d", audioPort))
 			if err != nil {
-				t.Logf("[%s] Audio WebSocket dial failed: %v", clientName, err)
+				t.Logf("[%s] UDP ResolveAddr failed: %v", clientName, err)
+				return
+			}
+
+			audioConn, err := net.DialUDP("udp", nil, serverUDPAddr)
+			if err != nil {
+				t.Logf("[%s] UDP Dial failed: %v", clientName, err)
 				return
 			}
 			defer audioConn.Close()
 
-			atomic.AddInt64(&connectedAudio, 1)
+			// UDP Registration: [0xFF] [NameLen] [Name] [AudioTicket]
+			nameBytes := []byte(clientName)
+			nameLen := len(nameBytes)
+			regPacket := make([]byte, 2+nameLen+32)
+			regPacket[0] = 0xFF
+			regPacket[1] = byte(nameLen)
+			copy(regPacket[2:], nameBytes)
+			copy(regPacket[2+nameLen:], []byte(audioTicket))
 
-			// Authenticate on Audio Server using the ticket
-			audioJoinMsg := core.MsgJoin{
-				Type:        "join",
-				Token:       "testsecret32characterlongtokenok",
-				Name:        clientName,
-				AudioTicket: audioTicket,
-			}
-			if err := audioConn.WriteJSON(audioJoinMsg); err != nil {
-				t.Logf("[%s] Audio MsgJoin write failed: %v", clientName, err)
+			_, err = audioConn.Write(regPacket)
+			if err != nil {
+				t.Logf("[%s] UDP Reg write failed: %v", clientName, err)
 				return
 			}
+
+			// Read ACK: 0xFE
+			_ = audioConn.SetReadDeadline(time.Now().Add(500 * time.Millisecond))
+			ackBuf := make([]byte, 1)
+			n, err := audioConn.Read(ackBuf)
+			if err != nil || n < 1 || ackBuf[0] != 0xFE {
+				t.Logf("[%s] UDP ACK read failed: %v", clientName, err)
+				return
+			}
+			_ = audioConn.SetReadDeadline(time.Time{})
+
+			atomic.AddInt64(&connectedAudio, 1)
 
 			// Spawn reader goroutine for Position Server
 			go func() {
@@ -160,14 +185,17 @@ func TestServerLoadSimulation(t *testing.T) {
 				}
 			}()
 
-			// Spawn reader goroutine for Audio Server
+			// Spawn reader goroutine for Audio Server (UDP)
 			go func() {
+				buf := make([]byte, 1500)
 				for {
-					_, _, err := audioConn.ReadMessage()
+					n, err := audioConn.Read(buf)
 					if err != nil {
 						break
 					}
-					atomic.AddInt64(&totalAudioReceived, 1)
+					if n >= 3 {
+						atomic.AddInt64(&totalAudioReceived, 1)
+					}
 				}
 			}()
 
@@ -202,12 +230,13 @@ func TestServerLoadSimulation(t *testing.T) {
 
 				// 2. Send simulated talking audio frame (25% chance of talking each tick)
 				if id%4 == 0 {
-					audioFrame := make([]byte, 21) // [Type (1)] + [Dummy voice data (20)]
-					audioFrame[0] = core.AudioTypeProximity
-					for idx := 1; idx < len(audioFrame); idx++ {
+					audioFrame := make([]byte, 23) // [Seq (2)] [Type (1)] [Dummy voice data (20)]
+					binary.BigEndian.PutUint16(audioFrame[0:2], uint16(step*10))
+					audioFrame[2] = core.AudioTypeProximity
+					for idx := 3; idx < len(audioFrame); idx++ {
 						audioFrame[idx] = byte(id + idx)
 					}
-					_ = audioConn.WriteMessage(websocket.BinaryMessage, audioFrame)
+					_, _ = audioConn.Write(audioFrame)
 				}
 			}
 		}(i)
