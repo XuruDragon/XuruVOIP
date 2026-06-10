@@ -28,7 +28,9 @@ file record PosPayload(
     [property: JsonPropertyName("x")] double X,
     [property: JsonPropertyName("y")] double Y,
     [property: JsonPropertyName("z")] double Z,
-    [property: JsonPropertyName("zone")] string Zone);
+    [property: JsonPropertyName("zone")] string Zone,
+    [property: JsonPropertyName("container_id")] string ContainerID,
+    [property: JsonPropertyName("container_name")] string ContainerName);
 
 file record MsgBase([property: JsonPropertyName("type")] string Type);
 
@@ -118,7 +120,7 @@ public class PositionWebSocketService : IAsyncDisposable
     {
         if (!IsConnected) return;
         var msg = new MsgPos("pos",
-            new PosPayload(pos.X, pos.Y, pos.Z, pos.Zone),
+            new PosPayload(pos.X, pos.Y, pos.Z, pos.Zone, pos.ContainerID, pos.ContainerName),
             pos.TsCapture);
         await SendJsonAsync(msg);
     }

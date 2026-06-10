@@ -200,7 +200,8 @@ public class AudioPlaybackService : IDisposable
         double distance = -1.0,
         string speakerZone = "",
         string listenerZone = "",
-        ushort seq = 0)
+        ushort seq = 0,
+        bool isIntercom = false)
     {
         if (_mixer == null) return;
 
@@ -231,7 +232,8 @@ public class AudioPlaybackService : IDisposable
             Metadata = metadata,
             Distance = distance,
             SpeakerZone = speakerZone,
-            ListenerZone = listenerZone
+            ListenerZone = listenerZone,
+            IsIntercom = isIntercom
         });
     }
 
@@ -256,22 +258,25 @@ public class AudioPlaybackService : IDisposable
     {
         lock (_lock)
         {
+            // Pass 1: Dequeue packets and update transmitter/intercom states for each track
             foreach (var kvp in _tracks)
             {
                 var playerName = kvp.Key;
                 var track = kvp.Value;
                 if (playerName == "__local_chime") continue;
 
-                var packet = track.Jitter.Dequeue(out bool isPlcNeeded);
+                track.CurrentTickPacket = track.Jitter.Dequeue(out bool isPlcNeeded);
+                track.CurrentTickPlcNeeded = isPlcNeeded;
 
-                if (packet != null)
+                if (track.CurrentTickPacket != null)
                 {
-                    // 1. Process end-of-transmission or PTT chimes triggers
+                    var packet = track.CurrentTickPacket;
                     if (packet.OpusData.Length == 0)
                     {
                         if (track.IsTransmitting)
                         {
                             track.IsTransmitting = false;
+                            track.IsIntercom = false;
                             if (EnableStt)
                             {
                                 FlushSttBuffer(track, packet.AudioType);
@@ -288,6 +293,7 @@ public class AudioPlaybackService : IDisposable
                     {
                         track.IsTransmitting = true;
                         track.LastAudioType = packet.AudioType;
+                        track.IsIntercom = packet.IsIntercom;
                         if (EnablePttChimes && packet.ApplyRadioEffect)
                         {
                             WriteFloatBuffer(track.Buffer, KeyDownChime);
@@ -296,9 +302,62 @@ public class AudioPlaybackService : IDisposable
                     else
                     {
                         track.LastAudioType = packet.AudioType;
+                        track.IsIntercom = packet.IsIntercom;
+                    }
+                }
+                else if (!isPlcNeeded)
+                {
+                    if (track.IsTransmitting)
+                    {
+                        track.IsTransmitting = false;
+                        track.IsIntercom = false;
+                        if (EnableStt)
+                        {
+                            FlushSttBuffer(track, track.LastAudioType);
+                        }
+                        if (EnablePttChimes)
+                        {
+                            WriteFloatBuffer(track.Buffer, KeyUpChime);
+                        }
+                    }
+                }
+            }
+
+            // Check if any pilot is transmitting on intercom (type 0x01 + isIntercom)
+            bool pilotIntercomActive = false;
+            foreach (var kvp in _tracks)
+            {
+                var track = kvp.Value;
+                if (kvp.Key == "__local_chime") continue;
+                if (track.IsTransmitting && track.LastAudioType == 0x01 && track.IsIntercom)
+                {
+                    string zoneLower = (track.CurrentTickPacket != null ? track.CurrentTickPacket.SpeakerZone : track.LastSpeakerZone).ToLower();
+                    if (zoneLower.Contains("pilot") || zoneLower.Contains("cockpit") || zoneLower.Contains("driver"))
+                    {
+                        pilotIntercomActive = true;
+                        break;
+                    }
+                }
+            }
+
+            // Pass 2: Calculate spatial parameters, apply ducking, and decode audio
+            foreach (var kvp in _tracks)
+            {
+                var playerName = kvp.Key;
+                var track = kvp.Value;
+                if (playerName == "__local_chime") continue;
+
+                var packet = track.CurrentTickPacket;
+                var isPlcNeeded = track.CurrentTickPlcNeeded;
+
+                if (packet != null)
+                {
+                    if (packet.OpusData.Length == 0)
+                    {
+                        track.CurrentTickPacket = null;
+                        continue;
                     }
 
-                    // 2. 3D Spatial Audio calculations (for proximity)
                     float currentPan = 0.0f;
                     float distanceVolumeFactor = 1.0f;
 
@@ -314,10 +373,15 @@ public class AudioPlaybackService : IDisposable
                         distanceVolumeFactor = volume;
                     }
 
+                    // Duck proximity audio if a pilot is talking on intercom
+                    if (packet.AudioType == 0x00 && pilotIntercomActive)
+                    {
+                        distanceVolumeFactor *= 0.15f;
+                    }
+
                     track.Panning.Pan = currentPan;
                     track.Volume.Volume = distanceVolumeFactor;
 
-                    // Calculate dynamic radio degradation
                     double deg = 0.0;
                     if (packet.ApplyRadioEffect && EnableRadioDegradation && packet.Distance >= 0)
                     {
@@ -329,33 +393,15 @@ public class AudioPlaybackService : IDisposable
                     }
                     track.DspFilter.DegradationFactor = deg;
 
-                    // Cache zones for potential PLC
                     track.LastSpeakerZone = packet.SpeakerZone;
                     track.LastListenerZone = packet.ListenerZone;
 
-                    // 3. Decode frame
                     DecodeAndWriteToBuffer(track, packet.OpusData, packet.ApplyRadioEffect, packet.SpeakerZone, packet.ListenerZone, packet.Metadata);
+                    track.CurrentTickPacket = null;
                 }
                 else if (isPlcNeeded)
                 {
-                    // Trigger PLC (Packet Loss Concealment)
                     DecodeAndWriteToBuffer(track, null, track.DspFilter.DegradationFactor > 0, track.LastSpeakerZone, track.LastListenerZone, null);
-                }
-                else
-                {
-                    // Underflow: play silence / stop transmission
-                    if (track.IsTransmitting)
-                    {
-                        track.IsTransmitting = false;
-                        if (EnableStt)
-                        {
-                            FlushSttBuffer(track, track.LastAudioType);
-                        }
-                        if (EnablePttChimes)
-                        {
-                            WriteFloatBuffer(track.Buffer, KeyUpChime);
-                        }
-                    }
                 }
             }
         }
@@ -591,6 +637,10 @@ public class AudioPlaybackService : IDisposable
         public byte LastAudioType { get; set; } = 0x00;
         public List<float> SttSampleBuffer { get; } = new();
         public readonly object SttLock = new();
+
+        public bool IsIntercom { get; set; } = false;
+        public AudioPacket? CurrentTickPacket { get; set; }
+        public bool CurrentTickPlcNeeded { get; set; }
     }
 }
 
@@ -604,6 +654,7 @@ internal class AudioPacket
     public double Distance { get; set; }
     public string SpeakerZone { get; set; } = string.Empty;
     public string ListenerZone { get; set; } = string.Empty;
+    public bool IsIntercom { get; set; }
 }
 
 internal class JitterBuffer
