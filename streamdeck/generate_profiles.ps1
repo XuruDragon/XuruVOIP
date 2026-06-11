@@ -127,15 +127,15 @@ $classicPilot = @{
     "3" = @{ UUID = "com.xuru.voip.action.cycle_radio"; Settings = @{ port = $port } }
     "4" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
     "5" = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    "6" = @{ UUID = "com.xuru.voip.action.beacon_repeater"; Settings = @{ port = $port } }
+    "6" = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
     "7" = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
-    "8" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "open hangar" } }
-    "9" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "request landing" } }
+    "8" = @{ UUID = "com.xuru.voip.action.hail_initiate"; Settings = @{ port = $port } }
+    "9" = @{ UUID = "com.xuru.voip.action.hail_accept"; Settings = @{ port = $port } }
     "10" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
     "11" = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
     "12" = @{ UUID = "com.xuru.voip.action.audio_radio_mute"; Settings = @{ port = $port } }
     "13" = @{ UUID = "com.xuru.voip.action.audio_profile_mute"; Settings = @{ port = $port } }
-    "14" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "status report" } }
+    "14" = @{ UUID = "com.xuru.voip.action.hail_decline"; Settings = @{ port = $port } }
 }
 $classicInfantry = @{
     "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
@@ -161,10 +161,10 @@ $classicCaptain = @{
     "3" = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
     "4" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
     "5" = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
-    "6" = @{ UUID = "com.xuru.voip.action.audio_radio_mute"; Settings = @{ port = $port } }
-    "7" = @{ UUID = "com.xuru.voip.action.beacon_repeater"; Settings = @{ port = $port } }
-    "8" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "power up shields" } }
-    "9" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "status check" } }
+    "6" = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
+    "7" = @{ UUID = "com.xuru.voip.action.hail_decline"; Settings = @{ port = $port } }
+    "8" = @{ UUID = "com.xuru.voip.action.hail_initiate"; Settings = @{ port = $port } }
+    "9" = @{ UUID = "com.xuru.voip.action.hail_accept"; Settings = @{ port = $port } }
     "10" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
     "11" = @{ UUID = "com.xuru.voip.action.cycle_radio"; Settings = @{ port = $port } }
     "12" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "simulate shield hit" } }
@@ -195,6 +195,12 @@ function Get-XLBase($rolePilot, $roleInfantry) {
     $keys["9"] = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
     $keys["10"] = @{ UUID = "com.xuru.voip.action.audio_radio_mute"; Settings = @{ port = $port } }
     $keys["11"] = @{ UUID = "com.xuru.voip.action.audio_profile_mute"; Settings = @{ port = $port } }
+    
+    # Hailing and Translation Subtitles
+    $keys["12"] = @{ UUID = "com.xuru.voip.action.hail_initiate"; Settings = @{ port = $port } }
+    $keys["13"] = @{ UUID = "com.xuru.voip.action.hail_accept"; Settings = @{ port = $port } }
+    $keys["14"] = @{ UUID = "com.xuru.voip.action.hail_decline"; Settings = @{ port = $port } }
+    $keys["15"] = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
     
     return $keys
 }
@@ -237,7 +243,7 @@ $plusPilot = @{
     "2" = @{ UUID = "com.xuru.voip.action.profile_mute"; Settings = @{ port = $port } }
     "3" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
     "4" = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    "5" = @{ UUID = "com.xuru.voip.action.beacon_repeater"; Settings = @{ port = $port } }
+    "5" = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
     "6" = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
     "7" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
     # Dials:
@@ -267,7 +273,7 @@ $plusCaptain = @{
     "4" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
     "5" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
     "6" = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
-    "7" = @{ UUID = "com.xuru.voip.action.audio_radio_mute"; Settings = @{ port = $port } }
+    "7" = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
     # Dials:
     "8" = @{ UUID = "com.xuru.voip.action.cycle_radio_dial"; Settings = @{ port = $port } }
     "9" = @{ UUID = "com.xuru.voip.action.adjust_exertion"; Settings = @{ port = $port } }

@@ -348,6 +348,71 @@
       },
       "SupportedInMultiActions": false,
       "Tooltip": "Rotate to change voice changer profiles, press to toggle"
+    },
+    {
+      "UUID": "com.xuru.voip.action.hail_initiate",
+      "Name": "Initiate Hail",
+      "Icon": "icons/hail_initiate",
+      "States": [
+        {
+          "Image": "icons/hail_initiate",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Initiate a private calling link to the closest cockpit target"
+    },
+    {
+      "UUID": "com.xuru.voip.action.hail_accept",
+      "Name": "Accept Hail",
+      "Icon": "icons/hail_accept",
+      "States": [
+        {
+          "Image": "icons/hail_accept",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Accept the incoming private hailing call"
+    },
+    {
+      "UUID": "com.xuru.voip.action.hail_decline",
+      "Name": "Decline/End Hail",
+      "Icon": "icons/hail_decline",
+      "States": [
+        {
+          "Image": "icons/hail_decline",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Decline or end the private hailing call"
+    },
+    {
+      "UUID": "com.xuru.voip.action.toggle_translation",
+      "Name": "HUD Translation Subtitles",
+      "Icon": "icons/translation_disabled",
+      "States": [
+        {
+          "Image": "icons/translation_disabled",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/translation_enabled",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle real-time HUD translation subtitles for foreign audio"
     }
   ]
 }

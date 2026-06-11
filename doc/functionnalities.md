@@ -30,6 +30,8 @@ Use the summary table below to navigate between the various features implemented
 | **16** | [🛡️ Security, Log Rotation & Admin Radar](#16-security-log-rotation--admin-canvas-radar) | Server moderation & zoomable radar | *Server Setup (.env)* |
 | **17** | [🪐 Planetary Atmosphere Simulation](#17-planetary-atmosphere-density-simulation) | Client-side muffling & range scaling | Audio |
 | **18** | [🎙️ Post-Op Voice Recorder & AAR Portal](#18-post-op-voice-recorder--aar-portal) | Server-side Ogg/Opus recording & admin timeline | *Server Setup (.env)* |
+| **19** | [📞 Ship-to-Ship Hailing & Calling](#19-ship-to-ship-hailing--calling-system) | Cockpit-to-cockpit private calls | Hotkeys |
+| **20** | [🔤 Visor HUD Real-Time Translation Subtitles](#20-visor-hud-real-time-translation-subtitles) | Real-time speech translation on HUD | Overlay |
 
 ---
 
@@ -389,3 +391,42 @@ An administrative voice recording suite that writes direct Opus frames to browse
 2. Open the Admin Web Portal and navigate to the **Archives** tab.
 3. Check target boxes to enable active recording (e.g., Proximity or a specific Radio Channel).
 4. View recorded clips and speak blocks dynamically plotted on the Canvas Timeline. Click on them to play or review.
+
+---
+
+## 📞 19. Ship-to-Ship Hailing & Calling System
+
+### Description
+Enables cockpit-to-cockpit private calling between ships with a maximum communication range limit of 5,000 meters.
+
+### How It Works
+* **Protocol-Level Calling:** Active at the position server socket level. When a player initiates a hail to another online player, the server verifies range constraints and busy status. If clear, the target receives an incoming call notification.
+* **Audio Loop Routing:** Once connected, a private audio stream is established. Microphones are captured and transmitted using custom audio frames (`AudioTypeHail = 0x04`) which bypass standard proximity/radio channels.
+* **Interactive Hotkeys:** Players can configure separate keybindings to Initiate, Accept, and Decline/End calls.
+* **VAD Auto-Transmission:** While in an active call, the voice capture service overrides PTT checks to enable hands-free voice transmission.
+* **Synthesized Audio Chimes:** Uses NAudio signal generators to play realistic dialing/ringing sweeps (900Hz to 600Hz) and connection/disconnection tones, providing clear acoustic feedback.
+
+### How to Use
+1. Set bindings for **Initiate Hail**, **Accept Hail**, and **Decline/End Hail** under the **Hotkeys** tab in Settings.
+2. When close to another ship, use your Initiate hotkey. The target will hear a ringing sound and see a HUD prompt.
+3. The target can press their Accept key to connect, or Decline key to reject the call. Press Decline during an active call to hang up.
+
+---
+
+## 🔤 20. Visor HUD Real-Time Translation Subtitles
+
+### Description
+Translates incoming foreign-language voice streams in real-time and displays them on your Visor HUD overlay.
+
+### How It Works
+* **Foreign Language Sync:** The client synchronizes your selected language (e.g., English, French, German, Spanish, Portuguese, Japanese, or Chinese) to the server.
+* **Multi-Language Transcription:** When a remote player speaks, the server forwards their spoken language metadata. The listening client uses this to transcribe the voice stream in the speaker's language using the offline Whisper model.
+* **Dynamic Translation Engine:** The transcription is mapped against a comprehensive military/flight phrase translator and displayed on the HUD with the source and target languages prefixed: `[FROM -> TO] Subtitle text`.
+* **Whisper Model Integration:** Requires the `ggml-tiny.bin` model. If not present, enabling the feature will prompt a download warning and fetch it in the background.
+
+### How to Use
+1. Go to the **Overlay** tab in Settings.
+2. Check **Enable Real-Time HUD Translation Subtitles**.
+3. If the Whisper model is missing, a yellow notice appears and the model will download automatically in the background.
+4. Incoming foreign speech will now be translated and displayed on your screen!
+

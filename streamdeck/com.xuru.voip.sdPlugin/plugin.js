@@ -151,6 +151,18 @@ async function handleKeyDown(context, actionInfo) {
             // Force a status refresh
             pollCompanionApp();
             return;
+        case "com.xuru.voip.action.hail_initiate":
+            apiAction = "hail_initiate";
+            break;
+        case "com.xuru.voip.action.hail_accept":
+            apiAction = "hail_accept";
+            break;
+        case "com.xuru.voip.action.hail_decline":
+            apiAction = "hail_decline";
+            break;
+        case "com.xuru.voip.action.toggle_translation":
+            apiAction = "toggle_translation";
+            break;
     }
 
     if (!apiAction) return;
@@ -513,6 +525,36 @@ function updateStreamDeckStates(port, status) {
                 } else {
                     title = "NO GPS";
                 }
+                break;
+            case "com.xuru.voip.action.hail_initiate":
+                state = 0;
+                if (status.hailState === "Outgoing") {
+                    title = "HAILING...";
+                } else if (status.hailState === "Connected") {
+                    title = `ACTIVE:\n${status.hailPeerName || ""}`;
+                } else {
+                    title = "Initiate\nHail";
+                }
+                break;
+            case "com.xuru.voip.action.hail_accept":
+                state = 0;
+                if (status.hailState === "Incoming") {
+                    title = "ACCEPT\nHAIL!";
+                } else {
+                    title = "Accept\nHail";
+                }
+                break;
+            case "com.xuru.voip.action.hail_decline":
+                state = 0;
+                if (status.hailState === "Incoming" || status.hailState === "Outgoing" || status.hailState === "Connected") {
+                    title = status.hailState === "Connected" ? "END\nHAIL" : "DECLINE";
+                } else {
+                    title = "Decline\nHail";
+                }
+                break;
+            case "com.xuru.voip.action.toggle_translation":
+                state = status.enableTranslationSubtitles ? 1 : 0;
+                title = status.enableTranslationSubtitles ? "TRANS\nON" : "TRANS\nOFF";
                 break;
         }
 
