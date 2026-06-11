@@ -55,6 +55,25 @@ public class AudioPlaybackService : IDisposable
 
     // Spatial Audio & Modulation State
     public bool EnableSpatialAudio { get; set; } = true;
+    private bool _enableHrtfBinaural = false;
+    public bool EnableHrtfBinaural
+    {
+        get => _enableHrtfBinaural;
+        set
+        {
+            if (_enableHrtfBinaural != value)
+            {
+                _enableHrtfBinaural = value;
+                lock (_lock)
+                {
+                    foreach (var track in _tracks.Values)
+                    {
+                        track.Panning.EnableHrtf = value;
+                    }
+                }
+            }
+        }
+    }
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
     public bool EnableEnvironmentalAcoustics { get; set; } = true;
@@ -652,7 +671,7 @@ public class AudioPlaybackService : IDisposable
     {
         var decoder = OpusCodecFactory.CreateDecoder(SampleRate, Channels);
         var buffer = new BufferedWaveProvider(_monoFormat) { DiscardOnBufferOverflow = true };
-        var panning = new PanningSampleProvider(buffer.ToSampleProvider()) { Pan = 0f };
+        var panning = new HrtfBinauralSampleProvider(buffer.ToSampleProvider()) { Pan = 0f, EnableHrtf = _enableHrtfBinaural };
         var volume = new VolumeSampleProvider(panning) { Volume = 1.0f };
         _mixer!.AddMixerInput(volume);
         return new PlayerAudioTrack(playerName, decoder, buffer, panning, volume);
@@ -916,13 +935,13 @@ public class AudioPlaybackService : IDisposable
         string playerName,
         IOpusDecoder decoder,
         BufferedWaveProvider buffer,
-        PanningSampleProvider panning,
+        HrtfBinauralSampleProvider panning,
         VolumeSampleProvider volume)
     {
         public string PlayerName { get; } = playerName;
         public IOpusDecoder Decoder { get; } = decoder;
         public BufferedWaveProvider Buffer { get; } = buffer;
-        public PanningSampleProvider Panning { get; } = panning;
+        public HrtfBinauralSampleProvider Panning { get; } = panning;
         public VolumeSampleProvider Volume { get; } = volume;
         public float VolumeLinear { get; set; } = 1.0f;
         public RadioDspFilter DspFilter { get; } = new();

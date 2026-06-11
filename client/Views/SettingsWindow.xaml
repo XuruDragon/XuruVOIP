@@ -481,6 +481,13 @@
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
 
+                            <!-- HRTF toggle -->
+                            <CheckBox Content="{DynamicResource LblEnableHrtf}"
+                                      IsChecked="{Binding Config.EnableHrtf, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{Binding Config.EnableSpatialAudio, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="16,4,0,8"/>
+
                             <!-- Radio degradation toggle -->
                             <CheckBox Content="{DynamicResource LblEnableRadioDegradation}"
                                       IsChecked="{Binding Config.EnableRadioDegradation, UpdateSourceTrigger=PropertyChanged}"
