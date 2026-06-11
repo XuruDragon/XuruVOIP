@@ -200,4 +200,10 @@
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS LISTENING...</sys:String>
     <sys:String x:Key="TxtVoiceSuccess">✔️ CMD: {0}</sys:String>
     <sys:String x:Key="TxtVoiceError">❌ CMD NOT RECOGNIZED</sys:String>
+
+    <!-- Hailing & Translation Subtitles -->
+    <sys:String x:Key="LblInitiateHail">Initiate Hail Key</sys:String>
+    <sys:String x:Key="LblAcceptHail">Accept Hail Key</sys:String>
+    <sys:String x:Key="LblDeclineHail">Decline/End Hail Key</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">Enable Visor HUD Real-Time Translation Subtitles</sys:String>
 </ResourceDictionary>

@@ -192,11 +192,93 @@ public partial class OverlayWindow : Window
 
         // 7. Update Tactical Radar Overlay
         UpdateRadar(cfg);
+
+        // 8. Update Hailing HUD panel
+        UpdateHailPanel(cfg);
+    }
+
+    private void UpdateHailPanel(AppConfig cfg)
+    {
+        var state = _vm.CurrentHailState;
+        if (state == HailState.Idle)
+        {
+            if (HailPanel.Visibility != Visibility.Collapsed)
+            {
+                HailPanel.Visibility = Visibility.Collapsed;
+            }
+            return;
+        }
+
+        if (HailPanel.Visibility != Visibility.Visible)
+        {
+            HailPanel.Visibility = Visibility.Visible;
+        }
+
+        string peerName = _vm.HailPeerName;
+        switch (state)
+        {
+            case HailState.Outgoing:
+                HailPanel.BorderBrush = BrushOrange;
+                TxtHailHeader.Text = "OUTGOING HAIL";
+                TxtHailHeader.Foreground = BrushOrange;
+                TxtHailStatus.Text = peerName;
+                TxtHailAction.Text = $"Calling pilot... Press {cfg.DeclineHailKey} to Cancel";
+                break;
+
+            case HailState.Incoming:
+                HailPanel.BorderBrush = BrushOrange;
+                TxtHailHeader.Text = "INCOMING HAIL";
+                TxtHailHeader.Foreground = BrushOrange;
+                TxtHailStatus.Text = peerName;
+                TxtHailAction.Text = $"Press {cfg.AcceptHailKey} to Accept / {cfg.DeclineHailKey} to Decline";
+                break;
+
+            case HailState.Connected:
+                HailPanel.BorderBrush = BrushGreen;
+                TxtHailHeader.Text = "HAIL LINK ACTIVE";
+                TxtHailHeader.Foreground = BrushGreen;
+                TxtHailStatus.Text = peerName;
+                TxtHailAction.Text = $"Hands-free open mic · Press {cfg.DeclineHailKey} to End";
+                break;
+        }
     }
 
     private void OnCaptionDecoded(string playerName, string text, byte channelType)
     {
-        if (!_vm.Config.Config.EnableStt) return;
+        var cfg = _vm.Config.Config;
+        bool wantsStt = cfg.EnableStt;
+        bool wantsTranslation = cfg.EnableTranslationSubtitles;
+
+        if (!wantsStt && !wantsTranslation) return;
+
+        // Determine remote language, default to "en"
+        string fromLang = "en";
+        if (_vm.RemoteLanguages.TryGetValue(playerName, out var rlang) && !string.IsNullOrEmpty(rlang))
+        {
+            fromLang = rlang;
+        }
+
+        string toLang = cfg.Language;
+        if (string.IsNullOrEmpty(toLang)) toLang = "en";
+
+        string fromUpper = fromLang.Split('-')[0].ToUpperInvariant();
+        string toUpper = toLang.Split('-')[0].ToUpperInvariant();
+
+        bool isForeign = fromUpper != toUpper;
+
+        if (isForeign && wantsTranslation)
+        {
+            string translated = TranslationService.TranslatePhrase(text, fromLang, toLang);
+            text = $"[{fromUpper} -> {toUpper}] \"{translated}\"";
+        }
+        else if (wantsStt)
+        {
+            text = $"\"{text}\"";
+        }
+        else
+        {
+            return;
+        }
 
         Dispatcher.Invoke(() =>
         {
@@ -205,6 +287,7 @@ public partial class OverlayWindow : Window
                 0x00 => "[Prox]",
                 0x01 => "[Radio]",
                 0x02 => "[Squad]",
+                0x04 => "[Hail]",
                 _ => "[Voip]"
             };
 
@@ -213,6 +296,7 @@ public partial class OverlayWindow : Window
                 0x00 => BrushGreen,
                 0x01 => new SolidColorBrush(Color.FromRgb(0x4E, 0x9F, 0xFF)),
                 0x02 => new SolidColorBrush(Color.FromRgb(0xD8, 0x00, 0x64)),
+                0x04 => BrushOrange,
                 _ => Brushes.White
             };
 
@@ -220,7 +304,7 @@ public partial class OverlayWindow : Window
             {
                 ChannelTag = channelTag,
                 SpeakerName = playerName + ":",
-                Text = $"\"{text}\"",
+                Text = text,
                 ChannelBrush = channelBrush,
                 Timestamp = DateTime.UtcNow
             });
@@ -234,7 +318,7 @@ public partial class OverlayWindow : Window
 
     private void UpdateCaptions(AppConfig cfg)
     {
-        if (!cfg.EnableStt)
+        if (!cfg.EnableStt && !cfg.EnableTranslationSubtitles)
         {
             if (LstCaptions.Visibility != Visibility.Collapsed)
             {

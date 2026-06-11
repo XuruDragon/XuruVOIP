@@ -260,7 +260,11 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg core.MsgJoin) {
 	}
 
 	// Register player and issue ticket
-	ticket := core.ActiveHub.RegisterPlayer(name, conn, validCh, ip, msg.Hwid)
+	lang := strings.TrimSpace(msg.Language)
+	if lang == "" {
+		lang = "en"
+	}
+	ticket := core.ActiveHub.RegisterPlayer(name, conn, validCh, ip, msg.Hwid, lang)
 
 	core.Log(fmt.Sprintf("JOIN Positions: %s (%s)", name, ip), core.ColorGreen)
 
@@ -314,6 +318,7 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg core.MsgJoin) {
 		Profile:           myProfile,
 		ProxShort:         false,
 		IsRadioRepeater:   isRepeater,
+		Language:          lang,
 	}
 	core.ActiveHub.BroadcastPosMessage(name, joinMsg)
 	core.ActiveHub.BroadcastToAdmins(joinMsg)
@@ -495,6 +500,19 @@ func handlePlayerJoin(conn *websocket.Conn, ip string, msg core.MsgJoin) {
 					})
 				}
 			}
+
+		case "hail_request":
+			var m core.MsgHailRequest
+			if err := json.Unmarshal(payload, &m); err != nil {
+				continue
+			}
+			core.ActiveHub.HandleHailRequest(name, m.Target)
+
+		case "hail_accept":
+			core.ActiveHub.HandleHailAccept(name)
+
+		case "hail_decline":
+			core.ActiveHub.HandleHailDecline(name)
 		}
 	}
 

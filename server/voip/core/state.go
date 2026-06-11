@@ -33,6 +33,9 @@ type ActivePlayer struct {
 	LastTalkTime      time.Time
 	IsRadioRepeater   bool
 	repeaterMu        sync.RWMutex
+	Language          string
+	HailState         int
+	HailPeer          string
 }
 
 // GetIsRadioRepeater returns whether the player acts as a radio repeater
@@ -105,7 +108,7 @@ var ActiveHub = Hub{
 }
 
 // RegisterPlayer registers or updates a player upon joining the positions server
-func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel string, ip string, hwid string) string {
+func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel string, ip string, hwid string, language string) string {
 	h.Mu.Lock()
 	defer h.Mu.Unlock()
 
@@ -158,6 +161,7 @@ func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel s
 		p.ScOnline = true
 		p.IP = ip
 		p.Hwid = hwid
+		p.Language = language
 	} else {
 		h.Players[name] = &ActivePlayer{
 			Name:              name,
@@ -171,6 +175,7 @@ func (h *Hub) RegisterPlayer(name string, conn *websocket.Conn, initialChannel s
 			ScOnline:          true,
 			IP:                ip,
 			Hwid:              hwid,
+			Language:          language,
 		}
 	}
 
@@ -193,6 +198,7 @@ func (h *Hub) UnregisterPosConn(conn *websocket.Conn) (string, bool) {
 		}
 		p.PosMu.Unlock()
 		if isMatch {
+			h.disconnectCallHelperLocked(name)
 			if EnableIntercom && p.Pos != nil && p.Pos.ContainerID != "" {
 				h.handleIntercomTransition(p, p.Pos.ContainerID, "")
 			}
@@ -283,6 +289,30 @@ func (h *Hub) UpdatePosition(name string, pos Position) bool {
 
 	p.Pos = &pos
 	p.LastSeen = time.Now()
+
+	if p.HailState == HailStateConnected && p.HailPeer != "" {
+		peer, ok := h.Players[p.HailPeer]
+		if ok && peer.HailState == HailStateConnected && peer.Pos != nil {
+			dx := pos.X - peer.Pos.X
+			dy := pos.Y - peer.Pos.Y
+			dz := pos.Z - peer.Pos.Z
+			dist := math.Sqrt(dx*dx + dy*dy + dz*dz)
+			if dist > 5000.0 {
+				p.HailState = HailStateIdle
+				p.HailPeer = ""
+				peer.HailState = HailStateIdle
+				peer.HailPeer = ""
+				_ = p.SafeWritePosJSON(MsgHailDisconnected{
+					Type:   "hail_disconnected",
+					Reason: "out_of_range",
+				})
+				_ = peer.SafeWritePosJSON(MsgHailDisconnected{
+					Type:   "hail_disconnected",
+					Reason: "out_of_range",
+				})
+			}
+		}
+	}
 
 	if EnableIntercom {
 		h.handleIntercomTransition(p, oldContainerID, pos.ContainerID)
@@ -432,6 +462,7 @@ func (h *Hub) GetPlayerStateList(excludeName string) []PlayerState {
 			ScOnline:          p.ScOnline,
 			IsTalking:         p.IsTalking,
 			IsRadioRepeater:   p.GetIsRadioRepeater(),
+			Language:          p.Language,
 		})
 	}
 	return states
@@ -455,6 +486,7 @@ func (h *Hub) GetAllPlayerStates() []PlayerState {
 			ScOnline:          p.ScOnline,
 			IsTalking:         p.IsTalking,
 			IsRadioRepeater:   p.GetIsRadioRepeater(),
+			Language:          p.Language,
 		})
 	}
 	return states
@@ -620,6 +652,7 @@ func (h *Hub) CleanupTimeouts(timeout time.Duration) []string {
 	for name, p := range h.Players {
 		if now.Sub(p.LastSeen) > timeout {
 			timedOut = append(timedOut, name)
+			h.disconnectCallHelperLocked(name)
 			p.PosMu.Lock()
 			if p.PosConn != nil {
 				_ = p.PosConn.Close()
@@ -893,4 +926,153 @@ func containsStringSlice(slice []string, s string) bool {
 		}
 	}
 	return false
+}
+
+func (h *Hub) disconnectCallHelperLocked(name string) {
+	p, ok := h.Players[name]
+	if !ok || p.HailState == HailStateIdle || p.HailPeer == "" {
+		return
+	}
+	peer, ok2 := h.Players[p.HailPeer]
+	if ok2 && peer.HailPeer == name {
+		peer.HailState = HailStateIdle
+		peer.HailPeer = ""
+		_ = peer.SafeWritePosJSON(MsgHailDisconnected{
+			Type:   "hail_disconnected",
+			Reason: "peer_disconnected",
+		})
+	}
+	p.HailState = HailStateIdle
+	p.HailPeer = ""
+}
+
+func (h *Hub) HandleHailRequest(senderName string, targetName string) {
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
+
+	sender, ok1 := h.Players[senderName]
+	target, ok2 := h.Players[targetName]
+
+	if !ok1 {
+		return
+	}
+	if !ok2 {
+		_ = sender.SafeWritePosJSON(MsgHailError{
+			Type:   "hail_error",
+			Reason: "target_offline",
+		})
+		return
+	}
+
+	// Distance check: within 5,000m
+	if sender.Pos == nil || target.Pos == nil || sender.Pos.Zone != target.Pos.Zone {
+		_ = sender.SafeWritePosJSON(MsgHailError{
+			Type:   "hail_error",
+			Reason: "out_of_range",
+		})
+		return
+	}
+
+	dx := sender.Pos.X - target.Pos.X
+	dy := sender.Pos.Y - target.Pos.Y
+	dz := sender.Pos.Z - target.Pos.Z
+	dist := math.Sqrt(dx*dx + dy*dy + dz*dz)
+
+	if dist > 5000.0 {
+		_ = sender.SafeWritePosJSON(MsgHailError{
+			Type:   "hail_error",
+			Reason: "out_of_range",
+		})
+		return
+	}
+
+	// Busy check
+	if target.HailState != HailStateIdle {
+		_ = sender.SafeWritePosJSON(MsgHailError{
+			Type:   "hail_error",
+			Reason: "busy",
+		})
+		return
+	}
+
+	// Set states
+	sender.HailState = HailStateOutgoing
+	sender.HailPeer = targetName
+	target.HailState = HailStateIncoming
+	target.HailPeer = senderName
+
+	// Send messages
+	_ = sender.SafeWritePosJSON(MsgHailRinging{
+		Type: "hail_ringing",
+		Peer: targetName,
+	})
+	_ = target.SafeWritePosJSON(MsgHailIncoming{
+		Type: "hail_incoming",
+		Peer: senderName,
+	})
+}
+
+func (h *Hub) HandleHailAccept(name string) {
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
+
+	player, ok := h.Players[name]
+	if !ok || player.HailState != HailStateIncoming {
+		return
+	}
+
+	peerName := player.HailPeer
+	peer, ok2 := h.Players[peerName]
+	if !ok2 || peer.HailState != HailStateOutgoing || peer.HailPeer != name {
+		// peer disconnected or canceled
+		player.HailState = HailStateIdle
+		player.HailPeer = ""
+		_ = player.SafeWritePosJSON(MsgHailDisconnected{
+			Type:   "hail_disconnected",
+			Reason: "peer_unavailable",
+		})
+		return
+	}
+
+	// Connect them!
+	player.HailState = HailStateConnected
+	peer.HailState = HailStateConnected
+
+	_ = player.SafeWritePosJSON(MsgHailConnected{
+		Type: "hail_connected",
+		Peer: peerName,
+	})
+	_ = peer.SafeWritePosJSON(MsgHailConnected{
+		Type: "hail_connected",
+		Peer: name,
+	})
+}
+
+func (h *Hub) HandleHailDecline(name string) {
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
+
+	player, ok := h.Players[name]
+	if !ok || player.HailState == HailStateIdle {
+		return
+	}
+
+	peerName := player.HailPeer
+	player.HailState = HailStateIdle
+	player.HailPeer = ""
+
+	_ = player.SafeWritePosJSON(MsgHailDisconnected{
+		Type:   "hail_disconnected",
+		Reason: "ended",
+	})
+
+	peer, ok2 := h.Players[peerName]
+	if ok2 && peer.HailPeer == name {
+		peer.HailState = HailStateIdle
+		peer.HailPeer = ""
+		_ = peer.SafeWritePosJSON(MsgHailDisconnected{
+			Type:   "hail_disconnected",
+			Reason: "declined_or_ended",
+		})
+	}
 }

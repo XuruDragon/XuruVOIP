@@ -40,6 +40,9 @@ public class AppConfig
     public string MuteAudioProximityKey { get; set; } = "None";
     public string MuteAudioRadioKey { get; set; } = "None";
     public string MuteAudioProfileKey { get; set; } = "None";
+    public string InitiateHailKey { get; set; } = "None";
+    public string AcceptHailKey { get; set; } = "None";
+    public string DeclineHailKey { get; set; } = "None";
     public int VadSensitivity { get; set; } = 2; // 0=Very Low, 1=Low, 2=Medium, 3=High
 
     // --- Audio Devices & Gain ---
@@ -68,6 +71,7 @@ public class AppConfig
     public bool EnableRadar { get; set; } = true;
     public double RadarRange { get; set; } = 50.0;
     public bool EnableStt { get; set; } = false;
+    public bool EnableTranslationSubtitles { get; set; } = false;
     public bool EnableVoiceCommands { get; set; } = false;
     public string VoiceCommandHotkey { get; set; } = "V";
     public double VoiceCommandConfidence { get; set; } = 0.5;

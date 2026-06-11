@@ -659,6 +659,23 @@
                                  </StackPanel>
                              </Border>
 
+                             <!-- Real-Time HUD Translation Subtitles Toggle -->
+                             <CheckBox x:Name="CbEnableTranslationSubtitles"
+                                       Content="{DynamicResource LblEnableTranslationSubtitles}"
+                                       IsChecked="{Binding Config.EnableTranslationSubtitles, UpdateSourceTrigger=PropertyChanged}"
+                                       Foreground="{StaticResource TextPrimary}"
+                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                       Checked="TranslationSubtitles_ToggleChanged" Unchecked="TranslationSubtitles_ToggleChanged"/>
+
+                             <!-- Translation Download Warning Message -->
+                             <Border x:Name="TranslationWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="16,4,0,16" Visibility="Collapsed">
+                                 <StackPanel>
+                                     <TextBlock Text="⚠️ Translation Engine Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
+                                     <TextBlock Text="Enabling translation subtitles requires the Whisper speech recognition model (ggml-tiny.bin) to transcribe incoming foreign audio. If not already downloaded, enabling this feature will automatically start downloading the model (75MB) in the background. Progress will be displayed on the HUD." 
+                                                Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
+                                 </StackPanel>
+                             </Border>
+
                             <!-- Overlay Capabilities Info -->
                             <TextBlock Text="{DynamicResource LblOverlayCapabilities}" Style="{StaticResource LabelStyle}" FontWeight="Bold" Margin="0,12,0,4"/>
                             <Border Background="{StaticResource BgElevated}" CornerRadius="8" Padding="12" Margin="0,0,0,16">
@@ -764,6 +781,30 @@
                             <TextBlock Text="{DynamicResource LblVoiceCommandHotkey}" Style="{StaticResource LabelStyle}"/>
                             <TextBox x:Name="TxVoiceCommandHotkey"
                                      Text="{Binding Config.VoiceCommandHotkey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Initiate Hail Key -->
+                            <TextBlock Text="{DynamicResource LblInitiateHail}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxInitiateHail"
+                                     Text="{Binding Config.InitiateHailKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Accept Hail Key -->
+                            <TextBlock Text="{DynamicResource LblAcceptHail}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxAcceptHail"
+                                     Text="{Binding Config.AcceptHailKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Decline Hail Key -->
+                            <TextBlock Text="{DynamicResource LblDeclineHail}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxDeclineHail"
+                                     Text="{Binding Config.DeclineHailKey, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource InputStyle}"
                                      KeyDown="Hotkey_KeyDown"
                                      Margin="0,0,0,10"/>

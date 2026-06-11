@@ -412,6 +412,15 @@ func handleUDPPacket(packet []byte, remoteAddr *net.UDPAddr) {
 			}
 			core.ActiveHub.Mu.RUnlock()
 		}
+	case core.AudioTypeHail:
+		core.ActiveHub.Mu.RLock()
+		if sender.HailState == core.HailStateConnected && sender.HailPeer != "" {
+			peer, exists := core.ActiveHub.Players[sender.HailPeer]
+			if exists {
+				targets = append(targets, peer)
+			}
+		}
+		core.ActiveHub.Mu.RUnlock()
 	}
 
 	if len(targets) == 0 {
