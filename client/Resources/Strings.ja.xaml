@@ -115,6 +115,7 @@
     <!-- 設定: オーバーレイ -->
     <sys:String x:Key="TabOverlay">オーバーレイ</sys:String>
     <sys:String x:Key="LblEnableOverlay">HUDオーバーレイを有効化</sys:String>
+    <sys:String x:Key="LblEnableVisorSpectrogram">バイザーHUD 3Dスペクトログラムを有効にする</sys:String>
     <sys:String x:Key="LblOverlayPosition">オーバーレイ表示位置</sys:String>
     <sys:String x:Key="OptTopLeft">左上</sys:String>
     <sys:String x:Key="OptTopCenter">中央上</sys:String>

@@ -26,7 +26,7 @@ public partial class OverlayWindow : Window
 {
     private readonly MainViewModel _vm;
     private readonly DispatcherTimer _timer;
-    private readonly ObservableCollection<string> _speakers = new();
+    private readonly ObservableCollection<OverlaySpeakerItem> _speakers = new();
     private readonly ObservableCollection<HudCaptionItem> _captions = new();
 
     // Win32 APIs for click-through window
@@ -520,26 +520,77 @@ public partial class OverlayWindow : Window
 
     private void UpdateActiveSpeakers()
     {
-        var currentSpeakers = _vm.Playback.GetActiveSpeakers(400);
+        var cfg = _vm.Config.Config;
+        var activeTelemetry = _vm.Playback.GetActiveSpeakersTelemetry(400);
 
-        // Update local speakers collection intelligently to avoid UI flickering
-        bool unchanged = currentSpeakers.Count == _speakers.Count;
-        if (unchanged)
+        var existingMap = new Dictionary<string, OverlaySpeakerItem>();
+        foreach (var item in _speakers)
         {
-            for (int i = 0; i < currentSpeakers.Count; i++)
+            existingMap[item.PlayerName] = item;
+        }
+
+        var newSpeakers = new List<OverlaySpeakerItem>();
+
+        foreach (var tel in activeTelemetry)
+        {
+            Brush channelBrush = tel.AudioType switch
             {
-                if (currentSpeakers[i] != _speakers[i])
+                0x00 => BrushGreen,
+                0x01 => new SolidColorBrush(Color.FromRgb(0x4E, 0x9F, 0xFF)),
+                0x02 => new SolidColorBrush(Color.FromRgb(0xD8, 0x00, 0x64)),
+                0x03 => BrushOrange,
+                0x04 => BrushOrange,
+                _ => Brushes.White
+            };
+
+            if (existingMap.TryGetValue(tel.PlayerName, out var item))
+            {
+                item.ChannelBrush = channelBrush;
+                item.SpectrogramVisibility = cfg.EnableVisorSpectrogram ? Visibility.Visible : Visibility.Collapsed;
+                for (int b = 0; b < 8; b++)
                 {
-                    unchanged = false;
+                    item.SpectralBars[b].Height = tel.SpectralBands[b] * 16.0;
+                    item.SpectralBars[b].Brush = channelBrush;
+                }
+                newSpeakers.Add(item);
+            }
+            else
+            {
+                var newItem = new OverlaySpeakerItem
+                {
+                    PlayerName = tel.PlayerName,
+                    ChannelBrush = channelBrush,
+                    SpectrogramVisibility = cfg.EnableVisorSpectrogram ? Visibility.Visible : Visibility.Collapsed
+                };
+                for (int b = 0; b < 8; b++)
+                {
+                    newItem.SpectralBars.Add(new SpectralBarItem
+                    {
+                        Height = tel.SpectralBands[b] * 16.0,
+                        Brush = channelBrush
+                    });
+                }
+                newSpeakers.Add(newItem);
+            }
+        }
+
+        bool listChanged = _speakers.Count != newSpeakers.Count;
+        if (!listChanged)
+        {
+            for (int i = 0; i < newSpeakers.Count; i++)
+            {
+                if (_speakers[i].PlayerName != newSpeakers[i].PlayerName)
+                {
+                    listChanged = true;
                     break;
                 }
             }
         }
 
-        if (!unchanged)
+        if (listChanged)
         {
             _speakers.Clear();
-            foreach (var s in currentSpeakers)
+            foreach (var s in newSpeakers)
             {
                 _speakers.Add(s);
             }
@@ -566,4 +617,57 @@ public partial class OverlayWindow : Window
         _vm.Stt.CaptionDecoded -= OnCaptionDecoded;
         Close();
     }
+}
+
+public class SpectralBarItem : System.ComponentModel.INotifyPropertyChanged
+{
+    private double _height;
+    private Brush _brush = Brushes.Green;
+
+    public double Height
+    {
+        get => _height;
+        set { if (_height != value) { _height = value; OnPropertyChanged(); } }
+    }
+
+    public Brush Brush
+    {
+        get => _brush;
+        set { if (_brush != value) { _brush = value; OnPropertyChanged(); } }
+    }
+
+    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? name = null)
+        => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
+}
+
+public class OverlaySpeakerItem : System.ComponentModel.INotifyPropertyChanged
+{
+    private string _playerName = "";
+    private Brush _channelBrush = Brushes.Green;
+    private Visibility _spectrogramVisibility = Visibility.Collapsed;
+
+    public string PlayerName
+    {
+        get => _playerName;
+        set { if (_playerName != value) { _playerName = value; OnPropertyChanged(); } }
+    }
+
+    public Brush ChannelBrush
+    {
+        get => _channelBrush;
+        set { if (_channelBrush != value) { _channelBrush = value; OnPropertyChanged(); } }
+    }
+
+    public Visibility SpectrogramVisibility
+    {
+        get => _spectrogramVisibility;
+        set { if (_spectrogramVisibility != value) { _spectrogramVisibility = value; OnPropertyChanged(); } }
+    }
+
+    public ObservableCollection<SpectralBarItem> SpectralBars { get; } = new();
+
+    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? name = null)
+        => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
 }

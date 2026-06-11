@@ -622,7 +622,14 @@
                             <CheckBox Content="{DynamicResource LblEnableOverlay}"
                                       IsChecked="{Binding Config.EnableOverlay, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,16"/>
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
+                            <!-- Visor Spectrogram Toggle -->
+                            <CheckBox Content="{DynamicResource LblEnableVisorSpectrogram}"
+                                      IsChecked="{Binding Config.EnableVisorSpectrogram, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{Binding Config.EnableOverlay, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="16,0,0,16"/>
 
                             <!-- Overlay Position -->
                             <TextBlock Text="{DynamicResource LblOverlayPosition}" Style="{StaticResource LabelStyle}"/>

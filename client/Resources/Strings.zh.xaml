@@ -115,6 +115,7 @@
     <!-- 设置: 覆盖层 -->
     <sys:String x:Key="TabOverlay">覆盖层</sys:String>
     <sys:String x:Key="LblEnableOverlay">启用 HUD 覆盖层</sys:String>
+    <sys:String x:Key="LblEnableVisorSpectrogram">启用面罩HUD 3D频谱图</sys:String>
     <sys:String x:Key="LblOverlayPosition">覆盖层显示位置</sys:String>
     <sys:String x:Key="OptTopLeft">左上</sys:String>
     <sys:String x:Key="OptTopCenter">中上</sys:String>
