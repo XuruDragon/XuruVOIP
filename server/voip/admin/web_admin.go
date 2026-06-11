@@ -353,7 +353,7 @@ func handleAarServe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	filename := parts[len(parts)-1]
-	if !strings.HasSuffix(filename, ".ogg") {
+	if !strings.HasSuffix(filename, ".ogg") && !strings.HasSuffix(filename, ".jsonl") {
 		http.NotFound(w, r)
 		return
 	}
@@ -366,7 +366,11 @@ func handleAarServe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "audio/ogg")
+	if strings.HasSuffix(filename, ".jsonl") {
+		w.Header().Set("Content-Type", "application/x-jsonlines")
+	} else {
+		w.Header().Set("Content-Type", "audio/ogg")
+	}
 	http.ServeFile(w, r, filePath)
 }
 
@@ -396,6 +400,8 @@ func handleAarDelete(w http.ResponseWriter, r *http.Request) {
 	dataDir := core.ResolveDataDir()
 	filePath := filepath.Join(dataDir, "recordings", req.ID+".ogg")
 	_ = os.Remove(filePath)
+	posFilePath := filepath.Join(dataDir, "recordings", req.ID+"_positions.jsonl")
+	_ = os.Remove(posFilePath)
 
 	if err := core.DBDeleteAarRecording(req.ID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

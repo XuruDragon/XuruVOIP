@@ -1675,11 +1675,38 @@ const dashboardHTML = `<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- Floating Audio Player -->
-    <div id="aar-floating-player" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 glass-panel px-6 py-3 rounded-2xl flex items-center gap-4 shadow-2xl border border-emerald-500/20 z-50">
-        <span class="text-xs font-semibold text-slate-300" id="floating-player-title">Playing: Player - Channel</span>
-        <audio id="aar-audio-element" controls class="h-8"></audio>
-        <button onclick="document.getElementById('aar-floating-player').classList.add('hidden'); document.getElementById('aar-audio-element').pause();" class="text-slate-400 hover:text-white">✕</button>
+    <!-- 3D Replay & Debriefing Modal -->
+    <div id="aar-replay-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+        <div class="bg-slate-900/95 border border-slate-800 p-6 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col h-[650px] glass-panel">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div>
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        🛰️ 3D Playback & Debriefing
+                    </h3>
+                    <p class="text-xs text-slate-400" id="aar-replay-subtitle">Synchronized spatial playback</p>
+                </div>
+                <button onclick="closeAarReplay()" class="text-slate-400 hover:text-white text-xl">✕</button>
+            </div>
+            
+            <!-- Replay Area -->
+            <div class="flex-1 min-h-0 bg-slate-950/80 rounded-xl border border-slate-800/80 overflow-hidden relative flex items-center justify-center mt-4">
+                <canvas id="aar-replay-canvas" class="w-full h-full"></canvas>
+                <div id="aar-replay-no-data" class="hidden absolute text-slate-500 text-sm font-semibold">
+                    No position data logged for this session.
+                </div>
+            </div>
+            
+            <!-- Controls & Timeline -->
+            <div class="pt-4 space-y-3">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span id="aar-replay-time">0:00 / 0:00</span>
+                    <span id="aar-replay-zone">Zone: N/A</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <audio id="aar-audio-element" controls class="w-full bg-slate-950 border border-slate-800 rounded-lg h-10 focus:outline-none"></audio>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- UI Prompts / Modals -->
@@ -3095,8 +3122,9 @@ const dashboardHTML = `<!DOCTYPE html>
                     '<td class="py-3.5 px-4 text-xs">' + dateStr + '</td>' +
                     '<td class="py-3.5 px-4 text-xs">' + durationStr + '</td>' +
                     '<td class="py-3.5 px-4">' + typeLabel + '</td>' +
-                    '<td class="py-3.5 px-4">' +
+                    '<td class="py-3.5 px-4 flex items-center gap-2">' +
                         '<audio controls src="/admin/aar/' + rec.file_path.replace(/\\/g, '/') + '" class="h-8 max-w-xs"></audio>' +
+                        '<button onclick="playRecordingById(\'' + rec.id + '\')" class="px-3 py-1.5 text-xs font-bold bg-emerald-500 text-slate-950 hover:bg-emerald-400 rounded transition flex items-center gap-1">▶ 3D Replay</button>' +
                     '</td>' +
                     '<td class="py-3.5 px-4 text-right">' +
                         '<button onclick="deleteAarRecording(\'' + rec.id + '\')" class="px-2 py-1 text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded transition">Delete</button>' +
@@ -3126,15 +3154,264 @@ const dashboardHTML = `<!DOCTYPE html>
             });
         }
 
+        let replayInterval = null;
+        let replayPositions = [];
+        
         function playRecording(rec) {
-            const player = document.getElementById('aar-floating-player');
+            const modal = document.getElementById('aar-replay-modal');
             const audio = document.getElementById('aar-audio-element');
-            const title = document.getElementById('floating-player-title');
+            const subtitle = document.getElementById('aar-replay-subtitle');
+            const timeDisplay = document.getElementById('aar-replay-time');
+            const zoneDisplay = document.getElementById('aar-replay-zone');
+            const canvas = document.getElementById('aar-replay-canvas');
+            const noData = document.getElementById('aar-replay-no-data');
             
-            title.innerText = 'Playing: ' + rec.player_name + ' (' + rec.channel + ')';
+            if (replayInterval) {
+                clearInterval(replayInterval);
+                replayInterval = null;
+            }
+            
+            subtitle.innerText = rec.player_name + ' | ' + (rec.audio_type === 1 ? 'Radio: ' + rec.channel : rec.audio_type === 2 ? 'Profile: ' + rec.channel : rec.audio_type === 0 ? 'Proximity' : 'PA');
             audio.src = '/admin/aar/' + rec.file_path.replace(/\\/g, '/');
-            player.classList.remove('hidden');
+            modal.classList.remove('hidden');
+            
+            replayPositions = [];
+            noData.classList.add('hidden');
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+            
+            const posUrl = '/admin/aar/' + rec.file_path.replace(/\\/g, '/').replace('.ogg', '_positions.jsonl');
+            fetch(posUrl)
+                .then(r => {
+                    if (!r.ok) throw new Error('No position data');
+                    return r.text();
+                })
+                .then(text => {
+                    const lines = text.split('\n');
+                    lines.forEach(line => {
+                        const trimmed = line.trim();
+                        if (trimmed) {
+                            try {
+                                const data = JSON.parse(trimmed);
+                                replayPositions.push(data);
+                            } catch (e) {}
+                        }
+                    });
+                    if (replayPositions.length === 0) {
+                        noData.classList.remove('hidden');
+                    }
+                })
+                .catch(err => {
+                    console.warn('Could not load position logs:', err);
+                    noData.classList.remove('hidden');
+                });
+                
             audio.play();
+            
+            replayInterval = setInterval(() => {
+                updateReplayUI(rec, audio, canvas, ctx, timeDisplay, zoneDisplay);
+            }, 50);
+        }
+        
+        function playRecordingById(id) {
+            const rec = aarRecordings.find(r => r.id === id);
+            if (rec) playRecording(rec);
+        }
+        
+        function closeAarReplay() {
+            const modal = document.getElementById('aar-replay-modal');
+            const audio = document.getElementById('aar-audio-element');
+            modal.classList.add('hidden');
+            audio.pause();
+            if (replayInterval) {
+                clearInterval(replayInterval);
+                replayInterval = null;
+            }
+        }
+        
+        function formatTime(secs) {
+            if (isNaN(secs)) return '0:00';
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60);
+            return m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        function updateReplayUI(rec, audio, canvas, ctx, timeDisplay, zoneDisplay) {
+            const currentMs = audio.currentTime * 1000;
+            const durationSec = audio.duration || (rec.duration_ms / 1000);
+            timeDisplay.innerText = formatTime(audio.currentTime) + ' / ' + formatTime(durationSec);
+            
+            const w = canvas.width;
+            const h = canvas.height;
+            const dpr = window.devicePixelRatio || 1;
+            
+            ctx.clearRect(0, 0, w, h);
+            
+            if (replayPositions.length === 0) {
+                zoneDisplay.innerText = 'Zone: N/A';
+                return;
+            }
+            
+            let currentPos = null;
+            if (currentMs <= replayPositions[0].t) {
+                currentPos = replayPositions[0];
+            } else if (currentMs >= replayPositions[replayPositions.length - 1].t) {
+                currentPos = replayPositions[replayPositions.length - 1];
+            } else {
+                for (let i = 0; i < replayPositions.length - 1; i++) {
+                    if (currentMs >= replayPositions[i].t && currentMs <= replayPositions[i+1].t) {
+                        const p1 = replayPositions[i];
+                        const p2 = replayPositions[i+1];
+                        const diff = p2.t - p1.t;
+                        const ratio = diff > 0 ? (currentMs - p1.t) / diff : 0;
+                        currentPos = {
+                            x: p1.x + ratio * (p2.x - p1.x),
+                            y: p1.y + ratio * (p2.y - p1.y),
+                            z: p1.z + ratio * (p2.z - p1.z),
+                            zone: p1.zone
+                        };
+                        break;
+                    }
+                }
+            }
+            
+            if (!currentPos) {
+                currentPos = replayPositions[replayPositions.length - 1];
+            }
+            
+            zoneDisplay.innerText = 'Zone: ' + (currentPos.zone || 'N/A');
+            
+            let minX = Infinity, maxX = -Infinity;
+            let minY = Infinity, maxY = -Infinity;
+            replayPositions.forEach(p => {
+                if (p.x < minX) minX = p.x;
+                if (p.x > maxX) maxX = p.x;
+                if (p.y < minY) minY = p.y;
+                if (p.y > maxY) maxY = p.y;
+            });
+            
+            const dx = maxX - minX;
+            const dy = maxY - minY;
+            const centerX = minX + dx / 2;
+            const centerY = minY + dy / 2;
+            
+            const margin = 50 * dpr;
+            const plotW = w - 2 * margin;
+            const plotH = h - 2 * margin;
+            
+            let scale = 1.0;
+            if (dx > 0.1 || dy > 0.1) {
+                scale = Math.min(plotW / (dx || 1), plotH / (dy || 1));
+            } else {
+                scale = 5.0 * dpr;
+            }
+            
+            function toCanvas(x, y) {
+                return {
+                    x: w / 2 + (x - centerX) * scale,
+                    y: h / 2 - (y - centerY) * scale
+                };
+            }
+            
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+            ctx.lineWidth = 1 * dpr;
+            const gridStep = 50 * scale;
+            if (gridStep > 5) {
+                for (let gx = w/2 - Math.floor(w/2 / gridStep)*gridStep; gx < w; gx += gridStep) {
+                    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke();
+                }
+                for (let gy = h/2 - Math.floor(h/2 / gridStep)*gridStep; gy < h; gy += gridStep) {
+                    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+                }
+            }
+            
+            ctx.beginPath();
+            let first = true;
+            replayPositions.forEach(p => {
+                const pt = toCanvas(p.x, p.y);
+                if (first) {
+                    ctx.moveTo(pt.x, pt.y);
+                    first = false;
+                } else {
+                    ctx.lineTo(pt.x, pt.y);
+                }
+            });
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)';
+            ctx.lineWidth = 2 * dpr;
+            ctx.stroke();
+            
+            ctx.beginPath();
+            first = true;
+            for (let i = 0; i < replayPositions.length; i++) {
+                const p = replayPositions[i];
+                if (p.t > currentMs) break;
+                const pt = toCanvas(p.x, p.y);
+                if (first) {
+                    ctx.moveTo(pt.x, pt.y);
+                    first = false;
+                } else {
+                    ctx.lineTo(pt.x, pt.y);
+                }
+            }
+            const curPt = toCanvas(currentPos.x, currentPos.y);
+            if (!first) {
+                ctx.lineTo(curPt.x, curPt.y);
+            }
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+            ctx.lineWidth = 2 * dpr;
+            ctx.stroke();
+            
+            if (!audio.paused && !audio.ended) {
+                const timeSeed = (Date.now() / 1500) % 1.0;
+                for (let r = 0; r < 3; r++) {
+                    const radius = (10 + (35 * ((timeSeed + r / 3.0) % 1.0))) * dpr;
+                    const alpha = 1.0 - ((timeSeed + r / 3.0) % 1.0);
+                    
+                    ctx.beginPath();
+                    ctx.arc(curPt.x, curPt.y, radius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = 'rgba(16, 185, 129, ' + (alpha * 0.4) + ')';
+                    ctx.lineWidth = 1.5 * dpr;
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.beginPath();
+            ctx.arc(curPt.x, curPt.y, 6 * dpr, 0, 2 * Math.PI);
+            ctx.fillStyle = '#10b981';
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5 * dpr;
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold ' + Math.round(12 * dpr) + 'px Outfit, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(rec.player_name, curPt.x, curPt.y - 12 * dpr);
+            
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = Math.round(9 * dpr) + 'px Outfit, sans-serif';
+            ctx.fillText(currentPos.x.toFixed(1) + ', ' + currentPos.y.toFixed(1), curPt.x, curPt.y + 16 * dpr);
+            
+            const mDistance = 50;
+            const scaleLen = mDistance * scale;
+            const legendX = 20 * dpr;
+            const legendY = h - 20 * dpr;
+            
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2 * dpr;
+            ctx.beginPath();
+            ctx.moveTo(legendX, legendY - 5 * dpr);
+            ctx.lineTo(legendX, legendY);
+            ctx.lineTo(legendX + scaleLen, legendY);
+            ctx.lineTo(legendX + scaleLen, legendY - 5 * dpr);
+            ctx.stroke();
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = Math.round(10 * dpr) + 'px Outfit, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(mDistance + 'm', legendX + 4 * dpr, legendY - 6 * dpr);
         }
 
         function drawAarTimeline() {
