@@ -144,4 +144,56 @@ public class VoiceCommandParserTests
         Assert.True(eventFired);
         Assert.Equal(VoiceCommandAction.VisorToggle, result.Action);
     }
+
+    [Fact]
+    public void ParseAndExecute_EnglishShipPower_ShouldTriggerEvent()
+    {
+        var service = new VoiceCommandService();
+        bool eventFired = false;
+        service.ShipPowerToggleRequested += () => eventFired = true;
+
+        var result = service.ParseAndExecute("computer, toggle power", "en", new List<string>(), 0.5);
+
+        Assert.True(eventFired);
+        Assert.Equal(VoiceCommandAction.ShipPowerToggle, result.Action);
+    }
+
+    [Fact]
+    public void ParseAndExecute_FrenchShipDoors_ShouldTriggerEvent()
+    {
+        var service = new VoiceCommandService();
+        bool eventFired = false;
+        service.ShipDoorsToggleRequested += () => eventFired = true;
+
+        var result = service.ParseAndExecute("ouvrir portes", "fr", new List<string>(), 0.5);
+
+        Assert.True(eventFired);
+        Assert.Equal(VoiceCommandAction.ShipDoorsToggle, result.Action);
+    }
+
+    [Fact]
+    public void ParseAndExecute_GermanShipShields_ShouldTriggerEvent()
+    {
+        var service = new VoiceCommandService();
+        bool eventFired = false;
+        service.ShipShieldsFrontRequested += () => eventFired = true;
+
+        var result = service.ParseAndExecute("schilde vorne bitte", "de", new List<string>(), 0.5);
+
+        Assert.True(eventFired);
+        Assert.Equal(VoiceCommandAction.ShipShieldsFront, result.Action);
+    }
+
+    [Fact]
+    public void ParseAndExecute_JapaneseShipLandingGear_ShouldTriggerEvent()
+    {
+        var service = new VoiceCommandService();
+        bool eventFired = false;
+        service.ShipLandingGearToggleRequested += () => eventFired = true;
+
+        var result = service.ParseAndExecute("ギア展開", "ja", new List<string>(), 0.5);
+
+        Assert.True(eventFired);
+        Assert.Equal(VoiceCommandAction.ShipLandingGearToggle, result.Action);
+    }
 }

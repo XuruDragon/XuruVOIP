@@ -197,6 +197,11 @@
     <!-- Voice Commands -->
     <sys:String x:Key="LblEnableVoiceCommands">Sprachbefehle aktivieren (Freihand-PTT)</sys:String>
     <sys:String x:Key="LblVoiceCommandHotkey">Sprachbefehl-Taste (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceShipControlsHeader">Sprachgesteuerte Schiffskontrollen (Simulierte Tasten)</sys:String>
+    <sys:String x:Key="LblVoicePowerKey">Sprache: Schiff-Stromtaste</sys:String>
+    <sys:String x:Key="LblVoiceDoorsKey">Sprache: Schiff-Türentaste</sys:String>
+    <sys:String x:Key="LblVoiceShieldsKey">Sprache: Schilde nach Vorne leiten</sys:String>
+    <sys:String x:Key="LblVoiceLandingGearKey">Sprache: Fahrwerktaste</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Sprachbefehl-Konfidenzschwellenwert</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">WARNUNG: Die Aktivierung von Offline-Sprachbefehlen lädt bei der ersten Aktivierung das Whisper-Transkriptionsmodell (~140 MB) herunter, falls es noch nicht vorhanden ist.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS HÖRT ZU...</sys:String>

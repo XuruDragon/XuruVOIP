@@ -197,6 +197,11 @@
     <!-- Voice Commands -->
     <sys:String x:Key="LblEnableVoiceCommands">启用语音命令 (免提 PTT)</sys:String>
     <sys:String x:Key="LblVoiceCommandHotkey">语音命令按键 (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceShipControlsHeader">语音激活飞船控制 (模拟按键)</sys:String>
+    <sys:String x:Key="LblVoicePowerKey">语音: 飞船电源开关按键</sys:String>
+    <sys:String x:Key="LblVoiceDoorsKey">语音: 飞船舱门开关按键</sys:String>
+    <sys:String x:Key="LblVoiceShieldsKey">语音: 护盾向前偏转按键</sys:String>
+    <sys:String x:Key="LblVoiceLandingGearKey">语音: 起落架收放按键</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">语音命令置信度阈值</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">警告：启用离线语音命令将在首次激活时下载 Whisper 转录模型（约 140MB，如果您的机器上尚不存在）。</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 正在聆听...</sys:String>

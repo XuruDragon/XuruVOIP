@@ -197,6 +197,11 @@
     <!-- Voice Commands -->
     <sys:String x:Key="LblEnableVoiceCommands">Enable Voice Commands (Hands-Free PTT)</sys:String>
     <sys:String x:Key="LblVoiceCommandHotkey">Voice Command Key (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceShipControlsHeader">Voice-Activated Ship Controls (Simulated Keys)</sys:String>
+    <sys:String x:Key="LblVoicePowerKey">Voice: Ship Power Toggle Key</sys:String>
+    <sys:String x:Key="LblVoiceDoorsKey">Voice: Ship Doors Toggle Key</sys:String>
+    <sys:String x:Key="LblVoiceShieldsKey">Voice: Divert Shields Forward Key</sys:String>
+    <sys:String x:Key="LblVoiceLandingGearKey">Voice: Landing Gear Toggle Key</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Voice Command Confidence Threshold</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">WARNING: Enabling Offline Voice Commands will download the Whisper transcription model (~140MB) on first activation if not already present on your machine.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS LISTENING...</sys:String>

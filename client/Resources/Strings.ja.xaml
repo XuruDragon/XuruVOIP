@@ -197,6 +197,11 @@
     <!-- Voice Commands -->
     <sys:String x:Key="LblEnableVoiceCommands">音声コマンドを有効化 (ハンズフリーPTT)</sys:String>
     <sys:String x:Key="LblVoiceCommandHotkey">音声コマンドキー (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceShipControlsHeader">音声起動式船体制御 (模擬キー)</sys:String>
+    <sys:String x:Key="LblVoicePowerKey">音声: 船体電源切替キー</sys:String>
+    <sys:String x:Key="LblVoiceDoorsKey">音声: 船体ドア開閉キー</sys:String>
+    <sys:String x:Key="LblVoiceShieldsKey">音声: シールド前方偏向キー</sys:String>
+    <sys:String x:Key="LblVoiceLandingGearKey">音声: 着陸脚切替キー</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">音声コマンドの信頼度しきい値</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">警告: オフライン音声コマンドを有効にすると、モデルがまだ存在しない場合、最初の起動時にWhisper文字起こしモデル（~140MB）がダウンロードされます。</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 聴取中...</sys:String>

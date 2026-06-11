@@ -77,6 +77,11 @@ public class AppConfig
     public bool EnableVoiceCommands { get; set; } = false;
     public string VoiceCommandHotkey { get; set; } = "V";
     public double VoiceCommandConfidence { get; set; } = 0.5;
+    public string VoiceCommandPowerKey { get; set; } = "U";
+    public string VoiceCommandDoorsKey { get; set; } = "K";
+    public string VoiceCommandDoorsModifier { get; set; } = "Alt";
+    public string VoiceCommandShieldsKey { get; set; } = "Up";
+    public string VoiceCommandLandingGearKey { get; set; } = "N";
 
     // --- Discord RPC ---
     public bool EnableDiscordRpc { get; set; } = true;
