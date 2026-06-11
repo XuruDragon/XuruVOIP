@@ -304,6 +304,22 @@ graph TB
 * **HUD Subtitle Prefixing:** Displays translated text directly on the visor HUD, prefixed with `[FROM -> TO]` source and target indicators.
 * **On-Demand Whisper Loader:** Checks if the Whisper model is present, displaying an overlay warning and downloading it asynchronously in the background if needed.
 
+### 20. 🎧 Binaural HRTF Spatial Audio
+* **Physical Ear Simulation:** Simulates human ear shape and head shadow effects using ITD (Interaural Time Difference) and ILD (Interaural Level Difference) low-pass attenuation.
+* **Stereo Compatibility:** Delivers high-fidelity 3D audio cues over standard stereo headphones without requiring surround-sound hardware.
+
+### 21. 📊 Visor HUD 3D Spectrogram
+* **FFT Telemetry Overlay:** Computes real-time Radix-2 64-point Fast Fourier Transforms (FFT) on incoming speaker voice streams.
+* **Dynamic HUD Visualization:** Groups audio frequencies into 8 spectral bands next to active speakers on the Vulkan/DX HUD, with smooth decay.
+
+### 22. 🎙️ Voice-Activated Ship Controls
+* **Speech-to-Keybind Translation:** Listens to voice commands (e.g. "open doors") and matches them against localized dictionaries in 8 languages.
+* **Direct Hardware Keystrokes:** Simulates physical keypresses with Low-level Win32 `keybd_event` (keys held for 50ms for reliable game capture, supporting modifiers).
+
+### 23. 🛰️ Server-Side AAR 3D Playback
+* **Coordinates Logging:** Server logs player coordinates and zones to a `<session_id>_positions.jsonl` file every 500ms.
+* **Synchronized Playback Canvas:** Visualizes the player's path and speaking pulse rings on a web-based HTML5 Canvas map, fully synchronized with the recorded Ogg/Opus audio.
+
 ---
 
 ## 🎮 XuruVoip Client Settings Tab Breakdown
@@ -648,7 +664,7 @@ The release package includes the pre-packaged `.streamDeckPlugin` file.
 ---
 
 ### 3. Adding and Configuring Actions
-You can drag and drop any of the following 17 actions onto your Stream Deck keys:
+You can drag and drop any of the following 19 actions onto your Stream Deck keys:
 * 🎤 **Proximity Mute**: Toggles outgoing proximity microphone muting.
 * 📻 **Radio Mute**: Toggles outgoing radio microphone muting.
 * 👤 **Profile Mute**: Toggles outgoing profile microphone muting.
@@ -666,6 +682,8 @@ You can drag and drop any of the following 17 actions onto your Stream Deck keys
 * 📞 **Accept/Answer Hail**: Accepts an incoming ship-to-ship call.
 * 📞 **Decline/End Hail**: Rejects an incoming call or terminates an active call.
 * 🔤 **Toggle Translation**: Toggles real-time HUD translation subtitles.
+* 🎧 **Toggle HRTF**: Toggles real-time HRTF spatial audio rendering.
+* 📊 **Toggle Spectrogram**: Toggles real-time visor HUD 3D spectrogram.
 
 #### Configuration (Property Inspector):
 For each action you drag onto a key, click on it and configure the settings in the **Property Inspector** panel at the bottom:

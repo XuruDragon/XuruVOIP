@@ -29,7 +29,7 @@ Getting the plugin installed into your Stream Deck software is very simple.
    * Your Elgato Stream Deck software will open and show a message asking if you want to install it. Click **Install**.
 3. **Verify:**
    * In your Elgato Stream Deck desktop app, look at the list of actions on the right side.
-   * Scroll down until you see a category named **XuruVOIP** containing 17 actions.
+   * Scroll down until you see a category named **XuruVOIP** containing 19 actions.
 
 ---
 
@@ -125,6 +125,16 @@ The plugin features dynamic icons and text that change in real-time based on you
 * **Use:** Toggles real-time HUD translation subtitles.
 * **Visual Feedback:** Shows green `ON` icon when enabled, and red crossed-out `OFF` icon when disabled.
 
+### 🎧 Toggle HRTF Spatial Audio
+* **Action:** **Toggle HRTF**.
+* **Use:** Toggles real-time HRTF spatial audio rendering.
+* **Visual Feedback:** Shows green `ON` icon (cyan ears) when enabled, and red crossed-out `OFF` icon when disabled.
+
+### 📊 Toggle Visor Spectrogram
+* **Action:** **Toggle Spectrogram**.
+* **Use:** Toggles real-time visor HUD 3D spectrogram.
+* **Visual Feedback:** Shows green `ON` icon (cyan equalizer bars) when enabled, and red crossed-out `OFF` icon when disabled.
+
 ---
 
 ## 🗺️ Stream Deck Layout Profiles
@@ -185,7 +195,7 @@ Provides a high-density 36-key layout for maximum physical control.
     | | Col 1 | Col 2 | Col 3 | Col 4 | Col 5 | Col 6 | Col 7 | Col 8 | Col 9 |
     | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
     | **Row 1** | Prox Mute | Radio Mute | Profile Mute | Toggle Helmet | Cycle Radio | PA Broadcast | Beacon Mode | Intercom Status | Location Telemetry |
-    | **Row 2** | Audio Prox Mute | Audio Radio Mute | Audio Profile Mute | - | - | - | - | - | - |
+    | **Row 2** | Audio Prox Mute | Audio Radio Mute | Audio Profile Mute | Initiate Hail | Accept/Answer Hail | Decline/End Hail | Toggle Translation | Toggle HRTF | Toggle Spectrogram |
 
 *   **Pilot Specializations (Rows 3 & 4):**
     *   **Row 3:** *Macro: Open Hangar* (Col 1), *Macro: Req Landing* (Col 2), *Macro: Status Report* (Col 3), *Macro: Close Visor* (Col 4)
