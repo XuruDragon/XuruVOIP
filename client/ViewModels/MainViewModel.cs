@@ -31,6 +31,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly GameDetectionService _gameDetector = new();
     public GameDetectionService GameDetector => _gameDetector;
     private CompanionAppService? _companionApp;
+    private TelemetryService? _telemetry;
 
     public PlayerPosition LastSentPos => _lastSentPos;
     public Dictionary<string, PlayerPosition> RemotePositions => _remotePositions;
@@ -39,6 +40,24 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private bool _isReconnecting = false;
     private readonly object _reconnectLock = new();
     private CancellationTokenSource? _reconnectCts;
+
+    private readonly VoiceCommandService _voiceCommand = new();
+    public VoiceCommandService VoiceCommand => _voiceCommand;
+
+    private bool _isVoiceListening;
+    public bool IsVoiceListening { get => _isVoiceListening; set => Set(ref _isVoiceListening, value); }
+
+    private string _voiceCommandStatusText = "";
+    public string VoiceCommandStatusText { get => _voiceCommandStatusText; set => Set(ref _voiceCommandStatusText, value); }
+
+    private string _voiceCommandStatusColor = "Cyan";
+    public string VoiceCommandStatusColor { get => _voiceCommandStatusColor; set => Set(ref _voiceCommandStatusColor, value); }
+
+    private bool _showVoiceCommandPanel;
+    public bool ShowVoiceCommandPanel { get => _showVoiceCommandPanel; set => Set(ref _showVoiceCommandPanel, value); }
+
+    private bool _isVoiceCommandListening = false;
+    private System.Timers.Timer? _voiceCommandResetTimer;
 
     // ─── Observable state ────────────────────────────────────────────────────
     private readonly Dictionary<string, bool> _remoteHelmets = [];
@@ -105,6 +124,19 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     {
         get => _exertion;
         set => Set(ref _exertion, Math.Clamp(value, 0.0, 1.0));
+    }
+
+    private IntercomDegradationState _intercomState = IntercomDegradationState.Normal;
+    public IntercomDegradationState IntercomState
+    {
+        get => _intercomState;
+        set
+        {
+            if (Set(ref _intercomState, value))
+            {
+                _playback.CurrentIntercomState = value;
+            }
+        }
     }
 
     private bool _isHelmetOn;
@@ -250,6 +282,15 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             string keyStr = key.ToString();
             var cfg = Config.Config;
 
+            if (cfg.EnableVoiceCommands && keyStr == cfg.VoiceCommandHotkey)
+            {
+                if (_stt.IsModelReady)
+                {
+                    HandleVoiceCommandHotkey(isDown);
+                }
+                return;
+            }
+
             if (keyStr == cfg.PttProximityKey)
             {
                 _isPttProximityDown = isDown;
@@ -352,6 +393,10 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                 Exertion = exertion;
             }
         });
+        _gameDetector.IntercomStateChanged += state => Application.Current?.Dispatcher.Invoke(() =>
+        {
+            IntercomState = state;
+        });
         _gameDetector.CustomGameLogPath = Config.Config.CustomGameLogPath;
         _gameDetector.Start();
 
@@ -360,6 +405,13 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         {
             _companionApp = new CompanionAppService(this);
             _companionApp.Start();
+        }
+
+        // Telemetry Broadcast
+        if (Config.Config.EnableTelemetry)
+        {
+            _telemetry = new TelemetryService(this);
+            _telemetry.Start();
         }
 
         // Position tracking setup
@@ -373,7 +425,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             var cfg = Config.Config;
             if (cfg.AudioMode == AudioMode.PTT)
             {
-                bool anyPttPressed = _isPttProximityDown || _isPttRadioDown || _isPttProfileDown;
+                bool anyPttPressed = _isPttProximityDown || _isPttRadioDown || _isPttProfileDown || _isVoiceCommandListening;
                 InputLevel = anyPttPressed ? _capture.InputLevel : 0f;
             }
             else // VAD mode
@@ -663,6 +715,53 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         {
             await _audioWs.SendAudioFrameAsync(txType, frame);
         };
+
+        // Voice Command Service wiring
+        _voiceCommand.VisorToggleRequested += () => ToggleHelmet();
+        _voiceCommand.ChannelChangeRequested += chan => _ = ChangeRadioChannelAsync(chan);
+        _voiceCommand.VoiceChangerProfileRequested += profile =>
+        {
+            Config.Config.EnableVoiceChanger = (profile != "None");
+            Config.Config.VoiceChangerType = profile;
+            SaveConfig();
+            ApplySettings();
+        };
+        _voiceCommand.MicStateChangeRequested += action =>
+        {
+            switch (action)
+            {
+                case VoiceCommandAction.MicMuteProximity:
+                    MicProximityMuted = true;
+                    break;
+                case VoiceCommandAction.MicUnmuteProximity:
+                    MicProximityMuted = false;
+                    break;
+                case VoiceCommandAction.MicMuteRadio:
+                    MicRadioMuted = true;
+                    break;
+                case VoiceCommandAction.MicUnmuteRadio:
+                    MicRadioMuted = false;
+                    break;
+                case VoiceCommandAction.MicMuteProfile:
+                    MicProfileMuted = true;
+                    break;
+                case VoiceCommandAction.MicUnmuteProfile:
+                    MicProfileMuted = false;
+                    break;
+                case VoiceCommandAction.MicMuteAll:
+                    MicProximityMuted = true;
+                    MicRadioMuted = true;
+                    MicProfileMuted = true;
+                    break;
+                case VoiceCommandAction.MicUnmuteAll:
+                    MicProximityMuted = false;
+                    MicRadioMuted = false;
+                    MicProfileMuted = false;
+                    break;
+            }
+        };
+        _stt.CaptionDecoded += OnCaptionDecoded;
+
         NotifyMicStatusChanged();
         IsHelmetOn = false;
     }
@@ -1135,6 +1234,10 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableHelmetModulator = Config.Config.EnableHelmetModulator;
         _playback.EnableStt = Config.Config.EnableStt;
         _playback.EnableShipPa = Config.Config.EnableShipPa;
+        _playback.EnableIntercomDegradation = Config.Config.EnableIntercomDegradation;
+        _playback.IntercomShieldHitsEnabled = Config.Config.IntercomShieldHitsEnabled;
+        _playback.IntercomCriticalPowerEnabled = Config.Config.IntercomCriticalPowerEnabled;
+        _playback.IntercomQuantumTravelEnabled = Config.Config.IntercomQuantumTravelEnabled;
         _discordRpc.Enabled = Config.Config.EnableDiscordRpc;
 
         // Sync position tracking source
@@ -1168,6 +1271,31 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             {
                 _companionApp.Stop();
                 _companionApp = null;
+            }
+        }
+
+        // Sync telemetry state
+        if (Config.Config.EnableTelemetry)
+        {
+            if (_telemetry != null && _telemetry.LastPort != Config.Config.TelemetryPort)
+            {
+                LogService.Info("Telemetry port changed, restarting telemetry...");
+                _telemetry.Stop();
+                _telemetry = null;
+            }
+
+            if (_telemetry == null)
+            {
+                _telemetry = new TelemetryService(this);
+                _telemetry.Start();
+            }
+        }
+        else
+        {
+            if (_telemetry != null)
+            {
+                _telemetry.Stop();
+                _telemetry = null;
             }
         }
 
@@ -1292,6 +1420,8 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        _voiceCommandResetTimer?.Stop();
+        _voiceCommandResetTimer?.Dispose();
         _ocrTimer.Stop();
         _keyHook.Dispose();
         _gameDetector.Dispose();
@@ -1301,6 +1431,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _ocr.Dispose();
         _discordRpc.Dispose();
         _companionApp?.Dispose();
+        _telemetry?.Dispose();
         await _posWs.DisposeAsync();
         await _audioWs.DisposeAsync();
     }
@@ -1434,5 +1565,103 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         }
 
         _discordRpc.UpdatePresence(details, state);
+    }
+
+    private void HandleVoiceCommandHotkey(bool isDown)
+    {
+        if (isDown)
+        {
+            if (_isVoiceCommandListening) return; // Prevent repeats
+            _isVoiceCommandListening = true;
+
+            // Clear visual reset timer if running
+            _voiceCommandResetTimer?.Stop();
+
+            // Set HUD listening state
+            ShowVoiceCommandPanel = true;
+            IsVoiceListening = true;
+            VoiceCommandStatusColor = "Cyan";
+            VoiceCommandStatusText = Application.Current?.TryFindResource("TxtVoiceListening") as string ?? "🎙️ AEGIS LISTENING...";
+
+            // Start capture recording
+            _capture.StartCommandRecording();
+        }
+        else
+        {
+            if (!_isVoiceCommandListening) return;
+            _isVoiceCommandListening = false;
+
+            IsVoiceListening = false;
+
+            // Stop capture recording
+            float[] samples = _capture.StopCommandRecording();
+
+            if (samples.Length > 0)
+            {
+                // Queue transcription with a special channel type 255 for internal parsing
+                _stt.QueueTranscription("LocalPlayerCommand", samples, 255, Config.Config.Language);
+            }
+            else
+            {
+                // Hide panel if no samples
+                ShowVoiceCommandPanel = false;
+            }
+        }
+    }
+
+    public void ProcessVoiceCommand(string text)
+    {
+        var result = _voiceCommand.ParseAndExecute(text, Config.Config.Language, _availableChannels, Config.Config.VoiceCommandConfidence);
+        
+        Application.Current?.Dispatcher.Invoke(() =>
+        {
+            if (result.Action != VoiceCommandAction.None)
+            {
+                string actionLabel = result.Action switch
+                {
+                    VoiceCommandAction.VisorToggle => Application.Current?.TryFindResource("LblHelmetToggle") as string ?? "Visor Toggle",
+                    VoiceCommandAction.MicMuteProximity => "Mute Proximity",
+                    VoiceCommandAction.MicUnmuteProximity => "Unmute Proximity",
+                    VoiceCommandAction.MicMuteRadio => "Mute Radio",
+                    VoiceCommandAction.MicUnmuteRadio => "Unmute Radio",
+                    VoiceCommandAction.MicMuteProfile => "Mute Profile",
+                    VoiceCommandAction.MicUnmuteProfile => "Unmute Profile",
+                    VoiceCommandAction.MicMuteAll => "Mute All",
+                    VoiceCommandAction.MicUnmuteAll => "Unmute All",
+                    VoiceCommandAction.RadioChannelSwitch => $"Channel: {result.TargetChannel}",
+                    VoiceCommandAction.VoiceChangerProfile => $"Voice Changer: {result.TargetProfile}",
+                    _ => "Command"
+                };
+
+                string successFormat = Application.Current?.TryFindResource("TxtVoiceSuccess") as string ?? "✔️ CMD: {0}";
+                VoiceCommandStatusText = string.Format(successFormat, actionLabel);
+                VoiceCommandStatusColor = "Green";
+            }
+            else
+            {
+                VoiceCommandStatusText = Application.Current?.TryFindResource("TxtVoiceError") as string ?? "❌ CMD NOT RECOGNIZED";
+                VoiceCommandStatusColor = "Red";
+            }
+
+            ShowVoiceCommandPanel = true;
+
+            // Show for 2 seconds, then reset panel visibility
+            _voiceCommandResetTimer?.Stop();
+            _voiceCommandResetTimer = new System.Timers.Timer(2000);
+            _voiceCommandResetTimer.Elapsed += (s, e) =>
+            {
+                _voiceCommandResetTimer.Stop();
+                ShowVoiceCommandPanel = false;
+            };
+            _voiceCommandResetTimer.Start();
+        });
+    }
+
+    private void OnCaptionDecoded(string playerName, string text, byte channelType)
+    {
+        if (playerName == "LocalPlayerCommand" && channelType == 255)
+        {
+            ProcessVoiceCommand(text);
+        }
     }
 }

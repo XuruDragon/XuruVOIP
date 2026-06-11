@@ -50,6 +50,14 @@
                                VerticalAlignment="Center"/>
                 </Grid>
 
+                <TextBlock x:Name="TxtIntercomStatus"
+                           Text=""
+                           Foreground="#FFFF9800"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Margin="0,0,0,6"
+                           Visibility="Collapsed"/>
+
                 <Separator Background="#20FFFFFF" Margin="0,0,0,8" Height="1"/>
 
                 <!-- Active Speakers List -->
@@ -158,5 +166,26 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+
+        <!-- Voice Command Status Banner (Bottom Center, just above bottom margin) -->
+        <Border x:Name="VoiceCommandPanel"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,60"
+                Padding="16,8"
+                CornerRadius="8"
+                Background="#E60E1116"
+                BorderThickness="1.5"
+                BorderBrush="#8000D2FF"
+                Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock x:Name="TxtVoiceCommandStatus"
+                           Text="🎙️ AEGIS LISTENING..."
+                           Foreground="#FF00D2FF"
+                           FontSize="12"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

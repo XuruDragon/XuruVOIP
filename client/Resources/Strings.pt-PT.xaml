@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">Ativar Discord Rich Presence</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Ativar servidor HTTP Companion</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Porta do servidor Companion</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">Ativar mapa tático do copiloto (MFD)</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">Ativar distorção de voz de Força-G e esforço</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">Ativar repetidores de rádio (encaminhamento multi-salto)</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">Agir como farol repetidor de rádio</sys:String>
@@ -179,4 +180,23 @@
     <!-- Avisos de ligação -->
     <sys:String x:Key="WarningGrtprNoPath">O Leitor Game.log (GRTPR) está activado, mas o caminho do ficheiro Game.log não está definido. Por favor, preencha o caminho do Game.log do Star Citizen na guia de configurações Geral antes de tentar ligar-se ao servidor.</sys:String>
     <sys:String x:Key="TitleWarning">Aviso</sys:String>
+    
+    <!-- Telemetria -->
+    <sys:String x:Key="LblEnableTelemetry">Ativar Transmissão de Telemetria (UDP)</sys:String>
+    <sys:String x:Key="LblTelemetryPort">Porta de Transmissão de Telemetria</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">Habilitar degradação do intercomunicador (Estado da nave)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">Habilitar efeito de impacto no escudo (Ruído e estalos)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">Habilitar efeito de energia crítica (Zumbido e resampling)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">Habilitar efeito de viagem quântica (Varrer de phaser)</sys:String>
+
+    <!-- Voice Commands -->
+    <sys:String x:Key="LblEnableVoiceCommands">Ativar comandos de voz (PTT mãos-livres)</sys:String>
+    <sys:String x:Key="LblVoiceCommandHotkey">Tecla de comando de voz (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandConfidence">Limiar de confiança do comando de voz</sys:String>
+    <sys:String x:Key="LblVoiceCommandWarning">AVISO: A ativação dos comandos de voz offline irá descarregar o modelo de transcrição Whisper (~140MB) na primeira ativação se não estiver presente no computador.</sys:String>
+    <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS A ESCUTAR...</sys:String>
+    <sys:String x:Key="TxtVoiceSuccess">✔️ CMD: {0}</sys:String>
+    <sys:String x:Key="TxtVoiceError">❌ CMD NÃO RECONHECIDO</sys:String>
 </ResourceDictionary>

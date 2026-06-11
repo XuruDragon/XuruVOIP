@@ -67,6 +67,9 @@ public class AppConfig
     public bool EnableRadar { get; set; } = true;
     public double RadarRange { get; set; } = 50.0;
     public bool EnableStt { get; set; } = false;
+    public bool EnableVoiceCommands { get; set; } = false;
+    public string VoiceCommandHotkey { get; set; } = "V";
+    public double VoiceCommandConfidence { get; set; } = 0.5;
 
     // --- Discord RPC ---
     public bool EnableDiscordRpc { get; set; } = true;
@@ -74,6 +77,11 @@ public class AppConfig
     // --- Companion App ---
     public bool EnableCompanionApp { get; set; } = false;
     public int CompanionAppPort { get; set; } = 8891;
+    public bool EnableCompanionMap { get; set; } = false;
+
+    // --- Telemetry Sync ---
+    public bool EnableTelemetry { get; set; } = false;
+    public int TelemetryPort { get; set; } = 8895;
 
     // --- Immersive Features ---
     public bool EnableExertionDistortion { get; set; } = false;
@@ -81,5 +89,11 @@ public class AppConfig
     public bool IsRadioRepeater { get; set; } = false;
     public bool EnableShipPa { get; set; } = false;
     public string PttPaKey { get; set; } = "P";
+
+    // --- Intercom Degradation ---
+    public bool EnableIntercomDegradation { get; set; } = false;
+    public bool IntercomShieldHitsEnabled { get; set; } = true;
+    public bool IntercomCriticalPowerEnabled { get; set; } = true;
+    public bool IntercomQuantumTravelEnabled { get; set; } = true;
 }
 

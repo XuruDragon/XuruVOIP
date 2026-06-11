@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">启用 Discord 状态呈现 (Rich Presence)</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">启用 Companion HTTP 服务器</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Companion 服务器端口</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">启用战术副驾驶地图 (MFD)</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">启用重力加速度（G力）与身体负荷语音失真</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">启用无线电中继器（多跳路由）</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">作为无线电中继信标运行</sys:String>
@@ -179,4 +180,23 @@
     <!-- 连接警告 -->
     <sys:String x:Key="WarningGrtprNoPath">Game.log 日志读取器 (GRTPR) 已启用，但未设置 Game.log 文件路径。请在尝试连接服务器之前，在“常规 (General)”设置选项卡中填入您的星际公民 Game.log 路径。</sys:String>
     <sys:String x:Key="TitleWarning">警告</sys:String>
+    
+    <!-- 遥测 -->
+    <sys:String x:Key="LblEnableTelemetry">启用遥测广播 (UDP)</sys:String>
+    <sys:String x:Key="LblTelemetryPort">遥测广播端口</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">启用内联对讲机降级 (飞船状态)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">启用护盾受击效果 (杂音与爆音)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">启用临界电力效果 (低压嗡嗡声与变调)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">启用量子旅行效果 (相位扫频)</sys:String>
+
+    <!-- Voice Commands -->
+    <sys:String x:Key="LblEnableVoiceCommands">启用语音命令 (免提 PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandHotkey">语音命令按键 (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandConfidence">语音命令置信度阈值</sys:String>
+    <sys:String x:Key="LblVoiceCommandWarning">警告：启用离线语音命令将在首次激活时下载 Whisper 转录模型（约 140MB，如果您的机器上尚不存在）。</sys:String>
+    <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 正在聆听...</sys:String>
+    <sys:String x:Key="TxtVoiceSuccess">✔️ 命令: {0}</sys:String>
+    <sys:String x:Key="TxtVoiceError">❌ 未识别语音命令</sys:String>
 </ResourceDictionary>

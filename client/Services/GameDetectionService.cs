@@ -9,6 +9,14 @@ using XuruVoipClient.Models;
 
 namespace XuruVoipClient.Services;
 
+public enum IntercomDegradationState
+{
+    Normal,
+    ShieldHit,
+    CriticalPower,
+    QuantumTravel
+}
+
 public class GameDetectionService : IDisposable
 {
     [DllImport("user32.dll")]
@@ -46,6 +54,13 @@ public class GameDetectionService : IDisposable
     private Task? _watcherTask;
     private CancellationTokenSource? _cts;
 
+    private readonly object _lock = new();
+
+    private IntercomDegradationState _lastIntercomState = IntercomDegradationState.Normal;
+    private bool _isPowerOffline = false;
+    private bool _isQuantumActive = false;
+    private DateTime _shieldHitEndTime = DateTime.MinValue;
+
     public RECT? GetGameClientRectInScreenCoords()
     {
         lock (_lock)
@@ -77,14 +92,13 @@ public class GameDetectionService : IDisposable
         }
     }
 
-    private readonly object _lock = new();
-
     public event Action<bool>? HelmetStateChanged; // (helmetOn)
     public event Action<PlayerPosition>? PositionReceived;
     public event Action<bool>? GameFocusChanged; // (isFocused)
     public event Action<bool>? GameRunningChanged; // (isRunning)
     public event Action<double>? GForceReceived;
     public event Action<double>? ExertionReceived;
+    public event Action<IntercomDegradationState>? IntercomStateChanged;
 
     private static readonly Regex HelmetRegex = new(
         @"<AttachmentReceived>\s+Player\[(?<player>[^\]]+)\]\s+Attachment\[(?<att>[^\]]+)\]\s+Status\[(?<status>[^\]]+)\]\s+Port\[(?<port>[^\]]+)\]",
@@ -100,6 +114,26 @@ public class GameDetectionService : IDisposable
 
     private static readonly Regex StaminaRegex = new(
         @"stamina:?\s*(?<val>[\d.]+)\s*%?",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex ShieldHitRegex = new(
+        @"\[Vehicle\]\s+Shield\s+hit|Shield\s+collapse|Vehicle\s+damage",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex PowerOfflineRegex = new(
+        @"Main\s+power\s+offline|Reactor\s+overload|Power\s+distribution\s+offline|System\s+power\s+offline|Critical\s+system\s+failure",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex PowerOnlineRegex = new(
+        @"Main\s+power\s+online|Power\s+distribution\s+online|System\s+power\s+online|Engine\s+online|Reactor\s+stable",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex QuantumStartRegex = new(
+        @"QuantumTravel\s+start|Quantum\s+travel\s+started|Entering\s+Quantum|QuantumDrive\s+active",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex QuantumEndRegex = new(
+        @"QuantumTravel\s+end|Quantum\s+travel\s+ended|Exiting\s+Quantum",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public bool IsGameRunning => _gameProcess != null && !_gameProcess.HasExited;
@@ -189,6 +223,10 @@ public class GameDetectionService : IDisposable
                     {
                         CloseLogFile();
                         lastLogPath = null;
+                        _isPowerOffline = false;
+                        _isQuantumActive = false;
+                        _shieldHitEndTime = DateTime.MinValue;
+                        UpdateIntercomState();
                     }
                 }
 
@@ -209,6 +247,7 @@ public class GameDetectionService : IDisposable
                     {
                         ReadLogChanges();
                     }
+                    UpdateIntercomState();
                 }
 
                 await Task.Delay(1000, ct);
@@ -388,6 +427,60 @@ public class GameDetectionService : IDisposable
             {
                 ExertionReceived?.Invoke(0.0);
             }
+        }
+
+        // 5. Check for Intercom Degradation events
+        if (ShieldHitRegex.IsMatch(line))
+        {
+            _shieldHitEndTime = DateTime.UtcNow.AddSeconds(2.5);
+            UpdateIntercomState();
+        }
+        else if (PowerOfflineRegex.IsMatch(line))
+        {
+            _isPowerOffline = true;
+            UpdateIntercomState();
+        }
+        else if (PowerOnlineRegex.IsMatch(line))
+        {
+            _isPowerOffline = false;
+            UpdateIntercomState();
+        }
+        else if (QuantumStartRegex.IsMatch(line))
+        {
+            _isQuantumActive = true;
+            UpdateIntercomState();
+        }
+        else if (QuantumEndRegex.IsMatch(line))
+        {
+            _isQuantumActive = false;
+            UpdateIntercomState();
+        }
+    }
+
+    public IntercomDegradationState GetCurrentIntercomState()
+    {
+        if (DateTime.UtcNow < _shieldHitEndTime)
+        {
+            return IntercomDegradationState.ShieldHit;
+        }
+        if (_isPowerOffline)
+        {
+            return IntercomDegradationState.CriticalPower;
+        }
+        if (_isQuantumActive)
+        {
+            return IntercomDegradationState.QuantumTravel;
+        }
+        return IntercomDegradationState.Normal;
+    }
+
+    private void UpdateIntercomState()
+    {
+        var newState = GetCurrentIntercomState();
+        if (newState != _lastIntercomState)
+        {
+            _lastIntercomState = newState;
+            IntercomStateChanged?.Invoke(newState);
         }
     }
 

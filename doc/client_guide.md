@@ -88,6 +88,31 @@ XuruVOIP includes special features that make voice communication match your game
   * Go to **Settings** and check **Enable Radio Repeaters**.
   * To act as a repeater for your team, check the **Act as Radio Repeater Beacon** box.
 
+### ⚡ 5. Dynamic Intercom Degradation (Ship Damage/Status)
+* **What it does:** Simulates communication interference when your spaceship takes shield damage, experiences power grid failures, or engages in Quantum Travel. This only affects intercom channels (channels starting with `Intercom_` that you automatically join when boarding a ship).
+  * **Shield Hits Effect:** Injects a burst of static noise and crackles for 2.5 seconds when the ship's shields are hit.
+  * **Critical Power Effect:** Injects an electrical AC hum (60Hz + harmonics), drops voice pitch (speed factor 0.78x), and applies heavy saturation distortion during power losses.
+  * **Quantum Travel Effect:** Applies a flanger/phaser comb-filter sweep and a high-frequency whine when traveling in quantum.
+* **How to configure it:**
+  * Go to **Settings** -> **General** tab.
+  * Check the global option **Enable Intercom Degradation (Ship Damage)** (disabled by default).
+  * Under it, you can toggle the individual sub-effects (**Shield Hits**, **Critical Power**, **Quantum Travel**) depending on your preferences.
+  * When active, warning messages like `⚡ INTERCOM: POWER LOSS` or `⚡ INTERCOM: QUANTUM WAVE` will display on your HUD overlay.
+
+### 🎙️ 6. Offline Voice Commands (Hands-Free PTT)
+* **What it does:** Allows you to hold a dedicated key to speak commands directly to your ship's onboard computer (like lowering/raising your helmet visor, muting/unmuting your microphone, changing radio channels, or switching voice changer profiles) without other players hearing you.
+  * **Suppressed Transmit:** Holding the Voice Command key silences your proximity and radio voice streams, keeping your instructions private.
+  * **Offline Transcription:** Uses an offline Whisper model to translate your speech into actions.
+  * **Confidence Threshold:** A slider filter allows you to adjust how strictly the computer matches your voice commands.
+  * **Supported Languages:** Localized matching dictionaries support English, French, German, Spanish, Portuguese, Japanese, and Chinese.
+* **How to configure it:**
+  * Go to **Settings** -> **General** tab.
+  * Check **Enable Voice Commands (Hands-Free PTT)** (disabled by default).
+  * *Notice: Enabling this for the first time will automatically download the required Whisper speech-to-text model (~140MB) in the background.*
+  * Go to the **Hotkeys** tab.
+  * Assign a hotkey in the **Voice Command Key (PTT)** box (default is `V`).
+  * Hold the key to speak (e.g. *"Computer, toggle visor"*, French: *"Ordinateur, basculer le casque"*, German: *"Kanal auf Alpha"*), and release it to execute.
+
 ---
 
 ## 📱 Using the Companion App
@@ -95,12 +120,26 @@ XuruVOIP includes special features that make voice communication match your game
 The Companion App allows you to control XuruVOIP from your smartphone, tablet, or secondary monitor browser.
 
 1. **Enable it:** Go to **Settings**, check **Enable Companion HTTP Server**, and set a port (default: `8891`).
-2. **Access it:** Open any web browser on your device and type `http://localhost:8891` (if on the same PC) or `http://[Your-PC-IP-Address]:8891` (if on your phone connected to the same Wi-Fi).
-3. **Controls:**
-   * Mute or unmute different audio feeds.
-   * View live compass and radar coordinates.
-   * Trigger the PA system using the big red button.
-   * Drag sliders to mock-test G-force/Exertion voice effects.
+2. **Enable Tactical Map Mode (Optional):** Check the box **Enable Tactical Co-Pilot Map (MFD)** (disabled by default) to stream location coordinates and enable the radar screen tab on the companion interface.
+3. **Access it:** Open any web browser on your device and type `http://localhost:8891` (if on the same PC) or `http://[Your-PC-IP-Address]:8891` (if on your phone connected to the same Wi-Fi).
+4. **Features & Layout:**
+   * **🎛️ Controls Tab:** Toggle mic/audio mutes, helmet modulation, PA broadcasts, select active radio channels, select voice changer profiles, or mock test G-Force/Exertion stress levels.
+   * **🗺️ Tactical Map Tab (MFD):**
+     * Displays a sci-fi glassmorphic radar screen tracking your local position.
+     * Renders other crew members and players inside your same container/zone.
+     * Displays real-time speaking status (pulsating green rings around active speakers).
+     * Includes **Heading-Up** (map rotates with your movement direction) and **North-Up** orientation modes.
+     * Range slider to adjust radar zoom levels from 10 meters up to 1000 meters.
+
+---
+
+## 🔌 External Hardware Telemetry (Sim-Pits & Custom Hardware)
+
+For players with custom cockpit simulator setups (sim-pits) or external displays, XuruVOIP can broadcast real-time telemetry.
+
+1. **Enable it:** Go to **Settings**, check **Enable Telemetry Broadcast (UDP)**, and set a port (default: `8895`).
+2. **How it works:** The client will broadcast a JSON payload over UDP to `127.0.0.1:8895` every 100ms.
+3. **Use cases:** Cockpit builders can use simple Arduino, Raspberry Pi, or Stream Deck plugins to read these packets and light up physical LEDs when receiving or transmitting radio messages, or when the suit visor is down.
 
 ---
 

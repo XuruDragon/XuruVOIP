@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">Discord Rich Presence aktivieren</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Begleit-App HTTP-Server aktivieren</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Begleit-Server Port</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">Taktische Co-Pilot-Karte (MFD) aktivieren</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">G-Force- &amp; Belastungs-Stimmverzerrung aktivieren</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">Funk-Repeater aktivieren (Multi-Hop-Routing)</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">Als Funk-Repeater-Bake fungieren</sys:String>
@@ -177,6 +178,25 @@
     <sys:String x:Key="TitleInvalidServerAddress">Ungültige Serveradresse</sys:String>
 
     <!-- Verbindungswarnungen -->
-    <sys:String x:Key="WarningGrtprNoPath">Der Game.log-Reader (GRTPR) ist aktiviert, aber der Pfad zur Game.log-Datei ist nicht festgelegt. Bitte tragen Sie den Pfad zu Ihrer Star Citizen Game.log-Datei im Einstellungsreiter "Allgemein" ein, bevor Sie versuchen, eine Verbindung zum Server herzustellen.</sys:String>
+    <sys:String x:Key="WarningGrtprNoPath">Der Game.log-Reader (GRTPR) is aktiviert, aber der Pfad zur Game.log-Datei ist nicht festgelegt. Bitte tragen Sie den Pfad zu Ihrer Star Citizen Game.log-Datei im Einstellungsreiter "Allgemein" ein, bevor Sie versuchen, eine Verbindung zum Server herzustellen.</sys:String>
     <sys:String x:Key="TitleWarning">Warnung</sys:String>
+    
+    <!-- Telemetrie -->
+    <sys:String x:Key="LblEnableTelemetry">Telemetrie-Übertragung (UDP) aktivieren</sys:String>
+    <sys:String x:Key="LblTelemetryPort">Telemetrie-Übertragungsport</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">Intercom-Degradation aktivieren (Schiffsstatus)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">Schildtreffer-Effekt aktivieren (Rauschen &amp; Knistern)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">Kritischen Krafteffekt aktivieren (Brummen &amp; Resample)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">Quantenreise-Effekt aktivieren (Phaser-Sweep)</sys:String>
+
+    <!-- Voice Commands -->
+    <sys:String x:Key="LblEnableVoiceCommands">Sprachbefehle aktivieren (Freihand-PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandHotkey">Sprachbefehl-Taste (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandConfidence">Sprachbefehl-Konfidenzschwellenwert</sys:String>
+    <sys:String x:Key="LblVoiceCommandWarning">WARNUNG: Die Aktivierung von Offline-Sprachbefehlen lädt bei der ersten Aktivierung das Whisper-Transkriptionsmodell (~140 MB) herunter, falls es noch nicht vorhanden ist.</sys:String>
+    <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS HÖRT ZU...</sys:String>
+    <sys:String x:Key="TxtVoiceSuccess">✔️ CMD: {0}</sys:String>
+    <sys:String x:Key="TxtVoiceError">❌ CMD NICHT ERKANNT</sys:String>
 </ResourceDictionary>

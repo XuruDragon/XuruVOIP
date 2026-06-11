@@ -36,6 +36,7 @@ O objetivo do XuruVoip é fornecer aos eventos de jogos Star Citizen, organizaç
 
 | Seção | Descrição |
 | :--- | :--- |
+| [📖 Guia detalhado de recursos](../doc/functionnalities.md) | Explicação técnica e do usuário de todos os mais de 16 recursos implementados. |
 | [📖 Guias de usuário não técnicos](#-guias-do-usuário-não-técnicos) | Guias passo a passo fáceis de entender para cliente, servidor e stream deck. |
 | [📸 Capturas de tela e IU](#-capturas-de-tela-e-interface-do-usuário) | Vitrine visual de telas de clientes, portal de administração e configurações. |
 | [🗂️ Estrutura do Projeto](#️-project-structure) | Layout do repositório e divisão de pastas. |
@@ -52,6 +53,7 @@ O objetivo do XuruVoip é fornecer aos eventos de jogos Star Citizen, organizaç
 
 Se você não tem experiência em ciência da computação, escrevemos guias simples e passo a passo para ajudá-lo a configurar e executar tudo facilmente:
 
+* 📖 **[Guia detalhado de recursos](../doc/functionnalities.md)**: Explicação detalhada de cada recurso implementado, como funcionam, como usá-los e por que são úteis.
 * 🎮 **[Guia do usuário do cliente](doc/client_guide.md)**: Guia amigável sobre como escolher microfones/alto-falantes, configurar Push-to-Talk, usar capacetes de trajes espaciais e ativar efeitos de voz de esforço.
 * 🖥️ **[Guia de configuração do servidor](doc/server_guide.md)**: Explica como hospedar um servidor, ajustar senhas/configurações no arquivo de configurações `.env` e configurar o Discord Voice Bridge.
 * 🎛️ **[Guia de plug-in do Stream Deck](doc/streamdeck_guide.md)**: Passo a passo sobre como instalar botões físicos para silenciar, alternar o visor e exibir canais de rádio ativos.
@@ -224,17 +226,28 @@ graph TB
 ### 6. 💬 Sistema de intercomunicação automática de navio
 * **Canais de intercomunicação de veículos:** Embarcar em um veículo inscreve automaticamente os jogadores em um canal de rádio dinâmico `Intercom_<ContainerID>`.
 * **Redução de prioridade do piloto:** Quando um jogador na cabine ou no assento do motorista transmite no intercomunicador, o áudio de proximidade de todos os outros jogadores é reduzido em 85% para garantir a clareza do comando de vôo.
+* **Degradação Dinâmica do Intercomunicador:** Os canais de intercomunicador degradam-se automaticamente com base no status da nave:
+  * **Impactos no Escudo (Shield Hits):** Injeta temporariamente rajadas de estática e estalos de volume (dura 2,5 segundos).
+  * **Energia Crítica (Critical Power):** Zumbido elétrico de corrente alternada de baixa tensão, distorção de saturação (soft-clipping) e queda de tom de voz (resampling).
+  * **Viagem Quântica (Quantum Travel):** Varredura de filtro comb (flanger/phaser) e zumbido de alta frequência.
+  * *Todos os subefeitos podem ser alternados individualmente nas Configurações Gerais e vêm desativados por padrão.*
 * **Recarga de limpeza:** Faz uma contagem regressiva de 5 minutos após o último jogador deixar a nave antes de excluir o canal de intercomunicação, maximizando o desempenho do servidor.
 
 ### 7. 📡 Sobreposição de HUD compatível com Vulkan e radar tático 2D
 * **Sobreposição Click-Through do Win32:** Uma sobreposição de HUD sem bordas que mostra conexões VoIP, frequências e estados de fala. Compatível com Vulkan e DirectX (executando em modo de janela sem borda).
+* **Indicador de Status do Intercomunicador:** Exibe avisos como `⚡ INTERCOM: DEGRADED` (com detalhes de substatus como `[Power Loss]`, `[Quantum]` ou `[Static Pop]`) na sobreposição do HUD quando a degradação do intercomunicador está ativa.
 * **Mini-Radar Tático:** Apresenta um radar HUD 2D alinhado ao rumo que exibe jogadores que falam relativamente, desenhando anéis sonoros pulsantes ao redor deles.
 * **Legendas de fala para texto:** Transcreve áudio de rádio/proximidade recebido para legendas localizadas do HUD usando um modelo Whisper leve e off-line (`ggml-tiny.bin`).
+* **Comandos de voz PTT viva-voz:** Manter pressionada a tecla dedicada de comando de voz silencia temporariamente as transmissões de voz de proximidade/rádio de saída e armazena o áudio do microfone em buffer. Ao soltá-la, a voz é transcrita localmente via modelo Whisper para acionar ações da nave:
+  * **Comandos suportados:** Alternar visor/capacete, silenciar/ativar microfone (proximidade/rádio/perfil/todos), seleção de canal de rádio ativo e predefinições do modulador de voz.
+  * **Correspondência de palavras-chave multilíngue:** Suportado em 8 idiomas (inglês, francês, alemão, espanhol, português, japonês e chinês).
+  * **Filtro de limite de confiança:** Um controle deslizante configurável filtra correspondências de baixa confiança ou falas irrelevantes.
+  * *Desabilitado por padrão; a ativação fará o download em segundo plano do modelo de transcrição off-line Whisper (~140 MB) se ainda não estiver presente.*
 
 ### 8. 📱 Aplicativo complementar e API REST
 * **Servidor Web HTTP local:** Hospeda um painel local em uma porta configurável (padrão: `8891`, desabilitado por padrão).
 * **Controlador Glassmorphic:** Conecta-se a telefones ou telas secundárias para alternar mudos, ciclos de canal, capacetes ou trocadores de voz.
-* **API REST:** Expõe endpoints `GET /api/status` e `POST /api/action` para integrações externas.
+* **API REST:** Expõe endpoints `GET /api/status` e `POST /api/action` para integrações externas (incluindo o status do intercomunicador e simulação de estados).
 
 ### 9. 🎛️ Plug-in de plataforma de streaming
 * **Stream Deck Action Pack:** Expõe 8 ações para controlar silenciamentos de microfone, silenciamentos de áudio, viseiras de capacete e ciclos de radiofrequência.
@@ -547,12 +560,13 @@ Como o instalador e os executáveis não são assinados digitalmente, o Windows 
 
 O XuruVOIP inclui um serviço web integrado do Companion App e um plugin oficial do Stream Deck que permite monitorar e acionar ações de voz diretamente de dispositivos secundários ou chaves físicas.
 
-### 1. Ativando o aplicativo complementar
-Por padrão, o servidor HTTP local do Companion App está desabilitado para economizar recursos do sistema. Para habilitá-lo:
+### 1. Habilitando o aplicativo complementar e o MFD do mapa tático
+Por padrão, o servidor HTTP local do Companion App e o modo do mapa tático estão desabilitados para economizar recursos do sistema. Para habilitá-los:
 1. Abra o cliente XuruVOIP e clique no ícone **Configurações**.
-2. Na guia **Geral**, marque a caixa **Ativar servidor HTTP complementar**.
-3. Em **Companion Server Port**, você pode personalizar o número da porta (padrão: `8891`).
-4. Clique em **Salvar e Fechar** para aplicar. O servidor HTTP agora será iniciado localmente. Você pode abrir `http://localhost:8891` em qualquer navegador em seu PC ou dispositivo móvel para acessar o painel do controlador web.
+2. Na guia **Geral**, marque a caixa **Habilitar servidor HTTP Companion** (porta padrão: `8891`).
+3. Para habilitar a exibição do radar, marque a caixa de seleção aninhada **Habilitar mapa tático do copiloto (MFD)**.
+4. Clique em **Salvar e Fechar** para aplicar.
+5. Acesse o painel: Você pode abrir `http://localhost:8891` em qualquer navegador em seu PC, tablet ou celular. Se o modo de mapa estiver habilitado, uma nova guia **🗺️ Mapa Tático** estará disponível, exibindo uma tela de radar HUD baseada em Canvas que rastreia a posição em tempo real do seu personagem, rumo, contatos da tripulação na mesma zona e indicadores de fala ativa.
 
 ---
 

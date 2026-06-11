@@ -118,6 +118,100 @@ public class CompanionAppService : IDisposable
                 // Serve JSON status
                 response.ContentType = "application/json";
                 
+                var remotePositions = new System.Collections.Generic.Dictionary<string, object>();
+                object? localPos = null;
+                double headingX = 0;
+                double headingY = 1.0;
+
+                bool mapEnabled = _viewModel.Config.Config.EnableCompanionMap;
+                if (mapEnabled)
+                {
+                    bool copied = false;
+                    if (Application.Current != null && !Application.Current.Dispatcher.CheckAccess())
+                    {
+                        try
+                        {
+                            var op = Application.Current.Dispatcher.InvokeAsync(() =>
+                            {
+                                foreach (var kvp in _viewModel.RemotePositions)
+                                {
+                                    remotePositions[kvp.Key] = new
+                                    {
+                                        x = kvp.Value.X,
+                                        y = kvp.Value.Y,
+                                        z = kvp.Value.Z,
+                                        zone = kvp.Value.Zone,
+                                        containerId = kvp.Value.ContainerID,
+                                        containerName = kvp.Value.ContainerName
+                                    };
+                                }
+                                var lp = _viewModel.LastSentPos;
+                                if (lp != null && !lp.IsEmpty)
+                                {
+                                    localPos = new
+                                    {
+                                        x = lp.X,
+                                        y = lp.Y,
+                                        z = lp.Z,
+                                        zone = lp.Zone,
+                                        containerId = lp.ContainerID,
+                                        containerName = lp.ContainerName
+                                    };
+                                }
+                                headingX = _viewModel.Playback.ListenerHeadingX;
+                                headingY = _viewModel.Playback.ListenerHeadingY;
+                            });
+
+                            if (op.Task.Wait(100))
+                            {
+                                copied = true;
+                            }
+                        }
+                        catch
+                        {
+                            // Ignore and fallback
+                        }
+                    }
+
+                    if (!copied)
+                    {
+                        try
+                        {
+                            foreach (var kvp in _viewModel.RemotePositions)
+                            {
+                                remotePositions[kvp.Key] = new
+                                {
+                                    x = kvp.Value.X,
+                                    y = kvp.Value.Y,
+                                    z = kvp.Value.Z,
+                                    zone = kvp.Value.Zone,
+                                    containerId = kvp.Value.ContainerID,
+                                    containerName = kvp.Value.ContainerName
+                                };
+                            }
+                            var lp = _viewModel.LastSentPos;
+                            if (lp != null && !lp.IsEmpty)
+                            {
+                                localPos = new
+                                {
+                                    x = lp.X,
+                                    y = lp.Y,
+                                    z = lp.Z,
+                                    zone = lp.Zone,
+                                    containerId = lp.ContainerID,
+                                    containerName = lp.ContainerName
+                                };
+                            }
+                            headingX = _viewModel.Playback.ListenerHeadingX;
+                            headingY = _viewModel.Playback.ListenerHeadingY;
+                        }
+                        catch
+                        {
+                            // If dictionary is modified during direct read, we just return whatever we got
+                        }
+                    }
+                }
+
                 var status = new
                 {
                     username = _viewModel.Config.Config.Username,
@@ -140,7 +234,19 @@ public class CompanionAppService : IDisposable
                     enableExertionDistortion = _viewModel.Config.Config.EnableExertionDistortion,
                     isRadioRepeater = _viewModel.Config.Config.IsRadioRepeater,
                     enableRadioRepeaters = _viewModel.Config.Config.EnableRadioRepeaters,
-                    enableShipPa = _viewModel.Config.Config.EnableShipPa
+                    enableShipPa = _viewModel.Config.Config.EnableShipPa,
+                    enableCompanionMap = mapEnabled,
+                    localPos = mapEnabled ? localPos : null,
+                    heading = mapEnabled ? new { x = headingX, y = headingY } : null,
+                    remotePositions = mapEnabled ? remotePositions : null,
+                    enableIntercomDegradation = _viewModel.Config.Config.EnableIntercomDegradation,
+                    intercomShieldHitsEnabled = _viewModel.Config.Config.IntercomShieldHitsEnabled,
+                    intercomCriticalPowerEnabled = _viewModel.Config.Config.IntercomCriticalPowerEnabled,
+                    intercomQuantumTravelEnabled = _viewModel.Config.Config.IntercomQuantumTravelEnabled,
+                    intercomState = _viewModel.IntercomState.ToString(),
+                    voiceCommandsEnabled = _viewModel.Config.Config.EnableVoiceCommands,
+                    isListening = _viewModel.IsVoiceListening,
+                    lastRecognizedCommand = _viewModel.VoiceCommandStatusText
                 };
 
                 string json = JsonSerializer.Serialize(status);
@@ -253,6 +359,27 @@ public class CompanionAppService : IDisposable
             case "stop_pa":
                 _viewModel.SetMockPttPaState(false);
                 break;
+            case "simulate_intercom_state":
+                if (root.TryGetProperty("state", out var stateProp))
+                {
+                    string stStr = stateProp.GetString()?.ToLower() ?? "normal";
+                    var stateVal = stStr switch
+                    {
+                        "shield_hit" => IntercomDegradationState.ShieldHit,
+                        "critical_power" => IntercomDegradationState.CriticalPower,
+                        "quantum" => IntercomDegradationState.QuantumTravel,
+                        _ => IntercomDegradationState.Normal
+                    };
+                    _viewModel.IntercomState = stateVal;
+                }
+                break;
+            case "simulate_voice_command":
+                if (root.TryGetProperty("command", out var cmdProp))
+                {
+                    string cmd = cmdProp.GetString() ?? "";
+                    _viewModel.ProcessVoiceCommand(cmd);
+                }
+                break;
         }
     }
 
@@ -327,6 +454,44 @@ public class CompanionAppService : IDisposable
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        
+        /* Tabs navigation */
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 4px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .tab.active {
+            background: rgba(0, 242, 254, 0.12);
+            color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
+        }
+        .tab-view {
+            display: none;
+        }
+        .tab-view.active {
+            display: block;
+        }
+
         .status-header {
             display: flex;
             justify-content: space-between;
@@ -474,6 +639,64 @@ public class CompanionAppService : IDisposable
             text-align: center;
             padding-top: 14px;
         }
+
+        /* Tactical Map elements */
+        .map-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            background: rgba(5, 7, 12, 0.8);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 242, 254, 0.15);
+            box-shadow: inset 0 0 25px rgba(0, 242, 254, 0.05), 0 10px 30px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+        #radar-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .map-controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+        }
+        .map-toggle-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .map-toggle-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
+        }
+        .map-toggle-btn.active {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
+        }
+
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.2); opacity: 0.5; }
@@ -484,6 +707,12 @@ public class CompanionAppService : IDisposable
 <body>
     <div class="container">
         <h1>XuruVOIP Companion</h1>
+
+        <!-- Tab Navigation -->
+        <div class="tabs" id="tab-container" style="display: none;">
+            <div class="tab active" id="tab-controls" onclick="switchTab('controls')">🎛️ Controls</div>
+            <div class="tab" id="tab-map" onclick="switchTab('map')">🗺️ Tactical Map</div>
+        </div>
         
         <div class="status-header">
             <div class="user-info">
@@ -493,96 +722,158 @@ public class CompanionAppService : IDisposable
             <div class="connection-dot" id="dot-connection"></div>
         </div>
 
-        <div class="section-title">Microphone Control</div>
-        <div class="grid-toggles">
-            <button class="btn" id="btn-mute-prox" onclick="postAction('toggle_proximity_mute')">
-                <span class="icon">🎙️</span>
-                <span>Proximity</span>
-            </button>
-            <button class="btn" id="btn-mute-radio" onclick="postAction('toggle_radio_mute')">
-                <span class="icon">📻</span>
-                <span>Radio</span>
-            </button>
-        </div>
-
-        <div class="section-title">Hardware & Systems</div>
-        <div class="grid-toggles">
-            <button class="btn" id="btn-helmet" onclick="postAction('toggle_helmet')">
-                <span class="icon">🪖</span>
-                <span>Visor Down</span>
-            </button>
-            <button class="btn" id="btn-mute-audio-prox" onclick="postAction('toggle_audio_proximity_mute')">
-                <span class="icon">🔊</span>
-                <span>Hear Prox</span>
-            </button>
-        </div>
-
-        <div class="controls-list">
-            <div class="control-row">
-                <div class="section-title">Active Radio Channel</div>
-                <select id="sel-channel" onchange="postAction('set_channel', { channel: this.value })">
-                    <option value="">General</option>
-                </select>
-            </div>
-            <div class="control-row">
-                <div class="section-title">Voice Changer profile</div>
-                <select id="sel-voice" onchange="postAction('set_voice_changer', { type: this.value })">
-                    <option value="None">None</option>
-                    <option value="Alien">Alien</option>
-                    <option value="Cyborg">Cyborg</option>
-                    <option value="Robotic">Robotic</option>
-                    <option value="PitchShift">PitchShift</option>
-                </select>
-            </div>
-            <div class="control-row" style="margin-top:12px;">
-                <div class="section-title">Immersive Distortion</div>
-                <button class="btn" id="btn-exertion-dist" onclick="postAction('toggle_exertion_distortion')" style="width:100%; margin-bottom:12px; flex-direction:row; padding:12px;">
-                    <span class="icon">🎚️</span>
-                    <span>Enable Exertion & G-Force</span>
+        <!-- VIEW 1: CONTROLS -->
+        <div id="view-controls" class="tab-view active">
+            <div class="section-title">Microphone Control</div>
+            <div class="grid-toggles">
+                <button class="btn" id="btn-mute-prox" onclick="postAction('toggle_proximity_mute')">
+                    <span class="icon">🎙️</span>
+                    <span>Proximity</span>
                 </button>
-                <div style="display:flex; flex-direction:column; gap:12px;">
-                    <div>
-                        <label style="font-size:12px; color:rgba(255,255,255,0.6); display:flex; justify-content:space-between; margin-bottom:4px;">
-                            <span>Mock G-Force:</span>
-                            <span id="val-gforce" style="color:var(--primary); font-weight:600;">0.0G</span>
-                        </label>
-                        <input type="range" id="slide-gforce" min="0" max="1" step="0.05" value="0" style="width:100%; accent-color:var(--primary); cursor:pointer;" oninput="updateMockExertion()"/>
+                <button class="btn" id="btn-mute-radio" onclick="postAction('toggle_radio_mute')">
+                    <span class="icon">📻</span>
+                    <span>Radio</span>
+                </button>
+            </div>
+
+            <div class="section-title">Hardware & Systems</div>
+            <div class="grid-toggles">
+                <button class="btn" id="btn-helmet" onclick="postAction('toggle_helmet')">
+                    <span class="icon">🪖</span>
+                    <span>Visor Down</span>
+                </button>
+                <button class="btn" id="btn-mute-audio-prox" onclick="postAction('toggle_audio_proximity_mute')">
+                    <span class="icon">🔊</span>
+                    <span>Hear Prox</span>
+                </button>
+            </div>
+
+            <div class="controls-list">
+                <div class="control-row">
+                    <div class="section-title">Active Radio Channel</div>
+                    <select id="sel-channel" onchange="postAction('set_channel', { channel: this.value })">
+                        <option value="">General</option>
+                    </select>
+                </div>
+                <div class="control-row">
+                    <div class="section-title">Voice Changer profile</div>
+                    <select id="sel-voice" onchange="postAction('set_voice_changer', { type: this.value })">
+                        <option value="None">None</option>
+                        <option value="Alien">Alien</option>
+                        <option value="Cyborg">Cyborg</option>
+                        <option value="Robotic">Robotic</option>
+                        <option value="PitchShift">PitchShift</option>
+                    </select>
+                </div>
+                <div class="control-row" style="margin-top:12px;">
+                    <div class="section-title">Immersive Distortion</div>
+                    <button class="btn" id="btn-exertion-dist" onclick="postAction('toggle_exertion_distortion')" style="width:100%; margin-bottom:12px; flex-direction:row; padding:12px;">
+                        <span class="icon">🎚️</span>
+                        <span>Enable Exertion & G-Force</span>
+                    </button>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <div>
+                            <label style="font-size:12px; color:rgba(255,255,255,0.6); display:flex; justify-content:space-between; margin-bottom:4px;">
+                                <span>Mock G-Force:</span>
+                                <span id="val-gforce" style="color:var(--primary); font-weight:600;">0.0G</span>
+                            </label>
+                            <input type="range" id="slide-gforce" min="0" max="1" step="0.05" value="0" style="width:100%; accent-color:var(--primary); cursor:pointer;" oninput="updateMockExertion()"/>
+                        </div>
+                        <div>
+                            <label style="font-size:12px; color:rgba(255,255,255,0.6); display:flex; justify-content:space-between; margin-bottom:4px;">
+                                <span>Mock Exertion:</span>
+                                <span id="val-exertion" style="color:var(--primary); font-weight:600;">0.0</span>
+                            </label>
+                            <input type="range" id="slide-exertion" min="0" max="1" step="0.05" value="0" style="width:100%; accent-color:var(--primary); cursor:pointer;" oninput="updateMockExertion()"/>
+                        </div>
                     </div>
-                    <div>
+                </div>
+                <div class="control-row" style="margin-top:12px;">
+                    <div class="section-title">Tactical Radio Relay</div>
+                    <button class="btn" id="btn-repeater-mode" onclick="postAction('toggle_repeater')" style="width:100%; flex-direction:row; padding:12px;">
+                        <span class="icon">📡</span>
+                        <span>Beacon Mode (Repeater)</span>
+                    </button>
+                </div>
+                <div class="control-row" style="margin-top:12px;">
+                    <div class="section-title">Ship Public Address (PA)</div>
+                    <button class="btn" id="btn-pa" style="width:100%; height:80px; font-size:18px; font-weight:800; text-transform:uppercase; letter-spacing:1px; background: rgba(0, 242, 254, 0.04); border-color: rgba(0, 242, 254, 0.2);" 
+                            onmousedown="postAction('start_pa')" onmouseup="postAction('stop_pa')" 
+                            ontouchstart="postAction('start_pa')" ontouchend="postAction('stop_pa')">
+                        📢 PA Broadcast
+                    </button>
+                </div>
+            </div>
+
+            <div class="section-title">Active Speakers</div>
+            <div class="speakers-card" id="list-speakers">
+                <div class="no-speakers">No active transmissions</div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: TACTICAL MAP -->
+        <div id="view-map" class="tab-view">
+            <div class="map-container">
+                <div class="canvas-container">
+                    <canvas id="radar-canvas"></canvas>
+                </div>
+                
+                <div class="map-controls">
+                    <div class="control-row">
                         <label style="font-size:12px; color:rgba(255,255,255,0.6); display:flex; justify-content:space-between; margin-bottom:4px;">
-                            <span>Mock Exertion:</span>
-                            <span id="val-exertion" style="color:var(--primary); font-weight:600;">0.0</span>
+                            <span>Radar Range:</span>
+                            <span id="val-range" style="color:var(--primary); font-weight:600;">100m</span>
                         </label>
-                        <input type="range" id="slide-exertion" min="0" max="1" step="0.05" value="0" style="width:100%; accent-color:var(--primary); cursor:pointer;" oninput="updateMockExertion()"/>
+                        <input type="range" id="slide-range" min="10" max="1000" step="10" value="100" style="width:100%; accent-color:var(--primary); cursor:pointer;" oninput="updateRange(this.value)"/>
+                    </div>
+                    
+                    <div class="control-row">
+                        <span class="section-title">MFD Orientation</span>
+                        <div class="map-toggle-group">
+                            <button id="btn-orient-heading" class="map-toggle-btn active" onclick="setOrientation('heading')">HEADING-UP</button>
+                            <button id="btn-orient-north" class="map-toggle-btn" onclick="setOrientation('north')">NORTH-UP</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="control-row" style="margin-top:12px;">
-                <div class="section-title">Tactical Radio Relay</div>
-                <button class="btn" id="btn-repeater-mode" onclick="postAction('toggle_repeater')" style="width:100%; flex-direction:row; padding:12px;">
-                    <span class="icon">📡</span>
-                    <span>Beacon Mode (Repeater)</span>
-                </button>
-            </div>
-            <div class="control-row" style="margin-top:12px;">
-                <div class="section-title">Ship Public Address (PA)</div>
-                <button class="btn" id="btn-pa" style="width:100%; height:80px; font-size:18px; font-weight:800; text-transform:uppercase; letter-spacing:1px; background: rgba(0, 242, 254, 0.04); border-color: rgba(0, 242, 254, 0.2);" 
-                        onmousedown="postAction('start_pa')" onmouseup="postAction('stop_pa')" 
-                        ontouchstart="postAction('start_pa')" ontouchend="postAction('stop_pa')">
-                    📢 PA Broadcast
-                </button>
-            </div>
-        </div>
-
-        <div class="section-title">Active Speakers</div>
-        <div class="speakers-card" id="list-speakers">
-            <div class="no-speakers">No active transmissions</div>
         </div>
     </div>
 
     <script>
         let isDraggingGForce = false;
         let isDraggingExertion = false;
+
+        // Tactical Map state
+        let currentRange = 100;
+        let mapOrientation = 'heading';
+        let localPos = null;
+        let heading = { x: 0, y: 1 };
+        let remotePositions = {};
+        let activeSpeakers = [];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+            
+            if (tabId === 'controls') {
+                document.getElementById('tab-controls').classList.add('active');
+                document.getElementById('view-controls').classList.add('active');
+            } else if (tabId === 'map') {
+                document.getElementById('tab-map').classList.add('active');
+                document.getElementById('view-map').classList.add('active');
+            }
+        }
+
+        function updateRange(val) {
+            currentRange = parseInt(val);
+            document.getElementById('val-range').textContent = val + 'm';
+        }
+
+        function setOrientation(mode) {
+            mapOrientation = mode;
+            document.getElementById('btn-orient-heading').classList.toggle('active', mode === 'heading');
+            document.getElementById('btn-orient-north').classList.toggle('active', mode === 'north');
+        }
 
         async function fetchStatus() {
             try {
@@ -686,6 +977,21 @@ public class CompanionAppService : IDisposable
                 } else {
                     list.innerHTML = '<div class="no-speakers">No active transmissions</div>';
                 }
+
+                // Update tab bar visibility and map data
+                const tabContainer = document.getElementById('tab-container');
+                if (data.enableCompanionMap) {
+                    tabContainer.style.display = 'flex';
+                } else {
+                    tabContainer.style.display = 'none';
+                    switchTab('controls');
+                }
+
+                localPos = data.localPos;
+                heading = data.heading || { x: 0, y: 1 };
+                remotePositions = data.remotePositions || {};
+                activeSpeakers = data.activeSpeakers || [];
+
             } catch (err) {
                 console.error(err);
             }
@@ -733,6 +1039,184 @@ public class CompanionAppService : IDisposable
             postAction('set_exertion', { gforce: gf, exertion: ex });
         }
 
+        // Radar Canvas drawing loop
+        function initRadar() {
+            const canvas = document.getElementById('radar-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            function draw() {
+                const dpr = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+
+                const width = rect.width;
+                const height = rect.height;
+                const cx = width / 2;
+                const cy = height / 2;
+                const radius = Math.min(width, height) / 2 - 20;
+
+                ctx.clearRect(0, 0, width, height);
+
+                // 1. Draw static background grid (rings)
+                ctx.strokeStyle = 'rgba(0, 242, 254, 0.08)';
+                ctx.lineWidth = 1;
+                for (let r = 0.25; r <= 1.00; r += 0.25) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius * r, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    // Draw range label
+                    ctx.fillStyle = 'rgba(0, 242, 254, 0.3)';
+                    ctx.font = '8px monospace';
+                    ctx.textBaseline = 'middle';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`${Math.round(currentRange * r)}m`, cx, cy - radius * r + 10);
+                }
+
+                // Calculate heading angle
+                let theta = Math.atan2(-heading.y, heading.x); // screen angle: North is Y+ (canvas Y-)
+
+                // 2. Rotatable elements
+                ctx.save();
+                if (mapOrientation === 'heading') {
+                    ctx.translate(cx, cy);
+                    ctx.rotate(-theta - Math.PI / 2);
+                    ctx.translate(-cx, -cy);
+                }
+
+                // Draw crosshairs (radial axes)
+                ctx.strokeStyle = 'rgba(0, 242, 254, 0.05)';
+                ctx.beginPath();
+                ctx.moveTo(cx - radius, cy); ctx.lineTo(cx + radius, cy);
+                ctx.moveTo(cx, cy - radius); ctx.lineTo(cx, cy + radius);
+                ctx.stroke();
+
+                // Draw compass letters
+                ctx.fillStyle = 'rgba(0, 242, 254, 0.5)';
+                ctx.font = 'bold 10px Outfit';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('N', cx, cy - radius + 8);
+                ctx.fillText('S', cx, cy + radius - 8);
+                ctx.fillText('E', cx + radius - 8, cy);
+                ctx.fillText('W', cx - radius + 8, cy);
+
+                // Draw remote players
+                if (localPos && remotePositions) {
+                    const scale = radius / currentRange;
+                    Object.keys(remotePositions).forEach(name => {
+                        const rp = remotePositions[name];
+                        // Check if in same zone
+                        if (rp.zone !== localPos.zone) return;
+                        
+                        const dx = rp.x - localPos.x;
+                        const dy = rp.y - localPos.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        if (dist > currentRange) return; // out of range
+
+                        // Screen coordinates for remote player
+                        const rx = cx + dx * scale;
+                        const ry = cy - dy * scale; // negative because game Y+ is North, canvas Y+ is South
+
+                        // Check if speaker is active
+                        const isSpeaking = activeSpeakers.includes(name);
+
+                        // Draw speaker waves if speaking
+                        if (isSpeaking) {
+                            const t = (Date.now() / 400) % 1.0;
+                            ctx.strokeStyle = `rgba(61, 219, 133, ${1.0 - t})`;
+                            ctx.lineWidth = 1.5;
+                            ctx.beginPath();
+                            ctx.arc(rx, ry, 6 + t * 12, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+
+                        // Draw contact marker
+                        ctx.beginPath();
+                        ctx.arc(rx, ry, 4, 0, Math.PI * 2);
+                        ctx.fillStyle = isSpeaking ? 'var(--green)' : 'var(--primary)';
+                        ctx.fill();
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+
+                        // Draw label
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = '9px Outfit';
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(`${name} (${Math.round(dist)}m)`, rx + 8, ry);
+                    });
+                }
+
+                ctx.restore();
+
+                // 3. Draw sweep line (in screen space)
+                let sweepAngle = (Date.now() / 2500) % (Math.PI * 2);
+                let trailSteps = 20;
+                let arcSize = 40 * Math.PI / 180;
+                for (let i = 0; i < trailSteps; i++) {
+                    let alpha = (i / trailSteps) * 0.08;
+                    let angle = sweepAngle - (trailSteps - i) * (arcSize / trailSteps);
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.arc(cx, cy, radius, angle, angle + (arcSize / trailSteps));
+                    ctx.closePath();
+                    ctx.fillStyle = `rgba(0, 242, 254, ${alpha})`;
+                    ctx.fill();
+                }
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(cx + Math.cos(sweepAngle) * radius, cy + Math.sin(sweepAngle) * radius);
+                ctx.strokeStyle = 'rgba(0, 242, 254, 0.25)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // 4. Draw local player at center
+                ctx.save();
+                ctx.translate(cx, cy);
+                if (mapOrientation === 'north') {
+                    ctx.rotate(theta + Math.PI / 2);
+                }
+                ctx.beginPath();
+                ctx.moveTo(0, -8);
+                ctx.lineTo(-6, 6);
+                ctx.lineTo(0, 3);
+                ctx.lineTo(6, 6);
+                ctx.closePath();
+                ctx.fillStyle = 'var(--primary)';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.restore();
+
+                // 5. HUD Text Overlay (Zone name, Coordinates, etc.)
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.font = '9px monospace';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                if (localPos) {
+                    const truncatedZone = localPos.zone ? (localPos.zone.length > 18 ? localPos.zone.substring(0,18) + '...' : localPos.zone) : 'SYSTEM';
+                    ctx.fillText(`ZONE: ${truncatedZone.toUpperCase()}`, 15, 20);
+                    ctx.fillText(`POS: ${Math.round(localPos.x)}, ${Math.round(localPos.y)}, ${Math.round(localPos.z)}`, 15, 32);
+                } else {
+                    ctx.fillText('SYS: NO POSITION DATA', 15, 20);
+                }
+                
+                ctx.textAlign = 'right';
+                ctx.fillText(`RANGE: ${currentRange}M`, width - 15, 20);
+                ctx.fillText(`MODE: ${mapOrientation.toUpperCase()}-UP`, width - 15, 32);
+
+                requestAnimationFrame(draw);
+            }
+            
+            requestAnimationFrame(draw);
+        }
+
         // Add event listeners for dragging
         document.getElementById('slide-gforce').addEventListener('mousedown', () => isDraggingGForce = true);
         document.getElementById('slide-gforce').addEventListener('mouseup', () => { isDraggingGForce = false; updateMockExertion(); });
@@ -747,6 +1231,7 @@ public class CompanionAppService : IDisposable
         // Poll every 500ms
         setInterval(fetchStatus, 500);
         fetchStatus();
+        initRadar();
     </script>
 </body>
 </html>

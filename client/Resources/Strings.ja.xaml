@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">Discord Rich Presenceを有効化</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Companion HTTPサーバーを有効化</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Companion サーバーポート</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">タクティカルコパイロットマップ(MFD)を有効化</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">Gフォース・呼吸負荷音声歪みを有効にする</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">無線リピーターを有効にする（マルチホップルーティング）</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">無線リピータービーコンとして動作する</sys:String>
@@ -179,4 +180,23 @@
     <!-- 接続警告 -->
     <sys:String x:Key="WarningGrtprNoPath">Game.logリーダー (GRTPR) が有効になっていますが、Game.logのファイルパスが設定されていません。サーバーに接続する前に、設定の「全般 (General)」タブでStar CitizenのGame.logパスを入力してください。</sys:String>
     <sys:String x:Key="TitleWarning">警告</sys:String>
+    
+    <!-- テレメトリ -->
+    <sys:String x:Key="LblEnableTelemetry">テレメトリ配信(UDP)を有効化</sys:String>
+    <sys:String x:Key="LblTelemetryPort">テレメトリ配信ポート</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">インターコム劣化を有効にする (船体ステータス)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">シールド被弾エフェクトを有効にする (ノイズ＆ポップ音)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">致命的電力エフェクトを有効にする (ハム音＆リサンプル)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">量子トラベルエフェクトを有効にする (フェイザースイープ)</sys:String>
+
+    <!-- Voice Commands -->
+    <sys:String x:Key="LblEnableVoiceCommands">音声コマンドを有効化 (ハンズフリーPTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandHotkey">音声コマンドキー (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandConfidence">音声コマンドの信頼度しきい値</sys:String>
+    <sys:String x:Key="LblVoiceCommandWarning">警告: オフライン音声コマンドを有効にすると、モデルがまだ存在しない場合、最初の起動時にWhisper文字起こしモデル（~140MB）がダウンロードされます。</sys:String>
+    <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 聴取中...</sys:String>
+    <sys:String x:Key="TxtVoiceSuccess">✔️ CMD: {0}</sys:String>
+    <sys:String x:Key="TxtVoiceError">❌ コマンドが認識されません</sys:String>
 </ResourceDictionary>

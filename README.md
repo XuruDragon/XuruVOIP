@@ -12,13 +12,13 @@
 <p align="center">
   <b>Translations:</b><br/>
   <a href="README.md">English</a> •
-  <a href="doc/README.fr.md">Français</a> •
-  <a href="doc/README.de.md">Deutsch</a> •
-  <a href="doc/README.es.md">Español</a> •
-  <a href="doc/README.pt-BR.md">Português (Brasil)</a> •
-  <a href="doc/README.pt-PT.md">Português (Portugal)</a> •
-  <a href="doc/README.ja.md">日本語</a> •
-  <a href="doc/README.zh.md">简体中文</a>
+  <a href="readmes/README.fr.md">Français</a> •
+  <a href="readmes/README.de.md">Deutsch</a> •
+  <a href="readmes/README.es.md">Español</a> •
+  <a href="readmes/README.pt-BR.md">Português (Brasil)</a> •
+  <a href="readmes/README.pt-PT.md">Português (Portugal)</a> •
+  <a href="readmes/README.ja.md">日本語</a> •
+  <a href="readmes/README.zh.md">简体中文</a>
 </p>
 
 <p align="center">
@@ -36,6 +36,7 @@ The goal of XuruVoip is to provide Star Citizen gaming events, roleplay organiza
 
 | Section | Description |
 | :--- | :--- |
+| [📖 Detailed Features Guide](doc/functionnalities.md) | Technical and user explanation of all 16+ implemented functionalities. |
 | [📖 Non-Technical User Guides](#-non-technical-user-guides) | Easy-to-understand step-by-step guides for Client, Server, and Stream Deck. |
 | [📸 Screenshots & UI](#-screenshots--ui) | Visual showcase of client screens, admin portal, and settings. |
 | [🗂️ Project Structure](#️-project-structure) | Repository layout and folder breakdown. |
@@ -52,6 +53,7 @@ The goal of XuruVoip is to provide Star Citizen gaming events, roleplay organiza
 
 If you do not have a background in computer science, we have written simple, step-by-step guides to help you get everything configured and running easily:
 
+* 📖 **[Detailed Features Guide](doc/functionnalities.md)**: Deep-dive explanation of each feature implemented, how they work, how to use them, and why they are useful.
 * 🎮 **[Client User Guide](doc/client_guide.md)**: Friendly guide on choosing microphones/speakers, setting up Push-to-Talk, using space suit helmets, and turning on exertion voice effects.
 * 🖥️ **[Server Configuration Guide](doc/server_guide.md)**: Explains how to host a server, adjust passwords/settings in the `.env` settings file, and set up the Discord Voice Bridge.
 * 🎛️ **[Stream Deck Plugin Guide](doc/streamdeck_guide.md)**: Walkthrough on installing physical buttons for muting, visor toggling, and displaying active radio channels.
@@ -227,17 +229,28 @@ graph TB
 ### 6. 💬 Automatic Ship Intercom System
 * **Vehicle Intercom Channels:** Boarding a vehicle automatically subscribes players to a dynamic `Intercom_<ContainerID>` radio channel.
 * **Pilot Priority Ducking:** When a player in a cockpit or driver seat transmits on the intercom, all other players' proximity audio is ducked by 85% to ensure flight command clarity.
+* **Dynamic Intercom Degradation:** Intercom channels automatically degrade based on vehicle status:
+  * **Shield Hits:** Temporarily injects static bursts and volume crackles (lasts 2.5 seconds).
+  * **Critical Power:** Low-voltage AC hum, soft-clipping distortion, and pitch-resampling drop.
+  * **Quantum Travel:** Comb-filter flanger/phaser sweep and high-frequency whine.
+  * *All sub-effects can be toggled individually in the General Settings and are disabled by default.*
 * **Cleanup Cooldown:** Counts down 5 minutes after the last player leaves the ship before deleting the intercom channel, maximizing server performance.
 
 ### 7. 📡 Vulkan-Compatible HUD Overlay & 2D Tactical Radar
 * **Win32 Click-Through Overlay:** A borderless HUD overlay showing VoIP connections, frequencies, and speaking states. Vulkan and DirectX compatible (running in borderless windowed mode).
+* **Intercom Status Indicator:** Displays warnings like `⚡ INTERCOM: DEGRADED` (with sub-status details such as `[Power Loss]`, `[Quantum]`, or `[Static Pop]`) in the overlay when intercom degradation is active.
 * **Tactical Mini-Radar:** Features a heading-aligned 2D HUD radar that displays relative speaking players, drawing pulsating sound rings around them.
 * **Speech-to-Text Subtitles:** Transcribes incoming radio/proximity audio to localized HUD subtitles using an offline, lightweight Whisper model (`ggml-tiny.bin`).
+* **Hands-Free PTT Voice Commands:** Holding the dedicated Voice Command key temporarily suppresses outgoing proximity/radio voice feeds and buffers mic audio. On release, the voice is transcribed locally via the Whisper model to trigger ship actions:
+  * **Supported Commands:** Visor/Helmet Toggle, Microphone Mute/Unmute (proximity/radio/profile/all), active Radio Channel selection, and Voice Changer presets.
+  * **Multi-Language Keyword Matching:** Supported across 8 languages (English, French, German, Spanish, Portuguese, Japanese, and Chinese).
+  * **Confidence Threshold Filter:** A configurable slider filters out low-confidence matches or extraneous speech.
+  * *Disabled by default; enabling it downloads the offline Whisper transcription model (~140MB) if not already present.*
 
 ### 8. 📱 Companion App & REST API
 * **Local HTTP Web Server:** Hosts a local dashboard on a configurable port (default: `8891`, disabled by default).
 * **Glassmorphic Controller:** Connects from phones or secondary screens to toggle mutes, channel cycles, helmets, or voice changers.
-* **REST API:** Exposes endpoints `GET /api/status` and `POST /api/action` for external integrations.
+* **REST API:** Exposes endpoints `GET /api/status` and `POST /api/action` for external integrations (including intercom state status and simulation overrides).
 
 ### 9. 🎛️ Stream Deck Plugin
 * **Stream Deck Action Pack:** Exposes 8 actions to control microphone mutes, audio mutes, helmet visors, and radio frequency cycles.
@@ -266,12 +279,17 @@ graph TB
 * **Ship-Wide Audio Broadcast:** Pilots or captains of multi-crew ships can broadcast voice announcements to all crew members sharing the same `ContainerID` (ship) in the same Zone.
 * **PA DSP & Klaxon Chime:** PA transmissions bypass local proximity and radio mutes (except master volume/mute), play mono center-panned, prepend a Sci-Fi dual-tone chime/klaxon alert, and apply a megaphone bandpass & reverberation filter simulating hollow ship interior acoustics.
 
+### 15. 🔌 External Hardware Telemetry (Sim-Pit UDP Sync)
+* **Real-Time UDP Sync:** When enabled, the client broadcasts its VoIP and helmet states in JSON format to `127.0.0.1:8895` (configurable) every 100ms.
+* **Telemetry Payload:** Includes local transmission states (`IsTransmittingProximity`, `IsTransmittingRadio`), remote receiving states (`IsReceivingProximity`, `IsReceivingRadio`), visor state (`HelmetVisorDown`), active channel, and current zone.
+* **Hardware Integration Ready:** Enables sim-pit cockpit builders to connect custom Arduino LEDs, Stream Decks, or physical warning indicators that react to active communications in real-time.
+
 ---
 
 ## 🎮 XuruVoip Client Settings Tab Breakdown
 
 The WPF settings window is structured into six configuration categories:
-1. **General**: Configure languages, tail `Game.log` files, toggle general file logging, and enable/configure the local **Companion App HTTP Server** and Port.
+1. **General**: Configure languages, tail `Game.log` files, toggle general file logging, enable/configure the local **Companion App HTTP Server** and Port, and toggle/configure **External Telemetry Broadcast (UDP)** and Port (disabled by default).
 2. **Connection**: Edit the Target Server IP, Position & Audio ports, Username, User Password, and Server Password.
 3. **Position**: Toggle the location source ("OCR Screen Scanner" vs "Game.log Reader (GRTPR)"), configure monitor indexes, crop regions, OCR intervals, and preview live coordinate text.
 4. **Audio**: Choose input/output hardware, adjust dB gains, select transmission mode (PTT vs VAD), configure VAD thresholds, toggle **Enable 3D Spatial Audio**, configure radio degradation, synthesized local chimes, visor modulator, and select **Voice Changer** presets.
@@ -583,12 +601,13 @@ Since the installer and executables are not digitally signed, Windows SmartScree
 
 XuruVOIP includes a built-in Companion App web service and an official Stream Deck plugin allowing you to monitor and trigger voice actions directly from secondary devices or physical keys.
 
-### 1. Enabling the Companion App
-By default, the Companion App local HTTP server is disabled to save system resources. To enable it:
+### 1. Enabling the Companion App & Tactical Map MFD
+By default, the Companion App local HTTP server and the Tactical Map mode are disabled to save system resources. To enable them:
 1. Open the XuruVOIP client and click the **Settings** icon.
-2. In the **General** tab, check the box **Enable Companion HTTP Server**.
-3. Under **Companion Server Port**, you can customize the port number (default: `8891`).
-4. Click **Save & Close** to apply. The HTTP server will now start locally. You can open `http://localhost:8891` in any browser on your PC or mobile device to access the web controller dashboard.
+2. In the **General** tab, check the box **Enable Companion HTTP Server** (default port: `8891`).
+3. To enable the radar display, check the nested **Enable Tactical Co-Pilot Map (MFD)** checkbox.
+4. Click **Save & Close** to apply.
+5. Access the dashboard: Open `http://localhost:8891` in a browser on your PC, tablet, or phone. If the Map mode is enabled, a new **🗺️ Tactical Map** tab will be available, displaying a canvas-based HUD radar screen tracking your character's real-time position, heading, same-zone crew contacts, and speaker activity indicators.
 
 ---
 

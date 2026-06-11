@@ -161,6 +161,21 @@ public partial class SettingsWindow : Window
         {
             CompanionPortPanel.Visibility = Cfg.EnableCompanionApp ? Visibility.Visible : Visibility.Collapsed;
         }
+        if (CbEnableCompanionMap != null)
+        {
+            CbEnableCompanionMap.IsChecked = Cfg.EnableCompanionMap;
+            CbEnableCompanionMap.Visibility = Cfg.EnableCompanionApp ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // Telemetry settings
+        if (CbEnableTelemetry != null)
+        {
+            CbEnableTelemetry.IsChecked = Cfg.EnableTelemetry;
+        }
+        if (TelemetryPortPanel != null)
+        {
+            TelemetryPortPanel.Visibility = Cfg.EnableTelemetry ? Visibility.Visible : Visibility.Collapsed;
+        }
 
         // Ship PA settings
         if (CbEnableShipPa != null)
@@ -170,6 +185,50 @@ public partial class SettingsWindow : Window
         if (ShipPaPanel != null)
         {
             ShipPaPanel.Visibility = Cfg.EnableShipPa ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // Intercom Degradation settings
+        if (CbEnableIntercomDegradation != null)
+        {
+            CbEnableIntercomDegradation.IsChecked = Cfg.EnableIntercomDegradation;
+        }
+        if (IntercomDegradationSubPanel != null)
+        {
+            IntercomDegradationSubPanel.Visibility = Cfg.EnableIntercomDegradation ? Visibility.Visible : Visibility.Collapsed;
+        }
+        if (CbIntercomShieldHits != null)
+        {
+            CbIntercomShieldHits.IsChecked = Cfg.IntercomShieldHitsEnabled;
+        }
+        if (CbIntercomCriticalPower != null)
+        {
+            CbIntercomCriticalPower.IsChecked = Cfg.IntercomCriticalPowerEnabled;
+        }
+        if (CbIntercomQuantumTravel != null)
+        {
+            CbIntercomQuantumTravel.IsChecked = Cfg.IntercomQuantumTravelEnabled;
+        }
+
+        // Voice Command settings
+        if (CbEnableVoiceCommands != null)
+        {
+            CbEnableVoiceCommands.IsChecked = Cfg.EnableVoiceCommands;
+        }
+        if (VoiceCommandsSubPanel != null)
+        {
+            VoiceCommandsSubPanel.Visibility = Cfg.EnableVoiceCommands ? Visibility.Visible : Visibility.Collapsed;
+        }
+        if (VoiceCommandWarningPanel != null)
+        {
+            VoiceCommandWarningPanel.Visibility = (Cfg.EnableVoiceCommands && _vm?.Stt != null && !_vm.Stt.IsModelReady) ? Visibility.Visible : Visibility.Collapsed;
+        }
+        if (SlVoiceCommandConfidence != null)
+        {
+            SlVoiceCommandConfidence.Value = Cfg.VoiceCommandConfidence;
+        }
+        if (VoiceCommandConfidenceLabel != null)
+        {
+            VoiceCommandConfidenceLabel.Text = $"{Cfg.VoiceCommandConfidence:F2}";
         }
 
         // OCR region display
@@ -380,6 +439,18 @@ public partial class SettingsWindow : Window
         bool enabled = CbEnableCompanionApp.IsChecked == true;
         Cfg.EnableCompanionApp = enabled;
         CompanionPortPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        if (CbEnableCompanionMap != null)
+        {
+            CbEnableCompanionMap.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
+
+    private void Telemetry_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || TelemetryPortPanel == null) return;
+        bool enabled = CbEnableTelemetry.IsChecked == true;
+        Cfg.EnableTelemetry = enabled;
+        TelemetryPortPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void ShipPa_ToggleChanged(object sender, RoutedEventArgs e)
@@ -388,6 +459,37 @@ public partial class SettingsWindow : Window
         bool enabled = CbEnableShipPa.IsChecked == true;
         Cfg.EnableShipPa = enabled;
         ShipPaPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void IntercomDegradation_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || IntercomDegradationSubPanel == null) return;
+        bool enabled = CbEnableIntercomDegradation.IsChecked == true;
+        Cfg.EnableIntercomDegradation = enabled;
+        IntercomDegradationSubPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void VoiceCommands_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || VoiceCommandsSubPanel == null) return;
+        bool enabled = CbEnableVoiceCommands.IsChecked == true;
+        Cfg.EnableVoiceCommands = enabled;
+        VoiceCommandsSubPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        if (VoiceCommandWarningPanel != null)
+        {
+            VoiceCommandWarningPanel.Visibility = (enabled && _vm?.Stt != null && !_vm.Stt.IsModelReady) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        if (enabled && _vm?.Stt != null && !_vm.Stt.IsModelReady)
+        {
+            _ = _vm.Stt.EnsureModelDownloadedAsync();
+        }
+    }
+
+    private void SlVoiceCommandConfidence_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (VoiceCommandConfidenceLabel != null) VoiceCommandConfidenceLabel.Text = $"{e.NewValue:F2}";
+        if (Cfg != null) Cfg.VoiceCommandConfidence = e.NewValue;
     }
 
     protected override void OnClosed(EventArgs e)
@@ -406,6 +508,10 @@ public partial class SettingsWindow : Window
             if (SttWarningPanel != null)
             {
                 SttWarningPanel.Visibility = Visibility.Collapsed;
+            }
+            if (VoiceCommandWarningPanel != null)
+            {
+                VoiceCommandWarningPanel.Visibility = Visibility.Collapsed;
             }
         });
     }

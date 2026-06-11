@@ -79,6 +79,26 @@ public class CompanionAppTests
 
             Assert.Equal("TestPlayer", root.GetProperty("username").GetString());
             Assert.False(root.GetProperty("micProximityMuted").GetBoolean());
+            
+            // Map telemetry should be null/disabled by default
+            Assert.False(root.GetProperty("enableCompanionMap").GetBoolean());
+            Assert.Equal(JsonValueKind.Null, root.GetProperty("localPos").ValueKind);
+            Assert.Equal(JsonValueKind.Null, root.GetProperty("heading").ValueKind);
+            Assert.Equal(JsonValueKind.Null, root.GetProperty("remotePositions").ValueKind);
+
+            // Toggle EnableCompanionMap to true and verify
+            vm.Config.Config.EnableCompanionMap = true;
+            var statusResponseMap = await client.GetAsync("http://localhost:8891/api/status");
+            Assert.True(statusResponseMap.IsSuccessStatusCode);
+            string statusJsonMap = await statusResponseMap.Content.ReadAsStringAsync();
+            using var docMap = JsonDocument.Parse(statusJsonMap);
+            var rootMap = docMap.RootElement;
+
+            Assert.True(rootMap.GetProperty("enableCompanionMap").GetBoolean());
+            Assert.Equal(JsonValueKind.Object, rootMap.GetProperty("heading").ValueKind);
+            Assert.Equal(0, rootMap.GetProperty("heading").GetProperty("x").GetDouble());
+            Assert.Equal(1, rootMap.GetProperty("heading").GetProperty("y").GetDouble());
+            Assert.Equal(JsonValueKind.Object, rootMap.GetProperty("remotePositions").ValueKind);
 
             // 2. Test POST /api/action - Toggle proximity mute
             var actionPayload = new { action = "toggle_proximity_mute" };

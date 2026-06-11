@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">Activer Discord Rich Presence</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Activer le serveur HTTP Compagnon</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Port du serveur compagnon</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">Activer la carte tactique du copilote (MFD)</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">Activer la distorsion vocale G-Force &amp; Effort</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">Activer les répéteurs radio (routage multi-sauts)</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">Agir comme une balise répéteur radio</sys:String>
@@ -179,4 +180,23 @@
     <!-- Avertissements de connexion -->
     <sys:String x:Key="WarningGrtprNoPath">Le lecteur Game.log (GRTPR) est activé, mais le chemin du fichier Game.log n'est pas défini. Veuillez renseigner le chemin du fichier Game.log de Star Citizen dans l'onglet Général des paramètres avant de tenter de vous connecter au serveur.</sys:String>
     <sys:String x:Key="TitleWarning">Avertissement</sys:String>
+    
+    <!-- Télémétrie -->
+    <sys:String x:Key="LblEnableTelemetry">Activer la diffusion de télémétrie (UDP)</sys:String>
+    <sys:String x:Key="LblTelemetryPort">Port de diffusion de télémétrie</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">Activer la dégradation de l'interphone (Statut du navire)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">Activer l'effet d'impact de bouclier (Bruit &amp; Craquements)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">Activer l'effet d'alimentation critique (Bourdonnement &amp; Resampling)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">Activer l'effet de voyage quantique (Balayage phaser)</sys:String>
+
+    <!-- Voice Commands -->
+    <sys:String x:Key="LblEnableVoiceCommands">Activer les commandes vocales (PTT mains libres)</sys:String>
+    <sys:String x:Key="LblVoiceCommandHotkey">Touche de commande vocale (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandConfidence">Seuil de confiance des commandes vocales</sys:String>
+    <sys:String x:Key="LblVoiceCommandWarning">ATTENTION : L'activation des commandes vocales hors ligne téléchargera le modèle de transcription Whisper (~140 Mo) lors du premier démarrage s'il n'est pas déjà présent.</sys:String>
+    <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS À L'ÉCOUTE...</sys:String>
+    <sys:String x:Key="TxtVoiceSuccess">✔️ CMD : {0}</sys:String>
+    <sys:String x:Key="TxtVoiceError">❌ CMD NON RECONNUE</sys:String>
 </ResourceDictionary>

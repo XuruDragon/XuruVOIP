@@ -265,6 +265,26 @@
                                          Style="{StaticResource InputStyle}"/>
                             </StackPanel>
 
+                            <CheckBox x:Name="CbEnableCompanionMap"
+                                      Content="{DynamicResource LblEnableCompanionMap}"
+                                      IsChecked="{Binding Config.EnableCompanionMap, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="16,8,0,0"/>
+
+                            <CheckBox x:Name="CbEnableTelemetry"
+                                      Content="{DynamicResource LblEnableTelemetry}"
+                                      IsChecked="{Binding Config.EnableTelemetry, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
+                                      Checked="Telemetry_ToggleChanged" Unchecked="Telemetry_ToggleChanged"/>
+
+                            <StackPanel x:Name="TelemetryPortPanel" Margin="16,4,0,0">
+                                <TextBlock Text="{DynamicResource LblTelemetryPort}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="TxTelemetryPort"
+                                         Text="{Binding Config.TelemetryPort, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+
                             <!-- Immersive Features -->
                             <CheckBox Content="{DynamicResource LblEnableExertionDistortion}"
                                       IsChecked="{Binding Config.EnableExertionDistortion, UpdateSourceTrigger=PropertyChanged}"
@@ -293,6 +313,62 @@
                                 <TextBox x:Name="TxPttPaKey"
                                          Text="{Binding Config.PttPaKey, UpdateSourceTrigger=PropertyChanged}"
                                          Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+
+                            <CheckBox x:Name="CbEnableIntercomDegradation"
+                                      Content="{DynamicResource LblEnableIntercomDegradation}"
+                                      IsChecked="{Binding Config.EnableIntercomDegradation, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
+                                      Checked="IntercomDegradation_ToggleChanged" Unchecked="IntercomDegradation_ToggleChanged"/>
+
+                            <StackPanel x:Name="IntercomDegradationSubPanel" Margin="16,4,0,0">
+                                <CheckBox x:Name="CbIntercomShieldHits"
+                                          Content="{DynamicResource LblIntercomShieldHits}"
+                                          IsChecked="{Binding Config.IntercomShieldHitsEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,0"/>
+
+                                <CheckBox x:Name="CbIntercomCriticalPower"
+                                          Content="{DynamicResource LblIntercomCriticalPower}"
+                                          IsChecked="{Binding Config.IntercomCriticalPowerEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,6,0,0"/>
+                                <CheckBox x:Name="CbIntercomQuantumTravel"
+                                          Content="{DynamicResource LblIntercomQuantumTravel}"
+                                          IsChecked="{Binding Config.IntercomQuantumTravelEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,6,0,0"/>
+                            </StackPanel>
+
+                            <!-- Voice Commands -->
+                            <CheckBox x:Name="CbEnableVoiceCommands"
+                                      Content="{DynamicResource LblEnableVoiceCommands}"
+                                      IsChecked="{Binding Config.EnableVoiceCommands, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
+                                      Checked="VoiceCommands_ToggleChanged" Unchecked="VoiceCommands_ToggleChanged"/>
+
+                            <StackPanel x:Name="VoiceCommandsSubPanel" Margin="16,4,0,0">
+                                <!-- WARNING Panel -->
+                                <Border x:Name="VoiceCommandWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,4,0,8" Visibility="Collapsed">
+                                    <StackPanel>
+                                        <TextBlock Text="⚠️ Voice Commands Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
+                                        <TextBlock Text="{DynamicResource LblVoiceCommandWarning}" 
+                                                   Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Confidence threshold slider -->
+                                <TextBlock Style="{StaticResource LabelStyle}" Margin="0,4,0,2">
+                                    <Run Text="{DynamicResource LblVoiceCommandConfidence}"/>
+                                    <Run Text=": "/>
+                                    <Run x:Name="VoiceCommandConfidenceLabel" Text="0.5"/>
+                                </TextBlock>
+                                <Slider x:Name="SlVoiceCommandConfidence" Minimum="0.1" Maximum="1.0"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        Foreground="{StaticResource Accent}"
+                                        ValueChanged="SlVoiceCommandConfidence_Changed" Margin="0,0,0,12"/>
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
@@ -674,6 +750,14 @@
                             <TextBlock Text="{DynamicResource LblMuteAudioProfile}" Style="{StaticResource LabelStyle}"/>
                             <TextBox x:Name="TxMuteAudioProfile"
                                      Text="{Binding Config.MuteAudioProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Voice Command Key (PTT) -->
+                            <TextBlock Text="{DynamicResource LblVoiceCommandHotkey}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxVoiceCommandHotkey"
+                                     Text="{Binding Config.VoiceCommandHotkey, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource InputStyle}"
                                      KeyDown="Hotkey_KeyDown"
                                      Margin="0,0,0,10"/>
