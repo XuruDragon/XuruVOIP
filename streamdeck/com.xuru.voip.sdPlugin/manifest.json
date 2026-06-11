@@ -275,6 +275,14 @@
       "UUID": "com.xuru.voip.action.cycle_radio_dial",
       "Name": "Radio Channel Dial",
       "Icon": "icons/cycle_radio",
+      "PropertyInspectorPath": "pi/pi.html",
+      "States": [
+        {
+          "Image": "icons/cycle_radio",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
       "Controllers": [
         "Encoder"
       ],
@@ -293,6 +301,14 @@
       "UUID": "com.xuru.voip.action.adjust_exertion",
       "Name": "Adjust Exertion/G-Force",
       "Icon": "icons/telemetry",
+      "PropertyInspectorPath": "pi/pi.html",
+      "States": [
+        {
+          "Image": "icons/telemetry",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
       "Controllers": [
         "Encoder"
       ],
@@ -311,6 +327,14 @@
       "UUID": "com.xuru.voip.action.voice_changer_dial",
       "Name": "Voice Changer Dial",
       "Icon": "icons/profile_unmuted",
+      "PropertyInspectorPath": "pi/pi.html",
+      "States": [
+        {
+          "Image": "icons/profile_unmuted",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
       "Controllers": [
         "Encoder"
       ],
