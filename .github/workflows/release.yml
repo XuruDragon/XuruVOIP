@@ -130,6 +130,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Publish to WinGet
+        if: ${{ vars.PUBLISH_TO_WINGET != 'false' }}
         uses: vedantmgoyal9/winget-releaser@v2
         with:
           identifier: XuruDragon.XuruVOIPClient # Your app package ID in winget format
