@@ -190,4 +190,13 @@
     <sys:String x:Key="LblIntercomShieldHits">シールド被弾エフェクトを有効にする (ノイズ＆ポップ音)</sys:String>
     <sys:String x:Key="LblIntercomCriticalPower">致命的電力エフェクトを有効にする (ハム音＆リサンプル)</sys:String>
     <sys:String x:Key="LblIntercomQuantumTravel">量子トラベルエフェクトを有効にする (フェイザースイープ)</sys:String>
+
+    <!-- Voice Commands -->
+    <sys:String x:Key="LblEnableVoiceCommands">音声コマンドを有効化 (ハンズフリーPTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandHotkey">音声コマンドキー (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandConfidence">音声コマンドの信頼度しきい値</sys:String>
+    <sys:String x:Key="LblVoiceCommandWarning">警告: オフライン音声コマンドを有効にすると、モデルがまだ存在しない場合、最初の起動時にWhisper文字起こしモデル（~140MB）がダウンロードされます。</sys:String>
+    <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 聴取中...</sys:String>
+    <sys:String x:Key="TxtVoiceSuccess">✔️ CMD: {0}</sys:String>
+    <sys:String x:Key="TxtVoiceError">❌ コマンドが認識されません</sys:String>
 </ResourceDictionary>

@@ -54,6 +54,10 @@ public class AudioCaptureService : IDisposable
     private bool _disposed;
     private volatile bool _isRecording = false;
 
+    private bool _isRecordingCommand = false;
+    private readonly List<float> _commandAudioBuffer = new();
+    private readonly object _commandAudioLock = new();
+
     /// <summary>Fired with (opusData, txType) when a voice frame is ready to send.</summary>
     public event Action<byte[], byte>? EncodedFrameReady;
 
@@ -152,6 +156,22 @@ public class AudioCaptureService : IDisposable
         }
         InputLevel = (float)Math.Sqrt(sumSq / sampleCount) / 32768f;
 
+        lock (_commandAudioLock)
+        {
+            if (_isRecordingCommand)
+            {
+                // Downsample from 48kHz to 16kHz by taking the average of every 3 samples
+                for (int i = 0; i < sampleCount; i += 3)
+                {
+                    if (i + 2 < sampleCount)
+                    {
+                        float avg = (incoming[i] + incoming[i + 1] + incoming[i + 2]) / (3.0f * 32768f);
+                        _commandAudioBuffer.Add(avg);
+                    }
+                }
+            }
+        }
+
         lock (_bufLock)
         {
             // Re-check since lock could have waited after Stop()
@@ -179,6 +199,23 @@ public class AudioCaptureService : IDisposable
 
     private void ProcessFrame(short[] pcmFrame)
     {
+        bool isCommandRecording;
+        lock (_commandAudioLock)
+        {
+            isCommandRecording = _isRecordingCommand;
+        }
+
+        if (isCommandRecording)
+        {
+            bool wasTx = IsTransmitting;
+            IsTransmitting = false;
+            if (wasTx)
+            {
+                EncodedFrameReady?.Invoke(new byte[0], _currentTxType);
+            }
+            return;
+        }
+
         if (_encoder == null) return;
         if (Mode == AudioMode.VAD && _vad == null) return;
 
@@ -386,6 +423,26 @@ public class AudioCaptureService : IDisposable
             _vad = null;
             InputLevel = 0;
             _frameBufferPos = 0;
+        }
+    }
+
+    public void StartCommandRecording()
+    {
+        lock (_commandAudioLock)
+        {
+            _commandAudioBuffer.Clear();
+            _isRecordingCommand = true;
+        }
+    }
+
+    public float[] StopCommandRecording()
+    {
+        lock (_commandAudioLock)
+        {
+            _isRecordingCommand = false;
+            var samples = _commandAudioBuffer.ToArray();
+            _commandAudioBuffer.Clear();
+            return samples;
         }
     }
 

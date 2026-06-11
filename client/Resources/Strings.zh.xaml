@@ -190,4 +190,13 @@
     <sys:String x:Key="LblIntercomShieldHits">启用护盾受击效果 (杂音与爆音)</sys:String>
     <sys:String x:Key="LblIntercomCriticalPower">启用临界电力效果 (低压嗡嗡声与变调)</sys:String>
     <sys:String x:Key="LblIntercomQuantumTravel">启用量子旅行效果 (相位扫频)</sys:String>
+
+    <!-- Voice Commands -->
+    <sys:String x:Key="LblEnableVoiceCommands">启用语音命令 (免提 PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandHotkey">语音命令按键 (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandConfidence">语音命令置信度阈值</sys:String>
+    <sys:String x:Key="LblVoiceCommandWarning">警告：启用离线语音命令将在首次激活时下载 Whisper 转录模型（约 140MB，如果您的机器上尚不存在）。</sys:String>
+    <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 正在聆听...</sys:String>
+    <sys:String x:Key="TxtVoiceSuccess">✔️ 命令: {0}</sys:String>
+    <sys:String x:Key="TxtVoiceError">❌ 未识别语音命令</sys:String>
 </ResourceDictionary>

@@ -235,7 +235,12 @@ graph TB
 * **Superposition Click-Through Win32 :** Une superposition HUD sans bordure affichant les connexions VoIP, les fréquences et les états de parole. Compatible Vulkan et DirectX (fonctionnant en mode fenêtré sans bordure).
 * **Indicateur d'état de l'interphone :** Affiche des avertissements tels que `⚡ INTERCOM: DEGRADED` (avec détails du sous-état comme `[Power Loss]`, `[Quantum]` ou `[Static Pop]`) sur l'affichage tête haute (HUD) lorsque la dégradation de l'interphone est active.
 * **Mini-radar tactique :** Comprend un radar HUD 2D aligné sur le cap qui affiche les joueurs parlant de manière relative, dessinant des anneaux sonores pulsés autour d'eux.
-* **Sous-titres parole-texte :** transcrit l'audio de radio/proximité entrant en sous-titres HUD localisés à l'aide d'un modèle Whisper léger et hors ligne (`ggml-tiny.bin`).
+* **Sous-titres parole-texte :** transcrit l'audio de radio/proximité entrant en sous-titres HUD localisés à l'aide d'un modèle Whisper léger et hors ligne (`ggml-tiny.bin`).
+* **Commandes vocales PTT mains libres :** Maintenir la touche dédiée aux commandes vocales désactive temporairement les flux vocaux de proximité/radio sortants et met en mémoire tampon l'audio du micro. Au relâchement, la voix est transcrite localement via le modèle Whisper pour déclencher des actions du vaisseau :
+  * **Commandes prises en charge :** Bascule visière/casque, sourdine micro (proximité/radio/profil/tout), sélection du canal radio actif et préréglages du changeur de voix.
+  * **Correspondance de mots-clés multilingue :** Prise en charge dans 8 langues (anglais, français, allemand, espagnol, portugais, japonais et chinois).
+  * **Filtre de seuil de confiance :** Un curseur configurable permet de filtrer les correspondances à faible confiance ou les bruits de fond.
+  * *Désactivé par défaut ; l'activer lancera le téléchargement en arrière-plan du modèle de transcription hors ligne Whisper (~140 Mo) s'il n'est pas déjà présent.*
 
 ### 8. 📱 Application compagnon et API REST
 * **Serveur Web HTTP local :** Héberge un tableau de bord local sur un port configurable (par défaut : `8891`, désactivé par défaut).

@@ -99,6 +99,20 @@ XuruVOIP includes special features that make voice communication match your game
   * Under it, you can toggle the individual sub-effects (**Shield Hits**, **Critical Power**, **Quantum Travel**) depending on your preferences.
   * When active, warning messages like `⚡ INTERCOM: POWER LOSS` or `⚡ INTERCOM: QUANTUM WAVE` will display on your HUD overlay.
 
+### 🎙️ 6. Offline Voice Commands (Hands-Free PTT)
+* **What it does:** Allows you to hold a dedicated key to speak commands directly to your ship's onboard computer (like lowering/raising your helmet visor, muting/unmuting your microphone, changing radio channels, or switching voice changer profiles) without other players hearing you.
+  * **Suppressed Transmit:** Holding the Voice Command key silences your proximity and radio voice streams, keeping your instructions private.
+  * **Offline Transcription:** Uses an offline Whisper model to translate your speech into actions.
+  * **Confidence Threshold:** A slider filter allows you to adjust how strictly the computer matches your voice commands.
+  * **Supported Languages:** Localized matching dictionaries support English, French, German, Spanish, Portuguese, Japanese, and Chinese.
+* **How to configure it:**
+  * Go to **Settings** -> **General** tab.
+  * Check **Enable Voice Commands (Hands-Free PTT)** (disabled by default).
+  * *Notice: Enabling this for the first time will automatically download the required Whisper speech-to-text model (~140MB) in the background.*
+  * Go to the **Hotkeys** tab.
+  * Assign a hotkey in the **Voice Command Key (PTT)** box (default is `V`).
+  * Hold the key to speak (e.g. *"Computer, toggle visor"*, French: *"Ordinateur, basculer le casque"*, German: *"Kanal auf Alpha"*), and release it to execute.
+
 ---
 
 ## 📱 Using the Companion App

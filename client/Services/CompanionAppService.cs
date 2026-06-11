@@ -243,7 +243,10 @@ public class CompanionAppService : IDisposable
                     intercomShieldHitsEnabled = _viewModel.Config.Config.IntercomShieldHitsEnabled,
                     intercomCriticalPowerEnabled = _viewModel.Config.Config.IntercomCriticalPowerEnabled,
                     intercomQuantumTravelEnabled = _viewModel.Config.Config.IntercomQuantumTravelEnabled,
-                    intercomState = _viewModel.IntercomState.ToString()
+                    intercomState = _viewModel.IntercomState.ToString(),
+                    voiceCommandsEnabled = _viewModel.Config.Config.EnableVoiceCommands,
+                    isListening = _viewModel.IsVoiceListening,
+                    lastRecognizedCommand = _viewModel.VoiceCommandStatusText
                 };
 
                 string json = JsonSerializer.Serialize(status);
@@ -368,6 +371,13 @@ public class CompanionAppService : IDisposable
                         _ => IntercomDegradationState.Normal
                     };
                     _viewModel.IntercomState = stateVal;
+                }
+                break;
+            case "simulate_voice_command":
+                if (root.TryGetProperty("command", out var cmdProp))
+                {
+                    string cmd = cmdProp.GetString() ?? "";
+                    _viewModel.ProcessVoiceCommand(cmd);
                 }
                 break;
         }

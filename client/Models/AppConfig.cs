@@ -67,6 +67,9 @@ public class AppConfig
     public bool EnableRadar { get; set; } = true;
     public double RadarRange { get; set; } = 50.0;
     public bool EnableStt { get; set; } = false;
+    public bool EnableVoiceCommands { get; set; } = false;
+    public string VoiceCommandHotkey { get; set; } = "V";
+    public double VoiceCommandConfidence { get; set; } = 0.5;
 
     // --- Discord RPC ---
     public bool EnableDiscordRpc { get; set; } = true;

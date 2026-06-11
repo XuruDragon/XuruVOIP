@@ -190,4 +190,13 @@
     <sys:String x:Key="LblIntercomShieldHits">Enable Shield Hits Effect (Static &amp; Pops)</sys:String>
     <sys:String x:Key="LblIntercomCriticalPower">Enable Critical Power Effect (Hum &amp; Resample)</sys:String>
     <sys:String x:Key="LblIntercomQuantumTravel">Enable Quantum Travel Effect (Phaser Sweep)</sys:String>
+
+    <!-- Voice Commands -->
+    <sys:String x:Key="LblEnableVoiceCommands">Enable Voice Commands (Hands-Free PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandHotkey">Voice Command Key (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandConfidence">Voice Command Confidence Threshold</sys:String>
+    <sys:String x:Key="LblVoiceCommandWarning">WARNING: Enabling Offline Voice Commands will download the Whisper transcription model (~140MB) on first activation if not already present on your machine.</sys:String>
+    <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS LISTENING...</sys:String>
+    <sys:String x:Key="TxtVoiceSuccess">✔️ CMD: {0}</sys:String>
+    <sys:String x:Key="TxtVoiceError">❌ CMD NOT RECOGNIZED</sys:String>
 </ResourceDictionary>

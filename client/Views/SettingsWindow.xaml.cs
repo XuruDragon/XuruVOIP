@@ -209,6 +209,28 @@ public partial class SettingsWindow : Window
             CbIntercomQuantumTravel.IsChecked = Cfg.IntercomQuantumTravelEnabled;
         }
 
+        // Voice Command settings
+        if (CbEnableVoiceCommands != null)
+        {
+            CbEnableVoiceCommands.IsChecked = Cfg.EnableVoiceCommands;
+        }
+        if (VoiceCommandsSubPanel != null)
+        {
+            VoiceCommandsSubPanel.Visibility = Cfg.EnableVoiceCommands ? Visibility.Visible : Visibility.Collapsed;
+        }
+        if (VoiceCommandWarningPanel != null)
+        {
+            VoiceCommandWarningPanel.Visibility = (Cfg.EnableVoiceCommands && _vm?.Stt != null && !_vm.Stt.IsModelReady) ? Visibility.Visible : Visibility.Collapsed;
+        }
+        if (SlVoiceCommandConfidence != null)
+        {
+            SlVoiceCommandConfidence.Value = Cfg.VoiceCommandConfidence;
+        }
+        if (VoiceCommandConfidenceLabel != null)
+        {
+            VoiceCommandConfidenceLabel.Text = $"{Cfg.VoiceCommandConfidence:F2}";
+        }
+
         // OCR region display
         UpdateRegionDisplay();
     }
@@ -447,6 +469,29 @@ public partial class SettingsWindow : Window
         IntercomDegradationSubPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    private void VoiceCommands_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || VoiceCommandsSubPanel == null) return;
+        bool enabled = CbEnableVoiceCommands.IsChecked == true;
+        Cfg.EnableVoiceCommands = enabled;
+        VoiceCommandsSubPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        if (VoiceCommandWarningPanel != null)
+        {
+            VoiceCommandWarningPanel.Visibility = (enabled && _vm?.Stt != null && !_vm.Stt.IsModelReady) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        if (enabled && _vm?.Stt != null && !_vm.Stt.IsModelReady)
+        {
+            _ = _vm.Stt.EnsureModelDownloadedAsync();
+        }
+    }
+
+    private void SlVoiceCommandConfidence_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (VoiceCommandConfidenceLabel != null) VoiceCommandConfidenceLabel.Text = $"{e.NewValue:F2}";
+        if (Cfg != null) Cfg.VoiceCommandConfidence = e.NewValue;
+    }
+
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
@@ -463,6 +508,10 @@ public partial class SettingsWindow : Window
             if (SttWarningPanel != null)
             {
                 SttWarningPanel.Visibility = Visibility.Collapsed;
+            }
+            if (VoiceCommandWarningPanel != null)
+            {
+                VoiceCommandWarningPanel.Visibility = Visibility.Collapsed;
             }
         });
     }

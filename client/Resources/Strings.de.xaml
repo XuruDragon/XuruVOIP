@@ -190,4 +190,13 @@
     <sys:String x:Key="LblIntercomShieldHits">Schildtreffer-Effekt aktivieren (Rauschen &amp; Knistern)</sys:String>
     <sys:String x:Key="LblIntercomCriticalPower">Kritischen Krafteffekt aktivieren (Brummen &amp; Resample)</sys:String>
     <sys:String x:Key="LblIntercomQuantumTravel">Quantenreise-Effekt aktivieren (Phaser-Sweep)</sys:String>
+
+    <!-- Voice Commands -->
+    <sys:String x:Key="LblEnableVoiceCommands">Sprachbefehle aktivieren (Freihand-PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandHotkey">Sprachbefehl-Taste (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceCommandConfidence">Sprachbefehl-Konfidenzschwellenwert</sys:String>
+    <sys:String x:Key="LblVoiceCommandWarning">WARNUNG: Die Aktivierung von Offline-Sprachbefehlen lädt bei der ersten Aktivierung das Whisper-Transkriptionsmodell (~140 MB) herunter, falls es noch nicht vorhanden ist.</sys:String>
+    <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS HÖRT ZU...</sys:String>
+    <sys:String x:Key="TxtVoiceSuccess">✔️ CMD: {0}</sys:String>
+    <sys:String x:Key="TxtVoiceError">❌ CMD NICHT ERKANNT</sys:String>
 </ResourceDictionary>

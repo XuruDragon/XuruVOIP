@@ -41,6 +41,24 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly object _reconnectLock = new();
     private CancellationTokenSource? _reconnectCts;
 
+    private readonly VoiceCommandService _voiceCommand = new();
+    public VoiceCommandService VoiceCommand => _voiceCommand;
+
+    private bool _isVoiceListening;
+    public bool IsVoiceListening { get => _isVoiceListening; set => Set(ref _isVoiceListening, value); }
+
+    private string _voiceCommandStatusText = "";
+    public string VoiceCommandStatusText { get => _voiceCommandStatusText; set => Set(ref _voiceCommandStatusText, value); }
+
+    private string _voiceCommandStatusColor = "Cyan";
+    public string VoiceCommandStatusColor { get => _voiceCommandStatusColor; set => Set(ref _voiceCommandStatusColor, value); }
+
+    private bool _showVoiceCommandPanel;
+    public bool ShowVoiceCommandPanel { get => _showVoiceCommandPanel; set => Set(ref _showVoiceCommandPanel, value); }
+
+    private bool _isVoiceCommandListening = false;
+    private System.Timers.Timer? _voiceCommandResetTimer;
+
     // ─── Observable state ────────────────────────────────────────────────────
     private readonly Dictionary<string, bool> _remoteHelmets = [];
     private readonly Dictionary<string, PlayerPosition> _remotePositions = [];
@@ -264,6 +282,15 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             string keyStr = key.ToString();
             var cfg = Config.Config;
 
+            if (cfg.EnableVoiceCommands && keyStr == cfg.VoiceCommandHotkey)
+            {
+                if (_stt.IsModelReady)
+                {
+                    HandleVoiceCommandHotkey(isDown);
+                }
+                return;
+            }
+
             if (keyStr == cfg.PttProximityKey)
             {
                 _isPttProximityDown = isDown;
@@ -398,7 +425,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             var cfg = Config.Config;
             if (cfg.AudioMode == AudioMode.PTT)
             {
-                bool anyPttPressed = _isPttProximityDown || _isPttRadioDown || _isPttProfileDown;
+                bool anyPttPressed = _isPttProximityDown || _isPttRadioDown || _isPttProfileDown || _isVoiceCommandListening;
                 InputLevel = anyPttPressed ? _capture.InputLevel : 0f;
             }
             else // VAD mode
@@ -688,6 +715,53 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         {
             await _audioWs.SendAudioFrameAsync(txType, frame);
         };
+
+        // Voice Command Service wiring
+        _voiceCommand.VisorToggleRequested += () => ToggleHelmet();
+        _voiceCommand.ChannelChangeRequested += chan => _ = ChangeRadioChannelAsync(chan);
+        _voiceCommand.VoiceChangerProfileRequested += profile =>
+        {
+            Config.Config.EnableVoiceChanger = (profile != "None");
+            Config.Config.VoiceChangerType = profile;
+            SaveConfig();
+            ApplySettings();
+        };
+        _voiceCommand.MicStateChangeRequested += action =>
+        {
+            switch (action)
+            {
+                case VoiceCommandAction.MicMuteProximity:
+                    MicProximityMuted = true;
+                    break;
+                case VoiceCommandAction.MicUnmuteProximity:
+                    MicProximityMuted = false;
+                    break;
+                case VoiceCommandAction.MicMuteRadio:
+                    MicRadioMuted = true;
+                    break;
+                case VoiceCommandAction.MicUnmuteRadio:
+                    MicRadioMuted = false;
+                    break;
+                case VoiceCommandAction.MicMuteProfile:
+                    MicProfileMuted = true;
+                    break;
+                case VoiceCommandAction.MicUnmuteProfile:
+                    MicProfileMuted = false;
+                    break;
+                case VoiceCommandAction.MicMuteAll:
+                    MicProximityMuted = true;
+                    MicRadioMuted = true;
+                    MicProfileMuted = true;
+                    break;
+                case VoiceCommandAction.MicUnmuteAll:
+                    MicProximityMuted = false;
+                    MicRadioMuted = false;
+                    MicProfileMuted = false;
+                    break;
+            }
+        };
+        _stt.CaptionDecoded += OnCaptionDecoded;
+
         NotifyMicStatusChanged();
         IsHelmetOn = false;
     }
@@ -1346,6 +1420,8 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        _voiceCommandResetTimer?.Stop();
+        _voiceCommandResetTimer?.Dispose();
         _ocrTimer.Stop();
         _keyHook.Dispose();
         _gameDetector.Dispose();
@@ -1489,5 +1565,103 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         }
 
         _discordRpc.UpdatePresence(details, state);
+    }
+
+    private void HandleVoiceCommandHotkey(bool isDown)
+    {
+        if (isDown)
+        {
+            if (_isVoiceCommandListening) return; // Prevent repeats
+            _isVoiceCommandListening = true;
+
+            // Clear visual reset timer if running
+            _voiceCommandResetTimer?.Stop();
+
+            // Set HUD listening state
+            ShowVoiceCommandPanel = true;
+            IsVoiceListening = true;
+            VoiceCommandStatusColor = "Cyan";
+            VoiceCommandStatusText = Application.Current?.TryFindResource("TxtVoiceListening") as string ?? "🎙️ AEGIS LISTENING...";
+
+            // Start capture recording
+            _capture.StartCommandRecording();
+        }
+        else
+        {
+            if (!_isVoiceCommandListening) return;
+            _isVoiceCommandListening = false;
+
+            IsVoiceListening = false;
+
+            // Stop capture recording
+            float[] samples = _capture.StopCommandRecording();
+
+            if (samples.Length > 0)
+            {
+                // Queue transcription with a special channel type 255 for internal parsing
+                _stt.QueueTranscription("LocalPlayerCommand", samples, 255, Config.Config.Language);
+            }
+            else
+            {
+                // Hide panel if no samples
+                ShowVoiceCommandPanel = false;
+            }
+        }
+    }
+
+    public void ProcessVoiceCommand(string text)
+    {
+        var result = _voiceCommand.ParseAndExecute(text, Config.Config.Language, _availableChannels, Config.Config.VoiceCommandConfidence);
+        
+        Application.Current?.Dispatcher.Invoke(() =>
+        {
+            if (result.Action != VoiceCommandAction.None)
+            {
+                string actionLabel = result.Action switch
+                {
+                    VoiceCommandAction.VisorToggle => Application.Current?.TryFindResource("LblHelmetToggle") as string ?? "Visor Toggle",
+                    VoiceCommandAction.MicMuteProximity => "Mute Proximity",
+                    VoiceCommandAction.MicUnmuteProximity => "Unmute Proximity",
+                    VoiceCommandAction.MicMuteRadio => "Mute Radio",
+                    VoiceCommandAction.MicUnmuteRadio => "Unmute Radio",
+                    VoiceCommandAction.MicMuteProfile => "Mute Profile",
+                    VoiceCommandAction.MicUnmuteProfile => "Unmute Profile",
+                    VoiceCommandAction.MicMuteAll => "Mute All",
+                    VoiceCommandAction.MicUnmuteAll => "Unmute All",
+                    VoiceCommandAction.RadioChannelSwitch => $"Channel: {result.TargetChannel}",
+                    VoiceCommandAction.VoiceChangerProfile => $"Voice Changer: {result.TargetProfile}",
+                    _ => "Command"
+                };
+
+                string successFormat = Application.Current?.TryFindResource("TxtVoiceSuccess") as string ?? "✔️ CMD: {0}";
+                VoiceCommandStatusText = string.Format(successFormat, actionLabel);
+                VoiceCommandStatusColor = "Green";
+            }
+            else
+            {
+                VoiceCommandStatusText = Application.Current?.TryFindResource("TxtVoiceError") as string ?? "❌ CMD NOT RECOGNIZED";
+                VoiceCommandStatusColor = "Red";
+            }
+
+            ShowVoiceCommandPanel = true;
+
+            // Show for 2 seconds, then reset panel visibility
+            _voiceCommandResetTimer?.Stop();
+            _voiceCommandResetTimer = new System.Timers.Timer(2000);
+            _voiceCommandResetTimer.Elapsed += (s, e) =>
+            {
+                _voiceCommandResetTimer.Stop();
+                ShowVoiceCommandPanel = false;
+            };
+            _voiceCommandResetTimer.Start();
+        });
+    }
+
+    private void OnCaptionDecoded(string playerName, string text, byte channelType)
+    {
+        if (playerName == "LocalPlayerCommand" && channelType == 255)
+        {
+            ProcessVoiceCommand(text);
+        }
     }
 }

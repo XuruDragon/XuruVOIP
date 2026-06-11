@@ -239,6 +239,11 @@ graph TB
 * **Intercom Status Indicator:** Displays warnings like `⚡ INTERCOM: DEGRADED` (with sub-status details such as `[Power Loss]`, `[Quantum]`, or `[Static Pop]`) in the overlay when intercom degradation is active.
 * **Tactical Mini-Radar:** Features a heading-aligned 2D HUD radar that displays relative speaking players, drawing pulsating sound rings around them.
 * **Speech-to-Text Subtitles:** Transcribes incoming radio/proximity audio to localized HUD subtitles using an offline, lightweight Whisper model (`ggml-tiny.bin`).
+* **Hands-Free PTT Voice Commands:** Holding the dedicated Voice Command key temporarily suppresses outgoing proximity/radio voice feeds and buffers mic audio. On release, the voice is transcribed locally via the Whisper model to trigger ship actions:
+  * **Supported Commands:** Visor/Helmet Toggle, Microphone Mute/Unmute (proximity/radio/profile/all), active Radio Channel selection, and Voice Changer presets.
+  * **Multi-Language Keyword Matching:** Supported across 8 languages (English, French, German, Spanish, Portuguese, Japanese, and Chinese).
+  * **Confidence Threshold Filter:** A configurable slider filters out low-confidence matches or extraneous speech.
+  * *Disabled by default; enabling it downloads the offline Whisper transcription model (~140MB) if not already present.*
 
 ### 8. 📱 Companion App & REST API
 * **Local HTTP Web Server:** Hosts a local dashboard on a configurable port (default: `8891`, disabled by default).

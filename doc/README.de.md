@@ -236,6 +236,11 @@ graph TB
 * **Gegensprech-Statusanzeige:** Zeigt Warnmeldungen wie `⚡ INTERCOM: DEGRADED` (mit Details wie `[Power Loss]`, `[Quantum]` oder `[Static Pop]`) auf dem HUD-Overlay an, wenn die Intercom-Verschlechterung aktiv ist.
 * **Taktisches Mini-Radar:** Verfügt über ein auf den Kurs ausgerichtetes 2D-HUD-Radar, das relativ sprechende Spieler anzeigt und pulsierende Tonringe um sie herum zeichnet.
 * **Speech-to-Text-Untertitel:** Transkribiert eingehende Radio-/Proximity-Audiodaten mithilfe eines Offline-, leichten Whisper-Modells („ggml-tiny.bin“) in lokalisierte HUD-Untertitel.
+* **Freihändige PTT-Sprachbefehle:** Das Halten der zugewiesenen Sprachbefehlstaste stummt vorübergehend die ausgehenden Proximity-/Radio-Sprachübertragungen und puffert das Mikrofon-Audio. Beim Loslassen wird die Sprache lokal über das Whisper-Modell transkribiert, um Schiffsaktionen auszulösen:
+  * **Unterstützte Befehle:** Visier-/Helm-Umschaltung, Mikrofon-Stummschaltung (Proximity/Radio/Profil/Alle), Auswahl des aktiven Funkkanals und Stimmenverzerrer-Voreinstellungen.
+  * **Mehrsprachige Schlüsselwort-Erkennung:** Unterstützt in 8 Sprachen (Englisch, Französisch, Deutsch, Spanisch, Portugiesisch, Japanisch und Chinesisch).
+  * **Konfidenzschwellenwert-Filter:** Ein konfigurierbarer Schieberegler filtert Erkennungen mit geringer Zuverlässigkeit oder Nebengeräusche heraus.
+  * *Standardmäßig deaktiviert; die Aktivierung lädt das Offline-Whisper-Transkriptionsmodell (~140 MB) herunter, falls es noch nicht vorhanden ist.*
 
 ### 8. 📱 Begleit-App und REST-API
 * **Lokaler HTTP-Webserver:** Hostet ein lokales Dashboard auf einem konfigurierbaren Port (Standard: „8891“, standardmäßig deaktiviert).

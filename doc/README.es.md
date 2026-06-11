@@ -236,6 +236,11 @@ graph TB
 * **Indicador de estado del intercomunicador:** Muestra advertencias como `⚡ INTERCOM: DEGRADED` (con detalles de subestado como `[Power Loss]`, `[Quantum]` o `[Static Pop]`) en la superposición de HUD cuando la degradación del intercomunicador está activa.
 * **Mini-radar táctico:** Cuenta con un radar HUD 2D alineado con el rumbo que muestra a los jugadores que hablan en relación, dibujando anillos de sonido pulsantes a su alrededor.
 * **Subtítulos de voz a texto:** Transcribe audio entrante de radio/proximidad a subtítulos HUD localizados usando un modelo Whisper liviano y fuera de línea (`ggml-tiny.bin`).
+* **Comandos de voz PTT manos libres:** Mantener presionada la tecla dedicada de comandos de voz silencia temporalmente las transmisiones salientes de proximidad/radio y almacena el audio del micrófono en búfer. Al soltarla, la voz se transcribe localmente mediante el modelo Whisper para activar acciones de la nave:
+  * **Comandos compatibles:** Alternar visor/casco, silenciar/activar micrófono (proximidad/radio/perfil/todo), selección de canal de radio activo y preajustes del modulador de voz.
+  * **Coincidencia de palabras clave multilingüe:** Compatible con 8 idiomas (inglés, francés, alemán, español, portugués, japonés y chino).
+  * **Filtro de umbral de confianza:** Un control deslizante configurable filtra coincidencias de baja confianza o habla irrelevante.
+  * *Desactivado por defecto; habilitarlo descargará el modelo de transcripción Whisper fuera de línea (~140 MB) si aún no está presente.*
 
 ### 8. 📱 Aplicación complementaria y API REST
 * **Servidor web HTTP local:** Alberga un panel local en un puerto configurable (predeterminado: `8891`, deshabilitado de forma predeterminada).
