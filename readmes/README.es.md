@@ -36,12 +36,12 @@ El objetivo de XuruVoip es proporcionar eventos de juegos de Star Citizen, organ
 
 | Sección | Descripción |
 | :--- | :--- |
-| [📖 Guía detallada de funciones](../doc/functionnalities.md) | Explicación técnica y de usuario de las más de 16 funciones implementadas. |
+| [📖 Guía detallada de funciones](../doc/functionnalities.md) | Explicación técnica y de usuario de las más de 20 funciones implementadas. |
 | [📖 Guías de usuario no técnicas](#-guías-de-usuario-no-técnicas) | Guías paso a paso fáciles de entender para Cliente, Servidor y Stream Deck. |
 | [📸 Capturas de pantalla y interfaz de usuario](#-capturas-de-pantalla-y-interfaz-de-usuario) | Muestra visual de las pantallas de los clientes, el portal de administración y la configuración. |
 | [🗂️ Estructura del proyecto](#️-project-structure) | Diseño del repositorio y desglose de carpetas. |
 | [⚙️ Arquitectura del sistema](#️-system-architecture) | El diagrama de flujo de trabajo real completo del cliente WPF, el servidor Go y los dispositivos externos. |
-| [💡 Descripción general de las funciones principales](#-descripción-general-de-las-funciones-principales) | Desglose detallado de las más de 11 funciones espaciales y de redes implementadas. |
+| [💡 Descripción general de las funciones principales](#-descripción-general-de-las-funciones-principales) | Desglose detallado de las más de 19 funciones espaciales y de redes implementadas. |
 | [🖥️ Ir al servidor (Ir)](#️-xuruvoip-server-go) | Instrucciones de construcción, ejecución, implementación y configuración del servidor. |
 | [🎛️ Puente de voz de Discord](#️-discord-voice-bridge-setup-guide) | Conexión de canales de radio del servidor Go a un canal de voz de Discord. |
 | [📱 Aplicación complementaria y plataforma de transmisión](#-integración-de-aplicación-complementaria-y-plataforma-de-transmisión) | Control remoto de dispositivos y configuración de teclas físicas de Stream Deck. |
@@ -275,6 +275,28 @@ graph TB
 ### 14. 📢 Sistema de transmisión de megafonía (PA) para barcos
 * **Transmisión de audio en todo el barco:** Los pilotos o capitanes de barcos con tripulación múltiple pueden transmitir anuncios de voz a todos los miembros de la tripulación que comparten el mismo "ContainerID" (barco) en la misma zona.
 * **PA DSP y Klaxon Chime:** Las transmisiones de megafonía evitan los silenciadores de proximidad y de radio locales (excepto el volumen maestro/silencio), reproducen mono con panorámica central, anteponen una alerta de timbre/klaxon de doble tono de ciencia ficción y aplican un filtro de reverberación y paso de banda de megáfono que simula la acústica interior de un barco hueco.
+
+### 15. 🔌 Telemetría de hardware externa (Sim-Pit UDP Sync)
+* **Sincronización UDP en tiempo real:** El cliente transmite estados de VoIP y casco en formato JSON a `127.0.0.1:8895` cada 100 ms.
+* **Integración de hardware:** Permite a los constructores de cabinas integrar luces LED o indicadores físicos que reaccionen a las comunicaciones.
+
+### 16. 🪐 Simulación de la densidad de la atmósfera planetaria
+* **Escala de rango:** El rango de voz de proximidad se adapta a la densidad atmosférica del planeta o luna (por ejemplo, caída de volumen 3.5 veces más rápida en Cellin).
+* **Silenciamiento de gas delgado:** Aplica filtros de paso bajo en el exterior bajo atmósferas delgadas, con derivación automática en interiores presurizados.
+
+### 17. 🎙️ Grabador de voz Post-Op y portal AAR
+* **Contenedor Ogg/Opus sin sobrecarga:** Guarda paquetes Opus directamente en archivos `.ogg` sin sobrecarga de codificación en el servidor.
+* **Línea de tiempo Canvas interactiva:** Permite a los administradores visualizar, reproducir y eliminar clips de voz grabados desde el panel de administración.
+
+### 18. 📞 Sistema de llamadas y hailing de nave a nave
+* **Llamadas de cabina a cabina:** Establece conexiones de voz privadas entre naves dentro de un límite de 5000 m.
+* **Transmisión manos libres:** Activa la transmisión VAD automáticamente durante la llamada, evitando las teclas PTT estándar.
+* **Tonos realistas:** Sintetiza tonos de marcado, llamada y desconexión realistas a través de NAudio.
+
+### 19. 🔤 Traducción de subtítulos en tiempo real en HUD de visor
+* **Traductor de frases dinámico:** Traduce transmisiones de voz extranjeras en tiempo real usando diccionarios militares/de vuelo para 7 idiomas.
+* **Prefijo de subtítulos HUD:** Muestra el texto traducido en el HUD del visor, con el prefijo `[DE -> A]`.
+* **Carga de modelo Whisper:** Descarga automáticamente el modelo Whisper (~75 MB) en segundo plano si no está presente al activarlo.
 
 ---
 
@@ -587,7 +609,7 @@ El paquete de lanzamiento incluye el archivo `.streamDeckPlugin` preempaquetado.
 ---
 
 ### 3. Agregar y configurar acciones
-Puedes arrastrar y soltar cualquiera de las siguientes 13 acciones en las teclas de tu Stream Deck:
+Puedes arrastrar y soltar cualquiera de las siguientes 17 acciones en las teclas de tu Stream Deck:
 * 🎤 **Silenciamiento de proximidad**: alterna el silenciamiento del micrófono de proximidad saliente.
 * 📻 **Silenciar radio**: alterna el silenciamiento del micrófono de radio saliente.
 * 👤 **Silenciar perfil**: alterna el silenciamiento del micrófono del perfil saliente.
@@ -601,6 +623,10 @@ Puedes arrastrar y soltar cualquiera de las siguientes 13 acciones en las teclas
 * 🎙️ **Voice Command Macro**: Activa una macro de comando de voz personalizada simulada en segundo plano (configurable en los ajustes).
 * 💬 **Intercom Status**: Muestra el estado del intercomunicador de la nave (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) y recorre los estados de la simulación al presionarla.
 * 🗺️ **Location Telemetry**: Muestra la zona actual del sistema y la telemetría de coordenadas $(X, Y, Z)$ en la tecla.
+* 📞 **Initiate Hail**: Inicia una llamada de nave a nave al jugador más cercano.
+* 📞 **Accept/Answer Hail**: Acepta una llamada de hailing ya recibida.
+* 📞 **Decline/End Hail**: Rechaza una llamada entrante o finaliza una llamada activa.
+* 🔤 **Toggle Translation**: Activa o desactiva la traducción de subtítulos en el HUD.
 
 #### Configuración (inspector de propiedades):
 Para cada acción que arrastre a una tecla, haga clic en ella y configure las opciones en el panel **Inspector de propiedades** en la parte inferior:

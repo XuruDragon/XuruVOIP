@@ -123,6 +123,13 @@ Once logged in, the dashboard gives you complete control over your voice server:
   * **Interactive Voice Timeline:** Visually trace speaking blocks for each player on a graphical time canvas.
   * **Audio Segment Playback:** Click on any timeline block or browse the segments list to play back `.ogg` voice clips directly in the browser, or permanently delete recordings from disk.
 
+## 📞 Ship-to-Ship Hailing & Calling Protocol
+
+The server handles hailing and private calling automatically at the protocol level, requiring no additional `.env` settings:
+* **Distance Tracking:** The server regularly tracks coordinates of calling peers. If the distance between two connected players exceeds 5,000 meters, the server automatically disconnects the call and sends a warning message (`out_of_range`) to both clients.
+* **Busy States:** If a player is already dialing or in an active call, the server automatically rejects any other incoming hailing requests, replying with a `busy` status to the caller.
+* **Audio Routing:** The UDP audio server directly routes voice frames marked as `AudioTypeHail (0x04)` between calling peers, bypassing standard radio channels and proximity logic.
+
 ---
 
 ## ❓ Troubleshooting (FAQ)

@@ -113,6 +113,35 @@ XuruVOIP includes special features that make voice communication match your game
   * Assign a hotkey in the **Voice Command Key (PTT)** box (default is `V`).
   * Hold the key to speak (e.g. *"Computer, toggle visor"*, French: *"Ordinateur, basculer le casque"*, German: *"Kanal auf Alpha"*), and release it to execute.
 
+### 📞 7. Ship-to-Ship Hailing & Calling
+* **What it does:** Allows you to place a private cockpit-to-cockpit call to another ship within 5,000 meters. The call operates on a private voice channel that overrides standard proximity and radio Push-to-Talk keys, enabling hands-free, voice-activated transmission during the call.
+* **How to configure it:**
+  1. Go to the **Hotkeys** tab in Settings.
+  2. Bind keys to **Initiate Hail**, **Accept Hail**, and **Decline/End Hail** (defaulted to `I`, `K`, and `X`).
+  3. When dialing, you will hear a dialing tone. The target will hear an incoming call ringing loop and see a tech-themed HUD notification.
+  4. Press the **Accept** key to answer, or **Decline** key to ignore/hang up.
+
+### 🔤 8. Visor HUD Real-Time Translation Subtitles
+* **What it does:** Automatically translates incoming foreign-language voice streams in real-time and displays them on your Visor HUD overlay, prefixed with source and target languages (e.g., `[FR -> EN] Subtitle text`).
+* **How to configure it:**
+  1. Go to the **Overlay** tab in Settings.
+  2. Check **Enable Real-Time HUD Translation Subtitles** (disabled by default).
+  3. *Notice: If the Whisper speech-to-text model (~75MB) is not already present, enabling this feature will trigger a yellow warning notice and start downloading the model in the background.*
+  4. Once downloaded, incoming foreign spoken languages will translate automatically to your client's configured language (e.g., English, French, German, Spanish, Portuguese, Japanese, or Chinese).
+
+### 🔌 9. External Hardware Telemetry (Sim-Pit UDP Sync)
+* **What it does:** Broadcasts client VoIP and helmet states in JSON format to `127.0.0.1:8895` (configurable) every 100ms. This allows physical simulator cockpits (sim-pits), custom LEDs, or external dashboard applications to sync in real-time with your VoIP status.
+* **How to configure it:**
+  1. Go to the **General** tab in Settings.
+  2. Check **Enable External Telemetry Broadcast (UDP)** (disabled by default).
+  3. Enter the target IP address and port (default is `127.0.0.1:8895`).
+
+### 🪐 10. Planetary Atmosphere Density Simulation
+* **What it does:** Dynamically scales your proximity voice range and muffles outgoing audio based on the atmospheric density of the planet or moon you are currently on. Thin atmospheres like Cellin result in quick voice decay and muffling, while pressurized ship cabins or space stations bypass this simulation automatically.
+* **How to configure it:**
+  1. This system works automatically in the background by reading coordinate and environmental logs.
+  2. Ensure your Star Citizen installation path is set correctly in settings so `Game.log` can be parsed.
+
 ---
 
 ## 📱 Using the Companion App

@@ -36,12 +36,12 @@ L'objectif de XuruVoip est de fournir aux événements de jeu Star Citizen, aux 
 
 | Rubrique | Descriptif |
 | :--- | :--- |
-| [📖 Guide détaillé des fonctionnalités](../doc/functionnalities.md) | Explication technique et utilisateur de l'ensemble des 16+ fonctionnalités implémentées. |
+| [📖 Guide détaillé des fonctionnalités](../doc/functionnalities.md) | Explication technique et utilisateur de l'ensemble des 20+ fonctionnalités implémentées. |
 | [📖 Guides de l'utilisateur non techniques](#-guides-dutilisation-non-techniques) | Guides étape par étape faciles à comprendre pour le client, le serveur et Stream Deck. |
 | [📸 Captures d'écran et interface utilisateur](#-captures-décran-et-interface-utilisateur) | Vitrine visuelle des écrans clients, du portail d'administration et des paramètres. |
 | [🗂️ Structure du projet](#️-project-structure) | Disposition du référentiel et répartition des dossiers. |
 | [⚙️Architecture système](#️-system-architecture) | Le diagramme de flux de travail complet du client WPF, du serveur Go et des périphériques externes. |
-| [💡 Aperçu des fonctionnalités principales](#-aperçu-des-fonctionnalités-principales) | Répartition détaillée des 11+ fonctionnalités spatiales et de réseau mises en œuvre. |
+| [💡 Aperçu des fonctionnalités principales](#-aperçu-des-fonctionnalités-principales) | Répartition détaillée des 19+ fonctionnalités spatiales et de réseau mises en œuvre. |
 | [🖥️ Go Serveur (Go)](#️-xuruvoip-server-go) | Instructions de création, d'exécution, de déploiement et de configuration du serveur. |
 | [🎛️ Pont vocal Discord](#️-discord-voice-bridge-setup-guide) | Connexion des chaînes radio du serveur Go à une chaîne vocale Discord. |
 | [📱 Application compagnon et Stream Deck](#-intégration-de-lapplication-companion-et-du-stream-deck) | Contrôle des appareils à distance et configuration des touches physiques du Stream Deck. |
@@ -275,6 +275,28 @@ graph TB
 ### 14. 📢 Expédier le système de diffusion de sonorisation publique (PA)
 * **Diffusion audio à l'échelle du navire :** Les pilotes ou capitaines de navires à équipage multiple peuvent diffuser des annonces vocales à tous les membres d'équipage partageant le même « ContainerID » (navire) dans la même zone.
 * **PA DSP et Klaxon Chime :** Les transmissions PA contournent la proximité locale et les sourdines de la radio (sauf le volume principal/la sourdine), jouent en mono avec panoramique central, ajoutent une alerte carillon/klaxon bicolore de science-fiction et appliquent un filtre passe-bande et de réverbération pour mégaphone simulant l'acoustique intérieure d'un navire creux.
+
+### 15. 🔌 Télémétrie de matériel externe (Sim-Pit UDP Sync)
+* **Synchronisation UDP en temps réel :** Le client diffuse ses états de VoIP et de casque au format JSON vers `127.0.0.1:8895` toutes les 100 ms.
+* **Intégration matérielle :** Permet aux constructeurs de cockpits d'intégrer des LED physiques, des boutons ou des indicateurs réagissant aux communications.
+
+### 16. 🪐 Simulation de densité de l'atmosphère planétaire
+* **Échelle de portée :** La portée des voix de proximité s'adapte à la densité atmosphérique de la planète ou lune (par exemple, atténuation 3,5x plus rapide sur Cellin).
+* **Mufflement :** Applique un filtre passe-bas aux voix à l'extérieur dans les atmosphères minces, contourné automatiquement dans les intérieurs pressurisés.
+
+### 17. 🎙️ Enregistreur vocal Post-Op & Portail AAR
+* **Conteneur Ogg/Opus sans surcharge :** Enregistre les paquets Opus directement dans des fichiers `.ogg` lisibles par le navigateur, sans transcodage serveur.
+* **Timeline Canvas interactive :** Permet aux administrateurs de visualiser, lire et supprimer les enregistrements vocaux des missions sur le portail d'administration.
+
+### 18. 📞 Système d'appel et de hailing de vaisseau à vaisseau
+* **Appel de cockpit à cockpit :** Établit un canal vocal privé entre vaisseaux dans une limite de 5 000 m.
+* **Streaming mains libres :** Active automatiquement la transmission vocale VAD pendant l'appel, contournant les touches PTT standard.
+* **Carillons réalistes :** Synthétise des signaux de numérotation, de sonnerie et de connexion/déconnexion réalistes via NAudio.
+
+### 19. 🔤 Traduction des sous-titres du HUD de la visière
+* **Traducteur dynamique :** Traduit les flux vocaux étrangers en temps réel en utilisant des dictionnaires militaires/de vol pour 7 langues.
+* **Préfixe HUD :** Affiche le texte traduit sur le HUD de la visière, préfixé par `[SOURCE -> CIBLE]`.
+* **Chargeur Whisper à la demande :** Télécharge automatiquement le modèle Whisper (~75 Mo) en arrière-plan lors de l'activation si nécessaire.
 
 ---
 
@@ -587,7 +609,7 @@ Le package de version inclut le fichier `.streamDeckPlugin` préemballé.
 ---
 
 ### 3. Ajout et configuration d'actions
-Vous pouvez glisser et déposer l'une des 13 actions suivantes sur vos touches Stream Deck :
+Vous pouvez glisser et déposer l'une des 17 actions suivantes sur vos touches Stream Deck :
 * 🎤 **Proximity Mute** : active la mise en sourdine du microphone de proximité sortant.
 * 📻 **Radio Mute** : active la mise en sourdine du microphone radio sortant.
 * 👤 **Profile Mute** : active la désactivation du microphone du profil sortant.
@@ -601,6 +623,10 @@ Vous pouvez glisser et déposer l'une des 13 actions suivantes sur vos touches S
 * 🎙️ **Voice Command Macro** : Déclenche une macro de commande vocale personnalisée simulée en arrière-plan (configurable via les paramètres).
 * 💬 **Intercom Status** : Affiche l'état de l'interphone du vaisseau (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) et fait défiler les états de simulation lorsque vous appuyez dessus.
 * 🗺️ **Location Telemetry** : Affiche votre zone système actuelle et la télémétrie des coordonnées $(X, Y, Z)$ sur la touche.
+* 📞 **Initiate Hail** : Initie un appel de vaisseau à vaisseau vers le joueur le plus proche.
+* 📞 **Accept/Answer Hail** : Accepte un appel de hailing entrant.
+* 📞 **Decline/End Hail** : Refuse un appel entrant ou raccroche un appel actif.
+* 🔤 **Toggle Translation** : Active ou désactive la traduction des sous-titres sur le HUD.
 
 #### Configuration (inspecteur de propriétés) :
 Pour chaque action que vous faites glisser sur une touche, cliquez dessus et configurez les paramètres dans le panneau **Property Inspector** en bas :

@@ -648,7 +648,7 @@ The release package includes the pre-packaged `.streamDeckPlugin` file.
 ---
 
 ### 3. Adding and Configuring Actions
-You can drag and drop any of the following 13 actions onto your Stream Deck keys:
+You can drag and drop any of the following 17 actions onto your Stream Deck keys:
 * 🎤 **Proximity Mute**: Toggles outgoing proximity microphone muting.
 * 📻 **Radio Mute**: Toggles outgoing radio microphone muting.
 * 👤 **Profile Mute**: Toggles outgoing profile microphone muting.
@@ -662,6 +662,10 @@ You can drag and drop any of the following 13 actions onto your Stream Deck keys
 * 🎙️ **Voice Command Macro**: Triggers a custom voice command macro simulated headlessly (configured via settings).
 * 💬 **Intercom Status**: Displays the ship intercom status (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) and cycles states when pressed.
 * 🗺️ **Location Telemetry**: Displays your current system zone and coordinate telemetry $(X, Y, Z)$ on the key face.
+* 📞 **Initiate Hail**: Initiates a ship-to-ship call to the nearest player.
+* 📞 **Accept/Answer Hail**: Accepts an incoming ship-to-ship call.
+* 📞 **Decline/End Hail**: Rejects an incoming call or terminates an active call.
+* 🔤 **Toggle Translation**: Toggles real-time HUD translation subtitles.
 
 #### Configuration (Property Inspector):
 For each action you drag onto a key, click on it and configure the settings in the **Property Inspector** panel at the bottom:
