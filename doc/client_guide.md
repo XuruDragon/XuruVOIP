@@ -142,6 +142,26 @@ XuruVOIP includes special features that make voice communication match your game
   1. This system works automatically in the background by reading coordinate and environmental logs.
   2. Ensure your Star Citizen installation path is set correctly in settings so `Game.log` can be parsed.
 
+### 🎧 11. Binaural HRTF Spatial Audio
+* **What it does:** Simulates the physical shape of human ears and head shadow effects (ITD/ILD low-pass attenuation) to provide rich, immersive 3D spatial cues over ordinary stereo headphones.
+* **How to configure it:**
+  1. Go to the **Audio** tab in settings.
+  2. Check **Enable HRTF Binaural Rendering** (disabled by default).
+  3. (Optional) Toggle this on/off in real-time using companion controllers or Stream Deck actions.
+
+### 📊 12. Visor HUD 3D Spectrogram
+* **What it does:** Computes a real-time Radix-2 64-point FFT on incoming speakers' voices and renders a 3D spectral analyzer overlay with smooth integrates decay next to their names on your HUD.
+* **How to configure it:**
+  1. Go to the **Overlay** tab in settings.
+  2. Check **Enable Visor HUD 3D Spectrogram** (disabled by default).
+
+### 🎙️ 13. Voice-Activated Ship Controls
+* **What it does:** Allows you to control ship operations (Power, Doors, Shields, and Landing Gear) by speaking localized commands in any of 8 languages, simulating low-level hardware keypresses.
+* **How to configure it:**
+  1. Go to the **Hotkeys** tab in settings and map custom keys for Power, Doors, Shields, and Landing Gear.
+  2. Go to the **General** tab and check **Enable Voice Commands (Hands-Free PTT)**.
+  3. Assign and hold the **Voice Command Key (PTT)** (default: `V`), speak a command (e.g. "open doors"), and release the key.
+
 ---
 
 ## 📱 Using the Companion App

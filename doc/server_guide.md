@@ -121,7 +121,7 @@ Once logged in, the dashboard gives you complete control over your voice server:
 * **AAR Archives (Mission Recording & Timeline):**
   * **Recording Controls:** Toggle voice recording dynamically for Proximity Chat, specific Radio Channels, or Audio Profiles.
   * **Interactive Voice Timeline:** Visually trace speaking blocks for each player on a graphical time canvas.
-  * **Audio Segment Playback:** Click on any timeline block or browse the segments list to play back `.ogg` voice clips directly in the browser, or permanently delete recordings from disk.
+  * **Audio Segment Playback & 3D Playback Canvas:** Click on any timeline block or browse the segments list to play back `.ogg` voice clips directly in the browser, or permanently delete recordings from disk. You can also open the **▶ 3D Replay** visualizer to watch player movements and speaker pulses animated in real-time on an interactive 2D Canvas map, fully synchronized with the recorded audio.
 
 ## 📞 Ship-to-Ship Hailing & Calling Protocol
 

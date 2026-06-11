@@ -32,6 +32,10 @@ Use the summary table below to navigate between the various features implemented
 | **18** | [🎙️ Post-Op Voice Recorder & AAR Portal](#18-post-op-voice-recorder--aar-portal) | Server-side Ogg/Opus recording & admin timeline | *Server Setup (.env)* |
 | **19** | [📞 Ship-to-Ship Hailing & Calling](#19-ship-to-ship-hailing--calling-system) | Cockpit-to-cockpit private calls | Hotkeys |
 | **20** | [🔤 Visor HUD Real-Time Translation Subtitles](#20-visor-hud-real-time-translation-subtitles) | Real-time speech translation on HUD | Overlay |
+| **21** | [🎧 Binaural HRTF Spatial Audio](#21-binaural-hrtf-spatial-audio) | Physical human hearing simulation | Audio |
+| **22** | [📊 Visor HUD 3D Spectrogram](#22-visor-hud-3d-spectrogram) | Real-time speaker frequency overlay | Overlay |
+| **23** | [🎙️ Voice-Activated Ship Controls](#23-voice-activated-ship-controls) | Simulated keystrokes via speech | Hotkeys / Settings |
+| **24** | [🛰️ Server-Side AAR 3D Playback](#24-server-side-aar-3d-playback) | Synchronized path replay Canvas | *Web Portal* |
 
 ---
 
@@ -429,4 +433,74 @@ Translates incoming foreign-language voice streams in real-time and displays the
 2. Check **Enable Real-Time HUD Translation Subtitles**.
 3. If the Whisper model is missing, a yellow notice appears and the model will download automatically in the background.
 4. Incoming foreign speech will now be translated and displayed on your screen!
+
+---
+
+## 🎧 21. Binaural HRTF Spatial Audio
+
+### Description
+Uses Head-Related Transfer Function (HRTF) algorithms to simulate the physical properties of human hearing. Instead of simple stereo panning, it modifies frequencies and delays to simulate how sound waves bounce off the listener's head and ears.
+
+### How It Works
+* **Woodworth's ITD (Interaural Time Difference):** Calculates the sub-millisecond delay between the left and right ears based on the speaker's angle relative to the listener's head.
+* **ILD (Interaural Level Difference):** Attenuates the volume of the sound reaching the opposite ear by simulating the head shadow effect using a dynamic low-pass filter.
+* **Stereo Headphone Optimization:** Custom-designed to work on all standard stereo headphones, allowing players to distinguish height, depth, and distance accurately.
+
+### How to Use
+1. Open the Client **Settings** window.
+2. In the **Audio** tab, check **Enable HRTF Binaural Rendering**.
+3. (Optional) Toggle this setting in real-time via the Stream Deck or Companion App.
+
+---
+
+## 📊 22. Visor HUD 3D Spectrogram
+
+### Description
+Renders a real-time, 3D Radix-2 64-point FFT spectral visualizer overlay directly on the in-game HUD next to each active speaker.
+
+### How It Works
+* **Fast Fourier Transform (FFT):** Calculates the frequency distribution of the incoming audio stream in real-time.
+* **Spectral Mapping:** Groups frequencies into 8 distinct visualizer bands with a leaky integrator decay simulation to create smooth motion.
+* **HUD Overlay Integration:** Displays the visualizer bars in the overlay window next to the speaker's name tag.
+
+### How to Use
+1. Open the Client **Settings** window.
+2. In the **Overlay** tab, check **Enable Visor HUD 3D Spectrogram**.
+3. When other players speak, the bars will dance next to their name tags.
+
+---
+
+## 🎙️ 23. Voice-Activated Ship Controls
+
+### Description
+Simulates keyboard presses in Star Citizen when the player speaks commands like "open doors" or "power up shields".
+
+### How It Works
+* **Voice Command Service:** Analyzes the microphone input in real-time. Supports match dictionaries in 8 languages.
+* **Virtual Key Simulation:** Simulates direct hardware keystrokes using low-level Win32 `keybd_event` API calls (supporting keys held down for 50ms for reliable game registration, and modifier keys like Alt).
+* **Configurable Hotkeys:** Keybind mappings can be configured in the Hotkeys tab in settings.
+
+### How to Use
+1. Open the Client **Settings** window.
+2. In the **Hotkeys** tab, bind custom keys for Power, Doors, Shields, and Landing Gear.
+3. Check **Enable Voice Commands** under Settings.
+4. Hold your Voice Command PTT hotkey (default: `V`) and speak a command (e.g. "open doors").
+
+---
+
+## 🛰️ 24. Server-Side AAR 3D Playback
+
+### Description
+Integrates real-time player coordinates logging and spatial 3D visualization within the After Action Review (AAR) web admin portal.
+
+### How It Works
+* **Positions Log:** The Go server records player coordinates and zones to a `<session_id>_positions.jsonl` file every 500ms during active recording.
+* **3D Replay Canvas:** An interactive HTML5 Canvas dashboard in the admin portal fetches this log and visualizes the player's trail over time.
+* **Synchronized Playback:** Animates player positions and speaking pulse rings on the canvas, synchronized with the playback timeline of the recorded Ogg/Opus audio.
+
+### How to Use
+1. Log into the Admin Web Portal.
+2. Under the **Archives** tab, click **▶ 3D Replay** on any recorded segment.
+3. The 3D Playback modal will open, displaying the player's path and speaking pulses on the map.
+
 

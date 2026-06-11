@@ -298,6 +298,22 @@ graph TB
 * **Prefijo de subtítulos HUD:** Muestra el texto traducido en el HUD del visor, con el prefijo `[DE -> A]`.
 * **Carga de modelo Whisper:** Descarga automáticamente el modelo Whisper (~75 MB) en segundo plano si no está presente al activarlo.
 
+### 20. 🎧 Audio espacial HRTF binaural
+* **Simulación física del oído:** Simula la forma del oído humano y los efectos de sombra de la cabeza usando ITD (Diferencia de tiempo interaural) y atenuación de paso bajo ILD (Diferencia de nivel interaural).
+* **Compatibilidad estéreo:** Ofrece indicaciones de audio 3D de alta fidelidad sobre auriculares estéreo estándar sin necesidad de hardware de sonido envolvente.
+
+### 21. 📊 Espectrograma 3D del HUD del visor
+* **Superposition de telemetría FFT:** Calcula transformadas rápidas de Fourier (FFT) Radix-2 de 64 puntos en tiempo real en las transmisiones de voz de los altavoces entrantes.
+* **Visualización dinámica de HUD:** Agrupa las frecuencias de audio en 8 bandas espectrales junto a los altavoces activos en el HUD Vulkan/DX, con un decaimiento suave.
+
+### 22. 🎙️ Controles de nave activados por voz
+* **Traducción de comando de voz a combinación de teclas:** Escucha comandos de voz (por ejemplo, "open doors") y los compara con diccionarios localizados en 8 idiomas.
+* **Pulsaciones de teclas de hardware directas:** Simula pulsaciones de teclas físicas con la API de bajo nivel de Win32 `keybd_event` (teclas mantenidas presionadas durante 50 ms para un registro confiable del juego, admitiendo teclas modificadoras).
+
+### 23. 🛰️ Reproducción 3D AAR en el servidor
+* **Registro de coordenadas:** El servidor registra las coordenadas y zonas de los jugadores en un archivo `<session_id>_positions.jsonl` cada 500 ms.
+* **Lienzo de reproducción sincronizado:** Visualiza la ruta del jugador y los anillos de pulso de habla en un mapa HTML5 Canvas basado en la web, totalmente sincronizado con el audio Ogg/Opus grabado.
+
 ---
 
 ## 🎮 Desglose de la pestaña Configuración del cliente XuruVoip
@@ -609,7 +625,7 @@ El paquete de lanzamiento incluye el archivo `.streamDeckPlugin` preempaquetado.
 ---
 
 ### 3. Agregar y configurar acciones
-Puedes arrastrar y soltar cualquiera de las siguientes 17 acciones en las teclas de tu Stream Deck:
+Puedes arrastrar y soltar cualquiera de las siguientes 19 acciones en las teclas de tu Stream Deck:
 * 🎤 **Silenciamiento de proximidad**: alterna el silenciamiento del micrófono de proximidad saliente.
 * 📻 **Silenciar radio**: alterna el silenciamiento del micrófono de radio saliente.
 * 👤 **Silenciar perfil**: alterna el silenciamiento del micrófono del perfil saliente.
@@ -627,6 +643,8 @@ Puedes arrastrar y soltar cualquiera de las siguientes 17 acciones en las teclas
 * 📞 **Accept/Answer Hail**: Acepta una llamada de hailing ya recibida.
 * 📞 **Decline/End Hail**: Rechaza una llamada entrante o finaliza una llamada activa.
 * 🔤 **Toggle Translation**: Activa o desactiva la traducción de subtítulos en el HUD.
+* 🎧 **Toggle HRTF**: Alterna la reproducción de audio espacial HRTF en tiempo real.
+* 📊 **Toggle Spectrogram**: Alterna el espectrograma 3D en el HUD del visor en tiempo real.
 
 #### Configuración (inspector de propiedades):
 Para cada acción que arrastre a una tecla, haga clic en ella y configure las opciones en el panel **Inspector de propiedades** en la parte inferior:

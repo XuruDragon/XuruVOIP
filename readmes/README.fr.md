@@ -298,6 +298,22 @@ graph TB
 * **Préfixe HUD :** Affiche le texte traduit sur le HUD de la visière, préfixé par `[SOURCE -> CIBLE]`.
 * **Chargeur Whisper à la demande :** Télécharge automatiquement le modèle Whisper (~75 Mo) en arrière-plan lors de l'activation si nécessaire.
 
+### 20. 🎧 Audio spatial HRTF binaural
+* **Simulation d'oreille physique :** Simule la forme de l'oreille humaine et les effets d'ombre de la tête en utilisant l'ITD (Interaural Time Difference) et l'atténuation passe-bas ILD (Interaural Level Difference).
+* **Compatibilité stéréo :** Offre des repères audio 3D haute fidélité sur des écouteurs stéréo standard sans nécessiter de matériel de son surround.
+
+### 21. 📊 Spectrogramme 3D du HUD de la visière
+* **Superposition de télémétrie FFT :** Calcule des transformées de Fourier rapides (FFT) Radix-2 à 64 points en temps réel sur les flux vocaux des haut-parleurs entrants.
+* **Visualisation dynamique du HUD :** Regroupe les fréquences audio en 8 bandes spectrales à côté des haut-parleurs actifs sur le HUD Vulkan/DX, avec un déclin fluide.
+
+### 22. 🎙️ Commandes de vaisseau activées par la voix
+* **Traduction de la parole en raccourcis clavier :** Écoute les commandes vocales (par exemple, "open doors") et les associe à des dictionnaires localisés dans 8 langues.
+* **Simulations de touches matérielles directes :** Simule des pressions physiques sur les touches avec l'API Win32 de bas niveau `keybd_event` (touches maintenues enfoncées pendant 50 ms pour une capture fiable du jeu, prenant en charge les modificateurs).
+
+### 23. 🛰️ Lecture AAR 3D côté serveur
+* **Journalisation des coordonnées :** Le serveur enregistre les coordonnées et les zones du joueur dans un fichier `<session_id>_positions.jsonl` toutes les 500 ms.
+* **Canvas de lecture synchronisé :** Visualise le chemin du joueur et les anneaux d'impulsion de parole sur une carte HTML5 Canvas basée sur le Web, entièrement synchronisée avec l'audio Ogg/Opus enregistré.
+
 ---
 
 ## 🎮 Répartition de l'onglet Paramètres du client XuruVoip
@@ -609,7 +625,7 @@ Le package de version inclut le fichier `.streamDeckPlugin` préemballé.
 ---
 
 ### 3. Ajout et configuration d'actions
-Vous pouvez glisser et déposer l'une des 17 actions suivantes sur vos touches Stream Deck :
+Vous pouvez glisser et déposer l'une des 19 actions suivantes sur vos touches Stream Deck :
 * 🎤 **Proximity Mute** : active la mise en sourdine du microphone de proximité sortant.
 * 📻 **Radio Mute** : active la mise en sourdine du microphone radio sortant.
 * 👤 **Profile Mute** : active la désactivation du microphone du profil sortant.
@@ -627,6 +643,8 @@ Vous pouvez glisser et déposer l'une des 17 actions suivantes sur vos touches S
 * 📞 **Accept/Answer Hail** : Accepte un appel de hailing entrant.
 * 📞 **Decline/End Hail** : Refuse un appel entrant ou raccroche un appel actif.
 * 🔤 **Toggle Translation** : Active ou désactive la traduction des sous-titres sur le HUD.
+* 🎧 **Toggle HRTF** : Active ou désactive le rendu spatial HRTF binaural.
+* 📊 **Toggle Spectrogram** : Active ou désactive l'affichage du spectrogramme 3D sur le HUD.
 
 #### Configuration (inspecteur de propriétés) :
 Pour chaque action que vous faites glisser sur une touche, cliquez dessus et configurez les paramètres dans le panneau **Property Inspector** en bas :

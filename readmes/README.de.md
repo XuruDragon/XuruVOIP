@@ -298,6 +298,22 @@ graph TB
 * **HUD-Präfix:** Zeigt übersetzten Text auf dem Visier-HUD an, vorangestellt mit `[VON -> NACH]`.
 * **Whisper-Modell-Loader:** Lädt das Whisper-Modell (~75 MB) bei Aktivierung automatisch im Hintergrund herunter, falls nicht vorhanden.
 
+### 20. 🎧 Binaurale HRTF-Räumliche Audio
+* **Physische Ohrensimulation:** Simuliert die menschliche Ohrform und Kopfschatteneffekte mittels ITD (Interaural Time Difference) und ILD (Interaural Level Difference) Tiefpassdämpfung.
+* **Stereokompatibilität:** Liefert hochauflösende 3D-Audioreize über Standard-Stereokopfhörer, ohne dass Surround-Sound-Hardware erforderlich ist.
+
+### 21. 📊 Visier-HUD 3D-Spektrogramm
+* **FFT-Telemetrie-Overlay:** Berechnet in Echtzeit Radix-2 64-Punkt Fast-Fourier-Transformationen (FFT) für eingehende Sprachströme der Sprecher.
+* **Dynamische HUD-Visualisierung:** Gruppiert Audiofrequenzen in 8 Spektralbänder neben aktiven Sprechern auf dem Vulkan/DX HUD, mit sanftem Abklingen.
+
+### 22. 🎙️ Sprachaktivierte Schiffssteuerung
+* **Sprachbefehl-zu-Hotkey-Übersetzung:** Hört auf Sprachbefehle (z. B. „open doors“) und gleicht sie mit lokalisierten Wörterbüchern in 8 Sprachen ab.
+* **Direkte Hardware-Tastatureingaben:** Simuliert physische Tastendrücke über die Low-Level-Win32-API `keybd_event` (Tasten werden für eine zuverlässige Erfassung im Spiel 50 ms lang gedrückt gehalten, inklusive Unterstützung für Modifikatortasten).
+
+### 23. 🛰️ Serverseitige AAR 3D-Wiedergabe
+* **Koordinatenprotokollierung:** Der Server protokolliert Spielerkoordinaten und Zonen alle 500 ms in einer `<session_id>_positions.jsonl`-Datei.
+* **Synchronisierte Wiedergabe-Canvas:** Visualisiert den Pfad des Spielers und Sprech-Pulsringe auf einer webbasierten HTML5-Canvas-Karte, die vollständig mit der aufgezeichneten Ogg/Opus-Audiodatei synchronisiert ist.
+
 ---
 
 ## 🎮 Aufschlüsselung der Registerkarte „XuruVoip-Client-Einstellungen“.
@@ -609,7 +625,7 @@ Das Release-Paket enthält die vorgefertigte Datei „.streamDeckPlugin“.
 ---
 
 ### 3. Aktionen hinzufügen und konfigurieren
-Sie können jede der folgenden 17 Aktionen per Drag & Drop auf Ihre Stream Deck-Tasten ziehen:
+Sie können jede der folgenden 19 Aktionen per Drag & Drop auf Ihre Stream Deck-Tasten ziehen:
 * 🎤 **Proximity Mute**: Schaltet die Stummschaltung des ausgehenden Näherungsmikrofons um.
 * 📻 **Radio-Stummschaltung**: Schaltet die Stummschaltung des ausgehenden Funkmikrofons um.
 * 👤 **Profil-Stummschaltung**: Schaltet die Stummschaltung des ausgehenden Profilmikrofons um.
@@ -627,6 +643,8 @@ Sie können jede der folgenden 17 Aktionen per Drag & Drop auf Ihre Stream Deck-
 * 📞 **Accept/Answer Hail**: Nimmt einen eingehenden Hailing-Anruf an.
 * 📞 **Decline/End Hail**: Lehnt einen eingehenden Anruf ab oder beendet ein aktives Gespräch.
 * 🔤 **Toggle Translation**: Schaltet die Echtzeit-HUD-Übersetzungsuntertitel ein oder aus.
+* 🎧 **Toggle HRTF**: Schaltet die Echtzeit-HRTF-Räumliche Audio-Wiedergabe um.
+* 📊 **Toggle Spectrogram**: Schaltet das Echtzeit-Visier-HUD-3D-Spektrogramm um.
 
 #### Konfiguration (Eigenschaftsinspektor):
 Klicken Sie für jede Aktion, die Sie auf eine Taste ziehen, darauf und konfigurieren Sie die Einstellungen im Bedienfeld **Eigenschafteninspektor** unten:
