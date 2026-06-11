@@ -37,7 +37,7 @@ public class EnvironmentalAcousticFilter
     /// Evaluates zones and positions to set target acoustic parameter presets.
     /// Supports compartment and deck-level occlusion based on local ship and bunker coordinates.
     /// </summary>
-    public void UpdateZoneInfo(string speakerZone, string listenerZone, double lx = 0, double ly = 0, double lz = 0, double sx = 0, double sy = 0, double sz = 0)
+    public void UpdateZoneInfo(string speakerZone, string listenerZone, double lx = 0, double ly = 0, double lz = 0, double sx = 0, double sy = 0, double sz = 0, bool enableAtmosphere = false, bool enableEnvironmentalAcoustics = true)
     {
         // 1. Determine Occlusion (muffled audio if players are in different sub-zones or separated by bulkheads/walls)
         double volumeFactor = 1.0;
@@ -48,97 +48,122 @@ public class EnvironmentalAcousticFilter
 
         bool hasCoordinates = (lx != 0 || ly != 0 || lz != 0) && (sx != 0 || sy != 0 || sz != 0);
 
-        if (hasCoordinates && speakerZone == listenerZone && !string.IsNullOrEmpty(speakerZone))
+        if (enableEnvironmentalAcoustics)
         {
-            // Inside the same zone, check if we are in a known ship or bunker compartment layout
-            if (lzLower.Contains("carrack"))
+            if (hasCoordinates && speakerZone == listenerZone && !string.IsNullOrEmpty(speakerZone))
             {
-                // Z levels: Command Deck (Top: Z > 5), Habitation (Middle: -5 to 5), Technical (Bottom: Z < -5)
-                int lDeck = lz > 5 ? 3 : (lz < -5 ? 1 : 2);
-                int sDeck = sz > 5 ? 3 : (sz < -5 ? 1 : 2);
-
-                if (lDeck != sDeck)
+                // Inside the same zone, check if we are in a known ship or bunker compartment layout
+                if (lzLower.Contains("carrack"))
                 {
-                    cutoff = 350.0;
-                    volumeFactor = 0.35;
+                    // Z levels: Command Deck (Top: Z > 5), Habitation (Middle: -5 to 5), Technical (Bottom: Z < -5)
+                    int lDeck = lz > 5 ? 3 : (lz < -5 ? 1 : 2);
+                    int sDeck = sz > 5 ? 3 : (sz < -5 ? 1 : 2);
+
+                    if (lDeck != sDeck)
+                    {
+                        cutoff = 350.0;
+                        volumeFactor = 0.35;
+                    }
+                    else
+                    {
+                        // Same deck, check compartment partitions (using Y coordinate)
+                        // Cockpit: Y > 15, Habitation: -10 to 15, Engines: Y < -10
+                        int lComp = ly > 15 ? 3 : (ly < -10 ? 1 : 2);
+                        int sComp = sy > 15 ? 3 : (sy < -10 ? 1 : 2);
+
+                        if (lComp != sComp)
+                        {
+                            cutoff = 900.0;
+                            volumeFactor = 0.65;
+                        }
+                    }
+                }
+                else if (lzLower.Contains("bunker") || lzLower.Contains("facility") || lzLower.Contains("ugf"))
+                {
+                    // Z levels: Lobby/Elevator (Z > 8), Intermediate (-5 to 8), Main level (Z <= -5)
+                    int lLevel = lz > 8 ? 3 : (lz < -5 ? 1 : 2);
+                    int sLevel = sz > 8 ? 3 : (sz < -5 ? 1 : 2);
+
+                    if (lLevel != sLevel)
+                    {
+                        cutoff = 300.0;
+                        volumeFactor = 0.30;
+                    }
+                    else
+                    {
+                        // Same level, check room divisions (using X coordinate)
+                        int lRoom = lx > 10 ? 2 : 1;
+                        int sRoom = sx > 10 ? 2 : 1;
+
+                        if (lRoom != sRoom)
+                        {
+                            cutoff = 800.0;
+                            volumeFactor = 0.60;
+                        }
+                    }
+                }
+                else if (lzLower.Contains("hercules"))
+                {
+                    // Hercules Starlifter: Habitation (Top: Z > 3), Cargo (Bottom: Z <= 3)
+                    bool lTop = lz > 3;
+                    bool sTop = sz > 3;
+                    if (lTop != sTop)
+                    {
+                        cutoff = 400.0;
+                        volumeFactor = 0.45;
+                    }
+                }
+                else if (lzLower.Contains("cutlass"))
+                {
+                    // Cutlass Black: Cockpit (Y > 8), Cargo (Y <= 8)
+                    bool lCockpit = ly > 8;
+                    bool sCockpit = sy > 8;
+                    if (lCockpit != sCockpit)
+                    {
+                        cutoff = 1000.0;
+                        volumeFactor = 0.70;
+                    }
                 }
                 else
                 {
-                    // Same deck, check compartment partitions (using Y coordinate)
-                    // Cockpit: Y > 15, Habitation: -10 to 15, Engines: Y < -10
-                    int lComp = ly > 15 ? 3 : (ly < -10 ? 1 : 2);
-                    int sComp = sy > 15 ? 3 : (sy < -10 ? 1 : 2);
-
-                    if (lComp != sComp)
+                    // General elevation heuristic: if height difference is > 4.5m, assume floor/ceiling occlusion
+                    double heightDiff = Math.Abs(lz - sz);
+                    if (heightDiff > 4.5)
                     {
-                        cutoff = 900.0;
-                        volumeFactor = 0.65;
+                        cutoff = 500.0;
+                        volumeFactor = 0.45;
                     }
-                }
-            }
-            else if (lzLower.Contains("bunker") || lzLower.Contains("facility") || lzLower.Contains("ugf"))
-            {
-                // Z levels: Lobby/Elevator (Z > 8), Intermediate (-5 to 8), Main level (Z <= -5)
-                int lLevel = lz > 8 ? 3 : (lz < -5 ? 1 : 2);
-                int sLevel = sz > 8 ? 3 : (sz < -5 ? 1 : 2);
-
-                if (lLevel != sLevel)
-                {
-                    cutoff = 300.0;
-                    volumeFactor = 0.30;
-                }
-                else
-                {
-                    // Same level, check room divisions (using X coordinate)
-                    int lRoom = lx > 10 ? 2 : 1;
-                    int sRoom = sx > 10 ? 2 : 1;
-
-                    if (lRoom != sRoom)
-                    {
-                        cutoff = 800.0;
-                        volumeFactor = 0.60;
-                    }
-                }
-            }
-            else if (lzLower.Contains("hercules"))
-            {
-                // Hercules Starlifter: Habitation (Top: Z > 3), Cargo (Bottom: Z <= 3)
-                bool lTop = lz > 3;
-                bool sTop = sz > 3;
-                if (lTop != sTop)
-                {
-                    cutoff = 400.0;
-                    volumeFactor = 0.45;
-                }
-            }
-            else if (lzLower.Contains("cutlass"))
-            {
-                // Cutlass Black: Cockpit (Y > 8), Cargo (Y <= 8)
-                bool lCockpit = ly > 8;
-                bool sCockpit = sy > 8;
-                if (lCockpit != sCockpit)
-                {
-                    cutoff = 1000.0;
-                    volumeFactor = 0.70;
                 }
             }
             else
             {
-                // General elevation heuristic: if height difference is > 4.5m, assume floor/ceiling occlusion
-                double heightDiff = Math.Abs(lz - sz);
-                if (heightDiff > 4.5)
+                if (speakerZone != listenerZone)
                 {
-                    cutoff = 500.0;
-                    volumeFactor = 0.45;
+                    cutoff = 600.0;
+                    volumeFactor = 0.65;
                 }
             }
         }
-        else
+
+        // Apply Atmosphere Simulation muffling (low-pass) if enabled and outdoors
+        if (enableAtmosphere)
         {
-            if (speakerZone != listenerZone)
+            // If player is inside a ship or facility, they are in standard pressurized air
+            bool isIndoors = lzLower.Contains("carrack") || lzLower.Contains("hercules") || lzLower.Contains("cutlass") ||
+                              lzLower.Contains("bunker") || lzLower.Contains("facility") || lzLower.Contains("ugf") ||
+                              lzLower.Contains("station") || lzLower.Contains("outpost") || lzLower.Contains("hangar");
+            if (!isIndoors)
             {
-                cutoff = 600.0;
-                volumeFactor = 0.65;
+                double atmosCutoff = 20000.0;
+                if (lzLower.Contains("cellin") || lzLower.Contains("ita")) atmosCutoff = 800.0;
+                else if (lzLower.Contains("yela") || lzLower.Contains("lyria")) atmosCutoff = 1000.0;
+                else if (lzLower.Contains("daymar") || lzLower.Contains("wala") || lzLower.Contains("magda")) atmosCutoff = 1200.0;
+                else if (lzLower.Contains("crusader") || lzLower.Contains("arial") || lzLower.Contains("aberdeen")) atmosCutoff = 16000.0; // slightly muffled at highs
+
+                if (atmosCutoff < cutoff)
+                {
+                    cutoff = atmosCutoff;
+                }
             }
         }
 
@@ -146,31 +171,32 @@ public class EnvironmentalAcousticFilter
         _targetCutoff = cutoff;
 
         // 2. Determine Reverb Presets based on listener's zone
-        string zoneLower = (listenerZone ?? "").ToLowerInvariant();
+        _targetDelaySamples = 0;
+        _targetFeedback = 0f;
+        _targetWetMix = 0f;
 
-        if (zoneLower.Contains("cave") || zoneLower.Contains("mine") || zoneLower.Contains("chasm") || zoneLower.Contains("tunnel") || zoneLower.Contains("ruin"))
+        if (enableEnvironmentalAcoustics)
         {
-            _targetDelaySamples = 4800; // 100ms delay
-            _targetFeedback = 0.6f;
-            _targetWetMix = 0.45f;
-        }
-        else if (zoneLower.Contains("bunker") || zoneLower.Contains("facility") || zoneLower.Contains("ugf") || zoneLower.Contains("station") || zoneLower.Contains("outpost"))
-        {
-            _targetDelaySamples = 2400; // 50ms delay
-            _targetFeedback = 0.4f;
-            _targetWetMix = 0.25f;
-        }
-        else if (zoneLower.Contains("hangar"))
-        {
-            _targetDelaySamples = 7200; // 150ms delay
-            _targetFeedback = 0.5f;
-            _targetWetMix = 0.35f;
-        }
-        else
-        {
-            _targetDelaySamples = 0;
-            _targetFeedback = 0f;
-            _targetWetMix = 0f;
+            string zoneLower = (listenerZone ?? "").ToLowerInvariant();
+
+            if (zoneLower.Contains("cave") || zoneLower.Contains("mine") || zoneLower.Contains("chasm") || zoneLower.Contains("tunnel") || zoneLower.Contains("ruin"))
+            {
+                _targetDelaySamples = 4800; // 100ms delay
+                _targetFeedback = 0.6f;
+                _targetWetMix = 0.45f;
+            }
+            else if (zoneLower.Contains("bunker") || zoneLower.Contains("facility") || zoneLower.Contains("ugf") || zoneLower.Contains("station") || zoneLower.Contains("outpost"))
+            {
+                _targetDelaySamples = 2400; // 50ms delay
+                _targetFeedback = 0.4f;
+                _targetWetMix = 0.25f;
+            }
+            else if (zoneLower.Contains("hangar"))
+            {
+                _targetDelaySamples = 7200; // 150ms delay
+                _targetFeedback = 0.5f;
+                _targetWetMix = 0.35f;
+            }
         }
     }
 

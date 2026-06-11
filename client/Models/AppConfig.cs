@@ -60,6 +60,7 @@ public class AppConfig
     public bool EnableVoiceChanger { get; set; } = false;
     public string VoiceChangerType { get; set; } = "None"; // None, Alien, Cyborg, Robotic, PitchShift
     public float VoicePitchFactor { get; set; } = 1.0f;
+    public bool EnableAtmosphereSimulation { get; set; } = false;
 
     // --- Borderless Overlay ---
     public bool EnableOverlay { get; set; } = false;

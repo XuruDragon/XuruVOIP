@@ -499,6 +499,12 @@
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
 
+                            <!-- Planetary atmosphere simulation toggle -->
+                            <CheckBox Content="{DynamicResource LblEnableAtmosphereSimulation}"
+                                      IsChecked="{Binding Config.EnableAtmosphereSimulation, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
                             <!-- Helmet/Suit modulator toggle -->
                             <CheckBox x:Name="CbEnableHelmetModulator"
                                       Content="Enable Helmet/Suit Comms Modulator"
