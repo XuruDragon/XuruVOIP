@@ -1,78 +1,78 @@
 {
+  "DeviceType": 7,
+  "Version": "1.0.0",
+  "DeviceModel": "XuruVOIP_plus",
+  "Name": "XuruVOIP Captain - Plus",
   "Rooms": {
     "0": {
       "Keys": {
-        "2,2": {
-          "Action": "com.xuru.voip.action.voice_changer_dial",
-          "Settings": {
-            "port": 8891
-          }
-        },
         "0,1": {
-          "Action": "com.xuru.voip.action.toggle_helmet",
           "Settings": {
             "port": 8891
-          }
-        },
-        "2,1": {
-          "Action": "com.xuru.voip.action.audio_proximity_mute",
-          "Settings": {
-            "port": 8891
-          }
-        },
-        "1,0": {
-          "Action": "com.xuru.voip.action.radio_mute",
-          "Settings": {
-            "port": 8891
-          }
-        },
-        "0,0": {
-          "Action": "com.xuru.voip.action.proximity_mute",
-          "Settings": {
-            "port": 8891
-          }
-        },
-        "1,1": {
-          "Action": "com.xuru.voip.action.location_telemetry",
-          "Settings": {
-            "port": 8891
-          }
-        },
-        "1,2": {
-          "Action": "com.xuru.voip.action.adjust_exertion",
-          "Settings": {
-            "port": 8891
-          }
-        },
-        "0,2": {
-          "Action": "com.xuru.voip.action.cycle_radio_dial",
-          "Settings": {
-            "port": 8891
-          }
+          },
+          "Action": "com.xuru.voip.action.toggle_helmet"
         },
         "3,1": {
-          "Action": "com.xuru.voip.action.audio_radio_mute",
           "Settings": {
             "port": 8891
-          }
+          },
+          "Action": "com.xuru.voip.action.toggle_translation"
+        },
+        "2,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.audio_proximity_mute"
+        },
+        "2,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_changer_dial"
+        },
+        "0,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.proximity_mute"
         },
         "3,0": {
-          "Action": "com.xuru.voip.action.intercom_status",
           "Settings": {
             "port": 8891
-          }
+          },
+          "Action": "com.xuru.voip.action.intercom_status"
+        },
+        "1,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.location_telemetry"
+        },
+        "1,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.radio_mute"
+        },
+        "0,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.cycle_radio_dial"
+        },
+        "1,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.adjust_exertion"
         },
         "2,0": {
-          "Action": "com.xuru.voip.action.pa_broadcast",
           "Settings": {
             "port": 8891
-          }
+          },
+          "Action": "com.xuru.voip.action.pa_broadcast"
         }
       }
     }
-  },
-  "DeviceModel": "XuruVOIP_plus",
-  "Version": "1.0.0",
-  "DeviceType": 7,
-  "Name": "XuruVOIP Captain - Plus"
+  }
 }

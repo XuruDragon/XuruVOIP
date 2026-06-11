@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Two communicating nodes -->
+    <circle cx="22" cy="48" r="6" fill="none" stroke="#3ddb85" stroke-width="3"/>
+    <circle cx="50" cy="24" r="6" fill="none" stroke="#3ddb85" stroke-width="3"/>
+    <line x1="27" y1="43" x2="45" y2="29" stroke="#3ddb85" stroke-width="2.5" stroke-dasharray="3,3"/>
+    <!-- Ring around receiving node -->
+    <circle cx="50" cy="24" r="11" fill="none" stroke="#3ddb85" stroke-width="1.5" opacity="0.5"/>
+    <!-- Green Checkmark (Accept) -->
+    <path d="M22 22 L27 28 L39 16" fill="none" stroke="#3ddb85" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

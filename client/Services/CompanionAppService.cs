@@ -256,7 +256,10 @@ public class CompanionAppService : IDisposable
                     intercomState = _viewModel.IntercomState.ToString(),
                     voiceCommandsEnabled = _viewModel.Config.Config.EnableVoiceCommands,
                     isListening = _viewModel.IsVoiceListening,
-                    lastRecognizedCommand = _viewModel.VoiceCommandStatusText
+                    lastRecognizedCommand = _viewModel.VoiceCommandStatusText,
+                    hailState = _viewModel.CurrentHailState.ToString(),
+                    hailPeerName = _viewModel.HailPeerName,
+                    enableTranslationSubtitles = _viewModel.Config.Config.EnableTranslationSubtitles
                 };
 
                 string json = JsonSerializer.Serialize(status);
@@ -389,6 +392,20 @@ public class CompanionAppService : IDisposable
                     string cmd = cmdProp.GetString() ?? "";
                     _viewModel.ProcessVoiceCommand(cmd);
                 }
+                break;
+            case "hail_initiate":
+                _viewModel.InitiateHailCall();
+                break;
+            case "hail_accept":
+                _viewModel.AcceptHailCall();
+                break;
+            case "hail_decline":
+                _viewModel.DeclineHailCall();
+                break;
+            case "toggle_translation":
+                _viewModel.Config.Config.EnableTranslationSubtitles = !_viewModel.Config.Config.EnableTranslationSubtitles;
+                _viewModel.SaveConfig();
+                _viewModel.ApplySettings();
                 break;
         }
     }

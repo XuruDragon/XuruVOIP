@@ -36,12 +36,12 @@ The goal of XuruVoip is to provide Star Citizen gaming events, roleplay organiza
 
 | Section | Description |
 | :--- | :--- |
-| [📖 Detailed Features Guide](doc/functionnalities.md) | Technical and user explanation of all 18+ implemented functionalities. |
+| [📖 Detailed Features Guide](doc/functionnalities.md) | Technical and user explanation of all 20+ implemented functionalities. |
 | [📖 Non-Technical User Guides](#-non-technical-user-guides) | Easy-to-understand step-by-step guides for Client, Server, and Stream Deck. |
 | [📸 Screenshots & UI](#-screenshots--ui) | Visual showcase of client screens, admin portal, and settings. |
 | [🗂️ Project Structure](#️-project-structure) | Repository layout and folder breakdown. |
 | [⚙️ System Architecture](#️-system-architecture) | The complete actual workflow diagram of the WPF client, Go server, and external devices. |
-| [💡 Core Features Overview](#-core-features-overview) | Detailed breakdown of the 11+ implemented spatial and networking features. |
+| [💡 Core Features Overview](#-core-features-overview) | Detailed breakdown of the 19+ implemented spatial and networking features. |
 | [🖥️ Go Server (Go)](#️-xuruvoip-server-go) | Server build, run, deployment, and configuration instructions. |
 | [🎛️ Discord Voice Bridge](#️-discord-voice-bridge-setup-guide) | Connecting Go server radio channels to a Discord Voice Channel. |
 | [📱 Companion App & Stream Deck](#-companion-app--stream-deck-integration) | Remote device control and Stream Deck physical keys setup. |
@@ -293,6 +293,16 @@ graph TB
 * **Zero-Overhead Ogg/Opus Container:** Saves raw VoIP Opus packets directly to disk inside browser-playable `.ogg` audio files, consuming 5x less disk space than MP3 with zero server CPU encoding load.
 * **Admin-Targeted Recording:** Recording only starts on active proximity, radio channel, or profile targets enabled via the Admin dashboard.
 * **Canvas Activity Timeline:** Visualizes voice transmission periods on a 2D HTML5 canvas timeline in the Admin Portal, enabling admins to click on blocks to play back clips or delete segments.
+
+### 18. 📞 Ship-to-Ship Hailing & Calling System
+* **Cockpit-to-Cockpit Calling:** Establishes direct private communication loops between ships within a 5,000m range limit.
+* **Hands-Free Call Streaming:** Captures voice automatically via Voice Activity Detection (VAD) override during calls, bypassing standard proximity/radio Push-to-Talk keys.
+* **Realistic Dialing Chimes:** Synthesizes realistic dial tone sweep, ringing loops, connection, and disconnection chimes via NAudio.
+
+### 19. 🔤 Visor HUD Real-Time Translation Subtitles
+* **Dynamic Phrase Translator:** Translates incoming foreign-language voice streams using localized military/flight dictionaries for 7 flight-supported languages.
+* **HUD Subtitle Prefixing:** Displays translated text directly on the visor HUD, prefixed with `[FROM -> TO]` source and target indicators.
+* **On-Demand Whisper Loader:** Checks if the Whisper model is present, displaying an overlay warning and downloading it asynchronously in the background if needed.
 
 ---
 
