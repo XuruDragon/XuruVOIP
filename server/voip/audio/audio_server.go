@@ -33,13 +33,15 @@ var (
 )
 
 type RecordingSession struct {
-	Writer     *OggWriter
-	ID         string
-	PlayerName string
-	StartTime  time.Time
-	Channel    string
-	AudioType  int
-	FilePath   string
+	Writer      *OggWriter
+	ID          string
+	PlayerName  string
+	StartTime   time.Time
+	Channel     string
+	AudioType   int
+	FilePath    string
+	PosFile     *os.File
+	LastLogTime time.Time
 }
 
 // StartAudioServer starts the audio server on the specified port
@@ -302,20 +304,44 @@ func handleUDPPacket(packet []byte, remoteAddr *net.UDPAddr) {
 					filePath := filepath.Join(recDir, id+".ogg")
 					writer, err := NewOggWriter(filePath)
 					if err == nil {
+						posFilePath := filepath.Join(recDir, id+"_positions.jsonl")
+						posFile, _ := os.Create(posFilePath)
 						session = &RecordingSession{
-							Writer:     writer,
-							ID:         id,
-							PlayerName: senderName,
-							StartTime:  time.Now(),
-							Channel:    channelVal,
-							AudioType:  int(audioType),
-							FilePath:   filepath.Join("recordings", id+".ogg"),
+							Writer:      writer,
+							ID:          id,
+							PlayerName:  senderName,
+							StartTime:   time.Now(),
+							Channel:     channelVal,
+							AudioType:   int(audioType),
+							FilePath:    filepath.Join("recordings", id+".ogg"),
+							PosFile:     posFile,
+							LastLogTime: time.Now().Add(-500 * time.Millisecond),
 						}
 						activeRecordings[senderName] = session
 					}
 				}
 				if session != nil {
 					_ = session.Writer.WriteOpusPacket(audioData)
+					if time.Since(session.LastLogTime) >= 500*time.Millisecond {
+						session.LastLogTime = time.Now()
+						if session.PosFile != nil {
+							core.ActiveHub.Mu.RLock()
+							pos := sender.Pos
+							var x, y, z float64
+							var zone string
+							if pos != nil {
+								x = pos.X
+								y = pos.Y
+								z = pos.Z
+								zone = pos.Zone
+							}
+							core.ActiveHub.Mu.RUnlock()
+
+							offsetMs := time.Since(session.StartTime).Milliseconds()
+							logLine := fmt.Sprintf("{\"t\": %d, \"x\": %f, \"y\": %f, \"z\": %f, \"zone\": %q}\n", offsetMs, x, y, z, zone)
+							_, _ = session.PosFile.WriteString(logLine)
+						}
+					}
 				}
 			}
 			aarMu.Unlock()
@@ -556,6 +582,9 @@ func stopRecordingSession(playerName string) {
 		aarMu.Unlock()
 
 		_ = session.Writer.Close()
+		if session.PosFile != nil {
+			_ = session.PosFile.Close()
+		}
 		durationMs := int(time.Since(session.StartTime).Milliseconds())
 		if durationMs > 100 {
 			rec := core.AarRecording{
@@ -570,6 +599,9 @@ func stopRecordingSession(playerName string) {
 			_ = core.DBSaveAarRecording(rec)
 		} else {
 			_ = os.Remove(filepath.Join(core.ResolveDataDir(), session.FilePath))
+			if session.PosFile != nil {
+				_ = os.Remove(filepath.Join(core.ResolveDataDir(), "recordings", session.ID+"_positions.jsonl"))
+			}
 		}
 	} else {
 		aarMu.Unlock()
