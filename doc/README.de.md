@@ -547,12 +547,13 @@ Da das Installationsprogramm und die ausführbaren Dateien nicht digital signier
 
 XuruVOIP umfasst einen integrierten Companion-App-Webdienst und ein offizielles Stream Deck-Plugin, mit dem Sie Sprachaktionen direkt von sekundären Geräten oder physischen Tasten aus überwachen und auslösen können.
 
-### 1. Aktivieren der Companion-App
-Standardmäßig ist der lokale HTTP-Server der Companion App deaktiviert, um Systemressourcen zu sparen. Um es zu aktivieren:
+### 1. Aktivieren der Companion-App & MFD für die taktische Karte
+Standardmäßig sind der lokale HTTP-Server der Companion App und der Modus für die taktische Karte deaktiviert, um Systemressourcen zu sparen. Um sie zu aktivieren:
 1. Öffnen Sie den XuruVOIP-Client und klicken Sie auf das Symbol **Einstellungen**.
-2. Aktivieren Sie auf der Registerkarte **Allgemein** das Kontrollkästchen **Companion HTTP Server aktivieren**.
-3. Unter **Companion Server Port** können Sie die Portnummer anpassen (Standard: „8891“).
-4. Klicken Sie zum Anwenden auf **Speichern und schließen**. Der HTTP-Server wird nun lokal gestartet. Sie können „http://localhost:8891“ in jedem Browser auf Ihrem PC oder Mobilgerät öffnen, um auf das Web-Controller-Dashboard zuzugreifen.
+2. Aktivieren Sie auf der Registerkarte **Allgemein** das Kontrollkästchen **Companion HTTP Server aktivieren** (Standardport: `8891`).
+3. Um das Radar-Display zu aktivieren, aktivieren Sie das untergeordnete Kontrollkästchen **Taktische Co-Pilot-Karte (MFD) aktivieren**.
+4. Klicken Sie zum Anwenden auf **Speichern und schließen**.
+5. Zugriff auf das Dashboard: Sie können „http://localhost:8891“ in jedem Browser auf Ihrem PC, Tablet oder Mobiltelefon öffnen. Wenn der Kartenmodus aktiviert ist, steht eine neue Registerkarte **🗺️ Taktische Karte** zur Verfügung. Diese zeigt einen Canvas-basierten HUD-Radarbildschirm an, der die Echtzeitposition Ihres Charakters, die Ausrichtung, Besatzungskontakte in derselben Zone und Anzeigen für aktive Sprecher verfolgt.
 
 ---
 

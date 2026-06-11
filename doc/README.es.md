@@ -547,12 +547,13 @@ Dado que el instalador y los ejecutables no están firmados digitalmente, Window
 
 XuruVOIP incluye un servicio web de aplicación complementaria integrado y un complemento Stream Deck oficial que le permite monitorear y activar acciones de voz directamente desde dispositivos secundarios o claves físicas.
 
-### 1. Habilitación de la aplicación complementaria
-De forma predeterminada, el servidor HTTP local de la aplicación complementaria está deshabilitado para ahorrar recursos del sistema. Para habilitarlo:
+### 1. Habilitación de la aplicación complementaria y MFD de mapa táctico
+De forma predeterminada, el servidor HTTP local de la aplicación complementaria y el modo de mapa táctico están deshabilitados para ahorrar recursos del sistema. Para habilitarlos:
 1. Abra el cliente XuruVOIP y haga clic en el icono **Configuración**.
-2. En la pestaña **General**, marque la casilla **Habilitar servidor HTTP complementario**.
-3. En **Puerto del servidor complementario**, puede personalizar el número de puerto (predeterminado: `8891`).
-4. Haga clic en **Guardar y cerrar** para aplicar. El servidor HTTP ahora se iniciará localmente. Puede abrir `http://localhost:8891` en cualquier navegador de su PC o dispositivo móvil para acceder al panel del controlador web.
+2. En la pestaña **General**, marque la casilla **Habilitar servidor HTTP complementario** (puerto predeterminado: `8891`).
+3. Para habilitar la pantalla de radar, marque la casilla de verificación anidada **Habilitar mapa táctico de copiloto (MFD)**.
+4. Haga clic en **Guardar y cerrar** para aplicar.
+5. Acceder al panel de control: Abra `http://localhost:8891` en cualquier navegador de su PC, tableta o teléfono móvil. Si el modo de mapa está habilitado, estará disponible una nueva pestaña **🗺️ Mapa táctico**, que muestra una pantalla de radar HUD basada en Canvas que rastrea la posición en tiempo real de su personaje, el rumbo, los contactos de la tripulación en la misma zona y los indicadores de actividad del altavoz.
 
 ---
 

@@ -547,12 +547,13 @@ Como o instalador e os executáveis não são assinados digitalmente, o Windows 
 
 O XuruVOIP inclui um serviço web integrado do Companion App e um plugin oficial do Stream Deck que permite monitorar e acionar ações de voz diretamente de dispositivos secundários ou chaves físicas.
 
-### 1. Ativando o aplicativo complementar
-Por padrão, o servidor HTTP local do Companion App está desabilitado para economizar recursos do sistema. Para habilitá-lo:
+### 1. Habilitando o aplicativo complementar e o MFD do mapa tático
+Por padrão, o servidor HTTP local do Companion App e o modo do mapa tático estão desabilitados para economizar recursos do sistema. Para habilitá-los:
 1. Abra o cliente XuruVOIP e clique no ícone **Configurações**.
-2. Na guia **Geral**, marque a caixa **Ativar servidor HTTP complementar**.
-3. Em **Companion Server Port**, você pode personalizar o número da porta (padrão: `8891`).
-4. Clique em **Salvar e Fechar** para aplicar. O servidor HTTP agora será iniciado localmente. Você pode abrir `http://localhost:8891` em qualquer navegador em seu PC ou dispositivo móvel para acessar o painel do controlador web.
+2. Na guia **Geral**, marque a caixa **Habilitar servidor HTTP Companion** (porta padrão: `8891`).
+3. Para habilitar a exibição do radar, marque a caixa de seleção aninhada **Habilitar mapa tático do copiloto (MFD)**.
+4. Clique em **Salvar e Fechar** para aplicar.
+5. Acesse o painel: Você pode abrir `http://localhost:8891` em qualquer navegador em seu PC, tablet ou celular. Se o modo de mapa estiver habilitado, uma nova guia **🗺️ Mapa Tático** estará disponível, exibindo uma tela de radar HUD baseada em Canvas que rastreia a posição em tempo real do seu personagem, rumo, contatos da tripulação na mesma zona e indicadores de fala ativa.
 
 ---
 

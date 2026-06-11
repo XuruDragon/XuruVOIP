@@ -547,12 +547,13 @@ dotnet run
 
 XuruVOIP comprend un service Web Companion App intégré et un plugin Stream Deck officiel vous permettant de surveiller et de déclencher des actions vocales directement à partir d'appareils secondaires ou de clés physiques.
 
-### 1. Activation de l'application Companion
-Par défaut, le serveur HTTP local de l'application Companion est désactivé pour économiser les ressources système. Pour l'activer :
+### 1. Activation de l'application compagnon et du MFD de la carte tactique
+Par défaut, le serveur HTTP local de l'application compagnon et le mode carte tactique sont désactivés pour économiser les ressources système. Pour les activer :
 1. Ouvrez le client XuruVOIP et cliquez sur l'icône **Paramètres**.
-2. Dans l'onglet **Général**, cochez la case **Activer le serveur HTTP compagnon**.
-3. Sous **Companion Server Port**, vous pouvez personnaliser le numéro de port (par défaut : « 8891 »).
-4. Cliquez sur **Enregistrer et fermer** pour postuler. Le serveur HTTP va maintenant démarrer localement. Vous pouvez ouvrir « http://localhost:8891 » dans n'importe quel navigateur sur votre PC ou appareil mobile pour accéder au tableau de bord du contrôleur Web.
+2. Dans l'onglet **Général**, cochez la case **Activer le serveur HTTP compagnon** (port par défaut : `8891`).
+3. Pour activer l'affichage radar, cochez la case imbriquée **Activer la carte de copilote tactique (MFD)**.
+4. Cliquez sur **Enregistrer et fermer** pour appliquer.
+5. Accéder au tableau de bord : Ouvrez `http://localhost:8891` dans un navigateur sur votre PC, tablette ou téléphone. Si le mode carte est activé, un nouvel onglet **🗺️ Carte tactique** sera disponible, affichant un écran radar HUD basé sur Canvas qui suit la position en temps réel de votre personnage, son cap, les contacts de l'équipage dans la même zone et les indicateurs d'activité du haut-parleur.
 
 ---
 
