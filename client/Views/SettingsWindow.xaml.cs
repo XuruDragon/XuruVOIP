@@ -161,6 +161,11 @@ public partial class SettingsWindow : Window
         {
             CompanionPortPanel.Visibility = Cfg.EnableCompanionApp ? Visibility.Visible : Visibility.Collapsed;
         }
+        if (CbEnableCompanionMap != null)
+        {
+            CbEnableCompanionMap.IsChecked = Cfg.EnableCompanionMap;
+            CbEnableCompanionMap.Visibility = Cfg.EnableCompanionApp ? Visibility.Visible : Visibility.Collapsed;
+        }
 
         // Telemetry settings
         if (CbEnableTelemetry != null)
@@ -390,6 +395,10 @@ public partial class SettingsWindow : Window
         bool enabled = CbEnableCompanionApp.IsChecked == true;
         Cfg.EnableCompanionApp = enabled;
         CompanionPortPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        if (CbEnableCompanionMap != null)
+        {
+            CbEnableCompanionMap.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        }
     }
 
     private void Telemetry_ToggleChanged(object sender, RoutedEventArgs e)

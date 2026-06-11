@@ -265,6 +265,12 @@
                                          Style="{StaticResource InputStyle}"/>
                             </StackPanel>
 
+                            <CheckBox x:Name="CbEnableCompanionMap"
+                                      Content="{DynamicResource LblEnableCompanionMap}"
+                                      IsChecked="{Binding Config.EnableCompanionMap, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="16,8,0,0"/>
+
                             <CheckBox x:Name="CbEnableTelemetry"
                                       Content="{DynamicResource LblEnableTelemetry}"
                                       IsChecked="{Binding Config.EnableTelemetry, UpdateSourceTrigger=PropertyChanged}"

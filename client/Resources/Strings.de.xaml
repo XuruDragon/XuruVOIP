@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">Discord Rich Presence aktivieren</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Begleit-App HTTP-Server aktivieren</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Begleit-Server Port</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">Taktische Co-Pilot-Karte (MFD) aktivieren</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">G-Force- &amp; Belastungs-Stimmverzerrung aktivieren</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">Funk-Repeater aktivieren (Multi-Hop-Routing)</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">Als Funk-Repeater-Bake fungieren</sys:String>

@@ -588,12 +588,13 @@ Since the installer and executables are not digitally signed, Windows SmartScree
 
 XuruVOIP includes a built-in Companion App web service and an official Stream Deck plugin allowing you to monitor and trigger voice actions directly from secondary devices or physical keys.
 
-### 1. Enabling the Companion App
-By default, the Companion App local HTTP server is disabled to save system resources. To enable it:
+### 1. Enabling the Companion App & Tactical Map MFD
+By default, the Companion App local HTTP server and the Tactical Map mode are disabled to save system resources. To enable them:
 1. Open the XuruVOIP client and click the **Settings** icon.
-2. In the **General** tab, check the box **Enable Companion HTTP Server**.
-3. Under **Companion Server Port**, you can customize the port number (default: `8891`).
-4. Click **Save & Close** to apply. The HTTP server will now start locally. You can open `http://localhost:8891` in any browser on your PC or mobile device to access the web controller dashboard.
+2. In the **General** tab, check the box **Enable Companion HTTP Server** (default port: `8891`).
+3. To enable the radar display, check the nested **Enable Tactical Co-Pilot Map (MFD)** checkbox.
+4. Click **Save & Close** to apply.
+5. Access the dashboard: Open `http://localhost:8891` in a browser on your PC, tablet, or phone. If the Map mode is enabled, a new **🗺️ Tactical Map** tab will be available, displaying a canvas-based HUD radar screen tracking your character's real-time position, heading, same-zone crew contacts, and speaker activity indicators.
 
 ---
 

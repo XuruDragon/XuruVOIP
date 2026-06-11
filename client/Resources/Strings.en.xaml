@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">Enable Discord Rich Presence</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Enable Companion HTTP Server</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Companion Server Port</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">Enable Tactical Co-Pilot Map (MFD)</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">Enable G-Force &amp; Exertion Voice Distortion</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">Enable Radio Repeaters (Multi-hop Routing)</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">Act as Radio Repeater Beacon</sys:String>

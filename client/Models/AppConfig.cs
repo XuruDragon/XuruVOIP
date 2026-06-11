@@ -74,6 +74,7 @@ public class AppConfig
     // --- Companion App ---
     public bool EnableCompanionApp { get; set; } = false;
     public int CompanionAppPort { get; set; } = 8891;
+    public bool EnableCompanionMap { get; set; } = false;
 
     // --- Telemetry Sync ---
     public bool EnableTelemetry { get; set; } = false;

@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">Ativar Discord Rich Presence</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Ativar servidor HTTP Companion</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Porta do servidor Companion</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">Ativar mapa tático do copiloto (MFD)</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">Ativar distorção de voz de Força-G e esforço</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">Ativar repetidores de rádio (encaminhamento multi-salto)</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">Agir como farol repetidor de rádio</sys:String>

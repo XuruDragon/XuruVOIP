@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">启用 Discord 状态呈现 (Rich Presence)</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">启用 Companion HTTP 服务器</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Companion 服务器端口</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">启用战术副驾驶地图 (MFD)</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">启用重力加速度（G力）与身体负荷语音失真</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">启用无线电中继器（多跳路由）</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">作为无线电中继信标运行</sys:String>

@@ -95,12 +95,16 @@ XuruVOIP includes special features that make voice communication match your game
 The Companion App allows you to control XuruVOIP from your smartphone, tablet, or secondary monitor browser.
 
 1. **Enable it:** Go to **Settings**, check **Enable Companion HTTP Server**, and set a port (default: `8891`).
-2. **Access it:** Open any web browser on your device and type `http://localhost:8891` (if on the same PC) or `http://[Your-PC-IP-Address]:8891` (if on your phone connected to the same Wi-Fi).
-3. **Controls:**
-   * Mute or unmute different audio feeds.
-   * View live compass and radar coordinates.
-   * Trigger the PA system using the big red button.
-   * Drag sliders to mock-test G-force/Exertion voice effects.
+2. **Enable Tactical Map Mode (Optional):** Check the box **Enable Tactical Co-Pilot Map (MFD)** (disabled by default) to stream location coordinates and enable the radar screen tab on the companion interface.
+3. **Access it:** Open any web browser on your device and type `http://localhost:8891` (if on the same PC) or `http://[Your-PC-IP-Address]:8891` (if on your phone connected to the same Wi-Fi).
+4. **Features & Layout:**
+   * **🎛️ Controls Tab:** Toggle mic/audio mutes, helmet modulation, PA broadcasts, select active radio channels, select voice changer profiles, or mock test G-Force/Exertion stress levels.
+   * **🗺️ Tactical Map Tab (MFD):**
+     * Displays a sci-fi glassmorphic radar screen tracking your local position.
+     * Renders other crew members and players inside your same container/zone.
+     * Displays real-time speaking status (pulsating green rings around active speakers).
+     * Includes **Heading-Up** (map rotates with your movement direction) and **North-Up** orientation modes.
+     * Range slider to adjust radar zoom levels from 10 meters up to 1000 meters.
 
 ---
 

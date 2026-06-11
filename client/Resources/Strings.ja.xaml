@@ -123,6 +123,7 @@
     <sys:String x:Key="LblEnableDiscordRpc">Discord Rich Presenceを有効化</sys:String>
     <sys:String x:Key="LblEnableCompanionApp">Companion HTTPサーバーを有効化</sys:String>
     <sys:String x:Key="LblCompanionAppPort">Companion サーバーポート</sys:String>
+    <sys:String x:Key="LblEnableCompanionMap">タクティカルコパイロットマップ(MFD)を有効化</sys:String>
     <sys:String x:Key="LblEnableExertionDistortion">Gフォース・呼吸負荷音声歪みを有効にする</sys:String>
     <sys:String x:Key="LblEnableRadioRepeaters">無線リピーターを有効にする（マルチホップルーティング）</sys:String>
     <sys:String x:Key="LblIsRadioRepeater">無線リピータービーコンとして動作する</sys:String>
