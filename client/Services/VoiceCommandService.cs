@@ -17,7 +17,11 @@ public enum VoiceCommandAction
     MicMuteAll,
     MicUnmuteAll,
     RadioChannelSwitch,
-    VoiceChangerProfile
+    VoiceChangerProfile,
+    ShipPowerToggle,
+    ShipDoorsToggle,
+    ShipShieldsFront,
+    ShipLandingGearToggle
 }
 
 public class VoiceCommandResult
@@ -153,6 +157,50 @@ public class VoiceCommandService
         { "zh", new[] { "变声器", "声音配置文件", "变声" } }
     };
 
+    private static readonly Dictionary<string, string[]> ShipPowerTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "power", "toggle power", "power on", "power off", "systems on", "systems off" } },
+        { "fr", new[] { "alimentation", "basculer alimentation", "allumer systemes", "eteindre systemes", "demarrer systemes", "couper systemes" } },
+        { "de", new[] { "energie", "energie umschalten", "systeme an", "systeme aus", "strom an", "strom aus" } },
+        { "es", new[] { "energia", "alternar energia", "sistemas encendidos", "sistemas apagados" } },
+        { "pt", new[] { "energia", "alternar energia", "sistemas ligados", "sistemas desligados" } },
+        { "ja", new[] { "パワー", "電源切り替え", "システム起動", "システム停止" } },
+        { "zh", new[] { "电源", "切换电源", "系统开启", "系统关闭" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipDoorsTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "doors", "exterior", "open doors", "close doors", "open exterior", "close exterior", "toggle doors", "toggle exterior" } },
+        { "fr", new[] { "portes", "exterieur", "ouvrir portes", "fermer portes", "ouvrir exterieur", "fermer exterieur", "basculer portes" } },
+        { "de", new[] { "tueren", "tueren oeffnen", "tueren schliessen", "aussen oeffnen", "aussen schliessen" } },
+        { "es", new[] { "puertas", "exterior", "abrir puertas", "cerrar puertas", "abrir exterior", "cerrar exterior" } },
+        { "pt", new[] { "portas", "exterior", "abrir portas", "fechar portas", "abrir exterior", "fechar exterior" } },
+        { "ja", new[] { "ドア", "外部", "ドア開閉", "ドアを開ける", "ドアを閉める", "外部開放", "外部閉鎖" } },
+        { "zh", new[] { "舱门", "外部", "开启舱门", "关闭舱门", "开启外部", "关闭外部" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipShieldsTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "shields", "shields front", "shields forward", "divert shields", "shields ahead" } },
+        { "fr", new[] { "boucliers", "boucliers avant", "devier boucliers", "boucliers devant" } },
+        { "de", new[] { "schilde", "schilde vorne", "schilde vorwaerts", "schilde umleiten" } },
+        { "es", new[] { "escudos", "escudos al frente", "escudos adelante", "desviar escudos" } },
+        { "pt", new[] { "escudos", "escudos na frente", "escudos para frente", "desviar escudos" } },
+        { "ja", new[] { "シールド", "シールド前方", "シールド前", "シールド偏向" } },
+        { "zh", new[] { "护盾", "护盾向前", "前部护盾", "偏转护盾" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipLandingGearTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "landing gear", "deploy landing gear", "retract landing gear", "toggle landing gear", "gear" } },
+        { "fr", new[] { "train d'atterrissage", "deployer train", "rentrer train", "train atterrissage" } },
+        { "de", new[] { "fahrwerk", "fahrwerk ausfahren", "fahrwerk einfahren" } },
+        { "es", new[] { "tren de aterrizaje", "desplegar tren", "retraer tren" } },
+        { "pt", new[] { "trem de pouso", "desdobrar trem", "recolher trem" } },
+        { "ja", new[] { "ランディングギア", "ギア", "ランディングギア展開", "ギア展開", "ギア格納" } },
+        { "zh", new[] { "起落架", "收放起落架", "放下起落架", "收起起落架" } }
+    };
+
     // Voice Changer Profiles localized
     private static readonly string[] ProfileAlienNames = new[] { "alien", "extraterrestre", "alienígena", "エイリアン", "外星人" };
     private static readonly string[] ProfileCyborgNames = new[] { "cyborg", "ciborg", "サイボーグ", "半机械人", "改造人" };
@@ -164,6 +212,10 @@ public class VoiceCommandService
     public event Action<string>? ChannelChangeRequested;
     public event Action<string>? VoiceChangerProfileRequested;
     public event Action<VoiceCommandAction>? MicStateChangeRequested;
+    public event Action? ShipPowerToggleRequested;
+    public event Action? ShipDoorsToggleRequested;
+    public event Action? ShipShieldsFrontRequested;
+    public event Action? ShipLandingGearToggleRequested;
 
     public VoiceCommandResult ParseAndExecute(string text, string appLang, IEnumerable<string> availableChannels, double confidence = 0.5)
     {
@@ -290,6 +342,36 @@ public class VoiceCommandService
                     return result;
                 }
             }
+        }
+
+        // 5. Voice Ship Controls
+        if (MatchesTrigger(cleanText, lang, ShipPowerTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipPowerToggle;
+            result.Similarity = sim;
+            ShipPowerToggleRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipDoorsTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipDoorsToggle;
+            result.Similarity = sim;
+            ShipDoorsToggleRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipShieldsTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipShieldsFront;
+            result.Similarity = sim;
+            ShipShieldsFrontRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipLandingGearTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipLandingGearToggle;
+            result.Similarity = sim;
+            ShipLandingGearToggleRequested?.Invoke();
+            return result;
         }
 
         // 5. Fallback: try to see if a channel name is simply said directly (e.g. "Alpha")

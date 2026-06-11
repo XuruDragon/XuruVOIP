@@ -197,6 +197,11 @@
     <!-- Voice Commands -->
     <sys:String x:Key="LblEnableVoiceCommands">Activer les commandes vocales (PTT mains libres)</sys:String>
     <sys:String x:Key="LblVoiceCommandHotkey">Touche de commande vocale (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceShipControlsHeader">Commandes de Vaisseau par Voix (Touches Simulées)</sys:String>
+    <sys:String x:Key="LblVoicePowerKey">Voix : Touche d'Alimentation du Vaisseau</sys:String>
+    <sys:String x:Key="LblVoiceDoorsKey">Voix : Touche des Portes du Vaisseau</sys:String>
+    <sys:String x:Key="LblVoiceShieldsKey">Voix : Touche de Déviation des Boucliers</sys:String>
+    <sys:String x:Key="LblVoiceLandingGearKey">Voix : Touche du Train d'Atterrissage</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Seuil de confiance des commandes vocales</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">ATTENTION : L'activation des commandes vocales hors ligne téléchargera le modèle de transcription Whisper (~140 Mo) lors du premier démarrage s'il n'est pas déjà présent.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS À L'ÉCOUTE...</sys:String>

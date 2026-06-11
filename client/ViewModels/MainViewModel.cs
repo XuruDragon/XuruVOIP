@@ -841,6 +841,14 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         // Voice Command Service wiring
         _voiceCommand.VisorToggleRequested += () => ToggleHelmet();
         _voiceCommand.ChannelChangeRequested += chan => _ = ChangeRadioChannelAsync(chan);
+        _voiceCommand.ShipPowerToggleRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandPowerKey);
+        _voiceCommand.ShipDoorsToggleRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandDoorsKey, Config.Config.VoiceCommandDoorsModifier);
+        _voiceCommand.ShipShieldsFrontRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandShieldsKey);
+        _voiceCommand.ShipLandingGearToggleRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandLandingGearKey);
         _voiceCommand.VoiceChangerProfileRequested += profile =>
         {
             Config.Config.EnableVoiceChanger = (profile != "None");

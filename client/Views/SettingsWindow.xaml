@@ -799,6 +799,56 @@
                                      KeyDown="Hotkey_KeyDown"
                                      Margin="0,0,0,10"/>
 
+                            <!-- Voice-Activated Ship Controls -->
+                            <TextBlock Text="{DynamicResource LblVoiceShipControlsHeader}" 
+                                       Foreground="{StaticResource Accent}" 
+                                       FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
+
+                            <!-- Power Key -->
+                            <TextBlock Text="{DynamicResource LblVoicePowerKey}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxVoicePowerKey"
+                                     Text="{Binding Config.VoiceCommandPowerKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Doors Key -->
+                            <TextBlock Text="{DynamicResource LblVoiceDoorsKey}" Style="{StaticResource LabelStyle}"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="TxVoiceDoorsKey" Grid.Column="0"
+                                         Text="{Binding Config.VoiceCommandDoorsKey, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"
+                                         KeyDown="Hotkey_KeyDown"/>
+                                <ComboBox x:Name="CbVoiceDoorsModifier" Grid.Column="1" Style="{StaticResource ComboStyle}" Margin="8,0,0,0"
+                                          SelectedValue="{Binding Config.VoiceCommandDoorsModifier, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValuePath="Content">
+                                    <ComboBoxItem Content="None"/>
+                                    <ComboBoxItem Content="Alt"/>
+                                    <ComboBoxItem Content="Ctrl"/>
+                                    <ComboBoxItem Content="Shift"/>
+                                </ComboBox>
+                            </Grid>
+
+                            <!-- Shields Key -->
+                            <TextBlock Text="{DynamicResource LblVoiceShieldsKey}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxVoiceShieldsKey"
+                                     Text="{Binding Config.VoiceCommandShieldsKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Landing Gear Key -->
+                            <TextBlock Text="{DynamicResource LblVoiceLandingGearKey}" Style="{StaticResource LabelStyle}"/>
+                            <TextBox x:Name="TxVoiceLandingGearKey"
+                                     Text="{Binding Config.VoiceCommandLandingGearKey, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputStyle}"
+                                     KeyDown="Hotkey_KeyDown"
+                                     Margin="0,0,0,10"/>
+
                             <!-- Initiate Hail Key -->
                             <TextBlock Text="{DynamicResource LblInitiateHail}" Style="{StaticResource LabelStyle}"/>
                             <TextBox x:Name="TxInitiateHail"

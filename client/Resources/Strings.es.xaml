@@ -197,6 +197,11 @@
     <!-- Voice Commands -->
     <sys:String x:Key="LblEnableVoiceCommands">Activar comandos de voz (PTT manos libres)</sys:String>
     <sys:String x:Key="LblVoiceCommandHotkey">Tecla de comando de voz (PTT)</sys:String>
+    <sys:String x:Key="LblVoiceShipControlsHeader">Controles de Nave por Voz (Teclas Simuladas)</sys:String>
+    <sys:String x:Key="LblVoicePowerKey">Voz: Tecla de Encendido de Nave</sys:String>
+    <sys:String x:Key="LblVoiceDoorsKey">Voz: Tecla de Puertas de Nave</sys:String>
+    <sys:String x:Key="LblVoiceShieldsKey">Voz: Tecla de Desviar Escudos Adelante</sys:String>
+    <sys:String x:Key="LblVoiceLandingGearKey">Voz: Tecla de Tren de Aterrizaje</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Umbral de confianza del comando de voz</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">ADVERTENCIA: La activación de comandos de voz sin conexión descargará el modelo de transcripción Whisper (~140 MB) en la primera activación si aún no está presente en su máquina.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS ESCUCHANDO...</sys:String>
