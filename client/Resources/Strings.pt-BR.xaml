@@ -115,6 +115,7 @@
     <!-- Configurações: Overlay -->
     <sys:String x:Key="TabOverlay">Overlay</sys:String>
     <sys:String x:Key="LblEnableOverlay">Habilitar HUD de Overlay</sys:String>
+    <sys:String x:Key="LblEnableVisorSpectrogram">Ativar o espectrograma 3D do HUD do visor</sys:String>
     <sys:String x:Key="LblOverlayPosition">Canto do Overlay</sys:String>
     <sys:String x:Key="OptTopLeft">Superior Esquerdo</sys:String>
     <sys:String x:Key="OptTopCenter">Superior Centro</sys:String>

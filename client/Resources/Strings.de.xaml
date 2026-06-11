@@ -115,6 +115,7 @@
     <!-- Einstellungen: Overlay -->
     <sys:String x:Key="TabOverlay">Overlay</sys:String>
     <sys:String x:Key="LblEnableOverlay">HUD-Overlay aktivieren</sys:String>
+    <sys:String x:Key="LblEnableVisorSpectrogram">Visier-HUD 3D-Spektrogramm aktivieren</sys:String>
     <sys:String x:Key="LblOverlayPosition">Overlay-Bildschirmecke</sys:String>
     <sys:String x:Key="OptTopLeft">Oben-Links</sys:String>
     <sys:String x:Key="OptTopCenter">Oben-Mitte</sys:String>

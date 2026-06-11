@@ -71,17 +71,36 @@
                 <ItemsControl x:Name="LstSpeakers" Margin="0,0,0,2">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="0,2,0,4">
-                                <!-- Audio transmitting soundwave indicator / icon -->
-                                <Path Fill="#FF3DDB85" 
-                                      VerticalAlignment="Center" 
-                                      Margin="0,0,8,0"
-                                      Data="M 2 5 L 2 11 L 4 11 L 7 14 L 7 2 L 4 5 Z M 9 5.5 A 4 4 0 0 1 9 10.5 M 11 3.5 A 7 7 0 0 1 11 12.5"/>
-                                <TextBlock Text="{Binding}" 
-                                           Foreground="#FFFFFFFF" 
-                                           FontSize="12" 
-                                           FontWeight="SemiBold" 
-                                           VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Vertical" Margin="0,2,0,6">
+                                <StackPanel Orientation="Horizontal">
+                                    <!-- Audio transmitting soundwave indicator / icon -->
+                                    <Path Fill="{Binding ChannelBrush}" 
+                                          VerticalAlignment="Center" 
+                                          Margin="0,0,8,0"
+                                          Data="M 2 5 L 2 11 L 4 11 L 7 14 L 7 2 L 4 5 Z M 9 5.5 A 4 4 0 0 1 9 10.5 M 11 3.5 A 7 7 0 0 1 11 12.5"/>
+                                    <TextBlock Text="{Binding PlayerName}" 
+                                               Foreground="#FFFFFFFF" 
+                                               FontSize="12" 
+                                               FontWeight="SemiBold" 
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                
+                                <!-- Real-time Spectrogram HUD visualizer -->
+                                <ItemsControl ItemsSource="{Binding SpectralBars}" Visibility="{Binding SpectrogramVisibility}" Margin="20,4,0,2">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Height="16"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Rectangle Width="3" Margin="0,0,2,0" 
+                                                       Height="{Binding Height}" 
+                                                       Fill="{Binding Brush}" 
+                                                       VerticalAlignment="Bottom"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

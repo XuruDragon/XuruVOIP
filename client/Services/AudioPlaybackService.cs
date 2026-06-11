@@ -81,6 +81,7 @@ public class AudioPlaybackService : IDisposable
     public bool EnableHelmetModulator { get; set; } = true;
     public bool EnableStt { get; set; } = false;
     public bool EnableShipPa { get; set; } = true;
+    public bool EnableVisorSpectrogram { get; set; } = false;
 
     // Intercom Degradation
     public bool EnableIntercomDegradation { get; set; } = false;
@@ -359,6 +360,15 @@ public class AudioPlaybackService : IDisposable
                 track.CurrentTickPacket = track.Jitter.Dequeue(out bool isPlcNeeded);
                 track.CurrentTickPlcNeeded = isPlcNeeded;
 
+                if (track.CurrentTickPacket == null)
+                {
+                    for (int b = 0; b < 8; b++)
+                    {
+                        track.SpectralBands[b] *= 0.7f;
+                        if (track.SpectralBands[b] < 0.01f) track.SpectralBands[b] = 0f;
+                    }
+                }
+
                 if (track.CurrentTickPacket != null)
                 {
                     var packet = track.CurrentTickPacket;
@@ -546,6 +556,12 @@ public class AudioPlaybackService : IDisposable
             floatBuf[i] = pcm[i] / 32768f;
         }
 
+        if (decoded >= 64)
+        {
+            Array.Copy(floatBuf, decoded - 64, track.Last64Samples, 0, 64);
+            track.UpdateSpectralBands();
+        }
+
         if (EnableEnvironmentalAcoustics || EnableAtmosphereSimulation)
         {
             if (metadata != null && metadata.SpatialEnabled)
@@ -721,6 +737,32 @@ public class AudioPlaybackService : IDisposable
                 if (kvp.Value.IsTransmitting && (DateTime.UtcNow - kvp.Value.LastReceivedTime).TotalMilliseconds < activeTimeoutMs)
                 {
                     active.Add(kvp.Key);
+                }
+            }
+        }
+        return active;
+    }
+
+    public List<SpeakerTelemetry> GetActiveSpeakersTelemetry(double activeTimeoutMs = 400)
+    {
+        var active = new List<SpeakerTelemetry>();
+        lock (_lock)
+        {
+            foreach (var kvp in _tracks)
+            {
+                if (kvp.Key == "__local_chime") continue;
+                var track = kvp.Value;
+                if (track.IsTransmitting && (DateTime.UtcNow - track.LastReceivedTime).TotalMilliseconds < activeTimeoutMs)
+                {
+                    var bandsCopy = new float[8];
+                    Array.Copy(track.SpectralBands, bandsCopy, 8);
+                    active.Add(new SpeakerTelemetry
+                    {
+                        PlayerName = track.PlayerName,
+                        AudioType = track.LastAudioType,
+                        IsIntercom = track.IsIntercom,
+                        SpectralBands = bandsCopy
+                    });
                 }
             }
         }
@@ -961,6 +1003,47 @@ public class AudioPlaybackService : IDisposable
         public bool IsIntercom { get; set; } = false;
         public AudioPacket? CurrentTickPacket { get; set; }
         public bool CurrentTickPlcNeeded { get; set; }
+
+        public float[] Last64Samples { get; } = new float[64];
+        public float[] SpectralBands { get; } = new float[8];
+        private readonly float[] _fftReal = new float[64];
+        private readonly float[] _fftImag = new float[64];
+
+        public void UpdateSpectralBands()
+        {
+            try
+            {
+                FftAnalysis.ComputeFft(Last64Samples, _fftReal, _fftImag);
+                int[][] binGroups = [
+                    [1],
+                    [2, 3],
+                    [4, 5],
+                    [6, 7, 8],
+                    [9, 10, 11, 12],
+                    [13, 14, 15, 16, 17],
+                    [18, 19, 20, 21, 22, 23, 24],
+                    [25, 26, 27, 28, 29, 30, 31]
+                ];
+                for (int b = 0; b < 8; b++)
+                {
+                    float sum = 0;
+                    foreach (int bin in binGroups[b])
+                    {
+                        float r = _fftReal[bin];
+                        float i = _fftImag[bin];
+                        sum += (float)Math.Sqrt(r * r + i * i);
+                    }
+                    float avg = sum / binGroups[b].Length;
+                    float targetValue = avg * 20.0f;
+                    if (targetValue > 1.0f) targetValue = 1.0f;
+                    if (targetValue > SpectralBands[b])
+                        SpectralBands[b] = SpectralBands[b] * 0.5f + targetValue * 0.5f;
+                    else
+                        SpectralBands[b] = SpectralBands[b] * 0.8f + targetValue * 0.2f;
+                }
+            }
+            catch {}
+        }
     }
 }
 
@@ -975,6 +1058,14 @@ internal class AudioPacket
     public string SpeakerZone { get; set; } = string.Empty;
     public string ListenerZone { get; set; } = string.Empty;
     public bool IsIntercom { get; set; }
+}
+
+public class SpeakerTelemetry
+{
+    public string PlayerName { get; set; } = string.Empty;
+    public byte AudioType { get; set; }
+    public bool IsIntercom { get; set; }
+    public float[] SpectralBands { get; set; } = new float[8];
 }
 
 internal class JitterBuffer
