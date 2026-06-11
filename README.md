@@ -227,17 +227,23 @@ graph TB
 ### 6. 💬 Automatic Ship Intercom System
 * **Vehicle Intercom Channels:** Boarding a vehicle automatically subscribes players to a dynamic `Intercom_<ContainerID>` radio channel.
 * **Pilot Priority Ducking:** When a player in a cockpit or driver seat transmits on the intercom, all other players' proximity audio is ducked by 85% to ensure flight command clarity.
+* **Dynamic Intercom Degradation:** Intercom channels automatically degrade based on vehicle status:
+  * **Shield Hits:** Temporarily injects static bursts and volume crackles (lasts 2.5 seconds).
+  * **Critical Power:** Low-voltage AC hum, soft-clipping distortion, and pitch-resampling drop.
+  * **Quantum Travel:** Comb-filter flanger/phaser sweep and high-frequency whine.
+  * *All sub-effects can be toggled individually in the General Settings and are disabled by default.*
 * **Cleanup Cooldown:** Counts down 5 minutes after the last player leaves the ship before deleting the intercom channel, maximizing server performance.
 
 ### 7. 📡 Vulkan-Compatible HUD Overlay & 2D Tactical Radar
 * **Win32 Click-Through Overlay:** A borderless HUD overlay showing VoIP connections, frequencies, and speaking states. Vulkan and DirectX compatible (running in borderless windowed mode).
+* **Intercom Status Indicator:** Displays warnings like `⚡ INTERCOM: DEGRADED` (with sub-status details such as `[Power Loss]`, `[Quantum]`, or `[Static Pop]`) in the overlay when intercom degradation is active.
 * **Tactical Mini-Radar:** Features a heading-aligned 2D HUD radar that displays relative speaking players, drawing pulsating sound rings around them.
 * **Speech-to-Text Subtitles:** Transcribes incoming radio/proximity audio to localized HUD subtitles using an offline, lightweight Whisper model (`ggml-tiny.bin`).
 
 ### 8. 📱 Companion App & REST API
 * **Local HTTP Web Server:** Hosts a local dashboard on a configurable port (default: `8891`, disabled by default).
 * **Glassmorphic Controller:** Connects from phones or secondary screens to toggle mutes, channel cycles, helmets, or voice changers.
-* **REST API:** Exposes endpoints `GET /api/status` and `POST /api/action` for external integrations.
+* **REST API:** Exposes endpoints `GET /api/status` and `POST /api/action` for external integrations (including intercom state status and simulation overrides).
 
 ### 9. 🎛️ Stream Deck Plugin
 * **Stream Deck Action Pack:** Exposes 8 actions to control microphone mutes, audio mutes, helmet visors, and radio frequency cycles.

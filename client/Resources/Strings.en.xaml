@@ -184,4 +184,10 @@
     <!-- Telemetry -->
     <sys:String x:Key="LblEnableTelemetry">Enable Telemetry Broadcast (UDP)</sys:String>
     <sys:String x:Key="LblTelemetryPort">Telemetry Broadcast Port</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">Enable Intercom Degradation (Ship Status)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">Enable Shield Hits Effect (Static &amp; Pops)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">Enable Critical Power Effect (Hum &amp; Resample)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">Enable Quantum Travel Effect (Phaser Sweep)</sys:String>
 </ResourceDictionary>

@@ -184,4 +184,10 @@
     <!-- Telemetría -->
     <sys:String x:Key="LblEnableTelemetry">Activar la transmisión de telemetría (UDP)</sys:String>
     <sys:String x:Key="LblTelemetryPort">Puerto de transmisión de telemetría</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">Habilitar degradación del intercomunicador (Estado de nave)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">Habilitar efecto de impacto de escudo (Ruido y crujidos)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">Habilitar efecto de energía crítica (Zumbido y resampleo)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">Habilitar efecto de viaje cuántico (Barrido de phaser)</sys:String>
 </ResourceDictionary>

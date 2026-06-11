@@ -54,6 +54,13 @@ public class AudioPlaybackService : IDisposable
     public bool EnableStt { get; set; } = false;
     public bool EnableShipPa { get; set; } = true;
 
+    // Intercom Degradation
+    public bool EnableIntercomDegradation { get; set; } = false;
+    public bool IntercomShieldHitsEnabled { get; set; } = true;
+    public bool IntercomCriticalPowerEnabled { get; set; } = true;
+    public bool IntercomQuantumTravelEnabled { get; set; } = true;
+    public IntercomDegradationState CurrentIntercomState { get; set; } = IntercomDegradationState.Normal;
+
     public event Action<string, float[], byte>? SttAudioChunkReady;
 
     public double ListenerX { get; set; }
@@ -517,6 +524,14 @@ public class AudioPlaybackService : IDisposable
             track.DspFilter.Process(floatBuf, decoded);
         }
 
+        if (EnableIntercomDegradation && track.IsIntercom && CurrentIntercomState != IntercomDegradationState.Normal)
+        {
+            track.IntercomFilter.ShieldHitsEnabled = IntercomShieldHitsEnabled;
+            track.IntercomFilter.CriticalPowerEnabled = IntercomCriticalPowerEnabled;
+            track.IntercomFilter.QuantumTravelEnabled = IntercomQuantumTravelEnabled;
+            track.IntercomFilter.Process(floatBuf, decoded, CurrentIntercomState);
+        }
+
         // Downsample to 16kHz for STT if enabled
         if (EnableStt)
         {
@@ -705,6 +720,7 @@ public class AudioPlaybackService : IDisposable
         public RadioDspFilter DspFilter { get; } = new();
         public MegaphoneDspFilter MegaphoneFilter { get; } = new();
         public EnvironmentalAcousticFilter AcousticFilter { get; } = new();
+        public IntercomDspFilter IntercomFilter { get; } = new();
         public bool IsTransmitting { get; set; } = false;
         public DateTime LastReceivedTime { get; set; } = DateTime.MinValue;
         public JitterBuffer Jitter { get; } = new();

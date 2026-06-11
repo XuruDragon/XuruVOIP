@@ -88,6 +88,17 @@ XuruVOIP includes special features that make voice communication match your game
   * Go to **Settings** and check **Enable Radio Repeaters**.
   * To act as a repeater for your team, check the **Act as Radio Repeater Beacon** box.
 
+### ⚡ 5. Dynamic Intercom Degradation (Ship Damage/Status)
+* **What it does:** Simulates communication interference when your spaceship takes shield damage, experiences power grid failures, or engages in Quantum Travel. This only affects intercom channels (channels starting with `Intercom_` that you automatically join when boarding a ship).
+  * **Shield Hits Effect:** Injects a burst of static noise and crackles for 2.5 seconds when the ship's shields are hit.
+  * **Critical Power Effect:** Injects an electrical AC hum (60Hz + harmonics), drops voice pitch (speed factor 0.78x), and applies heavy saturation distortion during power losses.
+  * **Quantum Travel Effect:** Applies a flanger/phaser comb-filter sweep and a high-frequency whine when traveling in quantum.
+* **How to configure it:**
+  * Go to **Settings** -> **General** tab.
+  * Check the global option **Enable Intercom Degradation (Ship Damage)** (disabled by default).
+  * Under it, you can toggle the individual sub-effects (**Shield Hits**, **Critical Power**, **Quantum Travel**) depending on your preferences.
+  * When active, warning messages like `⚡ INTERCOM: POWER LOSS` or `⚡ INTERCOM: QUANTUM WAVE` will display on your HUD overlay.
+
 ---
 
 ## 📱 Using the Companion App

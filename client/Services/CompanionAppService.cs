@@ -238,7 +238,12 @@ public class CompanionAppService : IDisposable
                     enableCompanionMap = mapEnabled,
                     localPos = mapEnabled ? localPos : null,
                     heading = mapEnabled ? new { x = headingX, y = headingY } : null,
-                    remotePositions = mapEnabled ? remotePositions : null
+                    remotePositions = mapEnabled ? remotePositions : null,
+                    enableIntercomDegradation = _viewModel.Config.Config.EnableIntercomDegradation,
+                    intercomShieldHitsEnabled = _viewModel.Config.Config.IntercomShieldHitsEnabled,
+                    intercomCriticalPowerEnabled = _viewModel.Config.Config.IntercomCriticalPowerEnabled,
+                    intercomQuantumTravelEnabled = _viewModel.Config.Config.IntercomQuantumTravelEnabled,
+                    intercomState = _viewModel.IntercomState.ToString()
                 };
 
                 string json = JsonSerializer.Serialize(status);
@@ -350,6 +355,20 @@ public class CompanionAppService : IDisposable
                 break;
             case "stop_pa":
                 _viewModel.SetMockPttPaState(false);
+                break;
+            case "simulate_intercom_state":
+                if (root.TryGetProperty("state", out var stateProp))
+                {
+                    string stStr = stateProp.GetString()?.ToLower() ?? "normal";
+                    var stateVal = stStr switch
+                    {
+                        "shield_hit" => IntercomDegradationState.ShieldHit,
+                        "critical_power" => IntercomDegradationState.CriticalPower,
+                        "quantum" => IntercomDegradationState.QuantumTravel,
+                        _ => IntercomDegradationState.Normal
+                    };
+                    _viewModel.IntercomState = stateVal;
+                }
                 break;
         }
     }

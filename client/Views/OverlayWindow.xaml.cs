@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using XuruVoipClient.ViewModels;
 using XuruVoipClient.Models;
+using XuruVoipClient.Services;
 
 namespace XuruVoipClient.Views;
 
@@ -140,6 +141,23 @@ public partial class OverlayWindow : Window
         {
             StatusDot.Fill = BrushRed;
             TxtStatus.Text = "Disconnected";
+        }
+
+        // Update Intercom degradation state indicator on HUD
+        if (cfg.EnableIntercomDegradation && _vm.IntercomState != IntercomDegradationState.Normal)
+        {
+            TxtIntercomStatus.Visibility = Visibility.Visible;
+            TxtIntercomStatus.Text = _vm.IntercomState switch
+            {
+                IntercomDegradationState.ShieldHit => "⚡ INTERCOM: STATIC BURST",
+                IntercomDegradationState.CriticalPower => "⚡ INTERCOM: POWER LOSS",
+                IntercomDegradationState.QuantumTravel => "⚡ INTERCOM: QUANTUM WAVE",
+                _ => ""
+            };
+        }
+        else
+        {
+            TxtIntercomStatus.Visibility = Visibility.Collapsed;
         }
 
         // 4. Update dynamic positioning corner

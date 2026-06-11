@@ -184,4 +184,10 @@
     <!-- テレメトリ -->
     <sys:String x:Key="LblEnableTelemetry">テレメトリ配信(UDP)を有効化</sys:String>
     <sys:String x:Key="LblTelemetryPort">テレメトリ配信ポート</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">インターコム劣化を有効にする (船体ステータス)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">シールド被弾エフェクトを有効にする (ノイズ＆ポップ音)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">致命的電力エフェクトを有効にする (ハム音＆リサンプル)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">量子トラベルエフェクトを有効にする (フェイザースイープ)</sys:String>
 </ResourceDictionary>

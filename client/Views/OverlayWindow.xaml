@@ -50,6 +50,14 @@
                                VerticalAlignment="Center"/>
                 </Grid>
 
+                <TextBlock x:Name="TxtIntercomStatus"
+                           Text=""
+                           Foreground="#FFFF9800"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Margin="0,0,0,6"
+                           Visibility="Collapsed"/>
+
                 <Separator Background="#20FFFFFF" Margin="0,0,0,8" Height="1"/>
 
                 <!-- Active Speakers List -->

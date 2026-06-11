@@ -184,4 +184,10 @@
     <!-- Telemetrie -->
     <sys:String x:Key="LblEnableTelemetry">Telemetrie-Übertragung (UDP) aktivieren</sys:String>
     <sys:String x:Key="LblTelemetryPort">Telemetrie-Übertragungsport</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">Intercom-Degradation aktivieren (Schiffsstatus)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">Schildtreffer-Effekt aktivieren (Rauschen &amp; Knistern)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">Kritischen Krafteffekt aktivieren (Brummen &amp; Resample)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">Quantenreise-Effekt aktivieren (Phaser-Sweep)</sys:String>
 </ResourceDictionary>

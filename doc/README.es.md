@@ -224,17 +224,23 @@ graph TB
 ### 6. 💬 Sistema automático de intercomunicación para barcos
 * **Canales de intercomunicación del vehículo:** Al abordar un vehículo, los jugadores se suscriben automáticamente a un canal de radio dinámico `Intercom_<ContainerID>`.
 * **Agachamiento de prioridad del piloto:** Cuando un jugador en la cabina o en el asiento del conductor transmite por el intercomunicador, el audio de proximidad de todos los demás jugadores se reduce en un 85% para garantizar la claridad del comando de vuelo.
+* **Degradación dinámica del intercomunicador:** Los canales del intercomunicador se degradan automáticamente según el estado del vehículo:
+  * **Impactos en el escudo (Shield Hits):** Inyecta temporalmente ráfagas de estática y crujidos de volumen (dura 2,5 segundos).
+  * **Energía crítica (Critical Power):** Zumbido de CA de bajo voltaje, distorsión de saturación y caída del tono de voz (resampling).
+  * **Viaje cuántico (Quantum Travel):** Barrido de filtro en peine (flanger/phaser) y pitido de alta frecuencia.
+  * *Todos los sub-efectos se pueden activar/desactivar individualmente en la configuración general y están desactivados por defecto.*
 * **Enfriamiento de limpieza:** Cuenta regresiva 5 minutos después de que el último jugador abandona el barco antes de eliminar el canal de intercomunicación, lo que maximiza el rendimiento del servidor.
 
 ### 7. 📡 Superposición de HUD y radar táctico 2D compatible con Vulkan
 * **Superposición de clic de Win32:** Una superposición de HUD sin bordes que muestra conexiones VoIP, frecuencias y estados de conversación. Compatible con Vulkan y DirectX (se ejecuta en modo de ventana sin bordes).
+* **Indicador de estado del intercomunicador:** Muestra advertencias como `⚡ INTERCOM: DEGRADED` (con detalles de subestado como `[Power Loss]`, `[Quantum]` o `[Static Pop]`) en la superposición de HUD cuando la degradación del intercomunicador está activa.
 * **Mini-radar táctico:** Cuenta con un radar HUD 2D alineado con el rumbo que muestra a los jugadores que hablan en relación, dibujando anillos de sonido pulsantes a su alrededor.
 * **Subtítulos de voz a texto:** Transcribe audio entrante de radio/proximidad a subtítulos HUD localizados usando un modelo Whisper liviano y fuera de línea (`ggml-tiny.bin`).
 
 ### 8. 📱 Aplicación complementaria y API REST
 * **Servidor web HTTP local:** Alberga un panel local en un puerto configurable (predeterminado: `8891`, deshabilitado de forma predeterminada).
 * **Controlador Glassmorphic:** Se conecta desde teléfonos o pantallas secundarias para alternar silencios, ciclos de canales, cascos o cambiadores de voz.
-* **API REST:** Expone los puntos finales `GET /api/status` y `POST /api/action` para integraciones externas.
+* **API REST:** Expone los puntos finales `GET /api/status` y `POST /api/action` para integraciones externas (incluyendo el estado del intercomunicador y anulaciones de simulación).
 
 ### 9. 🎛️ Complemento Stream Deck
 * **Paquete de acción Stream Deck:** Expone 8 acciones para controlar el silenciamiento del micrófono, el silenciamiento del audio, los visores del casco y los ciclos de radiofrecuencia.

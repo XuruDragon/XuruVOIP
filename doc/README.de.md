@@ -224,17 +224,23 @@ graph TB
 ### 6. 💬 Automatisches Schiffs-Gegensprechsystem
 * **Fahrzeug-Intercom-Kanäle:** Durch das Einsteigen in ein Fahrzeug abonnieren Spieler automatisch einen dynamischen „Intercom_<ContainerID>“-Funkkanal.
 * **Pilot Priority Ducking:** Wenn ein Spieler in einem Cockpit oder Fahrersitz über die Gegensprechanlage sendet, wird der Annäherungston aller anderen Spieler um 85 % geduckt, um die Klarheit der Flugbefehle zu gewährleisten.
+* **Dynamische Intercom-Verschlechterung:** Intercom-Kanäle verschlechtern sich automatisch basierend auf dem Schiffsstatus:
+  * **Schildtreffer (Shield Hits):** Erzeugt vorübergehend statische Rauscheffekte und Lautstärkeknackser (dauert 2,5 Sekunden).
+  * **Kritische Energie (Critical Power):** Niederspannungs-Wechselstrombrummen, Soft-Clipping-Verzerrung und Tonhöhenabfall (Resampling).
+  * **Quantenreise (Quantum Travel):** Kammfilter-Flanger/Phaser-Effekt und hochfrequentes Pfeifen.
+  * *Alle Untereffekte können in den allgemeinen Einstellungen einzeln ein- oder ausgeschaltet werden und sind standardmäßig deaktiviert.*
 * **Aufräum-Abklingzeit:** Zählt 5 Minuten herunter, nachdem der letzte Spieler das Schiff verlassen hat, bevor der Intercom-Kanal gelöscht wird, um die Serverleistung zu maximieren.
 
 ### 7. 📡 Vulkan-kompatibles HUD-Overlay und taktisches 2D-Radar
 * **Win32 Click-Through-Overlay:** Ein randloses HUD-Overlay, das VoIP-Verbindungen, Frequenzen und Sprechzustände anzeigt. Vulkan- und DirectX-kompatibel (läuft im randlosen Fenstermodus).
+* **Gegensprech-Statusanzeige:** Zeigt Warnmeldungen wie `⚡ INTERCOM: DEGRADED` (mit Details wie `[Power Loss]`, `[Quantum]` oder `[Static Pop]`) auf dem HUD-Overlay an, wenn die Intercom-Verschlechterung aktiv ist.
 * **Taktisches Mini-Radar:** Verfügt über ein auf den Kurs ausgerichtetes 2D-HUD-Radar, das relativ sprechende Spieler anzeigt und pulsierende Tonringe um sie herum zeichnet.
 * **Speech-to-Text-Untertitel:** Transkribiert eingehende Radio-/Proximity-Audiodaten mithilfe eines Offline-, leichten Whisper-Modells („ggml-tiny.bin“) in lokalisierte HUD-Untertitel.
 
 ### 8. 📱 Begleit-App und REST-API
 * **Lokaler HTTP-Webserver:** Hostet ein lokales Dashboard auf einem konfigurierbaren Port (Standard: „8891“, standardmäßig deaktiviert).
 * **Glassmorphic Controller:** Stellt eine Verbindung zu Telefonen oder sekundären Bildschirmen her, um Stummschaltung, Kanalwechsel, Helme oder Sprachwechsler umzuschalten.
-* **REST API:** Macht die Endpunkte „GET /api/status“ und „POST /api/action“ für externe Integrationen verfügbar.
+* **REST API:** Macht die Endpunkte „GET /api/status“ und „POST /api/action“ für externe Integrationen verfügbar (einschließlich Intercom-Status und Simulationsbefehlen).
 
 ### 9. 🎛️ Stream Deck Plugin
 * **Stream Deck Action Pack:** Stellt 8 Aktionen zur Steuerung von Mikrofon-Stummschaltungen, Audio-Stummschaltungen, Helmvisieren und Radiofrequenzzyklen bereit.

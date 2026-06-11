@@ -184,4 +184,10 @@
     <!-- 遥测 -->
     <sys:String x:Key="LblEnableTelemetry">启用遥测广播 (UDP)</sys:String>
     <sys:String x:Key="LblTelemetryPort">遥测广播端口</sys:String>
+
+    <!-- Intercom Degradation -->
+    <sys:String x:Key="LblEnableIntercomDegradation">启用内联对讲机降级 (飞船状态)</sys:String>
+    <sys:String x:Key="LblIntercomShieldHits">启用护盾受击效果 (杂音与爆音)</sys:String>
+    <sys:String x:Key="LblIntercomCriticalPower">启用临界电力效果 (低压嗡嗡声与变调)</sys:String>
+    <sys:String x:Key="LblIntercomQuantumTravel">启用量子旅行效果 (相位扫频)</sys:String>
 </ResourceDictionary>

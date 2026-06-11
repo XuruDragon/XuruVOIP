@@ -187,6 +187,28 @@ public partial class SettingsWindow : Window
             ShipPaPanel.Visibility = Cfg.EnableShipPa ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        // Intercom Degradation settings
+        if (CbEnableIntercomDegradation != null)
+        {
+            CbEnableIntercomDegradation.IsChecked = Cfg.EnableIntercomDegradation;
+        }
+        if (IntercomDegradationSubPanel != null)
+        {
+            IntercomDegradationSubPanel.Visibility = Cfg.EnableIntercomDegradation ? Visibility.Visible : Visibility.Collapsed;
+        }
+        if (CbIntercomShieldHits != null)
+        {
+            CbIntercomShieldHits.IsChecked = Cfg.IntercomShieldHitsEnabled;
+        }
+        if (CbIntercomCriticalPower != null)
+        {
+            CbIntercomCriticalPower.IsChecked = Cfg.IntercomCriticalPowerEnabled;
+        }
+        if (CbIntercomQuantumTravel != null)
+        {
+            CbIntercomQuantumTravel.IsChecked = Cfg.IntercomQuantumTravelEnabled;
+        }
+
         // OCR region display
         UpdateRegionDisplay();
     }
@@ -415,6 +437,14 @@ public partial class SettingsWindow : Window
         bool enabled = CbEnableShipPa.IsChecked == true;
         Cfg.EnableShipPa = enabled;
         ShipPaPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void IntercomDegradation_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || IntercomDegradationSubPanel == null) return;
+        bool enabled = CbEnableIntercomDegradation.IsChecked == true;
+        Cfg.EnableIntercomDegradation = enabled;
+        IntercomDegradationSubPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
     }
 
     protected override void OnClosed(EventArgs e)

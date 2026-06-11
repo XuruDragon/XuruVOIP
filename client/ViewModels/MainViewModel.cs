@@ -108,6 +108,19 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         set => Set(ref _exertion, Math.Clamp(value, 0.0, 1.0));
     }
 
+    private IntercomDegradationState _intercomState = IntercomDegradationState.Normal;
+    public IntercomDegradationState IntercomState
+    {
+        get => _intercomState;
+        set
+        {
+            if (Set(ref _intercomState, value))
+            {
+                _playback.CurrentIntercomState = value;
+            }
+        }
+    }
+
     private bool _isHelmetOn;
     public bool IsHelmetOn
     {
@@ -352,6 +365,10 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             {
                 Exertion = exertion;
             }
+        });
+        _gameDetector.IntercomStateChanged += state => Application.Current?.Dispatcher.Invoke(() =>
+        {
+            IntercomState = state;
         });
         _gameDetector.CustomGameLogPath = Config.Config.CustomGameLogPath;
         _gameDetector.Start();
@@ -1143,6 +1160,10 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableHelmetModulator = Config.Config.EnableHelmetModulator;
         _playback.EnableStt = Config.Config.EnableStt;
         _playback.EnableShipPa = Config.Config.EnableShipPa;
+        _playback.EnableIntercomDegradation = Config.Config.EnableIntercomDegradation;
+        _playback.IntercomShieldHitsEnabled = Config.Config.IntercomShieldHitsEnabled;
+        _playback.IntercomCriticalPowerEnabled = Config.Config.IntercomCriticalPowerEnabled;
+        _playback.IntercomQuantumTravelEnabled = Config.Config.IntercomQuantumTravelEnabled;
         _discordRpc.Enabled = Config.Config.EnableDiscordRpc;
 
         // Sync position tracking source

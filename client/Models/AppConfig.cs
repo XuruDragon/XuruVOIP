@@ -86,5 +86,11 @@ public class AppConfig
     public bool IsRadioRepeater { get; set; } = false;
     public bool EnableShipPa { get; set; } = false;
     public string PttPaKey { get; set; } = "P";
+
+    // --- Intercom Degradation ---
+    public bool EnableIntercomDegradation { get; set; } = false;
+    public bool IntercomShieldHitsEnabled { get; set; } = true;
+    public bool IntercomCriticalPowerEnabled { get; set; } = true;
+    public bool IntercomQuantumTravelEnabled { get; set; } = true;
 }
 

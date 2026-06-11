@@ -314,6 +314,33 @@
                                          Text="{Binding Config.PttPaKey, UpdateSourceTrigger=PropertyChanged}"
                                          Style="{StaticResource InputStyle}"/>
                             </StackPanel>
+
+                            <CheckBox x:Name="CbEnableIntercomDegradation"
+                                      Content="{DynamicResource LblEnableIntercomDegradation}"
+                                      IsChecked="{Binding Config.EnableIntercomDegradation, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
+                                      Checked="IntercomDegradation_ToggleChanged" Unchecked="IntercomDegradation_ToggleChanged"/>
+
+                            <StackPanel x:Name="IntercomDegradationSubPanel" Margin="16,4,0,0">
+                                <CheckBox x:Name="CbIntercomShieldHits"
+                                          Content="{DynamicResource LblIntercomShieldHits}"
+                                          IsChecked="{Binding Config.IntercomShieldHitsEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,0"/>
+
+                                <CheckBox x:Name="CbIntercomCriticalPower"
+                                          Content="{DynamicResource LblIntercomCriticalPower}"
+                                          IsChecked="{Binding Config.IntercomCriticalPowerEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,6,0,0"/>
+
+                                <CheckBox x:Name="CbIntercomQuantumTravel"
+                                          Content="{DynamicResource LblIntercomQuantumTravel}"
+                                          IsChecked="{Binding Config.IntercomQuantumTravelEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,6,0,0"/>
+                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>

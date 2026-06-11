@@ -224,17 +224,23 @@ graph TB
 ### 6. 💬 Système d'interphone automatique pour navire
 * **Canaux d'interphone des véhicules :** Monter à bord d'un véhicule abonne automatiquement les joueurs à un canal radio dynamique « Intercom_<ContainerID> ».
 * **Pilote Priority Ducking :** Lorsqu'un joueur dans un cockpit ou un siège conducteur transmet sur l'interphone, l'audio de proximité de tous les autres joueurs est réduit de 85 % pour garantir la clarté des commandes de vol.
+* **Dégradation dynamique de l'interphone :** Les canaux d'interphone se dégradent automatiquement selon l'état du véhicule :
+  * **Impacts de bouclier (Shield Hits) :** Injecte temporairement des rafales de parasites et des craquements de volume (dure 2,5 secondes).
+  * **Alimentation critique (Critical Power) :** Bourdonnement électrique basse tension, distorsion de saturation et baisse de hauteur de ton par rééchantillonnage.
+  * **Voyage quantique (Quantum Travel) :** Balayage de filtre en peigne (flanger/phaser) et sifflement haute fréquence.
+  * *Tous ces sous-effets peuvent être activés/désactivés individuellement dans les paramètres généraux et sont désactivés par défaut.*
 * **Cooldown de nettoyage :** compte à rebours 5 minutes après que le dernier joueur ait quitté le navire avant de supprimer le canal intercom, maximisant ainsi les performances du serveur.
 
 ### 7. 📡 Superposition HUD et radar tactique 2D compatibles Vulkan
 * **Superposition Click-Through Win32 :** Une superposition HUD sans bordure affichant les connexions VoIP, les fréquences et les états de parole. Compatible Vulkan et DirectX (fonctionnant en mode fenêtré sans bordure).
+* **Indicateur d'état de l'interphone :** Affiche des avertissements tels que `⚡ INTERCOM: DEGRADED` (avec détails du sous-état comme `[Power Loss]`, `[Quantum]` ou `[Static Pop]`) sur l'affichage tête haute (HUD) lorsque la dégradation de l'interphone est active.
 * **Mini-radar tactique :** Comprend un radar HUD 2D aligné sur le cap qui affiche les joueurs parlant de manière relative, dessinant des anneaux sonores pulsés autour d'eux.
 * **Sous-titres parole-texte :** transcrit l'audio de radio/proximité entrant en sous-titres HUD localisés à l'aide d'un modèle Whisper léger et hors ligne (`ggml-tiny.bin`).
 
 ### 8. 📱 Application compagnon et API REST
 * **Serveur Web HTTP local :** Héberge un tableau de bord local sur un port configurable (par défaut : `8891`, désactivé par défaut).
 * **Contrôleur Glassmorphic :** Se connecte à partir de téléphones ou d'écrans secondaires pour activer les sourdines, les cycles de canaux, les casques ou les changeurs de voix.
-* **API REST :** Expose les points de terminaison `GET /api/status` et `POST /api/action` pour les intégrations externes.
+* **API REST :** Expose les points de terminaison `GET /api/status` et `POST /api/action` pour les intégrations externes (y compris l'état de l'interphone et la simulation des pannes).
 
 ### 9. 🎛️ Plugin Stream Deck
 * **Stream Deck Action Pack :** Présente 8 actions pour contrôler la sourdine du microphone, la sourdine audio, les visières de casque et les cycles de fréquence radio.

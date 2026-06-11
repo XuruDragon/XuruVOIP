@@ -224,17 +224,23 @@ graph TB
 ### 6. 💬 Sistema de intercomunicação automática de navio
 * **Canais de intercomunicação de veículos:** Embarcar em um veículo inscreve automaticamente os jogadores em um canal de rádio dinâmico `Intercom_<ContainerID>`.
 * **Redução de prioridade do piloto:** Quando um jogador na cabine ou no assento do motorista transmite no intercomunicador, o áudio de proximidade de todos os outros jogadores é reduzido em 85% para garantir a clareza do comando de vôo.
+* **Degradação Dinâmica do Intercomunicador:** Os canais de intercomunicador degradam-se automaticamente com base no status da nave:
+  * **Impactos no Escudo (Shield Hits):** Injeta temporariamente rajadas de estática e estalos de volume (dura 2,5 segundos).
+  * **Energia Crítica (Critical Power):** Zumbido elétrico de corrente alternada de baixa tensão, distorção de saturação (soft-clipping) e queda de tom de voz (resampling).
+  * **Viagem Quântica (Quantum Travel):** Varredura de filtro comb (flanger/phaser) e zumbido de alta frequência.
+  * *Todos os subefeitos podem ser alternados individualmente nas Configurações Gerais e vêm desativados por padrão.*
 * **Recarga de limpeza:** Faz uma contagem regressiva de 5 minutos após o último jogador deixar a nave antes de excluir o canal de intercomunicação, maximizando o desempenho do servidor.
 
 ### 7. 📡 Sobreposição de HUD compatível com Vulkan e radar tático 2D
 * **Sobreposição Click-Through do Win32:** Uma sobreposição de HUD sem bordas que mostra conexões VoIP, frequências e estados de fala. Compatível com Vulkan e DirectX (executando em modo de janela sem borda).
+* **Indicador de Status do Intercomunicador:** Exibe avisos como `⚡ INTERCOM: DEGRADED` (com detalhes de substatus como `[Power Loss]`, `[Quantum]` ou `[Static Pop]`) na sobreposição do HUD quando a degradação do intercomunicador está ativa.
 * **Mini-Radar Tático:** Apresenta um radar HUD 2D alinhado ao rumo que exibe jogadores que falam relativamente, desenhando anéis sonoros pulsantes ao redor deles.
 * **Legendas de fala para texto:** Transcreve áudio de rádio/proximidade recebido para legendas localizadas do HUD usando um modelo Whisper leve e off-line (`ggml-tiny.bin`).
 
 ### 8. 📱 Aplicativo complementar e API REST
 * **Servidor Web HTTP local:** Hospeda um painel local em uma porta configurável (padrão: `8891`, desabilitado por padrão).
 * **Controlador Glassmorphic:** Conecta-se a telefones ou telas secundárias para alternar mudos, ciclos de canal, capacetes ou trocadores de voz.
-* **API REST:** Expõe endpoints `GET /api/status` e `POST /api/action` para integrações externas.
+* **API REST:** Expõe endpoints `GET /api/status` e `POST /api/action` para integrações externas (incluindo o status do intercomunicador e simulação de estados).
 
 ### 9. 🎛️ Plug-in de plataforma de streaming
 * **Stream Deck Action Pack:** Expõe 8 ações para controlar silenciamentos de microfone, silenciamentos de áudio, viseiras de capacete e ciclos de radiofrequência.
