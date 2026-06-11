@@ -50,6 +50,7 @@ public class AudioPlaybackService : IDisposable
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
     public bool EnableEnvironmentalAcoustics { get; set; } = true;
+    public bool EnableAtmosphereSimulation { get; set; } = false;
     public bool EnableHelmetModulator { get; set; } = true;
     public bool EnableStt { get; set; } = false;
     public bool EnableShipPa { get; set; } = true;
@@ -181,6 +182,26 @@ public class AudioPlaybackService : IDisposable
         // Start high-precision playback tick loop (20ms interval)
         _loopCts = new System.Threading.CancellationTokenSource();
         _loopTask = System.Threading.Tasks.Task.Run(() => PlaybackLoopAsync(_loopCts.Token));
+    }
+
+    public static double GetAtmosphereDistanceMultiplier(string zone)
+    {
+        if (string.IsNullOrEmpty(zone)) return 1.0;
+        string zoneLower = zone.ToLowerInvariant();
+
+        // If player is inside a ship or facility, they are in standard pressurized air
+        bool isIndoors = zoneLower.Contains("carrack") || zoneLower.Contains("hercules") || zoneLower.Contains("cutlass") ||
+                          zoneLower.Contains("bunker") || zoneLower.Contains("facility") || zoneLower.Contains("ugf") ||
+                          zoneLower.Contains("station") || zoneLower.Contains("outpost") || zoneLower.Contains("hangar");
+        if (isIndoors) return 1.0;
+
+        // Check moons and planets
+        if (zoneLower.Contains("cellin") || zoneLower.Contains("ita")) return 3.5;
+        if (zoneLower.Contains("yela") || zoneLower.Contains("lyria")) return 2.6;
+        if (zoneLower.Contains("daymar") || zoneLower.Contains("wala") || zoneLower.Contains("magda")) return 2.1;
+        if (zoneLower.Contains("crusader") || zoneLower.Contains("arial") || zoneLower.Contains("aberdeen")) return 0.75; // Thick gas: sound travels further
+
+        return 1.0; // Default planet/space standard
     }
 
     /// <summary>Calculates the pan and volume factor for 3D spatial audio.</summary>
@@ -410,11 +431,16 @@ public class AudioPlaybackService : IDisposable
 
                     if (packet.AudioType == 0x00 && packet.Metadata != null)
                     {
+                        float rawDistance = packet.Metadata.Distance;
+                        if (EnableAtmosphereSimulation)
+                        {
+                            rawDistance = (float)(rawDistance * GetAtmosphereDistanceMultiplier(packet.ListenerZone));
+                        }
                         var (pan, volume) = CalculateSpatialParams(
                             ListenerX, ListenerY, ListenerZ,
                             ListenerHeadingX, ListenerHeadingY,
                             packet.Metadata.SpeakerX, packet.Metadata.SpeakerY, packet.Metadata.SpeakerZ,
-                            packet.Metadata.Distance, packet.Metadata.MaxRange,
+                            rawDistance, packet.Metadata.MaxRange,
                             packet.Metadata.SpatialEnabled, EnableSpatialAudio);
                         currentPan = pan;
                         distanceVolumeFactor = volume;
@@ -493,7 +519,7 @@ public class AudioPlaybackService : IDisposable
             floatBuf[i] = pcm[i] / 32768f;
         }
 
-        if (EnableEnvironmentalAcoustics)
+        if (EnableEnvironmentalAcoustics || EnableAtmosphereSimulation)
         {
             if (metadata != null && metadata.SpatialEnabled)
             {
@@ -505,11 +531,13 @@ public class AudioPlaybackService : IDisposable
                     ListenerZ, 
                     metadata.SpeakerX, 
                     metadata.SpeakerY, 
-                    metadata.SpeakerZ);
+                    metadata.SpeakerZ,
+                    EnableAtmosphereSimulation,
+                    EnableEnvironmentalAcoustics);
             }
             else
             {
-                track.AcousticFilter.UpdateZoneInfo(speakerZone, listenerZone, 0, 0, 0, 0, 0, 0);
+                track.AcousticFilter.UpdateZoneInfo(speakerZone, listenerZone, 0, 0, 0, 0, 0, 0, EnableAtmosphereSimulation, EnableEnvironmentalAcoustics);
             }
             track.AcousticFilter.Process(floatBuf, decoded);
         }

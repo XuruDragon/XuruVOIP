@@ -954,6 +954,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableRadioDegradation = cfg.EnableRadioDegradation;
         _playback.EnablePttChimes = cfg.EnablePttChimes;
         _playback.EnableEnvironmentalAcoustics = cfg.EnableEnvironmentalAcoustics;
+        _playback.EnableAtmosphereSimulation = cfg.EnableAtmosphereSimulation;
         _playback.EnableHelmetModulator = cfg.EnableHelmetModulator;
         _playback.EnableStt = cfg.EnableStt;
         _playback.EnableShipPa = cfg.EnableShipPa;
@@ -1233,6 +1234,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableRadioDegradation = Config.Config.EnableRadioDegradation;
         _playback.EnablePttChimes = Config.Config.EnablePttChimes;
         _playback.EnableEnvironmentalAcoustics = Config.Config.EnableEnvironmentalAcoustics;
+        _playback.EnableAtmosphereSimulation = Config.Config.EnableAtmosphereSimulation;
         _playback.EnableHelmetModulator = Config.Config.EnableHelmetModulator;
         _playback.EnableStt = Config.Config.EnableStt;
         _playback.EnableShipPa = Config.Config.EnableShipPa;

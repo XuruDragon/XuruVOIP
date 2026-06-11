@@ -109,6 +109,7 @@
     <sys:String x:Key="LblEnableRadioDegradation">Activer la dégradation radio basée sur la distance</sys:String>
     <sys:String x:Key="LblEnablePttChimes">Activer les clics micro radio &amp; queues de squelch</sys:String>
     <sys:String x:Key="LblEnableEnvironmentalAcoustics">Activer l'acoustique environnementale (occlusion &amp; réverbération)</sys:String>
+    <sys:String x:Key="LblEnableAtmosphereSimulation">Activer la simulation d'atmosphère planétaire (étouffement &amp; portée)</sys:String>
 
     <!-- Paramètres : Overlay -->
     <sys:String x:Key="TabOverlay">Overlay</sys:String>

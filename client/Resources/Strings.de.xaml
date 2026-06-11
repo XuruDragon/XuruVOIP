@@ -109,6 +109,7 @@
     <sys:String x:Key="LblEnableRadioDegradation">Entfernungsbasierte Funkverschlechterung aktivieren</sys:String>
     <sys:String x:Key="LblEnablePttChimes">Funkmikrofon-Klicks &amp; Rauschsperren-Ende aktivieren</sys:String>
     <sys:String x:Key="LblEnableEnvironmentalAcoustics">Umgebungsakustik aktivieren (Okklusion &amp; Nachhall)</sys:String>
+    <sys:String x:Key="LblEnableAtmosphereSimulation">Planetenatmosphären-Simulation aktivieren (Dämpfung &amp; Reichweite)</sys:String>
 
     <!-- Einstellungen: Overlay -->
     <sys:String x:Key="TabOverlay">Overlay</sys:String>
