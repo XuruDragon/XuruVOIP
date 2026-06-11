@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Shield -->
+    <path d="M36 16C36 16 48 20 48 32C48 44 36 52 36 52C36 52 24 44 24 32C24 20 36 16 36 16Z" fill="none" stroke="#ff9800" stroke-width="4.5" stroke-linejoin="round"/>
+    <!-- Sparks -->
+    <path d="M12 28L18 32L14 36" fill="none" stroke="#ff9800" stroke-width="2" stroke-linecap="round"/>
+    <path d="M60 28L54 32L58 36" fill="none" stroke="#ff9800" stroke-width="2" stroke-linecap="round"/>
+    <!-- Shield Inner -->
+    <path d="M36 24V44M28 32H44" stroke="#ff9800" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+</svg>

@@ -580,21 +580,27 @@ Le package de version inclut le fichier `.streamDeckPlugin` préemballé.
 ---
 
 ### 3. Ajout et configuration d'actions
-Vous pouvez glisser et déposer l'une des 8 actions suivantes sur vos touches Stream Deck :
-* 🎤 **Proximity Mute** : active la mise en sourdine du microphone de proximité sortant.
-* 📻 **Radio Mute** : active la mise en sourdine du microphone radio sortant.
-* 👤 **Profile Mute** : active la désactivation du microphone du profil sortant.
-* 🔊 **Audio Proximity Mute** : active la mise en sourdine de la lecture de proximité entrante.
-* 🔊 **Audio Radio Mute** : active la sourdine de la lecture de la radio entrante.
-* 🔊 **Audio Profile Mute** : active la mise en sourdine de la lecture du profil entrant.
-* 🪖 **Basculer le casque** : Bascule la visière de votre casque de combinaison spatiale vers le bas ou vers le haut.
-* 🔄 **Cycle Radio** : passe d'une chaîne de radio disponible à l'autre.
+Vous pouvez glisser et déposer l'une des 13 actions suivantes sur vos touches Stream Deck :
+* 🎤 **Proximity Mute** : active la mise en sourdine du microphone de proximité sortant.
+* 📻 **Radio Mute** : active la mise en sourdine du microphone radio sortant.
+* 👤 **Profile Mute** : active la désactivation du microphone du profil sortant.
+* 🔊 **Audio Proximity Mute** : active la mise en sourdine de la lecture de proximité entrante.
+* 🔊 **Audio Radio Mute** : active la sourdine de la lecture de la radio entrante.
+* 🔊 **Audio Profile Mute** : active la mise en sourdine de la lecture du profil entrant.
+* 🪖 **Basculer le casque** : Bascule la visière de votre casque de combinaison spatiale vers le bas ou vers le haut.
+* 🔄 **Cycle Radio** : passe d'une chaîne de radio disponible à l'autre.
+* 📢 **PA Broadcast** : Touche Push-to-Talk pour diffuser sur le système d'adresse publique (PA) du vaisseau.
+* 📡 **Beacon Mode** : Active/désactive le mode relais radio / balise.
+* 🎙️ **Voice Command Macro** : Déclenche une macro de commande vocale personnalisée simulée en arrière-plan (configurable via les paramètres).
+* 💬 **Intercom Status** : Affiche l'état de l'interphone du vaisseau (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) et fait défiler les états de simulation lorsque vous appuyez dessus.
+* 🗺️ **Location Telemetry** : Affiche votre zone système actuelle et la télémétrie des coordonnées $(X, Y, Z)$ sur la touche.
 
-#### Configuration (inspecteur de propriétés) :
-Pour chaque action que vous faites glisser sur une touche, cliquez dessus et configurez le port cible dans le panneau **Property Inspector** en bas :
-* Définissez **Companion Port** pour qu'il corresponde au port configuré dans les paramètres de votre client WPF (par défaut : `8891`).
-* **Rétroaction dynamique :** Les bascules (comme Proximity Mute) mettent automatiquement à jour leur icône en temps réel sur votre appareil pour afficher si l'état est actif (icône lumineuse cyan) ou muet (icône barrée orange).
-* **Affichage de la fréquence en direct :** La touche **Cycle Radio** affichera dynamiquement le nom de la fréquence actuellement active (par exemple « 120,5 » ou « Général ») directement sur le bouton physique en temps réel !
+#### Configuration (inspecteur de propriétés) :
+Pour chaque action que vous faites glisser sur une touche, cliquez dessus et configurez les paramètres dans le panneau **Property Inspector** en bas :
+* **Companion Port** : Définissez-le pour qu'il corresponde au port configuré dans les paramètres de votre client WPF (par défaut : `8891`).
+* **Voice Command** (Voice Command Macro uniquement) : Saisissez la commande textuelle à exécuter (ex. `"close visor"`, `"open hangar"`).
+* **Rétroaction dynamique** : Les actions mettent à jour leurs icônes et leurs états en temps réel. Les bascules s'affichent en cyan/rouge, l'état de l'interphone fait défiler 4 états et la télémétrie de localisation affiche les coordonnées.
+* **Affichage de la fréquence en direct** : La touche **Cycle Radio** affichera dynamiquement le nom de la fréquence actuellement active (par exemple « 120,5 » ou « Général ») directement sur le bouton physique en temps réel !
 
 ---
 

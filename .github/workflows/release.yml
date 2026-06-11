@@ -95,6 +95,17 @@ jobs:
           Compress-Archive -Path plugin-staging/com.xuru.voip.sdPlugin -DestinationPath release-binaries/com.xuru.voip.zip -Force
           Rename-Item -Path release-binaries/com.xuru.voip.zip -NewName com.xuru.voip.streamDeckPlugin -Force
           Remove-Item -Recurse -Force -Path plugin-staging
+
+          # Generate and package Stream Deck Profiles for all layouts and devices
+          & pwsh streamdeck/generate_profiles.ps1
+          Get-ChildItem -Path streamdeck/profiles -Directory | ForEach-Object {
+              $device = $_.Name
+              Get-ChildItem -Path $_.FullName -Filter "*.sdProfile" -Directory | ForEach-Object {
+                  $layout = $_.BaseName
+                  $destFile = "release-binaries/XuruVOIP_${device}_${layout}.streamDeckProfile"
+                  Compress-Archive -Path $_.FullName -DestinationPath $destFile -Force
+              }
+          }
         shell: pwsh
 
       - name: Build Go Server (win-x64, linux-x64)

@@ -580,7 +580,7 @@ O pacote de lançamento inclui o arquivo `.streamDeckPlugin` pré-empacotado.
 ---
 
 ### 3. Adicionando e configurando ações
-Você pode arrastar e soltar qualquer uma das 8 ações a seguir nas teclas do Stream Deck:
+Você pode arrastar e soltar qualquer uma das 13 ações a seguir nas teclas do Stream Deck:
 * 🎤 **Silenciar proximidade**: Alterna o silenciamento do microfone de proximidade de saída.
 * 📻 **Rádio Mudo**: Alterna o silenciamento do microfone do rádio de saída.
 * 👤 **Perfil mudo**: Alterna o silenciamento do microfone do perfil de saída.
@@ -589,12 +589,18 @@ Você pode arrastar e soltar qualquer uma das 8 ações a seguir nas teclas do S
 * 🔊 **Desativar perfil de áudio**: alterna o silenciamento da reprodução do perfil de entrada.
 * 🪖 **Alternar capacete**: alterna a viseira do capacete do traje espacial para baixo ou para cima.
 * 🔄 **Cycle Radio**: percorre os canais de rádio disponíveis.
+* 📢 **PA Broadcast**: Tecla Push-to-Talk para transmitir no sistema de alto-falantes públicos (PA) da nave.
+* 📡 **Beacon Mode**: Alterna o modo repetidor de rádio / baliza.
+* 🎙️ **Voice Command Macro**: Aciona uma macro de comando de voz personalizada simulada em segundo plano (configurável nas configurações).
+* 💬 **Intercom Status**: Exibe o status do interfone da nave (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) e percorre os estados de simulação ao ser pressionado.
+* 🗺️ **Location Telemetry**: Exibe a zona atual do sistema e a telemetria das coordenadas $(X, Y, Z)$ na tecla.
 
-#### Configuração (Inspetor de Propriedade):
-Para cada ação arrastada para uma tecla, clique nela e configure a porta de destino no painel **Property Inspector** na parte inferior:
-* Defina **Companion Port** para corresponder à porta configurada nas configurações do cliente WPF (padrão: `8891`).
-* **Feedback dinâmico:** Alternadores (como Proximity Mute) atualizam automaticamente seu ícone em tempo real no seu dispositivo para exibir se o estado está ativo (ícone de brilho ciano) ou mudo (ícone âmbar riscado).
-* **Exibição de frequência ao vivo:** A tecla **Cycle Radio** exibirá dinamicamente o nome da frequência atualmente ativa (por exemplo, `120.5` ou `General`) diretamente no botão físico em tempo real!
+#### Configuração (Inspetor de Propriedades):
+Para cada ação arrastada para uma tecla, clique nela e configure as opções no painel **Property Inspector** na parte inferior:
+* **Companion Port**: Defina para corresponder à porta configurada nas configurações do cliente WPF (padrão: `8891`).
+* **Voice Command** (Apenas para Voice Command Macro): Insira o comando de texto a ser executado (ex: `"close visor"`, `"open hangar"`).
+* **Feedback dinâmico**: As ações atualizam seus ícones e estados em tempo real. Os alternadores mostram ciano/vermelho, o Intercom Status percorre 4 estados e a telemetria de localização mostra as coordenadas.
+* **Exibição de frequência ao vivo**: A tecla **Cycle Radio** exibirá dinamicamente o nome da frequência atualmente ativa (por exemplo, `120.5` ou `General`) diretamente no botão físico em tempo real!
 
 ---
 

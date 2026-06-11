@@ -213,18 +213,33 @@ Enables secondary screens (tablets or smartphones) to serve as physical ship MFD
 ## 🎛️ 10. Stream Deck Plugin
 
 ### Description
-Integrates physical Stream Deck buttons to display status and cycle radio frequencies.
+Integrates physical Stream Deck buttons to display status, cycle radio frequencies, trigger voice command macros, broadcast on ship PA, toggle beacon relays, cycle intercom simulation states, and display live GPS telemetry.
 
 ### How It Works
-* Connects via WebSockets to the client's Companion App.
-* **Dynamic Icons:** Toggles update their icons in real-time (cyan glow for active, amber strike-through for muted).
-* **Live frequency Titles:** The "Cycle Radio" button displays the active frequency name or channel string directly on the key in real-time.
+* Connects via WebSockets to the client's Companion App REST API.
+* **Dynamic Multi-State Actions:**
+  * **Mute Buttons:** Toggles update icons in real-time (cyan glow for active, red strike-through for muted).
+  * **PA Broadcast:** Functions as a Push-to-Talk (PTT) key. Holding it triggers `/api/action` with `start_pa`, and releasing it triggers `stop_pa`. The icon glows active cyan during broadcast.
+  * **Beacon Mode:** Toggles ship beacon relay. Displays cyan when transmitting, and dim grey/red when disabled.
+  * **Voice Command Macro:** Simulates voice commands headlessly. Users configure a text string (e.g., `"close visor"`, `"open cargo bay"`) in the Property Inspector. When pressed, the command executes. Shows a listening indicator if voice recognition is active.
+  * **Intercom Status:** A 4-state action displaying the ship intercom status (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`). Pressing the key cycles through these states in the simulation.
+  * **Location Telemetry:** A read-only MFD button displaying the current system zone and player coordinates $(X, Y, Z)$ dynamically formatted with newline characters:
+    ```
+    [Zone]
+    X: [value]
+    Y: [value]
+    Z: [value]
+    ```
+  * **Live Frequency Titles:** The "Cycle Radio" button displays the active channel name directly on the key in real-time.
 
 ### How to Use
-* Download `com.xuru.voip.streamDeckPlugin` from releases and double-click to install. Map the keys in your Stream Deck desktop app.
+1. Install the `com.xuru.voip.sdPlugin` in the Stream Deck app.
+2. Drag and drop any of the 13 available actions onto your Stream Deck keys.
+3. Configure the **Companion Port** (default: `8891`) in the key settings to match your client.
+4. For the **Voice Command Macro** action, enter the custom text command you want to trigger (e.g., `"open hangar"`).
 
 ### Why It's Good to Have
-Allows quick access to communication controls without tabbing out of the game or memorizing hotkeys.
+Allows hands-on physical access to communication controls and essential ship telemetry. You can control your comms, trigger voice macros, and check your space coordinates at a glance without having to open overlays or look away from your flight stick.
 
 ---
 

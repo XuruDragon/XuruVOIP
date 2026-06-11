@@ -168,6 +168,8 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private bool _isPttRadioDown = false;
     private bool _isPttProfileDown = false;
     private bool _isPttPaDown = false;
+    public bool IsPttPaDown => _isPttPaDown;
+
 
     private bool _micProximityMuted = false;
     public bool MicProximityMuted

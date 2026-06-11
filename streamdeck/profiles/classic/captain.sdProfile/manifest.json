@@ -1,0 +1,107 @@
+{
+  "Rooms": {
+    "0": {
+      "Keys": {
+        "4,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.toggle_helmet"
+        },
+        "2,2": {
+          "Settings": {
+            "command": "simulate shield hit",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "0,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.proximity_mute"
+        },
+        "1,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.cycle_radio"
+        },
+        "3,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.intercom_status"
+        },
+        "2,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.pa_broadcast"
+        },
+        "1,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.radio_mute"
+        },
+        "1,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.audio_radio_mute"
+        },
+        "2,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.beacon_repeater"
+        },
+        "3,2": {
+          "Settings": {
+            "command": "simulate power loss",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "0,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.location_telemetry"
+        },
+        "4,2": {
+          "Settings": {
+            "command": "simulate quantum spool",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "3,1": {
+          "Settings": {
+            "command": "power up shields",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "0,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.audio_proximity_mute"
+        },
+        "4,1": {
+          "Settings": {
+            "command": "status check",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        }
+      }
+    }
+  },
+  "Version": "1.0.0",
+  "DeviceType": 0,
+  "Name": "XuruVOIP Captain - Classic",
+  "DeviceModel": "XuruVOIP_classic"
+}

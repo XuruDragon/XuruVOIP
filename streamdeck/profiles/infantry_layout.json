@@ -1,0 +1,82 @@
+{
+  "ProfileName": "XuruVOIP - Infantry / FPS Layout",
+  "DeviceType": 0,
+  "GridSize": "5x3",
+  "Buttons": {
+    "0": {
+      "Name": "Proximity Mute",
+      "UUID": "com.xuru.voip.action.proximity_mute",
+      "Settings": { "port": 8891 }
+    },
+    "1": {
+      "Name": "Radio Mute",
+      "UUID": "com.xuru.voip.action.radio_mute",
+      "Settings": { "port": 8891 }
+    },
+    "2": {
+      "Name": "Toggle Helmet",
+      "UUID": "com.xuru.voip.action.toggle_helmet",
+      "Settings": { "port": 8891 }
+    },
+    "3": {
+      "Name": "Cycle Radio",
+      "UUID": "com.xuru.voip.action.cycle_radio",
+      "Settings": { "port": 8891 }
+    },
+    "4": {
+      "Name": "Macro: Status Report",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "status report" }
+    },
+    "5": {
+      "Name": "Audio Proximity Mute",
+      "UUID": "com.xuru.voip.action.audio_proximity_mute",
+      "Settings": { "port": 8891 }
+    },
+    "6": {
+      "Name": "Audio Radio Mute",
+      "UUID": "com.xuru.voip.action.audio_radio_mute",
+      "Settings": { "port": 8891 }
+    },
+    "7": {
+      "Name": "Beacon Mode",
+      "UUID": "com.xuru.voip.action.beacon_repeater",
+      "Settings": { "port": 8891 }
+    },
+    "8": {
+      "Name": "Macro: Mute Proximity",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "mute proximity" }
+    },
+    "9": {
+      "Name": "Macro: Unmute Proximity",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "unmute proximity" }
+    },
+    "10": {
+      "Name": "Location Telemetry",
+      "UUID": "com.xuru.voip.action.location_telemetry",
+      "Settings": { "port": 8891 }
+    },
+    "11": {
+      "Name": "Macro: Set Channel Alpha",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "set channel to alpha" }
+    },
+    "12": {
+      "Name": "Macro: Set Channel Beta",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "set channel to beta" }
+    },
+    "13": {
+      "Name": "Macro: Toggle Voice Changer",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "toggle voice changer" }
+    },
+    "14": {
+      "Name": "Macro: Voice Cyborg",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "change voice to cyborg" }
+    }
+  }
+}

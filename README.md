@@ -621,7 +621,7 @@ The release package includes the pre-packaged `.streamDeckPlugin` file.
 ---
 
 ### 3. Adding and Configuring Actions
-You can drag and drop any of the following 8 actions onto your Stream Deck keys:
+You can drag and drop any of the following 13 actions onto your Stream Deck keys:
 * 🎤 **Proximity Mute**: Toggles outgoing proximity microphone muting.
 * 📻 **Radio Mute**: Toggles outgoing radio microphone muting.
 * 👤 **Profile Mute**: Toggles outgoing profile microphone muting.
@@ -630,12 +630,18 @@ You can drag and drop any of the following 8 actions onto your Stream Deck keys:
 * 🔊 **Audio Profile Mute**: Toggles incoming profile playback muting.
 * 🪖 **Toggle Helmet**: Toggles your space suit helmet visor down or up.
 * 🔄 **Cycle Radio**: Cycles through available radio channels.
+* 📢 **PA Broadcast**: Push-to-Talk key to broadcast on the Ship Public Address (PA) system.
+* 📡 **Beacon Mode**: Toggles Radio Repeater / Beacon mode.
+* 🎙️ **Voice Command Macro**: Triggers a custom voice command macro simulated headlessly (configured via settings).
+* 💬 **Intercom Status**: Displays the ship intercom status (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) and cycles states when pressed.
+* 🗺️ **Location Telemetry**: Displays your current system zone and coordinate telemetry $(X, Y, Z)$ on the key face.
 
 #### Configuration (Property Inspector):
-For each action you drag onto a key, click on it and configure the target port in the **Property Inspector** panel at the bottom:
-* Set **Companion Port** to match the port configured in your WPF client settings (default: `8891`).
-* **Dynamic Feedback:** Toggles (like Proximity Mute) automatically update their icon in real-time on your device to display whether the state is active (cyan glow icon) or muted (amber strike-through icon).
-* **Live Frequency Display:** The **Cycle Radio** key will dynamically display the currently active frequency name (e.g. `120.5` or `General`) directly on the physical button in real-time!
+For each action you drag onto a key, click on it and configure the settings in the **Property Inspector** panel at the bottom:
+* **Companion Port**: Set to match the port configured in your WPF client settings (default: `8891`).
+* **Voice Command** (Voice Command Macro only): Enter the text command to execute (e.g., `"close visor"`, `"open hangar"`).
+* **Dynamic Feedback**: Actions update their icons and states in real-time. Toggles show cyan/red, Intercom Status cycles through 4 states, and Location Telemetry displays coordinates.
+* **Live Frequency Display**: The **Cycle Radio** key dynamically displays the currently active frequency name directly on the physical button in real-time!
 
 ---
 

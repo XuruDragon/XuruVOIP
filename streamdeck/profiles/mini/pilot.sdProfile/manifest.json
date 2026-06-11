@@ -1,0 +1,48 @@
+{
+  "Rooms": {
+    "0": {
+      "Keys": {
+        "0,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.pa_broadcast"
+        },
+        "1,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.intercom_status"
+        },
+        "2,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.location_telemetry"
+        },
+        "1,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.radio_mute"
+        },
+        "2,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.toggle_helmet"
+        },
+        "0,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.proximity_mute"
+        }
+      }
+    }
+  },
+  "Version": "1.0.0",
+  "DeviceType": 1,
+  "Name": "XuruVOIP Pilot - Mini",
+  "DeviceModel": "XuruVOIP_mini"
+}

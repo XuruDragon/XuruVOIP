@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Battery Outer -->
+    <rect x="22" y="22" width="28" height="34" rx="4" fill="none" stroke="#ff4e6a" stroke-width="4"/>
+    <rect x="30" y="16" width="12" height="6" rx="1" fill="#ff4e6a"/>
+    <!-- Lightning Bolt -->
+    <path d="M38 28H30L34 36H28L40 48V38H44L38 28Z" fill="#ff4e6a"/>
+    <!-- Caution border glow lines -->
+    <line x1="12" y1="12" x2="60" y2="12" stroke="#ff4e6a" stroke-width="1.5" stroke-dasharray="4,4"/>
+    <line x1="12" y1="60" x2="60" y2="60" stroke="#ff4e6a" stroke-width="1.5" stroke-dasharray="4,4"/>
+</svg>

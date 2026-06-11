@@ -124,14 +124,14 @@ public class CompanionAppService : IDisposable
                 double headingY = 1.0;
 
                 bool mapEnabled = _viewModel.Config.Config.EnableCompanionMap;
-                if (mapEnabled)
+                bool copied = false;
+                if (Application.Current != null && !Application.Current.Dispatcher.CheckAccess())
                 {
-                    bool copied = false;
-                    if (Application.Current != null && !Application.Current.Dispatcher.CheckAccess())
+                    try
                     {
-                        try
+                        var op = Application.Current.Dispatcher.InvokeAsync(() =>
                         {
-                            var op = Application.Current.Dispatcher.InvokeAsync(() =>
+                            if (mapEnabled)
                             {
                                 foreach (var kvp in _viewModel.RemotePositions)
                                 {
@@ -145,49 +145,6 @@ public class CompanionAppService : IDisposable
                                         containerName = kvp.Value.ContainerName
                                     };
                                 }
-                                var lp = _viewModel.LastSentPos;
-                                if (lp != null && !lp.IsEmpty)
-                                {
-                                    localPos = new
-                                    {
-                                        x = lp.X,
-                                        y = lp.Y,
-                                        z = lp.Z,
-                                        zone = lp.Zone,
-                                        containerId = lp.ContainerID,
-                                        containerName = lp.ContainerName
-                                    };
-                                }
-                                headingX = _viewModel.Playback.ListenerHeadingX;
-                                headingY = _viewModel.Playback.ListenerHeadingY;
-                            });
-
-                            if (op.Task.Wait(100))
-                            {
-                                copied = true;
-                            }
-                        }
-                        catch
-                        {
-                            // Ignore and fallback
-                        }
-                    }
-
-                    if (!copied)
-                    {
-                        try
-                        {
-                            foreach (var kvp in _viewModel.RemotePositions)
-                            {
-                                remotePositions[kvp.Key] = new
-                                {
-                                    x = kvp.Value.X,
-                                    y = kvp.Value.Y,
-                                    z = kvp.Value.Z,
-                                    zone = kvp.Value.Zone,
-                                    containerId = kvp.Value.ContainerID,
-                                    containerName = kvp.Value.ContainerName
-                                };
                             }
                             var lp = _viewModel.LastSentPos;
                             if (lp != null && !lp.IsEmpty)
@@ -202,13 +159,65 @@ public class CompanionAppService : IDisposable
                                     containerName = lp.ContainerName
                                 };
                             }
+                            if (mapEnabled)
+                            {
+                                headingX = _viewModel.Playback.ListenerHeadingX;
+                                headingY = _viewModel.Playback.ListenerHeadingY;
+                            }
+                        });
+
+                        if (op.Task.Wait(100))
+                        {
+                            copied = true;
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore and fallback
+                    }
+                }
+
+                if (!copied)
+                {
+                    try
+                    {
+                        if (mapEnabled)
+                        {
+                            foreach (var kvp in _viewModel.RemotePositions)
+                            {
+                                remotePositions[kvp.Key] = new
+                                {
+                                    x = kvp.Value.X,
+                                    y = kvp.Value.Y,
+                                    z = kvp.Value.Z,
+                                    zone = kvp.Value.Zone,
+                                    containerId = kvp.Value.ContainerID,
+                                    containerName = kvp.Value.ContainerName
+                                };
+                            }
+                        }
+                        var lp = _viewModel.LastSentPos;
+                        if (lp != null && !lp.IsEmpty)
+                        {
+                            localPos = new
+                            {
+                                x = lp.X,
+                                y = lp.Y,
+                                z = lp.Z,
+                                zone = lp.Zone,
+                                containerId = lp.ContainerID,
+                                containerName = lp.ContainerName
+                            };
+                        }
+                        if (mapEnabled)
+                        {
                             headingX = _viewModel.Playback.ListenerHeadingX;
                             headingY = _viewModel.Playback.ListenerHeadingY;
                         }
-                        catch
-                        {
-                            // If dictionary is modified during direct read, we just return whatever we got
-                        }
+                    }
+                    catch
+                    {
+                        // If dictionary is modified during direct read, we just return whatever we got
                     }
                 }
 
@@ -235,8 +244,9 @@ public class CompanionAppService : IDisposable
                     isRadioRepeater = _viewModel.Config.Config.IsRadioRepeater,
                     enableRadioRepeaters = _viewModel.Config.Config.EnableRadioRepeaters,
                     enableShipPa = _viewModel.Config.Config.EnableShipPa,
+                    isPttPaDown = _viewModel.IsPttPaDown,
                     enableCompanionMap = mapEnabled,
-                    localPos = mapEnabled ? localPos : null,
+                    localPos = localPos,
                     heading = mapEnabled ? new { x = headingX, y = headingY } : null,
                     remotePositions = mapEnabled ? remotePositions : null,
                     enableIntercomDegradation = _viewModel.Config.Config.EnableIntercomDegradation,

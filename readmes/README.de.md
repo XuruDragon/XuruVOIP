@@ -562,7 +562,7 @@ XuruVOIP umfasst einen integrierten Companion-App-Webdienst und ein offizielles 
 
 ### 1. Aktivieren der Companion-App & MFD für die taktische Karte
 Standardmäßig sind der lokale HTTP-Server der Companion App und der Modus für die taktische Karte deaktiviert, um Systemressourcen zu sparen. Um sie zu aktivieren:
-1. Öffnen Sie den XuruVOIP-Client und klicken Sie auf das Symbol **Einstellungen**.
+1. Öffnen Sie den XURUVOIP-Client und klicken Sie auf das Symbol **Einstellungen**.
 2. Aktivieren Sie auf der Registerkarte **Allgemein** das Kontrollkästchen **Companion HTTP Server aktivieren** (Standardport: `8891`).
 3. Um das Radar-Display zu aktivieren, aktivieren Sie das untergeordnete Kontrollkästchen **Taktische Co-Pilot-Karte (MFD) aktivieren**.
 4. Klicken Sie zum Anwenden auf **Speichern und schließen**.
@@ -580,7 +580,7 @@ Das Release-Paket enthält die vorgefertigte Datei „.streamDeckPlugin“.
 ---
 
 ### 3. Aktionen hinzufügen und konfigurieren
-Sie können jede der folgenden 8 Aktionen per Drag & Drop auf Ihre Stream Deck-Tasten ziehen:
+Sie können jede der folgenden 13 Aktionen per Drag & Drop auf Ihre Stream Deck-Tasten ziehen:
 * 🎤 **Proximity Mute**: Schaltet die Stummschaltung des ausgehenden Näherungsmikrofons um.
 * 📻 **Radio-Stummschaltung**: Schaltet die Stummschaltung des ausgehenden Funkmikrofons um.
 * 👤 **Profil-Stummschaltung**: Schaltet die Stummschaltung des ausgehenden Profilmikrofons um.
@@ -589,12 +589,18 @@ Sie können jede der folgenden 8 Aktionen per Drag & Drop auf Ihre Stream Deck-T
 * 🔊 **Audioprofil-Stummschaltung**: Schaltet die Stummschaltung der eingehenden Profilwiedergabe um.
 * 🪖 **Helm umschalten**: Schaltet das Visier Ihres Raumanzug-Helms nach unten oder oben um.
 * 🔄 **Radio wechseln**: Wechselt durch die verfügbaren Radiokanäle.
+* 📢 **PA Broadcast**: Push-to-Talk-Taste für das schiffsweite Durchsagesystem (Public Address - PA).
+* 📡 **Beacon Mode**: Schaltet den Funkrelais- / Bakenmodus um.
+* 🎙️ **Voice Command Macro**: Löst ein benutzerdefiniertes Sprachbefehl-Makro aus, das im Hintergrund simuliert wird (über Einstellungen konfigurierbar).
+* 💬 **Intercom Status**: Zeigt den Schiffs-Intercom-Status an (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) und schaltet Simulationszustände durch Drücken der Taste durch.
+* 🗺️ **Location Telemetry**: Zeigt die aktuelle Systemzone und die Koordinatendaten $(X, Y, Z)$ auf der Taste an.
 
 #### Konfiguration (Eigenschaftsinspektor):
-Klicken Sie für jede Aktion, die Sie auf eine Taste ziehen, darauf und konfigurieren Sie den Zielport im Bedienfeld **Eigenschafteninspektor** unten:
-* Stellen Sie **Companion Port** so ein, dass er mit dem in Ihren WPF-Client-Einstellungen konfigurierten Port übereinstimmt (Standard: „8891“).
-* **Dynamisches Feedback:** Umschalter (wie Proximity Mute) aktualisieren ihr Symbol automatisch in Echtzeit auf Ihrem Gerät, um anzuzeigen, ob der Status aktiv (cyanfarbenes leuchtendes Symbol) oder stummgeschaltet (gelbes durchgestrichenes Symbol) ist.
-* **Live-Frequenzanzeige:** Die Taste **Cycle Radio** zeigt dynamisch und in Echtzeit den aktuell aktiven Frequenznamen (z. B. „120,5“ oder „Allgemein“) direkt auf der physischen Taste an!
+Klicken Sie für jede Aktion, die Sie auf eine Taste ziehen, darauf und konfigurieren Sie die Einstellungen im Bedienfeld **Eigenschafteninspektor** unten:
+* **Companion Port**: Stellen Sie diesen so ein, dass er mit dem in Ihren WPF-Client-Einstellungen konfigurierten Port übereinstimmt (Standard: `8891`).
+* **Voice Command** (Nur für Voice Command Macro): Geben Sie den auszuführenden Textbefehl ein (z. B. `"close visor"`, `"open hangar"`).
+* **Dynamisches Feedback**: Aktionen aktualisieren ihre Symbole und Zustände in Echtzeit. Umschalter zeigen Cyan/Rot, Intercom Status durchläuft 4 Zustände und Location Telemetry zeigt Koordinaten an.
+* **Live-Frequenzanzeige**: Die Taste **Cycle Radio** zeigt dynamisch und in Echtzeit den aktuell aktiven Frequenznamen direkt auf der physischen Taste an!
 
 ---
 

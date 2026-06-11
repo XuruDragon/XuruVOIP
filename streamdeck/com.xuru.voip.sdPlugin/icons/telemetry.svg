@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Radar Rings -->
+    <circle cx="36" cy="36" r="28" fill="none" stroke="#00a2ff" stroke-width="1" opacity="0.4"/>
+    <circle cx="36" cy="36" r="18" fill="none" stroke="#00f0ff" stroke-width="1" opacity="0.6"/>
+    <!-- Crosshairs -->
+    <line x1="36" y1="8" x2="36" y2="64" stroke="#00f0ff" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+    <line x1="8" y1="36" x2="64" y2="36" stroke="#00f0ff" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+    <!-- Telemetry dots -->
+    <circle cx="24" cy="24" r="3" fill="#00f0ff"/>
+    <circle cx="48" cy="44" r="2.5" fill="#3ddb85"/>
+</svg>

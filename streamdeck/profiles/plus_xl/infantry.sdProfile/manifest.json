@@ -1,0 +1,151 @@
+{
+  "Rooms": {
+    "0": {
+      "Keys": {
+        "4,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.cycle_radio"
+        },
+        "0,4": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.cycle_radio_dial"
+        },
+        "5,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.pa_broadcast"
+        },
+        "0,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.proximity_mute"
+        },
+        "1,3": {
+          "Settings": {
+            "command": "set channel to beta",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "2,3": {
+          "Settings": {
+            "command": "toggle voice changer",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "2,4": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_changer_dial"
+        },
+        "7,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.intercom_status"
+        },
+        "0,3": {
+          "Settings": {
+            "command": "set channel to alpha",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "3,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.toggle_helmet"
+        },
+        "1,4": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.adjust_exertion"
+        },
+        "2,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.profile_mute"
+        },
+        "1,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.radio_mute"
+        },
+        "1,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.audio_radio_mute"
+        },
+        "2,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.audio_profile_mute"
+        },
+        "2,2": {
+          "Settings": {
+            "command": "unmute proximity",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "3,3": {
+          "Settings": {
+            "command": "change voice to cyborg",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "0,2": {
+          "Settings": {
+            "command": "status report",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "8,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.location_telemetry"
+        },
+        "1,2": {
+          "Settings": {
+            "command": "mute proximity",
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.voice_command"
+        },
+        "0,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.audio_proximity_mute"
+        },
+        "6,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xuru.voip.action.beacon_repeater"
+        }
+      }
+    }
+  },
+  "Version": "1.0.0",
+  "DeviceType": 2,
+  "Name": "XuruVOIP Infantry - Plus XL",
+  "DeviceModel": "XuruVOIP_plus_xl"
+}

@@ -1,0 +1,82 @@
+{
+  "ProfileName": "XuruVOIP - Captain / Co-Pilot Layout",
+  "DeviceType": 0,
+  "GridSize": "5x3",
+  "Buttons": {
+    "0": {
+      "Name": "Proximity Mute",
+      "UUID": "com.xuru.voip.action.proximity_mute",
+      "Settings": { "port": 8891 }
+    },
+    "1": {
+      "Name": "Radio Mute",
+      "UUID": "com.xuru.voip.action.radio_mute",
+      "Settings": { "port": 8891 }
+    },
+    "2": {
+      "Name": "PA Broadcast (PTT)",
+      "UUID": "com.xuru.voip.action.pa_broadcast",
+      "Settings": { "port": 8891 }
+    },
+    "3": {
+      "Name": "Intercom Status",
+      "UUID": "com.xuru.voip.action.intercom_status",
+      "Settings": { "port": 8891 }
+    },
+    "4": {
+      "Name": "Toggle Helmet",
+      "UUID": "com.xuru.voip.action.toggle_helmet",
+      "Settings": { "port": 8891 }
+    },
+    "5": {
+      "Name": "Audio Proximity Mute",
+      "UUID": "com.xuru.voip.action.audio_proximity_mute",
+      "Settings": { "port": 8891 }
+    },
+    "6": {
+      "Name": "Audio Radio Mute",
+      "UUID": "com.xuru.voip.action.audio_radio_mute",
+      "Settings": { "port": 8891 }
+    },
+    "7": {
+      "Name": "Beacon Mode",
+      "UUID": "com.xuru.voip.action.beacon_repeater",
+      "Settings": { "port": 8891 }
+    },
+    "8": {
+      "Name": "Macro: Power Up Shields",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "power up shields" }
+    },
+    "9": {
+      "Name": "Macro: Status Check",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "status check" }
+    },
+    "10": {
+      "Name": "Location Telemetry",
+      "UUID": "com.xuru.voip.action.location_telemetry",
+      "Settings": { "port": 8891 }
+    },
+    "11": {
+      "Name": "Cycle Radio",
+      "UUID": "com.xuru.voip.action.cycle_radio",
+      "Settings": { "port": 8891 }
+    },
+    "12": {
+      "Name": "Macro: Simulate Shield Hit",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "simulate shield hit" }
+    },
+    "13": {
+      "Name": "Macro: Simulate Power Loss",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "simulate power loss" }
+    },
+    "14": {
+      "Name": "Macro: Simulate Quantum Spool",
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Settings": { "port": 8891, "command": "simulate quantum spool" }
+    }
+  }
+}

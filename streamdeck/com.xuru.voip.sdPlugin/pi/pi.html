@@ -29,7 +29,7 @@
         .sdpi-item-value {
             width: 55%;
         }
-        input[type="number"] {
+        input[type="number"], input[type="text"] {
             background-color: #1a1a1a;
             border: 1px solid #404040;
             border-radius: 4px;
@@ -39,7 +39,7 @@
             width: 100%;
             box-sizing: border-box;
         }
-        input[type="number"]:focus {
+        input[type="number"]:focus, input[type="text"]:focus {
             border-color: #0078d4;
             outline: none;
         }
@@ -56,6 +56,12 @@
             <div class="sdpi-item-label">Companion Port</div>
             <div class="sdpi-item-value">
                 <input type="number" id="port-input" min="1" max="65535" value="8891" />
+            </div>
+        </div>
+        <div class="sdpi-item" id="command-container" style="display: none;">
+            <div class="sdpi-item-label">Voice Command</div>
+            <div class="sdpi-item-value">
+                <input type="text" id="command-input" placeholder="e.g. open visor" />
             </div>
         </div>
         <div class="note">

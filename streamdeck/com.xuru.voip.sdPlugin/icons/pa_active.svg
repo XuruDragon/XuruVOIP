@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Megaphone -->
+    <path d="M22 28H16C14.9 28 14 28.9 14 30V42C14 43.1 14.9 44 16 44H22L36 52V20L22 28Z" fill="#00f0ff"/>
+    <path d="M30 46V54C30 55.1 29.1 56 28 56H26C24.9 56 24 55.1 24 54" fill="none" stroke="#00f0ff" stroke-width="3" stroke-linecap="round"/>
+    <!-- Waves -->
+    <path d="M44 26C47 30 47 42 44 46" fill="none" stroke="#00f0ff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M50 20C55 26 55 46 50 52" fill="none" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M56 14C63 22 63 50 56 58" fill="none" stroke="#00f0ff" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+</svg>

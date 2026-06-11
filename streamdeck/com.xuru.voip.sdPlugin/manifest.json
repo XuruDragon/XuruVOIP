@@ -165,6 +165,165 @@
       "PropertyInspectorPath": "pi/pi.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Cycle through radio frequencies/channels"
+    },
+    {
+      "UUID": "com.xuru.voip.action.pa_broadcast",
+      "Name": "PA Broadcast (PTT)",
+      "Icon": "icons/pa_idle",
+      "States": [
+        {
+          "Image": "icons/pa_idle",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/pa_active",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Hold to broadcast on Ship Public Address (PA)"
+    },
+    {
+      "UUID": "com.xuru.voip.action.beacon_repeater",
+      "Name": "Beacon Mode",
+      "Icon": "icons/repeater_inactive",
+      "States": [
+        {
+          "Image": "icons/repeater_inactive",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/repeater_active",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Radio Repeater / Beacon mode"
+    },
+    {
+      "UUID": "com.xuru.voip.action.voice_command",
+      "Name": "Voice Command Macro",
+      "Icon": "icons/voice_ready",
+      "States": [
+        {
+          "Image": "icons/voice_ready",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/voice_listening",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Trigger a custom voice command macro"
+    },
+    {
+      "UUID": "com.xuru.voip.action.intercom_status",
+      "Name": "Intercom Status",
+      "Icon": "icons/intercom_normal",
+      "States": [
+        {
+          "Image": "icons/intercom_normal",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/intercom_shield",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/intercom_power",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/intercom_quantum",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Displays ship intercom state and cycles simulator when pressed"
+    },
+    {
+      "UUID": "com.xuru.voip.action.location_telemetry",
+      "Name": "Location Telemetry",
+      "Icon": "icons/telemetry",
+      "States": [
+        {
+          "Image": "icons/telemetry",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Displays current system zone and coordinate telemetry"
+    },
+    {
+      "UUID": "com.xuru.voip.action.cycle_radio_dial",
+      "Name": "Radio Channel Dial",
+      "Icon": "icons/cycle_radio",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$X1",
+        "triggerDescription": {
+          "rotate": "Rotate to select radio channel",
+          "push": "Push to toggle radio mute",
+          "touch": "Tap to cycle channel"
+        }
+      },
+      "SupportedInMultiActions": false,
+      "Tooltip": "Rotate to cycle through radio channels, press to mute radio"
+    },
+    {
+      "UUID": "com.xuru.voip.action.adjust_exertion",
+      "Name": "Adjust Exertion/G-Force",
+      "Icon": "icons/telemetry",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$X1",
+        "triggerDescription": {
+          "rotate": "Rotate to adjust G-force/exertion",
+          "push": "Push to toggle distortion",
+          "touch": "Tap to toggle distortion"
+        }
+      },
+      "SupportedInMultiActions": false,
+      "Tooltip": "Rotate to change mock G-Force or exertion values"
+    },
+    {
+      "UUID": "com.xuru.voip.action.voice_changer_dial",
+      "Name": "Voice Changer Dial",
+      "Icon": "icons/profile_unmuted",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$X1",
+        "triggerDescription": {
+          "rotate": "Rotate to select voice changer profile",
+          "push": "Push to toggle voice changer",
+          "touch": "Tap to toggle voice changer"
+        }
+      },
+      "SupportedInMultiActions": false,
+      "Tooltip": "Rotate to change voice changer profiles, press to toggle"
     }
   ]
 }

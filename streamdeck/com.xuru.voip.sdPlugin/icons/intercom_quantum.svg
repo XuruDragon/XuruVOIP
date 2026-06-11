@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Warp Lines -->
+    <line x1="10" y1="18" x2="48" y2="18" stroke="#af52de" stroke-width="3" stroke-linecap="round"/>
+    <line x1="24" y1="28" x2="62" y2="28" stroke="#af52de" stroke-width="4" stroke-linecap="round"/>
+    <line x1="8" y1="38" x2="42" y2="38" stroke="#af52de" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="20" y1="48" x2="56" y2="48" stroke="#af52de" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Center glow particle -->
+    <circle cx="36" cy="33" r="3" fill="#ffffff" filter="drop-shadow(0px 0px 8px #af52de)"/>
+</svg>
