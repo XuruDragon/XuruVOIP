@@ -29,7 +29,7 @@ Getting the plugin installed into your Stream Deck software is very simple.
    * Your Elgato Stream Deck software will open and show a message asking if you want to install it. Click **Install**.
 3. **Verify:**
    * In your Elgato Stream Deck desktop app, look at the list of actions on the right side.
-   * Scroll down until you see a category named **XuruVOIP** containing 13 actions.
+   * Scroll down until you see a category named **XuruVOIP** containing 17 actions.
 
 ---
 
@@ -111,6 +111,19 @@ The plugin features dynamic icons and text that change in real-time based on you
 * **Action:** **Location Telemetry**.
 * **Use:** A read-only telemetry display.
 * **Live Display:** Displays the current system zone and coordinate vectors $(X, Y, Z)$ directly on the key in real-time. Displays `NO GPS` if coordinates are unavailable.
+
+### 📞 Ship-to-Ship Hailing Actions
+* **Actions:** **Initiate Hail**, **Accept/Answer Hail**, and **Decline/End Hail**.
+* **Use:** Controls the cockpit calling system:
+  * **Initiate Hail:** Triggers a call request to the specified target. Shows dial status.
+  * **Accept/Answer Hail:** Answers an incoming call.
+  * **Decline/End Hail:** Rejects a incoming call or hangs up an active call.
+* **Visual Feedback:** Shows active ringing, dialing, or connected calling graphics.
+
+### 🔤 HUD Translation Subtitles Toggle
+* **Action:** **Toggle Translation**.
+* **Use:** Toggles real-time HUD translation subtitles.
+* **Visual Feedback:** Shows green `ON` icon when enabled, and red crossed-out `OFF` icon when disabled.
 
 ---
 

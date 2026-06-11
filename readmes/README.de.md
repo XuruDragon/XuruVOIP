@@ -36,12 +36,12 @@ Das Ziel von XuruVoip ist es, Star Citizen-Gaming-Events, Rollenspiel-Organisati
 
 | Abschnitt | Beschreibung |
 | :--- | :--- |
-| [📖 Detaillierter Funktionsleitfaden](../doc/functionnalities.md) | Technische und benutzerseitige Erklärung aller über 16 implementierten Funktionen. |
+| [📖 Detaillierter Funktionsleitfaden](../doc/functionnalities.md) | Technische und benutzerseitige Erklärung aller über 20 implementierten Funktionen. |
 | [📖 Nichttechnische Benutzerhandbücher](#-nichttechnische-benutzerhandbücher) | Leicht verständliche Schritt-für-Schritt-Anleitungen für Client, Server und Stream Deck. |
 | [📸 Screenshots und Benutzeroberfläche](#-screenshots-und-benutzeroberfläche) | Visuelle Darstellung der Kundenbildschirme, des Admin-Portals und der Einstellungen. |
 | [🗂️ Projektstruktur](#️-project-structure) | Repository-Layout und Ordneraufteilung. |
 | [⚙️ Systemarchitektur](#️-system-architecture) | Das vollständige tatsächliche Workflow-Diagramm des WPF-Clients, des Go-Servers und externer Geräte. |
-| [💡 Übersicht über die Kernfunktionen](#-übersicht-über-die-kernfunktionen) | Detaillierte Aufschlüsselung der über 11 implementierten räumlichen und Netzwerkfunktionen. |
+| [💡 Übersicht über die Kernfunktionen](#-übersicht-über-die-kernfunktionen) | Detaillierte Aufschlüsselung der über 19 implementierten räumlichen und Netzwerkfunktionen. |
 | [🖥️ Go Server (Go)](#️-xuruvoip-server-go) | Anweisungen zum Erstellen, Ausführen, Bereitstellen und Konfigurieren des Servers. |
 | [🎛️ Discord Voice Bridge](#️-discord-voice-bridge-setup-guide) | Verbinden von Go-Server-Funkkanälen mit einem Discord-Sprachkanal. |
 | [📱 Companion App & Stream Deck](#-companion-app--stream-deck-integration) | Fernsteuerung des Geräts und Einrichtung der physischen Tasten des Stream Decks. |
@@ -275,6 +275,28 @@ graph TB
 ### 14. 📢 Öffentliches Rundfunksystem (PA) des Schiffes
 * **Schiffsweite Audioübertragung:** Piloten oder Kapitäne von Schiffen mit mehreren Besatzungsmitgliedern können Sprachansagen an alle Besatzungsmitglieder senden, die dieselbe „ContainerID“ (Schiff) in derselben Zone haben.
 * **PA-DSP und Klaxon-Glockenspiel:** PA-Übertragungen umgehen lokale Annäherungs- und Radio-Stummschaltungen (außer Hauptlautstärke/Stummschaltung), spielen Mono mittengeschwenkt ab, stellen einen Sci-Fi-Zweiton-Glocken-/Klaxon-Alarm voran und wenden einen Megafon-Bandpass- und Nachhallfilter an, der die Innenakustik eines hohlen Schiffs simuliert.
+
+### 15. 🔌 Externe Hardware-Telemetrie (Sim-Pit UDP Sync)
+* **Echtzeit-UDP-Synchronisierung:** Der Client sendet VoIP- und Helmzustände im JSON-Format alle 100 ms an `127.0.0.1:8895`.
+* **Hardware-Integration:** Ermöglicht Cockpit-Bauern die Integration physischer LEDs oder Anzeigen, die auf Kommunikationsereignisse reagieren.
+
+### 16. 🪐 Planetare Atmosphärendichtesimulation
+* **Reichweitenskalierung:** Die Reichweite von Proximity-Stimmen passt sich der Dichte der planetaren Atmosphäre an (z. B. 3,5-mal schnellerer Abfall auf Cellin).
+* **Dämpfungsfilter:** Wendet einen Tiefpassfilter auf Stimmen im Freien bei dünner Atmosphäre an, der in druckbelüfteten Innenräumen automatisch umgangen wird.
+
+### 17. 🎙️ Post-Op-Sprachrekorder & AAR-Portal
+* **Ogg/Opus-Container ohne Overhead:** Speichert Opus-Pakete direkt in `.ogg`-Dateien ohne Server-Transkodierung.
+* **Interaktive Canvas-Timeline:** Ermöglicht Administratoren die Visualisierung, Wiedergabe und Löschung von Missionsaufzeichnungen im Admin-Portal.
+
+### 18. 📞 Schiff-zu-Schiff-Hailing & Anrufsystem
+* **Cockpit-zu-Cockpit-Anrufe:** Richtet private Sprachverbindungen zwischen Schiffen innerhalb einer Reichweite von 5.000 m.
+* **Freisprech-Streaming:** Aktiviert während des Anrufs automatisch die VAD-Sprachübertragung und umgeht Standard-PTT-Tasten.
+* **Realistische Glockenspiele:** Synthetisiert Wähltöne, Rufe und Verbindungs-/Trenntöne über NAudio.
+
+### 19. 🔤 Visier-HUD Echtzeit-Übersetzungsuntertitel
+* **Dynamischer Übersetzer:** Übersetzt eingehende fremdsprachige Sprachströme in Echtzeit mithilfe militärischer Flugwörterbücher für 7 Sprachen.
+* **HUD-Präfix:** Zeigt übersetzten Text auf dem Visier-HUD an, vorangestellt mit `[VON -> NACH]`.
+* **Whisper-Modell-Loader:** Lädt das Whisper-Modell (~75 MB) bei Aktivierung automatisch im Hintergrund herunter, falls nicht vorhanden.
 
 ---
 
@@ -587,7 +609,7 @@ Das Release-Paket enthält die vorgefertigte Datei „.streamDeckPlugin“.
 ---
 
 ### 3. Aktionen hinzufügen und konfigurieren
-Sie können jede der folgenden 13 Aktionen per Drag & Drop auf Ihre Stream Deck-Tasten ziehen:
+Sie können jede der folgenden 17 Aktionen per Drag & Drop auf Ihre Stream Deck-Tasten ziehen:
 * 🎤 **Proximity Mute**: Schaltet die Stummschaltung des ausgehenden Näherungsmikrofons um.
 * 📻 **Radio-Stummschaltung**: Schaltet die Stummschaltung des ausgehenden Funkmikrofons um.
 * 👤 **Profil-Stummschaltung**: Schaltet die Stummschaltung des ausgehenden Profilmikrofons um.
@@ -601,6 +623,10 @@ Sie können jede der folgenden 13 Aktionen per Drag & Drop auf Ihre Stream Deck-
 * 🎙️ **Voice Command Macro**: Löst ein benutzerdefiniertes Sprachbefehl-Makro aus, das im Hintergrund simuliert wird (über Einstellungen konfigurierbar).
 * 💬 **Intercom Status**: Zeigt den Schiffs-Intercom-Status an (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) und schaltet Simulationszustände durch Drücken der Taste durch.
 * 🗺️ **Location Telemetry**: Zeigt die aktuelle Systemzone und die Koordinatendaten $(X, Y, Z)$ auf der Taste an.
+* 📞 **Initiate Hail**: Initiiert einen Schiff-zu-Schiff-Anruf zum nächsten Spieler.
+* 📞 **Accept/Answer Hail**: Nimmt einen eingehenden Hailing-Anruf an.
+* 📞 **Decline/End Hail**: Lehnt einen eingehenden Anruf ab oder beendet ein aktives Gespräch.
+* 🔤 **Toggle Translation**: Schaltet die Echtzeit-HUD-Übersetzungsuntertitel ein oder aus.
 
 #### Konfiguration (Eigenschaftsinspektor):
 Klicken Sie für jede Aktion, die Sie auf eine Taste ziehen, darauf und konfigurieren Sie die Einstellungen im Bedienfeld **Eigenschafteninspektor** unten:

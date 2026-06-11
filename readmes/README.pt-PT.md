@@ -36,12 +36,12 @@ O objetivo do XuruVoip é fornecer aos eventos de jogos Star Citizen, organizaç
 
 | Seção | Descrição |
 | :--- | :--- |
-| [📖 Guia detalhado de recursos](../doc/functionnalities.md) | Explicação técnica e do usuário de todos os mais de 16 recursos implementados. |
-| [📖 Guias de usuário não técnicos](#-guias-do-usuário-não-técnicos) | Guias passo a passo fáceis de entender para cliente, servidor e stream deck. |
+| [📖 Guia detalhado de recursos](../doc/functionnalities.md) | Explicação técnica e do usuário de todos os mais de 20 recursos implementados. |
+| [📖 Guias de usuário não técnicos](#-guias-do-usuário-não-técnicos) | Guides passo a passo fáceis de entender para cliente, servidor e stream deck. |
 | [📸 Capturas de tela e IU](#-capturas-de-tela-e-interface-do-usuário) | Vitrine visual de telas de clientes, portal de administração e configurações. |
 | [🗂️ Estrutura do Projeto](#️-project-structure) | Layout do repositório e divisão de pastas. |
 | [⚙️ Arquitetura do Sistema](#️-system-architecture) | O diagrama de fluxo de trabalho real completo do cliente WPF, servidor Go e dispositivos externos. |
-| [💡 Visão geral dos principais recursos](#-visão-geral-dos-principais-recursos) | Análise detalhada dos mais de 11 recursos espaciais e de rede implementados. |
+| [💡 Visão geral dos principais recursos](#-visão-geral-dos-principais-recursos) | Análise detalhada dos mais de 19 recursos espaciais e de rede implementados. |
 | [🖥️ Servidor Go (Go)](#️-xuruvoip-server-go) | Instruções de construção, execução, implantação e configuração do servidor. |
 | [🎛️Ponte de voz do Discord](#️-discord-voice-bridge-setup-guide) | Conectando canais de rádio do servidor Go a um canal de voz Discord. |
 | [📱 Aplicativo complementar e plataforma de transmissão](#-integração-de-aplicativo-complementar-e-stream-deck) | Controle remoto de dispositivos e configuração de chaves físicas do Stream Deck. |
@@ -274,7 +274,29 @@ graph TB
 
 ### 14. 📢 Sistema de transmissão de endereço público (PA) do navio
 * **Transmissão de áudio para todo o navio:** Pilotos ou capitães de navios com tripulação múltipla podem transmitir anúncios de voz para todos os membros da tripulação que compartilham o mesmo `ContainerID` (navio) na mesma Zona.
-* **PA DSP e campainha de buzina:** As transmissões de PA ignoram a proximidade local e os mudos de rádio (exceto volume/mudo principal), reproduzem panorâmica central mono, acrescentam um alerta de buzina/carrilhão de tom duplo Sci-Fi e aplicam um passa-banda de megafone e filtro de reverberação simulando a acústica interior de um navio oco.
+* **PA DSP & Klaxon Chime:** As transmissões de PA ignoram os silenciamentos de proximidade e rádio locais (exceto volume mestre/mudo), reproduzem em mono com pan centralizado, precedem um alerta de chime/klaxon de dois tons de ficção científica e aplicam um filtro de megafone passa-banda e reverberação simulando a acústica de interiores vazios de naves.
+
+### 15. 🔌 Telemetria de hardware externa (Sim-Pit UDP Sync)
+* **Sincronização UDP em tempo real:** O cliente transmite os estados de VoIP e capacete em formato JSON para `127.0.0.1:8895` a cada 100ms.
+* **Integração de hardware:** Permite que construtores de cockpits integrem LEDs físicos ou indicadores que reajam às comunicações.
+
+### 16. 🪐 Simulação de densidade atmosférica planetária
+* **Alcance da voz:** O alcance da voz por proximidade se adapta à densidade atmosférica do planeta ou lusa (ex: decaimento de volume 3,5x mais rápido em Cellin).
+* **Abafamento de som:** Aplica filtros passa-baixa a vozes externas sob atmosferas rarefeitas, ignorado em interiores pressurizados.
+
+### 17. 🎙️ Gravador de voz pós-operação e portal AAR
+* **Contêiner Ogg/Opus sem sobrecarga:** Salva pacotes Opus diretamente em arquivos `.ogg` sem transcodificação no servidor.
+* **Linha do tempo interativa:** Permite que administradores visualizem, reproduzam e excluam gravações de voz de missões no painel de administração.
+
+### 18. 📞 Sistema de chamadas e hailing de nave para nave
+* **Chamadas de cockpit a cockpit:** Estabelece loops de comunicação privada entre naves dentro de um limite de 5.000m.
+* **Transmissão mãos-livres:** Ativa a transmissão de voz via VAD durante a chamada, ignorando teclas PTT padrão.
+* **Sinalização sonora realista:** Sintetiza tons de discagem, chamada e conexão/desconexão realistas via NAudio.
+
+### 19. 🔤 Legendas traduzidas em tempo real no HUD do visor
+* **Tradutor dinâmico:** Traduz transmissões de voz estrangeiras em tempo real usando dicionários de voo/militares para 7 idiomas.
+* **Prefixo de legenda no HUD:** Exibe o texto traduzido no HUD do visor, com o prefixo `[DE -> PARA]`.
+* **Carregamento de modelo Whisper:** Baixa o modelo Whisper (~75MB) em segundo plano ao ativar o recurso, se necessário.
 
 ---
 
@@ -587,7 +609,7 @@ O pacote de lançamento inclui o arquivo `.streamDeckPlugin` pré-empacotado.
 ---
 
 ### 3. Adicionando e configurando ações
-Você pode arrastar e soltar qualquer uma das 13 ações a seguir nas teclas do Stream Deck:
+Você pode arrastar e soltar qualquer uma das 17 ações a seguir nas teclas do Stream Deck:
 * 🎤 **Silenciar proximidade**: Alterna o silenciamento do microfone de proximidade de saída.
 * 📻 **Rádio Mudo**: Alterna o silenciamento do microfone do rádio de saída.
 * 👤 **Perfil mudo**: Alterna o silenciamento do microfone do perfil de saída.
@@ -599,8 +621,12 @@ Você pode arrastar e soltar qualquer uma das 13 ações a seguir nas teclas do 
 * 📢 **PA Broadcast**: Tecla Push-to-Talk para transmitir no sistema de alto-falantes públicos (PA) da nave.
 * 📡 **Beacon Mode**: Alterna o modo repetidor de rádio / baliza.
 * 🎙️ **Voice Command Macro**: Aciona uma macro de comando de voz personalizada simulada em segundo plano (configurável nas configurações).
-* 💬 **Intercom Status**: Exibe o status do interfone da nave (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) e percorre os estados de simulação ao ser pressionado.
+* 💬 **Intercom Status**: Exibe o status do interfone da nave (`NORMAL`, `SHIELD HIT`, `CRIT PWR`, `QUANTUM`) e percorre os estados de simulação ao ser pessoalmente pressionado.
 * 🗺️ **Location Telemetry**: Exibe a zona atual do sistema e a telemetria das coordenadas $(X, Y, Z)$ na tecla.
+* 📞 **Initiate Hail**: Inicia uma chamada de nave para nave para o jogador mais próximo.
+* 📞 **Accept/Answer Hail**: Aceita uma chamada de hailing recebida.
+* 📞 **Decline/End Hail**: Recusa uma chamada recebida ou encerra uma chamada ativa.
+* 🔤 **Toggle Translation**: Ativa/desativa as legendas de tradução do HUD em tempo real.
 
 #### Configuração (Inspetor de Propriedades):
 Para cada ação arrastada para uma tecla, clique nela e configure as opções no painel **Property Inspector** na parte inferior:
