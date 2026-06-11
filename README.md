@@ -12,13 +12,13 @@
 <p align="center">
   <b>Translations:</b><br/>
   <a href="README.md">English</a> •
-  <a href="doc/README.fr.md">Français</a> •
-  <a href="doc/README.de.md">Deutsch</a> •
-  <a href="doc/README.es.md">Español</a> •
-  <a href="doc/README.pt-BR.md">Português (Brasil)</a> •
-  <a href="doc/README.pt-PT.md">Português (Portugal)</a> •
-  <a href="doc/README.ja.md">日本語</a> •
-  <a href="doc/README.zh.md">简体中文</a>
+  <a href="readmes/README.fr.md">Français</a> •
+  <a href="readmes/README.de.md">Deutsch</a> •
+  <a href="readmes/README.es.md">Español</a> •
+  <a href="readmes/README.pt-BR.md">Português (Brasil)</a> •
+  <a href="readmes/README.pt-PT.md">Português (Portugal)</a> •
+  <a href="readmes/README.ja.md">日本語</a> •
+  <a href="readmes/README.zh.md">简体中文</a>
 </p>
 
 <p align="center">
@@ -36,6 +36,7 @@ The goal of XuruVoip is to provide Star Citizen gaming events, roleplay organiza
 
 | Section | Description |
 | :--- | :--- |
+| [📖 Detailed Features Guide](doc/functionnalities.md) | Technical and user explanation of all 16+ implemented functionalities. |
 | [📖 Non-Technical User Guides](#-non-technical-user-guides) | Easy-to-understand step-by-step guides for Client, Server, and Stream Deck. |
 | [📸 Screenshots & UI](#-screenshots--ui) | Visual showcase of client screens, admin portal, and settings. |
 | [🗂️ Project Structure](#️-project-structure) | Repository layout and folder breakdown. |
@@ -52,6 +53,7 @@ The goal of XuruVoip is to provide Star Citizen gaming events, roleplay organiza
 
 If you do not have a background in computer science, we have written simple, step-by-step guides to help you get everything configured and running easily:
 
+* 📖 **[Detailed Features Guide](doc/functionnalities.md)**: Deep-dive explanation of each feature implemented, how they work, how to use them, and why they are useful.
 * 🎮 **[Client User Guide](doc/client_guide.md)**: Friendly guide on choosing microphones/speakers, setting up Push-to-Talk, using space suit helmets, and turning on exertion voice effects.
 * 🖥️ **[Server Configuration Guide](doc/server_guide.md)**: Explains how to host a server, adjust passwords/settings in the `.env` settings file, and set up the Discord Voice Bridge.
 * 🎛️ **[Stream Deck Plugin Guide](doc/streamdeck_guide.md)**: Walkthrough on installing physical buttons for muting, visor toggling, and displaying active radio channels.

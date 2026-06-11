@@ -36,6 +36,7 @@ El objetivo de XuruVoip es proporcionar eventos de juegos de Star Citizen, organ
 
 | Sección | Descripción |
 | :--- | :--- |
+| [📖 Guía detallada de funciones](../doc/functionnalities.md) | Explicación técnica y de usuario de las más de 16 funciones implementadas. |
 | [📖 Guías de usuario no técnicas](#-guías-de-usuario-no-técnicas) | Guías paso a paso fáciles de entender para Cliente, Servidor y Stream Deck. |
 | [📸 Capturas de pantalla y interfaz de usuario](#-capturas-de-pantalla-y-interfaz-de-usuario) | Muestra visual de las pantallas de los clientes, el portal de administración y la configuración. |
 | [🗂️ Estructura del proyecto](#️-project-structure) | Diseño del repositorio y desglose de carpetas. |
@@ -52,6 +53,7 @@ El objetivo de XuruVoip es proporcionar eventos de juegos de Star Citizen, organ
 
 Si no tiene experiencia en informática, hemos escrito guías sencillas paso a paso para ayudarle a configurar todo y ejecutarlo fácilmente:
 
+* 📖 **[Guía detallada de funciones](../doc/functionnalities.md)**: Explicación detallada de cada función implementada, cómo funcionan, cómo usarlas y por qué son útiles.
 * 🎮 **[Guía del usuario del cliente](doc/client_guide.md)**: Guía sencilla sobre cómo elegir micrófonos/altavoces, configurar Push-to-Talk, usar cascos de trajes espaciales y activar efectos de voz de esfuerzo.
 * 🖥️ **[Guía de configuración del servidor](doc/server_guide.md)**: Explica cómo alojar un servidor, ajustar contraseñas/configuraciones en el archivo de configuración `.env` y configurar Discord Voice Bridge.
 * 🎛️ **[Guía del complemento Stream Deck](doc/streamdeck_guide.md)**: Tutorial sobre la instalación de botones físicos para silenciar, alternar la visera y mostrar canales de radio activos.
