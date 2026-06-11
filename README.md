@@ -36,7 +36,7 @@ The goal of XuruVoip is to provide Star Citizen gaming events, roleplay organiza
 
 | Section | Description |
 | :--- | :--- |
-| [📖 Detailed Features Guide](doc/functionnalities.md) | Technical and user explanation of all 16+ implemented functionalities. |
+| [📖 Detailed Features Guide](doc/functionnalities.md) | Technical and user explanation of all 18+ implemented functionalities. |
 | [📖 Non-Technical User Guides](#-non-technical-user-guides) | Easy-to-understand step-by-step guides for Client, Server, and Stream Deck. |
 | [📸 Screenshots & UI](#-screenshots--ui) | Visual showcase of client screens, admin portal, and settings. |
 | [🗂️ Project Structure](#️-project-structure) | Repository layout and folder breakdown. |
@@ -283,6 +283,16 @@ graph TB
 * **Real-Time UDP Sync:** When enabled, the client broadcasts its VoIP and helmet states in JSON format to `127.0.0.1:8895` (configurable) every 100ms.
 * **Telemetry Payload:** Includes local transmission states (`IsTransmittingProximity`, `IsTransmittingRadio`), remote receiving states (`IsReceivingProximity`, `IsReceivingRadio`), visor state (`HelmetVisorDown`), active channel, and current zone.
 * **Hardware Integration Ready:** Enables sim-pit cockpit builders to connect custom Arduino LEDs, Stream Decks, or physical warning indicators that react to active communications in real-time.
+
+### 16. 🪐 Planetary Atmosphere Density Simulation
+* **Volume Range Scaling:** Proximity voice ranges are scaled dynamically based on planetary atmosphere density (e.g. 3.5x faster decay on Cellin, 0.75x slower decay on Crusader).
+* **Thin Gas Muffling:** Outdoors on airless or thin-atmosphere moons, proximity voices are muffled via digital low-pass filters (e.g. 800Hz cutoff on Cellin).
+* **Interior Pressurization Bypasses:** The simulation is bypassed automatically inside ship cabins, facilities, or stations.
+
+### 17. 🎙️ Post-Op Voice Recorder & AAR Portal
+* **Zero-Overhead Ogg/Opus Container:** Saves raw VoIP Opus packets directly to disk inside browser-playable `.ogg` audio files, consuming 5x less disk space than MP3 with zero server CPU encoding load.
+* **Admin-Targeted Recording:** Recording only starts on active proximity, radio channel, or profile targets enabled via the Admin dashboard.
+* **Canvas Activity Timeline:** Visualizes voice transmission periods on a 2D HTML5 canvas timeline in the Admin Portal, enabling admins to click on blocks to play back clips or delete segments.
 
 ---
 

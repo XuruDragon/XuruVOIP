@@ -113,6 +113,15 @@ func createTables() error {
 			reason TEXT DEFAULT '',
 			created_at DATETIME NOT NULL
 		);`,
+		`CREATE TABLE IF NOT EXISTS aar_recordings (
+			id TEXT PRIMARY KEY,
+			player_name TEXT NOT NULL,
+			start_time DATETIME NOT NULL,
+			duration_ms INTEGER NOT NULL,
+			channel TEXT NOT NULL,
+			audio_type INTEGER NOT NULL,
+			file_path TEXT NOT NULL
+		);`,
 	}
 
 	for _, q := range queries {
@@ -799,4 +808,50 @@ func DBGetBannedHwidsList() ([]BannedHwidInfo, error) {
 		}
 	}
 	return list, nil
+}
+
+// AarRecording represents a completed recording segment in AAR database
+type AarRecording struct {
+	ID         string    `json:"id"`
+	PlayerName string    `json:"player_name"`
+	StartTime  time.Time `json:"start_time"`
+	DurationMs int       `json:"duration_ms"`
+	Channel    string    `json:"channel"`
+	AudioType  int       `json:"audio_type"` // 0=Proximity, 1=Radio, 2=Profile, 3=PA
+	FilePath   string    `json:"file_path"`
+}
+
+// DBSaveAarRecording inserts a new AAR record
+func DBSaveAarRecording(rec AarRecording) error {
+	_, err := db.Exec(
+		`INSERT INTO aar_recordings (id, player_name, start_time, duration_ms, channel, audio_type, file_path) 
+		VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		rec.ID, rec.PlayerName, rec.StartTime, rec.DurationMs, rec.Channel, rec.AudioType, rec.FilePath,
+	)
+	return err
+}
+
+// DBGetAarRecordings retrieves all AAR recording entries ordered by start_time DESC
+func DBGetAarRecordings() ([]AarRecording, error) {
+	rows, err := db.Query("SELECT id, player_name, start_time, duration_ms, channel, audio_type, file_path FROM aar_recordings ORDER BY start_time DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []AarRecording
+	for rows.Next() {
+		var rec AarRecording
+		err := rows.Scan(&rec.ID, &rec.PlayerName, &rec.StartTime, &rec.DurationMs, &rec.Channel, &rec.AudioType, &rec.FilePath)
+		if err == nil {
+			list = append(list, rec)
+		}
+	}
+	return list, nil
+}
+
+// DBDeleteAarRecording deletes a recording from the database
+func DBDeleteAarRecording(id string) error {
+	_, err := db.Exec("DELETE FROM aar_recordings WHERE id = ?", id)
+	return err
 }

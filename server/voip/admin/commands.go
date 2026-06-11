@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"xuruvoip/server/voip/audio"
 	"xuruvoip/server/voip/core"
 )
 
@@ -537,7 +538,21 @@ func ExecuteAdminCommand(cmd core.AdminCommand) (bool, string) {
 		core.ActiveHub.BroadcastToAdmins(core.MsgAdminRefresh{Type: "admin_refresh", Tab: "bans"})
 		return true, ""
 
-	case "get_players_list", "get_admins_list", "get_banned_ips_list", "get_banned_hwids_list":
+	case "set_aar_recording_target":
+		target := strings.TrimSpace(cmd.Name)
+		if target == "" {
+			return false, "Empty target name"
+		}
+		active, ok := cmd.Value.(bool)
+		if !ok {
+			return false, "Boolean value required"
+		}
+		audio.SetAarRecordingTarget(target, active)
+		core.Log(fmt.Sprintf("ADMIN: AAR Recording Target '%s' active -> %t", target, active), core.ColorBlue)
+		core.ActiveHub.BroadcastToAdmins(core.MsgAdminRefresh{Type: "admin_refresh", Tab: "aar"})
+		return true, ""
+
+	case "get_players_list", "get_admins_list", "get_banned_ips_list", "get_banned_hwids_list", "get_aar_recording_status":
 		return true, ""
 	}
 
@@ -571,6 +586,8 @@ func ExecuteAdminQuery(cmd core.AdminCommand) interface{} {
 			return nil
 		}
 		return list
+	case "get_aar_recording_status":
+		return audio.GetAarRecordingStatus()
 	}
 	return nil
 }
