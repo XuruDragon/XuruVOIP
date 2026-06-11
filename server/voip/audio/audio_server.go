@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 	"net"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -24,7 +26,21 @@ var (
 	statsMu            sync.Mutex
 	radioChannelFrames = make(map[string]uint64)
 	profileFrames      = make(map[string]uint64)
+
+	activeRecordings       = make(map[string]*RecordingSession)
+	activeRecordingTargets = make(map[string]bool)
+	aarMu                  sync.Mutex
 )
+
+type RecordingSession struct {
+	Writer     *OggWriter
+	ID         string
+	PlayerName string
+	StartTime  time.Time
+	Channel    string
+	AudioType  int
+	FilePath   string
+}
 
 // StartAudioServer starts the audio server on the specified port
 func StartAudioServer(port int, certFile, keyFile string) {
@@ -244,6 +260,68 @@ func handleUDPPacket(packet []byte, remoteAddr *net.UDPAddr) {
 		return
 	}
 
+	// 2a. AAR Recording interception
+	if core.EnableAarRecording {
+		targetKey := ""
+		channelVal := ""
+		switch audioType {
+		case core.AudioTypeProximity:
+			targetKey = "proximity"
+			channelVal = "Proximity"
+		case core.AudioTypeRadio:
+			core.ActiveHub.Mu.RLock()
+			senderChan := sender.ActiveChannel
+			core.ActiveHub.Mu.RUnlock()
+			if senderChan != "" {
+				targetKey = "radio:" + senderChan
+				channelVal = senderChan
+			}
+		case core.AudioTypeProfile:
+			core.ActiveHub.Mu.RLock()
+			senderProf := sender.Profile
+			core.ActiveHub.Mu.RUnlock()
+			if senderProf != "" {
+				targetKey = "profile:" + senderProf
+				channelVal = senderProf
+			}
+		case core.AudioTypePA:
+			targetKey = "pa"
+			channelVal = "PA"
+		}
+
+		if targetKey != "" {
+			aarMu.Lock()
+			isTargetActive := activeRecordingTargets[targetKey]
+			if isTargetActive && len(audioData) > 0 {
+				session, exists := activeRecordings[senderName]
+				if !exists {
+					id := core.GenerateRandomString(16)
+					dataDir := core.ResolveDataDir()
+					recDir := filepath.Join(dataDir, "recordings")
+					_ = os.MkdirAll(recDir, 0755)
+					filePath := filepath.Join(recDir, id+".ogg")
+					writer, err := NewOggWriter(filePath)
+					if err == nil {
+						session = &RecordingSession{
+							Writer:     writer,
+							ID:         id,
+							PlayerName: senderName,
+							StartTime:  time.Now(),
+							Channel:    channelVal,
+							AudioType:  int(audioType),
+							FilePath:   filepath.Join("recordings", id+".ogg"),
+						}
+						activeRecordings[senderName] = session
+					}
+				}
+				if session != nil {
+					_ = session.Writer.WriteOpusPacket(audioData)
+				}
+			}
+			aarMu.Unlock()
+		}
+	}
+
 	// Update player talking state
 	core.ActiveHub.Mu.Lock()
 	var broadcastTalkingMsg bool
@@ -270,6 +348,10 @@ func handleUDPPacket(packet []byte, remoteAddr *net.UDPAddr) {
 			Name:      senderName,
 			IsTalking: isTalkingVal,
 		})
+	}
+
+	if len(audioData) == 0 {
+		stopRecordingSession(senderName)
 	}
 
 	atomic.AddUint64(&audioTotalBytes, uint64(len(packet)))
@@ -452,7 +534,36 @@ func sweepTalkingLoop() {
 				Name:      name,
 				IsTalking: false,
 			})
+			stopRecordingSession(name)
 		}
+	}
+}
+
+func stopRecordingSession(playerName string) {
+	aarMu.Lock()
+	session, exists := activeRecordings[playerName]
+	if exists {
+		delete(activeRecordings, playerName)
+		aarMu.Unlock()
+
+		_ = session.Writer.Close()
+		durationMs := int(time.Since(session.StartTime).Milliseconds())
+		if durationMs > 100 {
+			rec := core.AarRecording{
+				ID:         session.ID,
+				PlayerName: session.PlayerName,
+				StartTime:  session.StartTime,
+				DurationMs: durationMs,
+				Channel:    session.Channel,
+				AudioType:  session.AudioType,
+				FilePath:   session.FilePath,
+			}
+			_ = core.DBSaveAarRecording(rec)
+		} else {
+			_ = os.Remove(filepath.Join(core.ResolveDataDir(), session.FilePath))
+		}
+	} else {
+		aarMu.Unlock()
 	}
 }
 
@@ -504,4 +615,26 @@ func InjectRadioAudio(senderName string, seq uint16, audioData []byte, channel s
 		}
 		_, _ = udpConn.WriteToUDP(packetToSend, targetAddr)
 	}
+}
+
+// SetAarRecordingTarget updates the active recording status of a target
+func SetAarRecordingTarget(target string, active bool) {
+	aarMu.Lock()
+	if active {
+		activeRecordingTargets[target] = true
+	} else {
+		delete(activeRecordingTargets, target)
+	}
+	aarMu.Unlock()
+}
+
+// GetAarRecordingStatus returns a copy of the active recording targets
+func GetAarRecordingStatus() map[string]bool {
+	aarMu.Lock()
+	defer aarMu.Unlock()
+	status := make(map[string]bool)
+	for k, v := range activeRecordingTargets {
+		status[k] = v
+	}
+	return status
 }

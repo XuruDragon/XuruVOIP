@@ -28,6 +28,8 @@ Use the summary table below to navigate between the various features implemented
 | **14** | [📢 Ship Public Address (PA) Broadcast](#14-ship-public-address-pa-broadcast-system) | Fleet-wide alert announcements | Hotkeys |
 | **15** | [🔌 External Hardware UDP Telemetry](#15-external-hardware-telemetry-sim-pit-udp-sync) | Sim-pit hardware integration | General |
 | **16** | [🛡️ Security, Log Rotation & Admin Radar](#16-security-log-rotation--admin-canvas-radar) | Server moderation & zoomable radar | *Server Setup (.env)* |
+| **17** | [🪐 Planetary Atmosphere Simulation](#17-planetary-atmosphere-density-simulation) | Client-side muffling & range scaling | Audio |
+| **18** | [🎙️ Post-Op Voice Recorder & AAR Portal](#18-post-op-voice-recorder--aar-portal) | Server-side Ogg/Opus recording & admin timeline | *Server Setup (.env)* |
 
 ---
 
@@ -345,3 +347,45 @@ Provides server administrators with tools for monitoring, log rotation, and real
 
 ### Why It's Good to Have
 Essential for large gaming events or public servers, allowing admins to moderate, track player activity, and manage server health securely.
+
+---
+
+## 🪐 17. Planetary Atmosphere Density Simulation
+
+### Description
+Simulates real-time voice range scaling and frequency dampening depending on the local atmospheric density of the moon or planet.
+
+### How It Works
+* **Volume Range Scaling:** Based on the listener's planetary zone, range is scaled by an atmospheric multiplier:
+  * Moon with trace/very thin atmosphere (e.g., Cellin, Ita): `3.5` (very rapid volume decay, sound dies quickly).
+  * Moon with thin atmosphere (e.g., Daymar, Yela, Lyria): `2.6` or `2.1` (moderate decay).
+  * Standard planet (e.g., MicroTech, Hurston, ArcCorp): `1.0` (standard decay).
+  * Dense gas atmosphere (e.g., Crusader, Arial): `0.75` (sound travels further).
+* **Gas Muffling (Low-Pass Filtering):** Applies low-pass filters to outdoor moon environments to model thin gas sound transmission constraints (e.g., Cellin outdoor zone applies an 800Hz low-pass cutoff).
+* **Pressurized Bypasses:** The simulation is bypassed entirely when players disembark their spacesuits or stand inside pressurized environments, such as facilities, outposts, hangars, and ship cabins.
+
+### How to Use
+1. Open the Client **Settings** window.
+2. In the **Audio** tab, check **Enable Planetary Atmosphere Simulation (Muffling & Range)**.
+
+### Why It's Good to Have
+Reinforces realism during ground operations. Squad members on airless moons will sound muffled and will need to stand closer to each other to communicate via proximity, while voices inside pressurized ships remain clear and standard.
+
+---
+
+## 🎙️ 18. Post-Op Voice Recorder & AAR Portal
+
+### Description
+An administrative voice recording suite that writes direct Opus frames to browser-playable Ogg container files, integrated with a timeline view on the admin dashboard.
+
+### How It Works
+* **Zero-Overhead Ogg/Opus Writer:** Saves incoming Opus voice packets directly into standard Ogg page files with correct CRC-32 checksums, requiring **zero server transcoding CPU load** and saving 5x more disk space than MP3 (~12 MB/hour of audio).
+* **Target-Based Activation:** Does not record everything automatically. Admins specify exactly which targets (Proximity chat, specific Radio Channels, or Audio Profiles) are actively recorded.
+* **PTT-Framed Sessions:** Instantiates a new recording when a player begins transmitting, and automatically closes/commits the segment to the database on PTT release or timeout.
+* **Canvas Timeline & Portal:** Displays an interactive canvas timeline of speaking periods. Admins can click on voice blocks directly on the timeline canvas to trigger a floating audio player and play back segments, or delete them.
+
+### How to Use
+1. Enable `XURUVOIP_ENABLE_AAR_RECORDING=1` in the server's `.env` config file.
+2. Open the Admin Web Portal and navigate to the **Archives** tab.
+3. Check target boxes to enable active recording (e.g., Proximity or a specific Radio Channel).
+4. View recorded clips and speak blocks dynamically plotted on the Canvas Timeline. Click on them to play or review.

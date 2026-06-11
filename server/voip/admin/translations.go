@@ -223,6 +223,7 @@ var translations = map[string]map[string]string{
 		"General":                   "General",
 		"BANNED":                    "BANNED",
 		"ACTIVE":                    "ACTIVE",
+		"AarArchives":               "Post-Op AAR Archives",
 	},
 	"fr": {
 		"SecurePortal":              "Portail d'administration sécurisé",
@@ -360,6 +361,7 @@ var translations = map[string]map[string]string{
 		"General":                   "Général",
 		"BANNED":                    "BANNI",
 		"ACTIVE":                    "ACTIF",
+		"AarArchives":               "Archives Post-Op AAR",
 	},
 	"de": {
 		"SecurePortal":              "Sicheres Administrationsportal",
@@ -497,6 +499,7 @@ var translations = map[string]map[string]string{
 		"General":                   "Allgemein",
 		"BANNED":                    "GESPERRT",
 		"ACTIVE":                    "AKTIV",
+		"AarArchives":               "Post-Op-AAR-Archive",
 	},
 	"es": {
 		"SecurePortal":              "Portal de administración seguro",
@@ -634,6 +637,7 @@ var translations = map[string]map[string]string{
 		"General":                   "General",
 		"BANNED":                    "BANEADO",
 		"ACTIVE":                    "ACTIVO",
+		"AarArchives":               "Archivos AAR Post-Op",
 	},
 	"pt-BR": {
 		"SecurePortal":              "Portal de Administração Seguro",
@@ -771,6 +775,7 @@ var translations = map[string]map[string]string{
 		"General":                   "Geral",
 		"BANNED":                    "BANIDO",
 		"ACTIVE":                    "ATIVO",
+		"AarArchives":               "Arquivos AAR Pós-Operação",
 	},
 	"pt-PT": {
 		"SecurePortal":              "Portal de Administração Seguro",
@@ -908,6 +913,7 @@ var translations = map[string]map[string]string{
 		"General":                   "Geral",
 		"BANNED":                    "BANIDO",
 		"ACTIVE":                    "ATIVO",
+		"AarArchives":               "Arquivos AAR Pós-Operação",
 	},
 	"zh": {
 		"SecurePortal":              "安全管理门户",
@@ -1045,6 +1051,7 @@ var translations = map[string]map[string]string{
 		"General":                   "通用",
 		"BANNED":                    "已封禁",
 		"ACTIVE":                    "活动",
+		"AarArchives":               "任务后AAR录音档案",
 	},
 	"ja": {
 		"SecurePortal":              "安全な管理ポータル",
@@ -1182,6 +1189,7 @@ var translations = map[string]map[string]string{
 		"General":                   "ジェネラル",
 		"BANNED":                    "BAN中",
 		"ACTIVE":                    "アクティブ",
+		"AarArchives":               "ミッション後AAR録音アーカイブ",
 	},
 }
 
@@ -1345,6 +1353,7 @@ const dashboardHTML = `<!DOCTYPE html>
         <button onclick="switchTab('accounts')" id="tab-btn-accounts" class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition">{{index .T "PlayerAccounts"}}</button>
         <button onclick="switchTab('admins')" id="tab-btn-admins" class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition">{{index .T "Administrators"}}</button>
         <button onclick="switchTab('bans')" id="tab-btn-bans" class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition">{{index .T "ActiveBans"}}</button>
+        <button onclick="switchTab('aar')" id="tab-btn-aar" class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition">{{index .T "AarArchives"}}</button>
     </div>
 
     <!-- Tab 1: Dashboard Panel -->
@@ -1621,6 +1630,58 @@ const dashboardHTML = `<!DOCTYPE html>
         </div>
     </div>
 
+    <!-- Tab 5: AAR Archives Panel -->
+    <div id="tab-content-aar" class="hidden p-6 max-w-[1800px] w-full mx-auto flex flex-col gap-6 flex-1">
+        <!-- Controls & Target Selection -->
+        <div class="glass-panel p-6 rounded-2xl space-y-4">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                🎙️ {{index .T "AarArchives"}}
+            </h3>
+            <p class="text-xs text-slate-400">Select which targets you want to record when players speak. Recording targets are managed in real-time by administrators.</p>
+            <div id="aar-targets-container" class="flex flex-wrap gap-4 pt-2">
+                <!-- Dynamically filled with checkboxes -->
+            </div>
+        </div>
+
+        <!-- Voice Activity Timeline -->
+        <div class="glass-panel p-6 rounded-2xl space-y-4 flex flex-col">
+            <h3 class="text-lg font-semibold text-white">Voice Activity Timeline</h3>
+            <div class="relative w-full h-[240px] bg-slate-950/80 rounded-xl border border-slate-800/80 overflow-hidden">
+                <canvas id="aar-timeline-canvas" class="w-full h-full cursor-pointer"></canvas>
+            </div>
+            <p class="text-xs text-slate-400">Click on any voice block on the timeline to play the recorded segment.</p>
+        </div>
+
+        <!-- Recordings List -->
+        <div class="glass-panel p-6 rounded-2xl space-y-4 flex flex-col flex-1 min-h-[300px]">
+            <h3 class="text-lg font-semibold text-white">Recorded Segments</h3>
+            <div class="overflow-x-auto custom-scroll flex-1">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider">
+                            <th class="py-3 px-4">Player</th>
+                            <th class="py-3 px-4">Start Time</th>
+                            <th class="py-3 px-4">Duration</th>
+                            <th class="py-3 px-4">Channel / Profile</th>
+                            <th class="py-3 px-4">Playback</th>
+                            <th class="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aar-recordings-table-body" class="divide-y divide-slate-900/50">
+                        <!-- Dynamically filled -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Audio Player -->
+    <div id="aar-floating-player" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 glass-panel px-6 py-3 rounded-2xl flex items-center gap-4 shadow-2xl border border-emerald-500/20 z-50">
+        <span class="text-xs font-semibold text-slate-300" id="floating-player-title">Playing: Player - Channel</span>
+        <audio id="aar-audio-element" controls class="h-8"></audio>
+        <button onclick="document.getElementById('aar-floating-player').classList.add('hidden'); document.getElementById('aar-audio-element').pause();" class="text-slate-400 hover:text-white">✕</button>
+    </div>
+
     <!-- UI Prompts / Modals -->
     <div id="prompt-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl">
@@ -1662,12 +1723,14 @@ const dashboardHTML = `<!DOCTYPE html>
             document.getElementById('tab-content-accounts').classList.add('hidden');
             document.getElementById('tab-content-admins').classList.add('hidden');
             document.getElementById('tab-content-bans').classList.add('hidden');
+            document.getElementById('tab-content-aar').classList.add('hidden');
 
             document.getElementById('tab-btn-dashboard').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
             document.getElementById('tab-btn-radar').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
             document.getElementById('tab-btn-accounts').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
             document.getElementById('tab-btn-admins').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
             document.getElementById('tab-btn-bans').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
+            document.getElementById('tab-btn-aar').className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition';
 
             document.getElementById('tab-content-' + tabId).classList.remove('hidden');
             document.getElementById('tab-btn-' + tabId).className = 'px-5 py-3.5 text-sm font-semibold border-b-2 border-emerald-500 text-white transition';
@@ -1680,6 +1743,29 @@ const dashboardHTML = `<!DOCTYPE html>
             } else if (tabId === 'bans') {
                 sendAdminCommand({ cmd: 'get_banned_ips_list' });
                 sendAdminCommand({ cmd: 'get_banned_hwids_list' });
+            } else if (tabId === 'aar') {
+                loadAarRecordings();
+                sendAdminCommand({ cmd: 'get_aar_recording_status' });
+                const canvas = document.getElementById('aar-timeline-canvas');
+                if (canvas && !canvas.getAttribute('data-init')) {
+                    canvas.setAttribute('data-init', 'true');
+                    canvas.addEventListener('click', function(e) {
+                        const rect = canvas.getBoundingClientRect();
+                        const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                        const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                        for (const bar of timelineBars) {
+                            if (clickX >= bar.x && clickX <= bar.x + bar.w && clickY >= bar.y && clickY <= bar.y + bar.h) {
+                                playRecording(bar.rec);
+                                break;
+                            }
+                        }
+                    });
+                    window.addEventListener('resize', function() {
+                        if (activeTab === 'aar') {
+                            drawAarTimeline();
+                        }
+                    });
+                }
             } else if (tabId === 'radar') {
                 // Resize and draw radar map immediately
                 if (radarCanvas) {
@@ -1902,6 +1988,9 @@ const dashboardHTML = `<!DOCTYPE html>
                     } else if (msg.tab === 'bans' && activeTab === 'bans') {
                         sendAdminCommand({ cmd: 'get_banned_ips_list' });
                         sendAdminCommand({ cmd: 'get_banned_hwids_list' });
+                    } else if (msg.tab === 'aar' && activeTab === 'aar') {
+                        loadAarRecordings();
+                        sendAdminCommand({ cmd: 'get_aar_recording_status' });
                     }
                     break;
 
@@ -1920,6 +2009,8 @@ const dashboardHTML = `<!DOCTYPE html>
                             renderBannedIPsList(msg.value);
                         } else if (msg.cmd === 'get_banned_hwids_list') {
                             renderBannedHwidsList(msg.value);
+                        } else if (msg.cmd === 'get_aar_recording_status') {
+                            renderAarRecordingStatus(msg.value);
                         }
                     }
                     // Trigger lists refresh on structural changes
@@ -2957,6 +3048,261 @@ const dashboardHTML = `<!DOCTYPE html>
             radarCtx.textAlign = 'left';
             const scaleDistance = (100 / radarZoom).toFixed(0);
             radarCtx.fillText(scaleDistance + 'm', legendX + 5, legendY - 8);
+        }
+
+        let aarRecordings = [];
+        let timelineBars = [];
+
+        function loadAarRecordings() {
+            fetch('/admin/aar/list')
+                .then(r => {
+                    if (!r.ok) throw new Error('AAR disabled or unauthorized');
+                    return r.json();
+                })
+                .then(data => {
+                    aarRecordings = data || [];
+                    renderAarRecordingsList();
+                    drawAarTimeline();
+                })
+                .catch(err => {
+                    console.error('Failed to load AAR recordings:', err);
+                });
+        }
+
+        function renderAarRecordingsList() {
+            const tbody = document.getElementById('aar-recordings-table-body');
+            tbody.innerHTML = '';
+            if (aarRecordings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-slate-500">No recorded segments available.</td></tr>';
+                return;
+            }
+
+            aarRecordings.forEach(rec => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-900/20 transition text-slate-300';
+                
+                const dateStr = new Date(rec.start_time).toLocaleString();
+                const durationStr = (rec.duration_ms / 1000).toFixed(2) + 's';
+                
+                let typeLabel = '';
+                if (rec.audio_type === 0) typeLabel = '<span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Proximity</span>';
+                else if (rec.audio_type === 1) typeLabel = '<span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Radio (' + rec.channel + ')</span>';
+                else if (rec.audio_type === 2) typeLabel = '<span class="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">Profile (' + rec.channel + ')</span>';
+                else if (rec.audio_type === 3) typeLabel = '<span class="text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">PA</span>';
+
+                tr.innerHTML = 
+                    '<td class="py-3.5 px-4 font-semibold text-white">' + rec.player_name + '</td>' +
+                    '<td class="py-3.5 px-4 text-xs">' + dateStr + '</td>' +
+                    '<td class="py-3.5 px-4 text-xs">' + durationStr + '</td>' +
+                    '<td class="py-3.5 px-4">' + typeLabel + '</td>' +
+                    '<td class="py-3.5 px-4">' +
+                        '<audio controls src="/admin/aar/' + rec.file_path.replace(/\\/g, '/') + '" class="h-8 max-w-xs"></audio>' +
+                    '</td>' +
+                    '<td class="py-3.5 px-4 text-right">' +
+                        '<button onclick="deleteAarRecording(\'' + rec.id + '\')" class="px-2 py-1 text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded transition">Delete</button>' +
+                    '</td>';
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteAarRecording(id) {
+            if (!confirm('Do you really want to delete this recorded segment?')) return;
+            fetch('/admin/aar/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.ok) {
+                    showToast('delete_recording', true);
+                    loadAarRecordings();
+                } else {
+                    showToast('delete_recording', false, res.reason);
+                }
+            })
+            .catch(err => {
+                showToast('delete_recording', false, err.message);
+            });
+        }
+
+        function playRecording(rec) {
+            const player = document.getElementById('aar-floating-player');
+            const audio = document.getElementById('aar-audio-element');
+            const title = document.getElementById('floating-player-title');
+            
+            title.innerText = 'Playing: ' + rec.player_name + ' (' + rec.channel + ')';
+            audio.src = '/admin/aar/' + rec.file_path.replace(/\\/g, '/');
+            player.classList.remove('hidden');
+            audio.play();
+        }
+
+        function drawAarTimeline() {
+            const canvas = document.getElementById('aar-timeline-canvas');
+            if (!canvas) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            
+            const width = rect.width;
+            const height = rect.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            timelineBars = [];
+            
+            if (aarRecordings.length === 0) {
+                ctx.fillStyle = '#64748b';
+                ctx.font = '14px Outfit, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('No voice activity recorded yet.', width / 2, height / 2);
+                return;
+            }
+            
+            const times = aarRecordings.map(r => new Date(r.start_time).getTime());
+            const endTimes = aarRecordings.map(r => new Date(r.start_time).getTime() + r.duration_ms);
+            const minTime = Math.min(...times);
+            const maxTime = Math.max(...endTimes);
+            const totalDuration = (maxTime - minTime) || 1;
+            
+            const playersList = [...new Set(aarRecordings.map(r => r.player_name))].sort();
+            
+            const timelineX = 140;
+            const timelineW = width - timelineX - 40;
+            const rowHeight = 28;
+            const startY = 50;
+            
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px Outfit, sans-serif';
+            ctx.textAlign = 'center';
+            
+            const gridIntervals = 5;
+            for (let i = 0; i <= gridIntervals; i++) {
+                const pct = i / gridIntervals;
+                const x = timelineX + pct * timelineW;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, startY - 10);
+                ctx.lineTo(x, startY + playersList.length * rowHeight);
+                ctx.stroke();
+                
+                const t = new Date(minTime + pct * totalDuration);
+                const timeStr = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                ctx.fillText(timeStr, x, startY - 20);
+            }
+            
+            playersList.forEach((pName, idx) => {
+                const y = startY + idx * rowHeight;
+                
+                ctx.strokeStyle = 'rgba(51, 65, 85, 0.2)';
+                ctx.beginPath();
+                ctx.moveTo(timelineX, y + rowHeight/2);
+                ctx.lineTo(timelineX + timelineW, y + rowHeight/2);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#e2e8f0';
+                ctx.font = '12px Outfit, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                let display = pName;
+                if (display.length > 15) display = display.substring(0, 13) + '...';
+                ctx.fillText(display, 15, y + rowHeight/2);
+            });
+            
+            aarRecordings.forEach(rec => {
+                const pIdx = playersList.indexOf(rec.player_name);
+                if (pIdx === -1) return;
+                
+                const recStart = new Date(rec.start_time).getTime();
+                const x1 = timelineX + ((recStart - minTime) / totalDuration) * timelineW;
+                const x2 = timelineX + (((recStart + rec.duration_ms) - minTime) / totalDuration) * timelineW;
+                const blockW = Math.max(x2 - x1, 6);
+                const y = startY + pIdx * rowHeight + 4;
+                const blockH = rowHeight - 8;
+                
+                let color = 'rgba(16, 185, 129, 0.7)';
+                let strokeColor = 'rgba(16, 185, 129, 1)';
+                if (rec.audio_type === 1) {
+                    color = 'rgba(59, 130, 246, 0.7)';
+                    strokeColor = 'rgba(59, 130, 246, 1)';
+                } else if (rec.audio_type === 2) {
+                    color = 'rgba(139, 92, 246, 0.7)';
+                    strokeColor = 'rgba(139, 92, 246, 1)';
+                } else if (rec.audio_type === 3) {
+                    color = 'rgba(234, 179, 8, 0.7)';
+                    strokeColor = 'rgba(234, 179, 8, 1)';
+                }
+                
+                ctx.fillStyle = color;
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 1;
+                
+                ctx.beginPath();
+                if (ctx.roundRect) {
+                    ctx.roundRect(x1, y, blockW, blockH, 4);
+                } else {
+                    ctx.rect(x1, y, blockW, blockH);
+                }
+                ctx.fill();
+                ctx.stroke();
+                
+                timelineBars.push({ x: x1, y: y, w: blockW, h: blockH, rec: rec });
+            });
+        }
+
+        function renderAarRecordingStatus(statusMap) {
+            const container = document.getElementById('aar-targets-container');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            // 1. Proximity checkbox
+            container.appendChild(createTargetCheckbox('proximity', 'Proximity Chat', statusMap));
+            
+            // 2. Channels checkboxes
+            channels.forEach(ch => {
+                const key = 'radio:' + ch;
+                container.appendChild(createTargetCheckbox(key, 'Radio Channel: ' + ch, statusMap));
+            });
+            
+            // 3. Profiles checkboxes
+            profiles.forEach(prof => {
+                const key = 'profile:' + prof;
+                container.appendChild(createTargetCheckbox(key, 'Profile: ' + prof, statusMap));
+            });
+        }
+
+        function createTargetCheckbox(key, label, statusMap) {
+            const isActive = statusMap && statusMap[key] === true;
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-2 px-4 py-2.5 bg-slate-900/40 border border-slate-800 rounded-xl hover:border-slate-700 transition';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = 'aar-chk-' + key.replace(/:/g, '-');
+            checkbox.checked = isActive;
+            checkbox.className = 'w-4 h-4 text-emerald-500 bg-slate-950 border-slate-800 rounded focus:ring-emerald-500 focus:ring-offset-slate-900';
+            checkbox.onchange = function() {
+                sendAdminCommand({
+                    cmd: 'set_aar_recording_target',
+                    name: key,
+                    value: checkbox.checked
+                });
+            };
+            
+            const lbl = document.createElement('label');
+            lbl.htmlFor = checkbox.id;
+            lbl.className = 'text-xs font-semibold text-slate-300 cursor-pointer select-none';
+            lbl.innerText = label;
+            
+            div.appendChild(checkbox);
+            div.appendChild(lbl);
+            return div;
         }
 
         // Initialize connection

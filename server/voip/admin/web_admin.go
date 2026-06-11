@@ -8,6 +8,9 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -84,6 +87,9 @@ func RegisterWebAdminHandlers(mux *http.ServeMux) {
 	mux.HandleFunc("/admin/login", handleWebAdminLogin)
 	mux.HandleFunc("/admin/logout", handleWebAdminLogout)
 	mux.HandleFunc("/admin/ws", handleWebAdminWS)
+	mux.HandleFunc("/admin/aar/list", handleAarList)
+	mux.HandleFunc("/admin/aar/recordings/", handleAarServe)
+	mux.HandleFunc("/admin/aar/delete", handleAarDelete)
 	mux.HandleFunc("/admin/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/png")
 		logoBytes, _ := logoFS.ReadFile("logo.png")
@@ -310,5 +316,93 @@ func handleWebAdminWS(w http.ResponseWriter, r *http.Request) {
 	}
 
 	core.Log("WEB ADMIN disconnected", core.ColorOrange)
+}
+
+func handleAarList(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("xuruvoip_session")
+	if err != nil || !ValidateSession(cookie.Value) {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	if !core.EnableAarRecording {
+		http.Error(w, "AAR Recording feature is disabled", http.StatusForbidden)
+		return
+	}
+	list, err := core.DBGetAarRecordings()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(list)
+}
+
+func handleAarServe(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("xuruvoip_session")
+	if err != nil || !ValidateSession(cookie.Value) {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	if !core.EnableAarRecording {
+		http.Error(w, "AAR Recording feature is disabled", http.StatusForbidden)
+		return
+	}
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 5 {
+		http.NotFound(w, r)
+		return
+	}
+	filename := parts[len(parts)-1]
+	if !strings.HasSuffix(filename, ".ogg") {
+		http.NotFound(w, r)
+		return
+	}
+	filename = filepath.Base(filename)
+	dataDir := core.ResolveDataDir()
+	filePath := filepath.Join(dataDir, "recordings", filename)
+
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		http.NotFound(w, r)
+		return
+	}
+
+	w.Header().Set("Content-Type", "audio/ogg")
+	http.ServeFile(w, r, filePath)
+}
+
+func handleAarDelete(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("xuruvoip_session")
+	if err != nil || !ValidateSession(cookie.Value) {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct {
+		ID string `json:"id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+		return
+	}
+	req.ID = filepath.Base(req.ID)
+	if req.ID == "" {
+		http.Error(w, "ID required", http.StatusBadRequest)
+		return
+	}
+
+	dataDir := core.ResolveDataDir()
+	filePath := filepath.Join(dataDir, "recordings", req.ID+".ogg")
+	_ = os.Remove(filePath)
+
+	if err := core.DBDeleteAarRecording(req.ID); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write([]byte(`{"ok":true}`))
 }
 

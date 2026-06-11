@@ -51,6 +51,7 @@ You can customize how your server behaves by editing a simple settings file name
 * **`XURUVOIP_ENABLE_DISCORD_BRIDGE`** (`1` = On, `0` = Off): Toggles the Discord voice connection gateway.
 * **`XURUVOIP_ENABLE_RADIO_REPEATERS`** (`1` = On, `0` = Off): Enables or disables the multi-hop radio repeater beacon system.
 * **`XURUVOIP_ENABLE_SHIP_PA`** (`1` = On, `0` = Off): Enables or disables the ship-wide Public Address (PA) broadcast system.
+* **`XURUVOIP_ENABLE_AAR_RECORDING`** (`1` = On, `0` = Off): Enforce global AAR voice recording capability (disabled by default). When enabled, administrators can toggle recording of specific proximity/channels/profiles via the Admin Dashboard.
 
 ---
 
@@ -117,6 +118,10 @@ Once logged in, the dashboard gives you complete control over your voice server:
   * **Toggle Anonymous Mode:** Turn on global anonymous mode to hide usernames and protect player identities during open matches.
 * **Admin Management:**
   * Create new administrator logins, remove existing ones, or update admin passwords.
+* **AAR Archives (Mission Recording & Timeline):**
+  * **Recording Controls:** Toggle voice recording dynamically for Proximity Chat, specific Radio Channels, or Audio Profiles.
+  * **Interactive Voice Timeline:** Visually trace speaking blocks for each player on a graphical time canvas.
+  * **Audio Segment Playback:** Click on any timeline block or browse the segments list to play back `.ogg` voice clips directly in the browser, or permanently delete recordings from disk.
 
 ---
 
