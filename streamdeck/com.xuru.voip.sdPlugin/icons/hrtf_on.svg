@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Headphone shape -->
+    <path d="M20 36V46C20 49 22 51 25 51H28V36H20Z" fill="#10b981"/>
+    <path d="M52 36V46C52 49 50 51 47 51H44V36H52Z" fill="#10b981"/>
+    <path d="M24 38C24 24 48 24 48 38" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -413,6 +413,46 @@
       "PropertyInspectorPath": "pi/pi.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Toggle real-time HUD translation subtitles for foreign audio"
+    },
+    {
+      "UUID": "com.xuru.voip.action.toggle_hrtf",
+      "Name": "Toggle HRTF",
+      "Icon": "icons/hrtf_off",
+      "States": [
+        {
+          "Image": "icons/hrtf_off",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/hrtf_on",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Binaural HRTF Spatial Audio"
+    },
+    {
+      "UUID": "com.xuru.voip.action.toggle_spectrogram",
+      "Name": "Toggle Spectrogram",
+      "Icon": "icons/spectrogram_off",
+      "States": [
+        {
+          "Image": "icons/spectrogram_off",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/spectrogram_on",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle Visor HUD Spectrogram Visualizer"
     }
   ]
 }

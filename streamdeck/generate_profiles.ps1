@@ -201,6 +201,8 @@ function Get-XLBase($rolePilot, $roleInfantry) {
     $keys["13"] = @{ UUID = "com.xuru.voip.action.hail_accept"; Settings = @{ port = $port } }
     $keys["14"] = @{ UUID = "com.xuru.voip.action.hail_decline"; Settings = @{ port = $port } }
     $keys["15"] = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
+    $keys["16"] = @{ UUID = "com.xuru.voip.action.toggle_hrtf"; Settings = @{ port = $port } }
+    $keys["17"] = @{ UUID = "com.xuru.voip.action.toggle_spectrogram"; Settings = @{ port = $port } }
     
     return $keys
 }
