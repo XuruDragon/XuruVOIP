@@ -539,7 +539,14 @@ dotnet run
 
 由于安装程序和可执行文件没有经过数字签名，Windows SmartScreen 最初可能会阻止它们。您可以使用属性菜单轻松解锁它们。
 
-* **选项 A：MSI 安装程序（推荐）**
+* **选项 A：Windows 程序包管理器 (winget) - (推荐)**
+  1. 打开终端（PowerShell 或命令提示符）。
+  2. 运行以下命令安装客户端：
+     ```powershell
+     winget install XuruDragon.XuruVOIPClient
+     ```
+
+* **选项 B：MSI 安装程序**
   1. 从 [发布页面](https://github.com/XuruDragon/XuruVOIP/releases) 下载 `XuruVoipClient-win-x64.msi`。
   2. 要防止 Windows SmartScreen 阻止安装：
      - 右键单击下载的“XuruVoipClient-win-x64.msi”文件，然后选择“**属性**”。
@@ -548,7 +555,7 @@ dotnet run
   3. 双击该文件运行安装程序并按照提示进行操作。
      *（注意：您将看到标准的 Windows 用户帐户控制“未知发布者”提示；只需单击 **是** 或 **运行** 即可继续。）*
 
-* **选项 B：便携式 ZIP 版本**
+* **选项 C：便携式 ZIP 版本**
   1. 从 [发布页面](https://github.com/XuruDragon/XuruVOIP/releases) 下载 `XuruVoipClient-win-x64.zip`。
   2. 将 ZIP 包中的文件解压到您选择的任何文件夹（例如“C:\Games\XuruVoip”）：
   3. 然后右键单击解压的“XuruVoipClient.exe”文件并选择“**属性**”。

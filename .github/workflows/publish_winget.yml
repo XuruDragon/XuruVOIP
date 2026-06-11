@@ -1,0 +1,84 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Release Assets
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+          architecture: x64
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v3
+        with:
+          msbuild-architecture: x64
+
+      - name: Determine Version
+        id: get_version
+        run: |
+          $version = "${{ github.event.release.tag_name }}" -replace '^v',''
+          if ($version -notmatch '^\d+\.\d+\.\d+\.\d+$') {
+              if ($version -match '^\d+\.\d+\.\d+$') {
+                  $version = "$version.0"
+              } else {
+                  $version = "1.0.0.0"
+              }
+          }
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Restore Solution
+        run: |
+          dotnet restore client/XuruVoipClient.sln
+        shell: pwsh
+
+      - name: Publish Client
+        run: |
+          dotnet publish client/XuruVoipClient.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=false -p:Version="${{ steps.get_version.outputs.VERSION }}" -o client/publish
+        shell: pwsh
+
+      - name: Package Portable Client (ZIP)
+        run: |
+          Compress-Archive -Path client/publish/* -DestinationPath client/XuruVoipClient-win-x64.zip
+        shell: pwsh
+
+      - name: Build MSI Installer
+        run: |
+          candle -dPlatform=x64 -dSourceDir="client/publish" -dVersion="${{ steps.get_version.outputs.VERSION }}" client/setup.wxs -out client/setup.wixobj
+          light client/setup.wixobj -out client/XuruVoipClient-win-x64.msi
+        shell: pwsh
+
+      - name: Organize Release Binaries
+        run: |
+          New-Item -ItemType Directory -Force -Path release-binaries
+          if (Test-Path "client/XuruVoipClient-win-x64.msi") {
+              Copy-Item "client/XuruVoipClient-win-x64.msi" -Destination release-binaries/XuruVoipClient-win-x64.msi
+          }
+          if (Test-Path "client/XuruVoipClient-win-x64.zip") {
+              Copy-Item "client/XuruVoipClient-win-x64.zip" -Destination release-binaries/XuruVoipClient-win-x64.zip
+          }
+        shell: pwsh
+
+      - name: Publish to WinGet
+        if: ${{ vars.PUBLISH_TO_WINGET != 'false' }}
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: XuruDragon.XuruVOIPClient # Your app package ID in winget format
+          installers-regex: '\.msi$' # Matches the .msi file built during release
+          token: ${{ secrets.GH_TOKEN }}
+          max-versions-to-keep: 5
+

@@ -539,7 +539,14 @@ dotnet run
 
 インストーラーと実行可能ファイルはデジタル署名されていないため、Windows SmartScreen によって最初はブロックされる場合があります。プロパティ メニューを使用して簡単にブロックを解除できます。
 
-* **オプション A: MSI インストーラー (推奨)**
+* **オプション A: Windows パッケージ マネージャー (winget) - (推奨)**
+  1. ターミナル (PowerShell またはコマンド プロンプト) を開きます。
+  2. 次のコマンドを実行してクライアントをインストールします。
+     ```powershell
+     winget install XuruDragon.XuruVOIPClient
+     ```
+
+* **オプション B: MSI インストーラー**
   1. [リリース ページ](https://github.com/XuruDragon/XuruVOIP/releases) から `XuruVoipClient-win-x64.msi` をダウンロードします。
   2. Windows SmartScreen がインストールをブロックしないようにするには、次の手順を実行します。
      - ダウンロードした「XuruVoipClient-win-x64.msi」ファイルを右クリックし、**プロパティ**を選択します。
@@ -548,7 +555,7 @@ dotnet run
   3. ファイルをダブルクリックしてインストーラーを実行し、プロンプトの指示に従います。
      *(注: 標準の Windows ユーザー アカウント制御の「不明な発行者」プロンプトが表示されます。続行するには、**はい** または **実行** をクリックしてください。)*
 
-* **オプション B: ポータブル ZIP バージョン**
+* **オプション C: ポータブル ZIP バージョン**
   1. [リリース ページ](https://github.com/XuruDragon/XuruVOIP/releases) から `XuruVoipClient-win-x64.zip` をダウンロードします。
   2. ZIP パッケージ内のファイルを任意のフォルダー (例: `C:\Games\XuruVoip`) に抽出します。
   3. 次に、抽出した「XuruVoipClient.exe」ファイルを右クリックし、**プロパティ**を選択します。

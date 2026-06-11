@@ -539,7 +539,14 @@ dotnet run
 
 Da das Installationsprogramm und die ausführbaren Dateien nicht digital signiert sind, werden sie möglicherweise zunächst von Windows SmartScreen blockiert. Sie können sie ganz einfach über das Eigenschaftenmenü entsperren.
 
-* **Option A: MSI-Installer (empfohlen)**
+* **Option A: Windows Package Manager (winget) - (Empfohlen)**
+  1. Öffnen Sie ein Terminal (PowerShell oder Eingabeaufforderung).
+  2. Führen Sie den folgenden Befehl aus, um den Client zu installieren:
+     ```powershell
+     winget install XuruDragon.XuruVOIPClient
+     ```
+
+* **Option B: MSI-Installer**
   1. Laden Sie „XuruVoipClient-win-x64.msi“ von der [Release-Seite](https://github.com/XuruDragon/XuruVOIP/releases) herunter.
   2. Um zu verhindern, dass Windows SmartScreen die Installation blockiert:
      - Klicken Sie mit der rechten Maustaste auf die heruntergeladene Datei „XuruVoipClient-win-x64.msi“ und wählen Sie **Eigenschaften**.
@@ -548,7 +555,7 @@ Da das Installationsprogramm und die ausführbaren Dateien nicht digital signier
   3. Doppelklicken Sie auf die Datei, um das Installationsprogramm auszuführen, und befolgen Sie die Anweisungen der Eingabeaufforderung.
      *(Hinweis: Es wird die Standardaufforderung „Unbekannter Herausgeber“ der Windows-Benutzerkontensteuerung angezeigt; klicken Sie einfach auf **Ja** oder **Ausführen**, um fortzufahren.)*
 
-* **Option B: Portable ZIP-Version**
+* **Option C: Portable ZIP-Version**
   1. Laden Sie „XuruVoipClient-win-x64.zip“ von der [Release-Seite](https://github.com/XuruDragon/XuruVOIP/releases) herunter.
   2. Extrahieren Sie die Dateien im ZIP-Paket in einen beliebigen Ordner Ihrer Wahl (z. B. „C:\Games\XuruVoip“):
   3. Klicken Sie dann mit der rechten Maustaste auf die extrahierte Datei „XuruVoipClient.exe“ und wählen Sie **Eigenschaften**.

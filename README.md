@@ -580,7 +580,14 @@ dotnet run
 
 Since the installer and executables are not digitally signed, Windows SmartScreen may block them initially. You can easily unblock them using the properties menu.
 
-* **Option A: MSI Installer (Recommended)**
+* **Option A: Windows Package Manager (winget) - (Recommended)**
+  1. Open a terminal (PowerShell or Command Prompt).
+  2. Run the following command to install the client:
+     ```powershell
+     winget install XuruDragon.XuruVOIPClient
+     ```
+
+* **Option B: MSI Installer**
   1. Download `XuruVoipClient-win-x64.msi` from the [releases page](https://github.com/XuruDragon/XuruVOIP/releases).
   2. To prevent Windows SmartScreen from blocking the installation:
      - Right-click the downloaded `XuruVoipClient-win-x64.msi` file and select **Properties**.
@@ -589,7 +596,7 @@ Since the installer and executables are not digitally signed, Windows SmartScree
   3. Double-click the file to run the installer and follow the prompt instructions.
      *(Note: You will see a standard Windows User Account Control "Unknown Publisher" prompt; simply click **Yes** or **Run** to proceed.)*
 
-* **Option B: Portable ZIP Version**
+* **Option C: Portable ZIP Version**
   1. Download `XuruVoipClient-win-x64.zip` from the [releases page](https://github.com/XuruDragon/XuruVOIP/releases).
   2. Extract the files in the ZIP package to any folder of your choice (e.g., `C:\Games\XuruVoip`):
   3. Then right-click the extracted `XuruVoipClient.exe` file and select **Properties**.
