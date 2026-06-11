@@ -62,6 +62,14 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     // ─── Observable state ────────────────────────────────────────────────────
     private readonly Dictionary<string, bool> _remoteHelmets = [];
     private readonly Dictionary<string, PlayerPosition> _remotePositions = [];
+    private readonly Dictionary<string, string> _remoteLanguages = [];
+    public Dictionary<string, string> RemoteLanguages => _remoteLanguages;
+
+    private HailState _hailState = HailState.Idle;
+    public HailState CurrentHailState { get => _hailState; set => Set(ref _hailState, value); }
+
+    private string _hailPeerName = "";
+    public string HailPeerName { get => _hailPeerName; set => Set(ref _hailPeerName, value); }
     private readonly Dictionary<string, string> _remoteChannels = [];
     private readonly Dictionary<string, bool> _remoteRepeaters = [];
     private bool _wasRadioTransmitting = false;
@@ -313,6 +321,18 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                 _isPttPaDown = isDown;
                 UpdatePttState();
             }
+            else if (keyStr == cfg.InitiateHailKey && isDown)
+            {
+                InitiateHailCall();
+            }
+            else if (keyStr == cfg.AcceptHailKey && isDown)
+            {
+                AcceptHailCall();
+            }
+            else if (keyStr == cfg.DeclineHailKey && isDown)
+            {
+                DeclineHailCall();
+            }
             else if (keyStr == cfg.HelmetToggleKey && isDown)
             {
                 ToggleHelmet();
@@ -533,6 +553,11 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                             {
                                 _remoteRepeaters[name] = repEl.GetBoolean();
                             }
+
+                            if (player.TryGetProperty("language", out var langEl))
+                            {
+                                _remoteLanguages[name] = langEl.GetString() ?? "en";
+                            }
                         }
                     }
                 }
@@ -548,6 +573,10 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                         if (doc.RootElement.TryGetProperty("is_radio_repeater", out var repEl))
                         {
                             _remoteRepeaters[remoteName] = repEl.GetBoolean();
+                        }
+                        if (doc.RootElement.TryGetProperty("language", out var langEl))
+                        {
+                            _remoteLanguages[remoteName] = langEl.GetString() ?? "en";
                         }
                     }
                 }
@@ -610,7 +639,77 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                         _remotePositions.Remove(remoteName);
                         _remoteChannels.Remove(remoteName);
                         _remoteRepeaters.Remove(remoteName);
+                        _remoteLanguages.Remove(remoteName);
                         _playback.RemovePlayer(remoteName);
+                    }
+                }
+                else if (type == "hail_ringing")
+                {
+                    if (doc.RootElement.TryGetProperty("peer", out var peerEl))
+                    {
+                        string peer = peerEl.GetString() ?? "";
+                        CurrentHailState = HailState.Outgoing;
+                        HailPeerName = peer;
+                        StatusMessage = $"Hailing {peer}...";
+                        StartHailChimeLoop(HailState.Outgoing);
+                    }
+                }
+                else if (type == "hail_incoming")
+                {
+                    if (doc.RootElement.TryGetProperty("peer", out var peerEl))
+                    {
+                        string peer = peerEl.GetString() ?? "";
+                        CurrentHailState = HailState.Incoming;
+                        HailPeerName = peer;
+                        StatusMessage = $"Incoming hail from {peer}";
+                        StartHailChimeLoop(HailState.Incoming);
+                    }
+                }
+                else if (type == "hail_connected")
+                {
+                    if (doc.RootElement.TryGetProperty("peer", out var peerEl))
+                    {
+                        string peer = peerEl.GetString() ?? "";
+                        CurrentHailState = HailState.Connected;
+                        HailPeerName = peer;
+                        StatusMessage = $"Hail connected to {peer}";
+                        StopHailChimeLoop();
+                        _playback.PlayHailConnectedFeedback();
+                    }
+                }
+                else if (type == "hail_disconnected")
+                {
+                    var prev = CurrentHailState;
+                    CurrentHailState = HailState.Idle;
+                    HailPeerName = "";
+                    StatusMessage = "Hail disconnected.";
+                    StopHailChimeLoop();
+                    if (prev != HailState.Idle)
+                    {
+                        _playback.PlayHailDisconnectedFeedback();
+                    }
+                }
+                else if (type == "hail_error")
+                {
+                    if (doc.RootElement.TryGetProperty("reason", out var reasonEl))
+                    {
+                        string reason = reasonEl.GetString() ?? "";
+                        string friendlyReason = reason switch
+                        {
+                            "target_offline" => "Target player is offline.",
+                            "out_of_range" => "Target is out of hailing range (5,000m).",
+                            "busy" => "Target line is busy.",
+                            _ => $"Call failed: {reason}"
+                        };
+                        StatusMessage = friendlyReason;
+                    }
+                    var prev = CurrentHailState;
+                    CurrentHailState = HailState.Idle;
+                    HailPeerName = "";
+                    StopHailChimeLoop();
+                    if (prev != HailState.Idle)
+                    {
+                        _playback.PlayHailDisconnectedFeedback();
                     }
                 }
                 else if (type == "player_channel")
@@ -707,9 +806,30 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 
         _playback.SttAudioChunkReady += (name, samples, type) =>
         {
-            if (Config.Config.EnableStt)
+            bool wantsStt = Config.Config.EnableStt;
+            bool wantsTranslation = Config.Config.EnableTranslationSubtitles;
+
+            if (wantsStt || wantsTranslation)
             {
-                _stt.QueueTranscription(name, samples, type, Config.Config.Language);
+                _remoteLanguages.TryGetValue(name, out var remoteLang);
+                if (string.IsNullOrEmpty(remoteLang))
+                {
+                    remoteLang = "en";
+                }
+
+                string localLang = Config.Config.Language;
+                if (string.IsNullOrEmpty(localLang))
+                {
+                    localLang = "en";
+                }
+
+                // If translation is enabled and the remote speaker uses a different language,
+                // we must transcribe using their language so the audio is correctly interpreted before translation.
+                string transcriptionLang = (wantsTranslation && remoteLang.Split('-')[0].ToLowerInvariant() != localLang.Split('-')[0].ToLowerInvariant()) 
+                    ? remoteLang 
+                    : localLang;
+
+                _stt.QueueTranscription(name, samples, type, transcriptionLang);
             }
         };
 
@@ -1667,5 +1787,129 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         {
             ProcessVoiceCommand(text);
         }
+    }
+
+    private CancellationTokenSource? _hailChimeCts;
+
+    private void StartHailChimeLoop(HailState state)
+    {
+        _hailChimeCts?.Cancel();
+        _hailChimeCts = new CancellationTokenSource();
+        var ct = _hailChimeCts.Token;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                while (!ct.IsCancellationRequested)
+                {
+                    if (state == HailState.Outgoing && CurrentHailState == HailState.Outgoing)
+                    {
+                        _playback.PlayOutgoingHailFeedback();
+                        await Task.Delay(2000, ct);
+                    }
+                    else if (state == HailState.Incoming && CurrentHailState == HailState.Incoming)
+                    {
+                        _playback.PlayIncomingHailFeedback();
+                        await Task.Delay(1500, ct);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                LogService.Error("Error in HailChimeLoop", ex);
+            }
+        }, ct);
+    }
+
+    private void StopHailChimeLoop()
+    {
+        _hailChimeCts?.Cancel();
+        _hailChimeCts = null;
+    }
+
+    public async Task InitiateHailCallAsync()
+    {
+        if (!_posWs.IsConnected)
+        {
+            StatusMessage = "Cannot initiate call: Disconnected from position server.";
+            return;
+        }
+
+        if (CurrentHailState != HailState.Idle)
+        {
+            StatusMessage = "Cannot initiate call: Already in a calling state.";
+            return;
+        }
+
+        var localPos = LastSentPos;
+        if (localPos == null || localPos.IsEmpty)
+        {
+            StatusMessage = "Cannot initiate call: Your location is unknown.";
+            return;
+        }
+
+        string? closestPlayerName = null;
+        double minDistance = double.MaxValue;
+
+        foreach (var kvp in _remotePositions)
+        {
+            var remotePos = kvp.Value;
+            if (remotePos.Zone != localPos.Zone) continue;
+
+            double dx = remotePos.X - localPos.X;
+            double dy = remotePos.Y - localPos.Y;
+            double dz = remotePos.Z - localPos.Z;
+            double dist = Math.Sqrt(dx * dx + dy * dy + dz * dz);
+
+            if (dist <= 5000.0 && dist < minDistance)
+            {
+                minDistance = dist;
+                closestPlayerName = kvp.Key;
+            }
+        }
+
+        if (closestPlayerName == null)
+        {
+            StatusMessage = "No cockpit targets found within 5,000m.";
+            return;
+        }
+
+        StatusMessage = $"Initiating private calling link to {closestPlayerName}...";
+        await _posWs.SendHailRequestAsync(closestPlayerName);
+    }
+
+    public void InitiateHailCall()
+    {
+        _ = InitiateHailCallAsync();
+    }
+
+    public async Task AcceptHailCallAsync()
+    {
+        if (CurrentHailState != HailState.Incoming) return;
+        StatusMessage = "Accepting incoming call...";
+        await _posWs.SendHailAcceptAsync();
+    }
+
+    public void AcceptHailCall()
+    {
+        _ = AcceptHailCallAsync();
+    }
+
+    public async Task DeclineHailCallAsync()
+    {
+        if (CurrentHailState == HailState.Idle) return;
+        StatusMessage = "Ending call...";
+        await _posWs.SendHailDeclineAsync();
+    }
+
+    public void DeclineHailCall()
+    {
+        _ = DeclineHailCallAsync();
     }
 }

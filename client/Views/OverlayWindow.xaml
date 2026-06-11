@@ -125,6 +125,44 @@
             </Grid>
         </Border>
 
+        <!-- Ship-to-Ship Hailing HUD Panel (Top Center) -->
+        <Border x:Name="HailPanel"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Margin="0,20,0,0"
+                Padding="20,12"
+                CornerRadius="8"
+                Background="#E60E1116"
+                BorderThickness="2"
+                BorderBrush="#FFFF9800"
+                MinWidth="280"
+                Visibility="Collapsed">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="15" ShadowDepth="3" Opacity="0.5"/>
+            </Border.Effect>
+            <StackPanel Orientation="Vertical">
+                <TextBlock x:Name="TxtHailHeader"
+                           Text="SHIP-TO-SHIP HAILING"
+                           Foreground="#FFFF9800"
+                           FontWeight="Bold"
+                           FontSize="10"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,6"/>
+                <TextBlock x:Name="TxtHailStatus"
+                           Text="Incoming Call..."
+                           Foreground="#FFFFFFFF"
+                           FontWeight="SemiBold"
+                           FontSize="14"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,4"/>
+                <TextBlock x:Name="TxtHailAction"
+                           Text="Press [Key] to Accept / [Key] to Decline"
+                           Foreground="#FFB0B3B8"
+                           FontSize="10"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
         <!-- Real-time HUD Subtitles / Captions (Bottom Center) -->
         <ItemsControl x:Name="LstCaptions"
                       HorizontalAlignment="Center"

@@ -1100,3 +1100,134 @@ func TestShipIntercomLifecycle(t *testing.T) {
 		t.Error("Expected intercom channel to be deleted after cooldown execution")
 	}
 }
+
+// TestHailCallingLifecycle verifies the server-side state machine and range disconnect logic for Ship-to-Ship hailing.
+func TestHailCallingLifecycle(t *testing.T) {
+	testHub := Hub{
+		Players: make(map[string]*ActivePlayer),
+		Admins:  make(map[*websocket.Conn]*AdminSession),
+	}
+
+	// 1. Setup mock players
+	testHub.Players["Alice"] = &ActivePlayer{
+		Name: "Alice",
+		Pos: &Position{
+			X:    0.0,
+			Y:    0.0,
+			Z:    0.0,
+			Zone: "stanton",
+		},
+		HailState: HailStateIdle,
+	}
+
+	testHub.Players["Bob"] = &ActivePlayer{
+		Name: "Bob",
+		Pos: &Position{
+			X:    100.0,
+			Y:    0.0,
+			Z:    0.0,
+			Zone: "stanton",
+		},
+		HailState: HailStateIdle,
+	}
+
+	testHub.Players["Charlie"] = &ActivePlayer{
+		Name: "Charlie",
+		Pos: &Position{
+			X:    0.0,
+			Y:    0.0,
+			Z:    0.0,
+			Zone: "stanton",
+		},
+		HailState: HailStateIdle,
+	}
+
+	testHub.Players["David"] = &ActivePlayer{
+		Name: "David",
+		Pos: &Position{
+			X:    6000.0, // Out of range
+			Y:    0.0,
+			Z:    0.0,
+			Zone: "stanton",
+		},
+		HailState: HailStateIdle,
+	}
+
+	testHub.Players["Eve"] = &ActivePlayer{
+		Name: "Eve",
+		Pos: &Position{
+			X:    0.0,
+			Y:    0.0,
+			Z:    0.0,
+			Zone: "pyro", // Different zone
+		},
+		HailState: HailStateIdle,
+	}
+
+	// 2. Normal Request: Alice calls Bob
+	testHub.HandleHailRequest("Alice", "Bob")
+
+	if testHub.Players["Alice"].HailState != HailStateOutgoing || testHub.Players["Alice"].HailPeer != "Bob" {
+		t.Errorf("Expected Alice to be Outgoing to Bob, got state %d peer %s", testHub.Players["Alice"].HailState, testHub.Players["Alice"].HailPeer)
+	}
+	if testHub.Players["Bob"].HailState != HailStateIncoming || testHub.Players["Bob"].HailPeer != "Alice" {
+		t.Errorf("Expected Bob to be Incoming from Alice, got state %d peer %s", testHub.Players["Bob"].HailState, testHub.Players["Bob"].HailPeer)
+	}
+
+	// 3. Busy check: Charlie tries to call Bob (who is already in Incoming call with Alice)
+	testHub.HandleHailRequest("Charlie", "Bob")
+	if testHub.Players["Charlie"].HailState != HailStateIdle {
+		t.Errorf("Expected Charlie to remain Idle, got state %d", testHub.Players["Charlie"].HailState)
+	}
+
+	// 4. Out of range check: David tries to call Alice
+	testHub.HandleHailRequest("David", "Alice")
+	if testHub.Players["David"].HailState != HailStateIdle {
+		t.Errorf("Expected David to remain Idle, got state %d", testHub.Players["David"].HailState)
+	}
+
+	// 5. Zone mismatch check: Eve tries to call Alice
+	testHub.HandleHailRequest("Eve", "Alice")
+	if testHub.Players["Eve"].HailState != HailStateIdle {
+		t.Errorf("Expected Eve to remain Idle, got state %d", testHub.Players["Eve"].HailState)
+	}
+
+	// 6. Target accepts call: Bob accepts Alice's call
+	testHub.HandleHailAccept("Bob")
+	if testHub.Players["Alice"].HailState != HailStateConnected || testHub.Players["Alice"].HailPeer != "Bob" {
+		t.Errorf("Expected Alice to be Connected to Bob, got state %d peer %s", testHub.Players["Alice"].HailState, testHub.Players["Alice"].HailPeer)
+	}
+	if testHub.Players["Bob"].HailState != HailStateConnected || testHub.Players["Bob"].HailPeer != "Alice" {
+		t.Errorf("Expected Bob to be Connected to Alice, got state %d peer %s", testHub.Players["Bob"].HailState, testHub.Players["Bob"].HailPeer)
+	}
+
+	// 7. Distance check - out of range disconnect: Alice moves > 5000m away
+	testHub.UpdatePosition("Alice", Position{
+		X:    6000.0,
+		Y:    0.0,
+		Z:    0.0,
+		Zone: "stanton",
+	})
+	if testHub.Players["Alice"].HailState != HailStateIdle || testHub.Players["Alice"].HailPeer != "" {
+		t.Errorf("Expected Alice to be disconnected after moving out of range, got state %d peer %s", testHub.Players["Alice"].HailState, testHub.Players["Alice"].HailPeer)
+	}
+	if testHub.Players["Bob"].HailState != HailStateIdle || testHub.Players["Bob"].HailPeer != "" {
+		t.Errorf("Expected Bob to be disconnected after Alice moved out of range, got state %d peer %s", testHub.Players["Bob"].HailState, testHub.Players["Bob"].HailPeer)
+	}
+
+	// 8. Decline / End Call check: Alice calls Bob again, then Bob declines
+	testHub.Players["Alice"].Pos.X = 0.0 // Move back within range
+	testHub.HandleHailRequest("Alice", "Bob")
+	if testHub.Players["Alice"].HailState != HailStateOutgoing || testHub.Players["Bob"].HailState != HailStateIncoming {
+		t.Fatalf("Failed to reset call setup: Alice=%d, Bob=%d", testHub.Players["Alice"].HailState, testHub.Players["Bob"].HailState)
+	}
+
+	testHub.HandleHailDecline("Bob")
+	if testHub.Players["Alice"].HailState != HailStateIdle || testHub.Players["Alice"].HailPeer != "" {
+		t.Errorf("Expected Alice to be Idle after decline, got state %d peer %s", testHub.Players["Alice"].HailState, testHub.Players["Alice"].HailPeer)
+	}
+	if testHub.Players["Bob"].HailState != HailStateIdle || testHub.Players["Bob"].HailPeer != "" {
+		t.Errorf("Expected Bob to be Idle after decline, got state %d peer %s", testHub.Players["Bob"].HailState, testHub.Players["Bob"].HailPeer)
+	}
+}
+

@@ -6,6 +6,7 @@ const (
 	AudioTypeRadio     byte = 0x01
 	AudioTypeProfile   byte = 0x02
 	AudioTypePA        byte = 0x03
+	AudioTypeHail      byte = 0x04
 )
 
 // Position represents a player's 3D coordinates and zone
@@ -35,6 +36,7 @@ type MsgJoin struct {
 	Channel     string `json:"channel,omitempty"`
 	AudioTicket string `json:"audio_ticket,omitempty"` // Used by the audio server
 	Hwid        string `json:"hwid,omitempty"`
+	Language    string `json:"language,omitempty"`
 }
 
 // MsgPos represents the position message sent by the client
@@ -99,6 +101,7 @@ type PlayerState struct {
 	ScOnline          bool      `json:"sc_online"`
 	IsTalking         bool      `json:"is_talking"`
 	IsRadioRepeater   bool      `json:"is_radio_repeater"`
+	Language          string    `json:"language"`
 }
 
 type MsgPlayerTalking struct {
@@ -130,6 +133,7 @@ type MsgPlayerJoin struct {
 	Profile           string   `json:"profile"`
 	ProxShort         bool     `json:"prox_short"`
 	IsRadioRepeater   bool     `json:"is_radio_repeater"`
+	Language          string   `json:"language"`
 }
 
 // MsgPlayerPos broadcasts an updated player position
@@ -292,4 +296,48 @@ type BannedHwidInfo struct {
 type MsgAdminRefresh struct {
 	Type string `json:"type"`
 	Tab  string `json:"tab"`
+}
+
+// Calling State Constants
+const (
+	HailStateIdle      = 0
+	HailStateOutgoing  = 1
+	HailStateIncoming  = 2
+	HailStateConnected = 3
+)
+
+// MsgHailRequest represents a request to call another player
+type MsgHailRequest struct {
+	Type   string `json:"type"`
+	Target string `json:"target"`
+}
+
+// MsgHailIncoming represents an incoming call notification
+type MsgHailIncoming struct {
+	Type string `json:"type"`
+	Peer string `json:"peer"`
+}
+
+// MsgHailRinging represents an outgoing ringing notification
+type MsgHailRinging struct {
+	Type string `json:"type"`
+	Peer string `json:"peer"`
+}
+
+// MsgHailConnected represents a connected call notification
+type MsgHailConnected struct {
+	Type string `json:"type"`
+	Peer string `json:"peer"`
+}
+
+// MsgHailDisconnected represents a disconnected call notification
+type MsgHailDisconnected struct {
+	Type   string `json:"type"`
+	Reason string `json:"reason"`
+}
+
+// MsgHailError represents a calling error
+type MsgHailError struct {
+	Type   string `json:"type"`
+	Reason string `json:"reason"`
 }

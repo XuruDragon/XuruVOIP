@@ -33,12 +33,20 @@ public class AudioPlaybackService : IDisposable
     private static readonly float[] KeyDownChime;
     private static readonly float[] KeyUpChime;
     private static readonly float[] PaKlaxonChime;
+    private static readonly float[] OutgoingHailChime;
+    private static readonly float[] IncomingHailChime;
+    private static readonly float[] HailConnectedChime;
+    private static readonly float[] HailDisconnectedChime;
 
     static AudioPlaybackService()
     {
         KeyDownChime = GenerateKeyDownChime();
         KeyUpChime = GenerateKeyUpChime();
         PaKlaxonChime = GeneratePaKlaxonChime();
+        OutgoingHailChime = GenerateOutgoingHailChime();
+        IncomingHailChime = GenerateIncomingHailChime();
+        HailConnectedChime = GenerateHailConnectedChime();
+        HailDisconnectedChime = GenerateHailDisconnectedChime();
     }
 
     public bool ProximityMuted { get; set; } = false;
@@ -723,7 +731,7 @@ public class AudioPlaybackService : IDisposable
             foreach (var kvp in _tracks)
             {
                 if (kvp.Key == "__local_chime") continue;
-                if (kvp.Value.IsTransmitting && (kvp.Value.LastAudioType == 0x01 || kvp.Value.LastAudioType == 0x02 || kvp.Value.LastAudioType == 0x03) && (DateTime.UtcNow - kvp.Value.LastReceivedTime).TotalMilliseconds < activeTimeoutMs)
+                if (kvp.Value.IsTransmitting && (kvp.Value.LastAudioType == 0x01 || kvp.Value.LastAudioType == 0x02 || kvp.Value.LastAudioType == 0x03 || kvp.Value.LastAudioType == 0x04) && (DateTime.UtcNow - kvp.Value.LastReceivedTime).TotalMilliseconds < activeTimeoutMs)
                 {
                     return true;
                 }
@@ -732,6 +740,178 @@ public class AudioPlaybackService : IDisposable
         return false;
     }
 
+    public void PlayOutgoingHailFeedback()
+    {
+        PlayerAudioTrack track;
+        lock (_lock)
+        {
+            if (!_tracks.TryGetValue("__local_chime", out track!))
+            {
+                track = CreateTrack("__local_chime");
+                _tracks["__local_chime"] = track;
+            }
+        }
+        track.Panning.Pan = 0f;
+        track.Volume.Volume = 0.5f;
+        WriteFloatBuffer(track.Buffer, OutgoingHailChime);
+    }
+
+    public void PlayIncomingHailFeedback()
+    {
+        PlayerAudioTrack track;
+        lock (_lock)
+        {
+            if (!_tracks.TryGetValue("__local_chime", out track!))
+            {
+                track = CreateTrack("__local_chime");
+                _tracks["__local_chime"] = track;
+            }
+        }
+        track.Panning.Pan = 0f;
+        track.Volume.Volume = 0.5f;
+        WriteFloatBuffer(track.Buffer, IncomingHailChime);
+    }
+
+    public void PlayHailConnectedFeedback()
+    {
+        PlayerAudioTrack track;
+        lock (_lock)
+        {
+            if (!_tracks.TryGetValue("__local_chime", out track!))
+            {
+                track = CreateTrack("__local_chime");
+                _tracks["__local_chime"] = track;
+            }
+        }
+        track.Panning.Pan = 0f;
+        track.Volume.Volume = 0.5f;
+        WriteFloatBuffer(track.Buffer, HailConnectedChime);
+    }
+
+    public void PlayHailDisconnectedFeedback()
+    {
+        PlayerAudioTrack track;
+        lock (_lock)
+        {
+            if (!_tracks.TryGetValue("__local_chime", out track!))
+            {
+                track = CreateTrack("__local_chime");
+                _tracks["__local_chime"] = track;
+            }
+        }
+        track.Panning.Pan = 0f;
+        track.Volume.Volume = 0.5f;
+        WriteFloatBuffer(track.Buffer, HailDisconnectedChime);
+    }
+
+    private static float[] GenerateOutgoingHailChime()
+    {
+        int samples = 48000 * 600 / 1000;
+        float[] buffer = new float[samples];
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / 48000.0;
+            float sample = (float)(Math.Sin(2 * Math.PI * 440.0 * t) + Math.Sin(2 * Math.PI * 480.0 * t)) * 0.5f;
+            float env = 1.0f;
+            if (i < 960) env = i / 960.0f;
+            else if (i > samples - 2400) env = (samples - i) / 2400.0f;
+            buffer[i] = sample * env * 0.2f;
+        }
+        return buffer;
+    }
+
+    private static float[] GenerateIncomingHailChime()
+    {
+        int samples = 48000 * 400 / 1000;
+        float[] buffer = new float[samples];
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / 48000.0;
+            float sample = 0f;
+            if (i < 7200)
+            {
+                sample = (float)(Math.Sin(2 * Math.PI * 880.0 * t) + Math.Sin(2 * Math.PI * 980.0 * t)) * 0.5f;
+                float env = 1.0f;
+                if (i < 480) env = i / 480.0f;
+                else if (i > 6720) env = (7200 - i) / 480.0f;
+                sample *= env;
+            }
+            else if (i >= 12000)
+            {
+                double t2 = (double)(i - 12000) / 48000.0;
+                sample = (float)(Math.Sin(2 * Math.PI * 880.0 * t2) + Math.Sin(2 * Math.PI * 980.0 * t2)) * 0.5f;
+                float env = 1.0f;
+                int elapsed = i - 12000;
+                if (elapsed < 480) env = elapsed / 480.0f;
+                else if (i > samples - 480) env = (samples - i) / 480.0f;
+                sample *= env;
+            }
+            buffer[i] = sample * 0.2f;
+        }
+        return buffer;
+    }
+
+    private static float[] GenerateHailConnectedChime()
+    {
+        int samples = 48000 * 200 / 1000;
+        float[] buffer = new float[samples];
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / 48000.0;
+            float sample;
+            if (i < 4800)
+            {
+                sample = (float)Math.Sin(2 * Math.PI * 523.25 * t);
+                float env = 1.0f;
+                if (i < 240) env = i / 240.0f;
+                else if (i > 4560) env = (4800 - i) / 240.0f;
+                sample *= env;
+            }
+            else
+            {
+                double t2 = (double)(i - 4800) / 48000.0;
+                sample = (float)Math.Sin(2 * Math.PI * 659.25 * t2);
+                float env = 1.0f;
+                int elapsed = i - 4800;
+                if (elapsed < 240) env = elapsed / 240.0f;
+                else if (i > samples - 240) env = (samples - i) / 240.0f;
+                sample *= env;
+            }
+            buffer[i] = sample * 0.2f;
+        }
+        return buffer;
+    }
+
+    private static float[] GenerateHailDisconnectedChime()
+    {
+        int samples = 48000 * 300 / 1000;
+        float[] buffer = new float[samples];
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / 48000.0;
+            float sample;
+            if (i < 7200)
+            {
+                sample = (float)Math.Sin(2 * Math.PI * 392.00 * t);
+                float env = 1.0f;
+                if (i < 240) env = i / 240.0f;
+                else if (i > 6960) env = (7200 - i) / 240.0f;
+                sample *= env;
+            }
+            else
+            {
+                double t2 = (double)(i - 7200) / 48000.0;
+                sample = (float)Math.Sin(2 * Math.PI * 311.13 * t2);
+                float env = 1.0f;
+                int elapsed = i - 7200;
+                if (elapsed < 240) env = elapsed / 240.0f;
+                else if (i > samples - 240) env = (samples - i) / 240.0f;
+                sample *= env;
+            }
+            buffer[i] = sample * 0.2f;
+        }
+        return buffer;
+    }
     private sealed class PlayerAudioTrack(
         string playerName,
         IOpusDecoder decoder,
@@ -907,4 +1087,5 @@ internal class JitterBuffer
             return CompareSequenceNumbers(x, y);
         }
     }
+
 }

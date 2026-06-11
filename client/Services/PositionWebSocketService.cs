@@ -17,7 +17,8 @@ file record MsgJoin(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("token")] string Token,
     [property: JsonPropertyName("password")] string Password,
-    [property: JsonPropertyName("hwid")] string Hwid);
+    [property: JsonPropertyName("hwid")] string Hwid,
+    [property: JsonPropertyName("language")] string Language);
 
 file record MsgPos(
     [property: JsonPropertyName("type")] string Type,
@@ -85,7 +86,7 @@ public class PositionWebSocketService : IAsyncDisposable
             LogService.Info("WebSocket connected to Position Server. Sending join authentication frame...");
 
             // Send join message
-            var join = new MsgJoin("join", config.Username, config.ServerPassword, config.UserPassword, config.Hwid);
+            var join = new MsgJoin("join", config.Username, config.ServerPassword, config.UserPassword, config.Hwid, config.Language);
             await SendJsonAsync(join);
 
             // Wait for welcome (with audio_ticket) — timeout 5s
@@ -151,6 +152,27 @@ public class PositionWebSocketService : IAsyncDisposable
         if (!IsConnected) return;
         LogService.Info($"Sending toggle repeater status: active={active}");
         await SendJsonAsync(new { type = "toggle_repeater", active = active });
+    }
+
+    public async Task SendHailRequestAsync(string target)
+    {
+        if (!IsConnected) return;
+        LogService.Info($"Sending hail request to target: {target}");
+        await SendJsonAsync(new { type = "hail_request", target = target });
+    }
+
+    public async Task SendHailAcceptAsync()
+    {
+        if (!IsConnected) return;
+        LogService.Info("Sending hail accept message");
+        await SendJsonAsync(new { type = "hail_accept" });
+    }
+
+    public async Task SendHailDeclineAsync()
+    {
+        if (!IsConnected) return;
+        LogService.Info("Sending hail decline/end message");
+        await SendJsonAsync(new { type = "hail_decline" });
     }
 
     public void Disconnect()

@@ -200,4 +200,10 @@
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS ESCUCHANDO...</sys:String>
     <sys:String x:Key="TxtVoiceSuccess">✔️ CMD: {0}</sys:String>
     <sys:String x:Key="TxtVoiceError">❌ CMD NO RECONOCIDO</sys:String>
+
+    <!-- Hailing & Translation Subtitles -->
+    <sys:String x:Key="LblInitiateHail">Tecla de iniciar llamada</sys:String>
+    <sys:String x:Key="LblAcceptHail">Tecla de aceptar llamada</sys:String>
+    <sys:String x:Key="LblDeclineHail">Tecla de rechazar/terminar llamada</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">Activar traducción de subtítulos en tiempo real en HUD de visor</sys:String>
 </ResourceDictionary>

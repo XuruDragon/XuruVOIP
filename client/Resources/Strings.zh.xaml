@@ -200,4 +200,10 @@
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 正在聆听...</sys:String>
     <sys:String x:Key="TxtVoiceSuccess">✔️ 命令: {0}</sys:String>
     <sys:String x:Key="TxtVoiceError">❌ 未识别语音命令</sys:String>
+
+    <!-- Hailing & Translation Subtitles -->
+    <sys:String x:Key="LblInitiateHail">发起呼叫快捷键</sys:String>
+    <sys:String x:Key="LblAcceptHail">接受呼叫快捷键</sys:String>
+    <sys:String x:Key="LblDeclineHail">拒绝/结束呼叫快捷键</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">启用面罩HUD实时翻译字幕</sys:String>
 </ResourceDictionary>

@@ -174,4 +174,35 @@ public class HotkeyTests
         vm.MicProximityMuted = true;
         Assert.Contains("Proximity VAD (Muted)", vm.MicModeText);
     }
+
+    [StaFact]
+    public async Task Hotkey_HailingActions_ShouldTriggerHailingFlows()
+    {
+        // GIVEN
+        await using var vm = new MainViewModel();
+        vm.Config.Config.InitiateHailKey = "I";
+        vm.Config.Config.AcceptHailKey = "O";
+        vm.Config.Config.DeclineHailKey = "X";
+
+        // WHEN we press Initiate key (disconnected state)
+        vm.KeyHook.SimulateKeyEvent(Key.I, true);
+
+        // THEN it should update the status message
+        Assert.Contains("Cannot initiate call", vm.StatusMessage);
+
+        // WHEN we press Accept key (idle state - should be ignored)
+        vm.StatusMessage = "Idle test";
+        vm.KeyHook.SimulateKeyEvent(Key.O, true);
+        Assert.Equal("Idle test", vm.StatusMessage);
+
+        // WHEN we simulate an incoming call and press Accept
+        vm.CurrentHailState = HailState.Incoming;
+        vm.KeyHook.SimulateKeyEvent(Key.O, true);
+        Assert.Equal("Accepting incoming call...", vm.StatusMessage);
+
+        // WHEN we are connected and press Decline
+        vm.CurrentHailState = HailState.Connected;
+        vm.KeyHook.SimulateKeyEvent(Key.X, true);
+        Assert.Equal("Ending call...", vm.StatusMessage);
+    }
 }

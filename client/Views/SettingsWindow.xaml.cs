@@ -231,6 +231,16 @@ public partial class SettingsWindow : Window
             VoiceCommandConfidenceLabel.Text = $"{Cfg.VoiceCommandConfidence:F2}";
         }
 
+        // Translation Subtitles settings
+        if (CbEnableTranslationSubtitles != null)
+        {
+            CbEnableTranslationSubtitles.IsChecked = Cfg.EnableTranslationSubtitles;
+        }
+        if (TranslationWarningPanel != null)
+        {
+            TranslationWarningPanel.Visibility = (Cfg.EnableTranslationSubtitles && _vm?.Stt != null && !_vm.Stt.IsModelReady) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         // OCR region display
         UpdateRegionDisplay();
     }
@@ -486,6 +496,22 @@ public partial class SettingsWindow : Window
         }
     }
 
+    private void TranslationSubtitles_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null) return;
+        bool enabled = CbEnableTranslationSubtitles.IsChecked == true;
+        Cfg.EnableTranslationSubtitles = enabled;
+        if (TranslationWarningPanel != null)
+        {
+            TranslationWarningPanel.Visibility = (enabled && _vm?.Stt != null && !_vm.Stt.IsModelReady) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        if (enabled && _vm?.Stt != null && !_vm.Stt.IsModelReady)
+        {
+            _ = _vm.Stt.EnsureModelDownloadedAsync();
+        }
+    }
+
     private void SlVoiceCommandConfidence_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (VoiceCommandConfidenceLabel != null) VoiceCommandConfidenceLabel.Text = $"{e.NewValue:F2}";
@@ -512,6 +538,10 @@ public partial class SettingsWindow : Window
             if (VoiceCommandWarningPanel != null)
             {
                 VoiceCommandWarningPanel.Visibility = Visibility.Collapsed;
+            }
+            if (TranslationWarningPanel != null)
+            {
+                TranslationWarningPanel.Visibility = Visibility.Collapsed;
             }
         });
     }

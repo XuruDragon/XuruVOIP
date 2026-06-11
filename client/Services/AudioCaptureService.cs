@@ -222,7 +222,22 @@ public class AudioCaptureService : IDisposable
         bool shouldTransmit = false;
         byte txType = _currentTxType;
 
-        if (txType == 0x00 && ProximityMuted)
+        if (App.ViewModel?.CurrentHailState == HailState.Connected)
+        {
+            txType = 0x04;
+            // Hands-free voice transmission using VAD to avoid sending continuous silence
+            var bytes = new byte[pcmFrame.Length * 2];
+            Buffer.BlockCopy(pcmFrame, 0, bytes, 0, bytes.Length);
+            try
+            {
+                shouldTransmit = _vad != null && _vad.HasSpeech(bytes, WebRtcVadSharp.SampleRate.Is48kHz, WebRtcVadSharp.FrameLength.Is20ms);
+            }
+            catch
+            {
+                shouldTransmit = true; // Fallback to open mic if VAD fails
+            }
+        }
+        else if (txType == 0x00 && ProximityMuted)
         {
             shouldTransmit = false;
         }
