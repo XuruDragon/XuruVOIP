@@ -79,6 +79,7 @@
 
     <!-- Einstellungen: Audio -->
     <sys:String x:Key="LblEnableSpatialAudio">3D-Raumklang aktivieren</sys:String>
+    <sys:String x:Key="LblEnableHrtf">HRTF Binaurales Rendering aktivieren (Kopfhörer)</sys:String>
     <sys:String x:Key="LblInputDevice">Eingangsgerät (Mikrofon)</sys:String>
     <sys:String x:Key="LblInputGain">Eingangsverstärkung: </sys:String>
     <sys:String x:Key="LblOutputDevice">Ausgangsgerät</sys:String>

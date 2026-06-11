@@ -1071,6 +1071,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         var cfg = Config.Config;
         LogService.Info($"StartAudio: Starting playback and capture devices. Mode={cfg.AudioMode}");
         _playback.EnableSpatialAudio = cfg.EnableSpatialAudio;
+        _playback.EnableHrtfBinaural = cfg.EnableHrtf;
         _playback.EnableRadioDegradation = cfg.EnableRadioDegradation;
         _playback.EnablePttChimes = cfg.EnablePttChimes;
         _playback.EnableEnvironmentalAcoustics = cfg.EnableEnvironmentalAcoustics;
@@ -1351,6 +1352,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         LogService.EnableGeneralLogs = Config.Config.EnableGeneralLogs;
         _gameDetector.CustomGameLogPath = Config.Config.CustomGameLogPath;
         _playback.EnableSpatialAudio = Config.Config.EnableSpatialAudio; // Sync spatial audio setting
+        _playback.EnableHrtfBinaural = Config.Config.EnableHrtf;
         _playback.EnableRadioDegradation = Config.Config.EnableRadioDegradation;
         _playback.EnablePttChimes = Config.Config.EnablePttChimes;
         _playback.EnableEnvironmentalAcoustics = Config.Config.EnableEnvironmentalAcoustics;

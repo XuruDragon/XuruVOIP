@@ -79,6 +79,7 @@
 
     <!-- Settings: Audio -->
     <sys:String x:Key="LblEnableSpatialAudio">Ativar áudio espacial 3D</sys:String>
+    <sys:String x:Key="LblEnableHrtf">Ativar renderização binaural HRTF (Fones de ouvido)</sys:String>
     <sys:String x:Key="LblInputDevice">Dispositivo de Entrada (Microfone)</sys:String>
     <sys:String x:Key="LblInputGain">Ganho de Entrada: </sys:String>
     <sys:String x:Key="LblOutputDevice">Dispositivo de Saída</sys:String>

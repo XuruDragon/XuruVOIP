@@ -79,6 +79,7 @@
 
     <!-- Settings: Audio -->
     <sys:String x:Key="LblEnableSpatialAudio">3D空間オーディオを有効にする</sys:String>
+    <sys:String x:Key="LblEnableHrtf">HRTFバイノーラルレンダリングを有効にする (ヘッドフォン)</sys:String>
     <sys:String x:Key="LblInputDevice">入力デバイス (マイク)</sys:String>
     <sys:String x:Key="LblInputGain">入力ゲイン: </sys:String>
     <sys:String x:Key="LblOutputDevice">出力デバイス</sys:String>

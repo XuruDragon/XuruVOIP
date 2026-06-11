@@ -79,6 +79,7 @@
 
     <!-- Settings: Audio -->
     <sys:String x:Key="LblEnableSpatialAudio">启用3D空间音频</sys:String>
+    <sys:String x:Key="LblEnableHrtf">启用 HRTF 双耳渲染 (耳机)</sys:String>
     <sys:String x:Key="LblInputDevice">输入设备 (麦克风)</sys:String>
     <sys:String x:Key="LblInputGain">输入增益: </sys:String>
     <sys:String x:Key="LblOutputDevice">输出设备</sys:String>

@@ -56,6 +56,7 @@ public class AppConfig
 
     // --- Spatial & Radio Effects ---
     public bool EnableSpatialAudio { get; set; } = true;
+    public bool EnableHrtf { get; set; } = false;
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
     public bool EnableEnvironmentalAcoustics { get; set; } = true;
