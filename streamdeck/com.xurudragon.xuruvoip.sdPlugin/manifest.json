@@ -4,15 +4,26 @@
   "Description": "Control mutes, active channel, and helmet state for XuruVOIP",
   "Name": "XuruVOIP Control",
   "Icon": "icons/pluginIcon",
-  "Version": "1.0.0",
+  "Version": "0.4.0.0",
   "Software": {
-    "MinimumVersion": "6.0"
+    "MinimumVersion": "7.0"
   },
-  "CodePath": "index.html",
-  "Category": "XuruVOIP",
+  "CodePath": "bin/plugin.js",
+  "Nodejs": {
+    "Version": "20"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "Category": "XuruVOIP Control",
+  "CategoryIcon": "icons/pluginIcon",
+  "UUID": "com.xurudragon.xuruvoip",
   "Actions": [
     {
-      "UUID": "com.xuru.voip.action.proximity_mute",
+      "UUID": "com.xurudragon.xuruvoip.action.proximity-mute",
       "Name": "Proximity Mute",
       "Icon": "icons/proximity_unmuted",
       "States": [
@@ -32,7 +43,7 @@
       "Tooltip": "Toggle proximity microphone mute"
     },
     {
-      "UUID": "com.xuru.voip.action.radio_mute",
+      "UUID": "com.xurudragon.xuruvoip.action.radio-mute",
       "Name": "Radio Mute",
       "Icon": "icons/radio_unmuted",
       "States": [
@@ -52,7 +63,7 @@
       "Tooltip": "Toggle radio microphone mute"
     },
     {
-      "UUID": "com.xuru.voip.action.profile_mute",
+      "UUID": "com.xurudragon.xuruvoip.action.profile-mute",
       "Name": "Profile Mute",
       "Icon": "icons/profile_unmuted",
       "States": [
@@ -72,7 +83,7 @@
       "Tooltip": "Toggle profile microphone mute"
     },
     {
-      "UUID": "com.xuru.voip.action.audio_proximity_mute",
+      "UUID": "com.xurudragon.xuruvoip.action.audio-proximity-mute",
       "Name": "Audio Proximity Mute",
       "Icon": "icons/audio_proximity_unmuted",
       "States": [
@@ -92,7 +103,7 @@
       "Tooltip": "Toggle hearing proximity mute"
     },
     {
-      "UUID": "com.xuru.voip.action.audio_radio_mute",
+      "UUID": "com.xurudragon.xuruvoip.action.audio-radio-mute",
       "Name": "Audio Radio Mute",
       "Icon": "icons/audio_radio_unmuted",
       "States": [
@@ -112,7 +123,7 @@
       "Tooltip": "Toggle hearing radio mute"
     },
     {
-      "UUID": "com.xuru.voip.action.audio_profile_mute",
+      "UUID": "com.xurudragon.xuruvoip.action.audio-profile-mute",
       "Name": "Audio Profile Mute",
       "Icon": "icons/audio_profile_unmuted",
       "States": [
@@ -132,7 +143,7 @@
       "Tooltip": "Toggle hearing profile mute"
     },
     {
-      "UUID": "com.xuru.voip.action.toggle_helmet",
+      "UUID": "com.xurudragon.xuruvoip.action.toggle-helmet",
       "Name": "Toggle Helmet",
       "Icon": "icons/helmet_up",
       "States": [
@@ -152,7 +163,7 @@
       "Tooltip": "Toggle helmet visor down/up"
     },
     {
-      "UUID": "com.xuru.voip.action.cycle_radio",
+      "UUID": "com.xurudragon.xuruvoip.action.cycle-radio",
       "Name": "Cycle Radio",
       "Icon": "icons/cycle_radio",
       "States": [
@@ -167,7 +178,7 @@
       "Tooltip": "Cycle through radio frequencies/channels"
     },
     {
-      "UUID": "com.xuru.voip.action.pa_broadcast",
+      "UUID": "com.xurudragon.xuruvoip.action.pa-broadcast",
       "Name": "PA Broadcast (PTT)",
       "Icon": "icons/pa_idle",
       "States": [
@@ -187,7 +198,7 @@
       "Tooltip": "Hold to broadcast on Ship Public Address (PA)"
     },
     {
-      "UUID": "com.xuru.voip.action.beacon_repeater",
+      "UUID": "com.xurudragon.xuruvoip.action.beacon-repeater",
       "Name": "Beacon Mode",
       "Icon": "icons/repeater_inactive",
       "States": [
@@ -207,7 +218,7 @@
       "Tooltip": "Toggle Radio Repeater / Beacon mode"
     },
     {
-      "UUID": "com.xuru.voip.action.voice_command",
+      "UUID": "com.xurudragon.xuruvoip.action.voice-command",
       "Name": "Voice Command Macro",
       "Icon": "icons/voice_ready",
       "States": [
@@ -227,7 +238,7 @@
       "Tooltip": "Trigger a custom voice command macro"
     },
     {
-      "UUID": "com.xuru.voip.action.intercom_status",
+      "UUID": "com.xurudragon.xuruvoip.action.intercom-status",
       "Name": "Intercom Status",
       "Icon": "icons/intercom_normal",
       "States": [
@@ -257,7 +268,7 @@
       "Tooltip": "Displays ship intercom state and cycles simulator when pressed"
     },
     {
-      "UUID": "com.xuru.voip.action.location_telemetry",
+      "UUID": "com.xurudragon.xuruvoip.action.location-telemetry",
       "Name": "Location Telemetry",
       "Icon": "icons/telemetry",
       "States": [
@@ -272,7 +283,7 @@
       "Tooltip": "Displays current system zone and coordinate telemetry"
     },
     {
-      "UUID": "com.xuru.voip.action.cycle_radio_dial",
+      "UUID": "com.xurudragon.xuruvoip.action.cycle-radio-dial",
       "Name": "Radio Channel Dial",
       "Icon": "icons/cycle_radio",
       "PropertyInspectorPath": "pi/pi.html",
@@ -288,17 +299,17 @@
       ],
       "Encoder": {
         "layout": "$X1",
-        "triggerDescription": {
-          "rotate": "Rotate to select radio channel",
-          "push": "Push to toggle radio mute",
-          "touch": "Tap to cycle channel"
+        "TriggerDescription": {
+          "Rotate": "Rotate to select radio channel",
+          "Push": "Push to toggle radio mute",
+          "Touch": "Tap to cycle channel"
         }
       },
       "SupportedInMultiActions": false,
       "Tooltip": "Rotate to cycle through radio channels, press to mute radio"
     },
     {
-      "UUID": "com.xuru.voip.action.adjust_exertion",
+      "UUID": "com.xurudragon.xuruvoip.action.adjust-exertion",
       "Name": "Adjust Exertion/G-Force",
       "Icon": "icons/telemetry",
       "PropertyInspectorPath": "pi/pi.html",
@@ -314,17 +325,17 @@
       ],
       "Encoder": {
         "layout": "$X1",
-        "triggerDescription": {
-          "rotate": "Rotate to adjust G-force/exertion",
-          "push": "Push to toggle distortion",
-          "touch": "Tap to toggle distortion"
+        "TriggerDescription": {
+          "Rotate": "Rotate to adjust G-force/exertion",
+          "Push": "Push to toggle distortion",
+          "Touch": "Tap to toggle distortion"
         }
       },
       "SupportedInMultiActions": false,
       "Tooltip": "Rotate to change mock G-Force or exertion values"
     },
     {
-      "UUID": "com.xuru.voip.action.voice_changer_dial",
+      "UUID": "com.xurudragon.xuruvoip.action.voice-changer-dial",
       "Name": "Voice Changer Dial",
       "Icon": "icons/profile_unmuted",
       "PropertyInspectorPath": "pi/pi.html",
@@ -340,17 +351,17 @@
       ],
       "Encoder": {
         "layout": "$X1",
-        "triggerDescription": {
-          "rotate": "Rotate to select voice changer profile",
-          "push": "Push to toggle voice changer",
-          "touch": "Tap to toggle voice changer"
+        "TriggerDescription": {
+          "Rotate": "Rotate to select voice changer profile",
+          "Push": "Push to toggle voice changer",
+          "Touch": "Tap to toggle voice changer"
         }
       },
       "SupportedInMultiActions": false,
       "Tooltip": "Rotate to change voice changer profiles, press to toggle"
     },
     {
-      "UUID": "com.xuru.voip.action.hail_initiate",
+      "UUID": "com.xurudragon.xuruvoip.action.hail-initiate",
       "Name": "Initiate Hail",
       "Icon": "icons/hail_initiate",
       "States": [
@@ -365,7 +376,7 @@
       "Tooltip": "Initiate a private calling link to the closest cockpit target"
     },
     {
-      "UUID": "com.xuru.voip.action.hail_accept",
+      "UUID": "com.xurudragon.xuruvoip.action.hail-accept",
       "Name": "Accept Hail",
       "Icon": "icons/hail_accept",
       "States": [
@@ -380,7 +391,7 @@
       "Tooltip": "Accept the incoming private hailing call"
     },
     {
-      "UUID": "com.xuru.voip.action.hail_decline",
+      "UUID": "com.xurudragon.xuruvoip.action.hail-decline",
       "Name": "Decline/End Hail",
       "Icon": "icons/hail_decline",
       "States": [
@@ -395,7 +406,7 @@
       "Tooltip": "Decline or end the private hailing call"
     },
     {
-      "UUID": "com.xuru.voip.action.toggle_translation",
+      "UUID": "com.xurudragon.xuruvoip.action.toggle-translation",
       "Name": "HUD Translation Subtitles",
       "Icon": "icons/translation_disabled",
       "States": [
@@ -415,7 +426,7 @@
       "Tooltip": "Toggle real-time HUD translation subtitles for foreign audio"
     },
     {
-      "UUID": "com.xuru.voip.action.toggle_hrtf",
+      "UUID": "com.xurudragon.xuruvoip.action.toggle-hrtf",
       "Name": "Toggle HRTF",
       "Icon": "icons/hrtf_off",
       "States": [
@@ -435,7 +446,7 @@
       "Tooltip": "Toggle Binaural HRTF Spatial Audio"
     },
     {
-      "UUID": "com.xuru.voip.action.toggle_spectrogram",
+      "UUID": "com.xurudragon.xuruvoip.action.toggle-spectrogram",
       "Name": "Toggle Spectrogram",
       "Icon": "icons/spectrogram_off",
       "States": [

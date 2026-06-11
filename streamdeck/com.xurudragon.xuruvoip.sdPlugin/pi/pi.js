@@ -20,7 +20,7 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo) 
         websocket.send(JSON.stringify(json));
         
         // Show command container if it is voice command action
-        if (actionName === "com.xuru.voip.action.voice_command") {
+        if (actionName === "com.xurudragon.xuruvoip.action.voice-command") {
             const container = document.getElementById("command-container");
             if (container) container.style.display = "flex";
         }

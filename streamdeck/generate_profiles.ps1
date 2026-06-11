@@ -91,28 +91,28 @@ function Write-ProfileManifest($device, $layout, $name, $deviceType, $keys) {
 
 # --- 1. STREAM DECK MINI (DeviceType: 1) ---
 $miniPilot = @{
-    "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    "1" = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    "2" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
-    "3" = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    "4" = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
-    "5" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
+    "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    "1" = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    "2" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-helmet"; Settings = @{ port = $port } }
+    "3" = @{ UUID = "com.xurudragon.xuruvoip.action.pa-broadcast"; Settings = @{ port = $port } }
+    "4" = @{ UUID = "com.xurudragon.xuruvoip.action.intercom-status"; Settings = @{ port = $port } }
+    "5" = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
 }
 $miniInfantry = @{
-    "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    "1" = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    "2" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
-    "3" = @{ UUID = "com.xuru.voip.action.cycle_radio"; Settings = @{ port = $port } }
-    "4" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "status report" } }
-    "5" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
+    "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    "1" = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    "2" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-helmet"; Settings = @{ port = $port } }
+    "3" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio"; Settings = @{ port = $port } }
+    "4" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "status report" } }
+    "5" = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
 }
 $miniCaptain = @{
-    "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    "1" = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    "2" = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    "3" = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
-    "4" = @{ UUID = "com.xuru.voip.action.cycle_radio"; Settings = @{ port = $port } }
-    "5" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
+    "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    "1" = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    "2" = @{ UUID = "com.xurudragon.xuruvoip.action.pa-broadcast"; Settings = @{ port = $port } }
+    "3" = @{ UUID = "com.xurudragon.xuruvoip.action.intercom-status"; Settings = @{ port = $port } }
+    "4" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio"; Settings = @{ port = $port } }
+    "5" = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
 }
 
 Write-ProfileManifest "mini" "pilot" "XuruVOIP Pilot - Mini" 1 $miniPilot
@@ -121,55 +121,55 @@ Write-ProfileManifest "mini" "captain" "XuruVOIP Captain - Mini" 1 $miniCaptain
 
 # --- 2. STREAM DECK CLASSIC (DeviceType: 0) ---
 $classicPilot = @{
-    "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    "1" = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    "2" = @{ UUID = "com.xuru.voip.action.profile_mute"; Settings = @{ port = $port } }
-    "3" = @{ UUID = "com.xuru.voip.action.cycle_radio"; Settings = @{ port = $port } }
-    "4" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
-    "5" = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    "6" = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
-    "7" = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
-    "8" = @{ UUID = "com.xuru.voip.action.hail_initiate"; Settings = @{ port = $port } }
-    "9" = @{ UUID = "com.xuru.voip.action.hail_accept"; Settings = @{ port = $port } }
-    "10" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
-    "11" = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
-    "12" = @{ UUID = "com.xuru.voip.action.audio_radio_mute"; Settings = @{ port = $port } }
-    "13" = @{ UUID = "com.xuru.voip.action.audio_profile_mute"; Settings = @{ port = $port } }
-    "14" = @{ UUID = "com.xuru.voip.action.hail_decline"; Settings = @{ port = $port } }
+    "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    "1" = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    "2" = @{ UUID = "com.xurudragon.xuruvoip.action.profile-mute"; Settings = @{ port = $port } }
+    "3" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio"; Settings = @{ port = $port } }
+    "4" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-helmet"; Settings = @{ port = $port } }
+    "5" = @{ UUID = "com.xurudragon.xuruvoip.action.pa-broadcast"; Settings = @{ port = $port } }
+    "6" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-translation"; Settings = @{ port = $port } }
+    "7" = @{ UUID = "com.xurudragon.xuruvoip.action.intercom-status"; Settings = @{ port = $port } }
+    "8" = @{ UUID = "com.xurudragon.xuruvoip.action.hail-initiate"; Settings = @{ port = $port } }
+    "9" = @{ UUID = "com.xurudragon.xuruvoip.action.hail-accept"; Settings = @{ port = $port } }
+    "10" = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
+    "11" = @{ UUID = "com.xurudragon.xuruvoip.action.audio-proximity-mute"; Settings = @{ port = $port } }
+    "12" = @{ UUID = "com.xurudragon.xuruvoip.action.audio-radio-mute"; Settings = @{ port = $port } }
+    "13" = @{ UUID = "com.xurudragon.xuruvoip.action.audio-profile-mute"; Settings = @{ port = $port } }
+    "14" = @{ UUID = "com.xurudragon.xuruvoip.action.hail-decline"; Settings = @{ port = $port } }
 }
 $classicInfantry = @{
-    "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    "1" = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    "2" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
-    "3" = @{ UUID = "com.xuru.voip.action.cycle_radio"; Settings = @{ port = $port } }
-    "4" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "status report" } }
-    "5" = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
-    "6" = @{ UUID = "com.xuru.voip.action.audio_radio_mute"; Settings = @{ port = $port } }
-    "7" = @{ UUID = "com.xuru.voip.action.beacon_repeater"; Settings = @{ port = $port } }
-    "8" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "mute proximity" } }
-    "9" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "unmute proximity" } }
-    "10" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
-    "11" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "set channel to alpha" } }
-    "12" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "set channel to beta" } }
-    "13" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "toggle voice changer" } }
-    "14" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "change voice to cyborg" } }
+    "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    "1" = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    "2" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-helmet"; Settings = @{ port = $port } }
+    "3" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio"; Settings = @{ port = $port } }
+    "4" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "status report" } }
+    "5" = @{ UUID = "com.xurudragon.xuruvoip.action.audio-proximity-mute"; Settings = @{ port = $port } }
+    "6" = @{ UUID = "com.xurudragon.xuruvoip.action.audio-radio-mute"; Settings = @{ port = $port } }
+    "7" = @{ UUID = "com.xurudragon.xuruvoip.action.beacon-repeater"; Settings = @{ port = $port } }
+    "8" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "mute proximity" } }
+    "9" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "unmute proximity" } }
+    "10" = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
+    "11" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "set channel to alpha" } }
+    "12" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "set channel to beta" } }
+    "13" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "toggle voice changer" } }
+    "14" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "change voice to cyborg" } }
 }
 $classicCaptain = @{
-    "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    "1" = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    "2" = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    "3" = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
-    "4" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
-    "5" = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
-    "6" = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
-    "7" = @{ UUID = "com.xuru.voip.action.hail_decline"; Settings = @{ port = $port } }
-    "8" = @{ UUID = "com.xuru.voip.action.hail_initiate"; Settings = @{ port = $port } }
-    "9" = @{ UUID = "com.xuru.voip.action.hail_accept"; Settings = @{ port = $port } }
-    "10" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
-    "11" = @{ UUID = "com.xuru.voip.action.cycle_radio"; Settings = @{ port = $port } }
-    "12" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "simulate shield hit" } }
-    "13" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "simulate power loss" } }
-    "14" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "simulate quantum spool" } }
+    "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    "1" = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    "2" = @{ UUID = "com.xurudragon.xuruvoip.action.pa-broadcast"; Settings = @{ port = $port } }
+    "3" = @{ UUID = "com.xurudragon.xuruvoip.action.intercom-status"; Settings = @{ port = $port } }
+    "4" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-helmet"; Settings = @{ port = $port } }
+    "5" = @{ UUID = "com.xurudragon.xuruvoip.action.audio-proximity-mute"; Settings = @{ port = $port } }
+    "6" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-translation"; Settings = @{ port = $port } }
+    "7" = @{ UUID = "com.xurudragon.xuruvoip.action.hail-decline"; Settings = @{ port = $port } }
+    "8" = @{ UUID = "com.xurudragon.xuruvoip.action.hail-initiate"; Settings = @{ port = $port } }
+    "9" = @{ UUID = "com.xurudragon.xuruvoip.action.hail-accept"; Settings = @{ port = $port } }
+    "10" = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
+    "11" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio"; Settings = @{ port = $port } }
+    "12" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "simulate shield hit" } }
+    "13" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "simulate power loss" } }
+    "14" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "simulate quantum spool" } }
 }
 
 Write-ProfileManifest "classic" "pilot" "XuruVOIP Pilot - Classic" 0 $classicPilot
@@ -181,57 +181,57 @@ Write-ProfileManifest "classic" "captain" "XuruVOIP Captain - Classic" 0 $classi
 function Get-XLBase($rolePilot, $roleInfantry) {
     $keys = @{}
     # Map top keys
-    $keys["0"] = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    $keys["1"] = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    $keys["2"] = @{ UUID = "com.xuru.voip.action.profile_mute"; Settings = @{ port = $port } }
-    $keys["3"] = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
-    $keys["4"] = @{ UUID = "com.xuru.voip.action.cycle_radio"; Settings = @{ port = $port } }
-    $keys["5"] = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    $keys["6"] = @{ UUID = "com.xuru.voip.action.beacon_repeater"; Settings = @{ port = $port } }
-    $keys["7"] = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
-    $keys["8"] = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
+    $keys["0"] = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    $keys["1"] = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    $keys["2"] = @{ UUID = "com.xurudragon.xuruvoip.action.profile-mute"; Settings = @{ port = $port } }
+    $keys["3"] = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-helmet"; Settings = @{ port = $port } }
+    $keys["4"] = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio"; Settings = @{ port = $port } }
+    $keys["5"] = @{ UUID = "com.xurudragon.xuruvoip.action.pa-broadcast"; Settings = @{ port = $port } }
+    $keys["6"] = @{ UUID = "com.xurudragon.xuruvoip.action.beacon-repeater"; Settings = @{ port = $port } }
+    $keys["7"] = @{ UUID = "com.xurudragon.xuruvoip.action.intercom-status"; Settings = @{ port = $port } }
+    $keys["8"] = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
     
     # Row 2: Mutes and audios
-    $keys["9"] = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
-    $keys["10"] = @{ UUID = "com.xuru.voip.action.audio_radio_mute"; Settings = @{ port = $port } }
-    $keys["11"] = @{ UUID = "com.xuru.voip.action.audio_profile_mute"; Settings = @{ port = $port } }
+    $keys["9"] = @{ UUID = "com.xurudragon.xuruvoip.action.audio-proximity-mute"; Settings = @{ port = $port } }
+    $keys["10"] = @{ UUID = "com.xurudragon.xuruvoip.action.audio-radio-mute"; Settings = @{ port = $port } }
+    $keys["11"] = @{ UUID = "com.xurudragon.xuruvoip.action.audio-profile-mute"; Settings = @{ port = $port } }
     
     # Hailing and Translation Subtitles
-    $keys["12"] = @{ UUID = "com.xuru.voip.action.hail_initiate"; Settings = @{ port = $port } }
-    $keys["13"] = @{ UUID = "com.xuru.voip.action.hail_accept"; Settings = @{ port = $port } }
-    $keys["14"] = @{ UUID = "com.xuru.voip.action.hail_decline"; Settings = @{ port = $port } }
-    $keys["15"] = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
-    $keys["16"] = @{ UUID = "com.xuru.voip.action.toggle_hrtf"; Settings = @{ port = $port } }
-    $keys["17"] = @{ UUID = "com.xuru.voip.action.toggle_spectrogram"; Settings = @{ port = $port } }
+    $keys["12"] = @{ UUID = "com.xurudragon.xuruvoip.action.hail-initiate"; Settings = @{ port = $port } }
+    $keys["13"] = @{ UUID = "com.xurudragon.xuruvoip.action.hail-accept"; Settings = @{ port = $port } }
+    $keys["14"] = @{ UUID = "com.xurudragon.xuruvoip.action.hail-decline"; Settings = @{ port = $port } }
+    $keys["15"] = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-translation"; Settings = @{ port = $port } }
+    $keys["16"] = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-hrtf"; Settings = @{ port = $port } }
+    $keys["17"] = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-spectrogram"; Settings = @{ port = $port } }
     
     return $keys
 }
 
 # Pilot XL
 $xlPilot = Get-XLBase
-$xlPilot["18"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "open hangar" } }
-$xlPilot["19"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "request landing" } }
-$xlPilot["20"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "status report" } }
-$xlPilot["21"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "close visor" } }
-$xlPilot["27"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "power up shields" } }
+$xlPilot["18"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "open hangar" } }
+$xlPilot["19"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "request landing" } }
+$xlPilot["20"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "status report" } }
+$xlPilot["21"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "close visor" } }
+$xlPilot["27"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "power up shields" } }
 
 # Infantry XL
 $xlInfantry = Get-XLBase
-$xlInfantry["18"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "status report" } }
-$xlInfantry["19"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "mute proximity" } }
-$xlInfantry["20"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "unmute proximity" } }
-$xlInfantry["27"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "set channel to alpha" } }
-$xlInfantry["28"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "set channel to beta" } }
-$xlInfantry["29"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "toggle voice changer" } }
-$xlInfantry["30"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "change voice to cyborg" } }
+$xlInfantry["18"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "status report" } }
+$xlInfantry["19"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "mute proximity" } }
+$xlInfantry["20"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "unmute proximity" } }
+$xlInfantry["27"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "set channel to alpha" } }
+$xlInfantry["28"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "set channel to beta" } }
+$xlInfantry["29"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "toggle voice changer" } }
+$xlInfantry["30"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "change voice to cyborg" } }
 
 # Captain XL
 $xlCaptain = Get-XLBase
-$xlCaptain["18"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "power up shields" } }
-$xlCaptain["19"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "status check" } }
-$xlCaptain["27"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "simulate shield hit" } }
-$xlCaptain["28"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "simulate power loss" } }
-$xlCaptain["29"] = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "simulate quantum spool" } }
+$xlCaptain["18"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "power up shields" } }
+$xlCaptain["19"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "status check" } }
+$xlCaptain["27"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "simulate shield hit" } }
+$xlCaptain["28"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "simulate power loss" } }
+$xlCaptain["29"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "simulate quantum spool" } }
 
 Write-ProfileManifest "xl" "pilot" "XuruVOIP Pilot - XL" 2 $xlPilot
 Write-ProfileManifest "xl" "infantry" "XuruVOIP Infantry - XL" 2 $xlInfantry
@@ -240,46 +240,46 @@ Write-ProfileManifest "xl" "captain" "XuruVOIP Captain - XL" 2 $xlCaptain
 # --- 4. STREAM DECK PLUS (DeviceType: 7) ---
 # 8 keys (0-7) + 4 dials (8-11)
 $plusPilot = @{
-    "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    "1" = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    "2" = @{ UUID = "com.xuru.voip.action.profile_mute"; Settings = @{ port = $port } }
-    "3" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
-    "4" = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    "5" = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
-    "6" = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
-    "7" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
+    "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    "1" = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    "2" = @{ UUID = "com.xurudragon.xuruvoip.action.profile-mute"; Settings = @{ port = $port } }
+    "3" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-helmet"; Settings = @{ port = $port } }
+    "4" = @{ UUID = "com.xurudragon.xuruvoip.action.pa-broadcast"; Settings = @{ port = $port } }
+    "5" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-translation"; Settings = @{ port = $port } }
+    "6" = @{ UUID = "com.xurudragon.xuruvoip.action.intercom-status"; Settings = @{ port = $port } }
+    "7" = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
     # Dials:
-    "8" = @{ UUID = "com.xuru.voip.action.cycle_radio_dial"; Settings = @{ port = $port } }
-    "9" = @{ UUID = "com.xuru.voip.action.adjust_exertion"; Settings = @{ port = $port } }
-    "10" = @{ UUID = "com.xuru.voip.action.voice_changer_dial"; Settings = @{ port = $port } }
+    "8" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio-dial"; Settings = @{ port = $port } }
+    "9" = @{ UUID = "com.xurudragon.xuruvoip.action.adjust-exertion"; Settings = @{ port = $port } }
+    "10" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-changer-dial"; Settings = @{ port = $port } }
 }
 $plusInfantry = @{
-    "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    "1" = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    "2" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
-    "3" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
-    "4" = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
-    "5" = @{ UUID = "com.xuru.voip.action.audio_radio_mute"; Settings = @{ port = $port } }
-    "6" = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    "7" = @{ UUID = "com.xuru.voip.action.voice_command"; Settings = @{ port = $port; command = "status report" } }
+    "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    "1" = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    "2" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-helmet"; Settings = @{ port = $port } }
+    "3" = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
+    "4" = @{ UUID = "com.xurudragon.xuruvoip.action.audio-proximity-mute"; Settings = @{ port = $port } }
+    "5" = @{ UUID = "com.xurudragon.xuruvoip.action.audio-radio-mute"; Settings = @{ port = $port } }
+    "6" = @{ UUID = "com.xurudragon.xuruvoip.action.pa-broadcast"; Settings = @{ port = $port } }
+    "7" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-command"; Settings = @{ port = $port; command = "status report" } }
     # Dials:
-    "8" = @{ UUID = "com.xuru.voip.action.cycle_radio_dial"; Settings = @{ port = $port } }
-    "9" = @{ UUID = "com.xuru.voip.action.voice_changer_dial"; Settings = @{ port = $port } }
-    "10" = @{ UUID = "com.xuru.voip.action.adjust_exertion"; Settings = @{ port = $port } }
+    "8" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio-dial"; Settings = @{ port = $port } }
+    "9" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-changer-dial"; Settings = @{ port = $port } }
+    "10" = @{ UUID = "com.xurudragon.xuruvoip.action.adjust-exertion"; Settings = @{ port = $port } }
 }
 $plusCaptain = @{
-    "0" = @{ UUID = "com.xuru.voip.action.proximity_mute"; Settings = @{ port = $port } }
-    "1" = @{ UUID = "com.xuru.voip.action.radio_mute"; Settings = @{ port = $port } }
-    "2" = @{ UUID = "com.xuru.voip.action.pa_broadcast"; Settings = @{ port = $port } }
-    "3" = @{ UUID = "com.xuru.voip.action.intercom_status"; Settings = @{ port = $port } }
-    "4" = @{ UUID = "com.xuru.voip.action.toggle_helmet"; Settings = @{ port = $port } }
-    "5" = @{ UUID = "com.xuru.voip.action.location_telemetry"; Settings = @{ port = $port } }
-    "6" = @{ UUID = "com.xuru.voip.action.audio_proximity_mute"; Settings = @{ port = $port } }
-    "7" = @{ UUID = "com.xuru.voip.action.toggle_translation"; Settings = @{ port = $port } }
+    "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
+    "1" = @{ UUID = "com.xurudragon.xuruvoip.action.radio-mute"; Settings = @{ port = $port } }
+    "2" = @{ UUID = "com.xurudragon.xuruvoip.action.pa-broadcast"; Settings = @{ port = $port } }
+    "3" = @{ UUID = "com.xurudragon.xuruvoip.action.intercom-status"; Settings = @{ port = $port } }
+    "4" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-helmet"; Settings = @{ port = $port } }
+    "5" = @{ UUID = "com.xurudragon.xuruvoip.action.location-telemetry"; Settings = @{ port = $port } }
+    "6" = @{ UUID = "com.xurudragon.xuruvoip.action.audio-proximity-mute"; Settings = @{ port = $port } }
+    "7" = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-translation"; Settings = @{ port = $port } }
     # Dials:
-    "8" = @{ UUID = "com.xuru.voip.action.cycle_radio_dial"; Settings = @{ port = $port } }
-    "9" = @{ UUID = "com.xuru.voip.action.adjust_exertion"; Settings = @{ port = $port } }
-    "10" = @{ UUID = "com.xuru.voip.action.voice_changer_dial"; Settings = @{ port = $port } }
+    "8" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio-dial"; Settings = @{ port = $port } }
+    "9" = @{ UUID = "com.xurudragon.xuruvoip.action.adjust-exertion"; Settings = @{ port = $port } }
+    "10" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-changer-dial"; Settings = @{ port = $port } }
 }
 
 Write-ProfileManifest "plus" "pilot" "XuruVOIP Pilot - Plus" 7 $plusPilot
@@ -295,9 +295,9 @@ function Get-PlusXLBase($keysMap) {
         $keys[$keyId] = $keysMap[$keyId]
     }
     # Add dials:
-    $keys["36"] = @{ UUID = "com.xuru.voip.action.cycle_radio_dial"; Settings = @{ port = $port } }
-    $keys["37"] = @{ UUID = "com.xuru.voip.action.adjust_exertion"; Settings = @{ port = $port } }
-    $keys["38"] = @{ UUID = "com.xuru.voip.action.voice_changer_dial"; Settings = @{ port = $port } }
+    $keys["36"] = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio-dial"; Settings = @{ port = $port } }
+    $keys["37"] = @{ UUID = "com.xurudragon.xuruvoip.action.adjust-exertion"; Settings = @{ port = $port } }
+    $keys["38"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-changer-dial"; Settings = @{ port = $port } }
     return $keys
 }
 

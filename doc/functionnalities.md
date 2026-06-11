@@ -241,7 +241,7 @@ Integrates physical Stream Deck buttons to display status, cycle radio frequenci
   * **Live Frequency Titles:** The "Cycle Radio" button displays the active channel name directly on the key in real-time.
 
 ### How to Use
-1. Install the `com.xuru.voip.sdPlugin` in the Stream Deck app.
+1. Install the `com.xurudragon.xuruvoip.sdPlugin` in the Stream Deck app.
 2. Drag and drop any of the 13 available actions onto your Stream Deck keys.
 3. Configure the **Companion Port** (default: `8891`) in the key settings to match your client.
 4. For the **Voice Command Macro** action, enter the custom text command you want to trigger (e.g., `"open hangar"`).

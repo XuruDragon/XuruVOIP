@@ -13,3 +13,4 @@ XuruVoipClient.Package/cert.ps1
 XuruVoipClient.Package/pfx-encoded-bytes2.txt
 
 .agents
+node_modules/

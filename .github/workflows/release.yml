@@ -44,6 +44,20 @@ jobs:
           go-version: '1.26'
           cache: true
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: streamdeck/package.json
+
+      - name: Build Stream Deck Plugin
+        run: |
+          cd streamdeck
+          npm install
+          npm run build
+        shell: pwsh
+
       - name: Determine Version
         id: get_version
         run: |
@@ -89,12 +103,9 @@ jobs:
               Copy-Item "client/XuruVoipClient-win-x64.zip" -Destination release-binaries/XuruVoipClient-win-x64.zip
           }
           
-          # Stage and package Stream Deck Plugin
-          New-Item -ItemType Directory -Force -Path plugin-staging
-          Copy-Item -Recurse -Path streamdeck/com.xuru.voip.sdPlugin -Destination plugin-staging/com.xuru.voip.sdPlugin
-          Compress-Archive -Path plugin-staging/com.xuru.voip.sdPlugin -DestinationPath release-binaries/com.xuru.voip.zip -Force
-          Rename-Item -Path release-binaries/com.xuru.voip.zip -NewName com.xuru.voip.streamDeckPlugin -Force
-          Remove-Item -Recurse -Force -Path plugin-staging
+          # Package Stream Deck Plugin using official CLI
+          npm install -g @elgato/cli@latest
+          streamdeck pack streamdeck/com.xurudragon.xuruvoip.sdPlugin --output release-binaries
 
           # Generate and package Stream Deck Profiles for all layouts and devices
           & pwsh streamdeck/generate_profiles.ps1

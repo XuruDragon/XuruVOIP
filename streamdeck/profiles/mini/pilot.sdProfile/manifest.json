@@ -1,48 +1,48 @@
 {
-  "Name": "XuruVOIP Pilot - Mini",
-  "DeviceType": 1,
   "Rooms": {
     "0": {
       "Keys": {
-        "2,1": {
-          "Action": "com.xuru.voip.action.location_telemetry",
+        "0,1": {
           "Settings": {
             "port": 8891
-          }
+          },
+          "Action": "com.xurudragon.xuruvoip.action.pa-broadcast"
         },
-        "1,1": {
-          "Action": "com.xuru.voip.action.intercom_status",
+        "2,1": {
           "Settings": {
             "port": 8891
-          }
+          },
+          "Action": "com.xurudragon.xuruvoip.action.location-telemetry"
         },
         "0,0": {
-          "Action": "com.xuru.voip.action.proximity_mute",
           "Settings": {
             "port": 8891
-          }
-        },
-        "2,0": {
-          "Action": "com.xuru.voip.action.toggle_helmet",
-          "Settings": {
-            "port": 8891
-          }
-        },
-        "0,1": {
-          "Action": "com.xuru.voip.action.pa_broadcast",
-          "Settings": {
-            "port": 8891
-          }
+          },
+          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
         },
         "1,0": {
-          "Action": "com.xuru.voip.action.radio_mute",
           "Settings": {
             "port": 8891
-          }
+          },
+          "Action": "com.xurudragon.xuruvoip.action.radio-mute"
+        },
+        "1,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.intercom-status"
+        },
+        "2,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.toggle-helmet"
         }
       }
     }
   },
+  "Name": "XuruVOIP Pilot - Mini",
+  "DeviceModel": "XuruVOIP_mini",
   "Version": "1.0.0",
-  "DeviceModel": "XuruVOIP_mini"
+  "DeviceType": 1
 }

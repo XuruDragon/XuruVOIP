@@ -23,7 +23,7 @@ The **XuruVOIP Stream Deck Plugin** links your physical Elgato Stream Deck hardw
 Getting the plugin installed into your Stream Deck software is very simple.
 
 1. **Download the Plugin:**
-   * Download the file named `com.xuru.voip.streamDeckPlugin` from the releases page.
+   * Download the file named `com.xurudragon.xuruvoip.streamDeckPlugin` from the releases page.
 2. **Install:**
    * Double-click the downloaded file.
    * Your Elgato Stream Deck software will open and show a message asking if you want to install it. Click **Install**.
@@ -225,16 +225,16 @@ Combines physical keys with rotary encoders and a touch strip display.
     | **Row 2 (Captain)** | Toggle Helmet | Location Telemetry | Audio Prox Mute | Audio Radio Mute |
 
 *   **Rotary Encoders (Dials) & Touch Strip:**
-    1.  **Dial 1: Radio Channel Dial** (`com.xuru.voip.action.cycle_radio_dial`)
+    1.  **Dial 1: Radio Channel Dial** (`com.xurudragon.xuruvoip.action.cycle-radio-dial`)
         *   *Rotate:* Select active radio frequency/channel.
         *   *Push / Touch Screen Tap:* Toggle radio microphone mute.
         *   *Display:* Active radio channel name (red `[MUTED]` tag appended if muted).
-    2.  **Dial 2: Adjust Exertion/G-Force** (`com.xuru.voip.action.adjust_exertion`)
+    2.  **Dial 2: Adjust Exertion/G-Force** (`com.xurudragon.xuruvoip.action.adjust-exertion`)
         *   *Rotate:* Adjust Mock G-Force.
         *   *Rotate while pressed:* Adjust Mock Exertion value.
         *   *Push / Touch Screen Tap:* Toggle immersive exertion distortion simulation.
         *   *Display:* G-force amount (G) and Exertion percentage (%) with state status.
-    3.  **Dial 3: Voice Changer Dial** (`com.xuru.voip.action.voice_changer_dial`)
+    3.  **Dial 3: Voice Changer Dial** (`com.xurudragon.xuruvoip.action.voice-changer-dial`)
         *   *Rotate:* Cycle through active voice changer profiles (None, Alien, Cyborg, Robotic, PitchShift).
         *   *Push / Touch Screen Tap:* Toggle voice changer on/off.
         *   *Display:* Active voice profile name or `Disabled`.

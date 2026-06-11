@@ -3,7 +3,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const PLUGIN_DIR = path.resolve(__dirname, '../com.xuru.voip.sdPlugin');
+const PLUGIN_DIR = path.resolve(__dirname, '../com.xurudragon.xuruvoip.sdPlugin');
 const MANIFEST_PATH = path.join(PLUGIN_DIR, 'manifest.json');
 
 test('Stream Deck Plugin Manifest Validation', async (t) => {
@@ -28,8 +28,9 @@ test('Stream Deck Plugin Manifest Validation', async (t) => {
     await t.test('manifest has correct metadata', () => {
         assert.strictEqual(manifest.SDKVersion, 2, 'SDKVersion must be 2');
         assert.strictEqual(manifest.Author, 'XuruDragon', 'Author must be XuruDragon');
-        assert.strictEqual(manifest.CodePath, 'index.html', 'CodePath must be index.html');
-        assert.strictEqual(manifest.Category, 'XuruVOIP', 'Category must be XuruVOIP');
+        assert.strictEqual(manifest.CodePath, 'bin/plugin.js', 'CodePath must be bin/plugin.js');
+        assert.strictEqual(manifest.Category, 'XuruVOIP Control', 'Category must be XuruVOIP Control');
+        assert.strictEqual(manifest.CategoryIcon, 'icons/pluginIcon', 'CategoryIcon must be icons/pluginIcon');
         assert.ok(Array.isArray(manifest.Actions), 'Actions must be an array');
         assert.ok(manifest.Actions.length > 0, 'Actions array cannot be empty');
     });
@@ -39,7 +40,7 @@ test('Stream Deck Plugin Manifest Validation', async (t) => {
         for (const action of manifest.Actions) {
             const uuid = action.UUID;
             assert.ok(uuid, 'Action missing UUID');
-            assert.ok(uuid.startsWith('com.xuru.voip.action.'), 'UUID must start with com.xuru.voip.action.');
+            assert.ok(uuid.startsWith('com.xurudragon.xuruvoip.action.'), 'UUID must start with com.xurudragon.xuruvoip.action.');
             assert.ok(action.Name, `Action ${uuid} missing Name`);
             assert.strictEqual(action.PropertyInspectorPath, 'pi/pi.html', `Action ${uuid} must have PropertyInspectorPath set to pi/pi.html`);
 
@@ -67,11 +68,9 @@ test('Stream Deck Plugin Manifest Validation', async (t) => {
         }
     });
 
-    // 5. Verify index.html and plugin.js exist
-    await t.test('background index.html and plugin.js files exist', () => {
-        const indexHtmlPath = path.join(PLUGIN_DIR, 'index.html');
-        const pluginJsPath = path.join(PLUGIN_DIR, 'plugin.js');
-        assert.ok(fs.existsSync(indexHtmlPath), 'index.html background loader does not exist');
-        assert.ok(fs.existsSync(pluginJsPath), 'plugin.js background script does not exist');
+    // 5. Verify bin/plugin.js exists
+    await t.test('compiled background bin/plugin.js file exists', () => {
+        const pluginJsPath = path.join(PLUGIN_DIR, 'bin/plugin.js');
+        assert.ok(fs.existsSync(pluginJsPath), 'bin/plugin.js background script does not exist');
     });
 });
