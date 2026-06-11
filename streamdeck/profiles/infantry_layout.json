@@ -77,6 +77,16 @@
       "Name": "Macro: Voice Cyborg",
       "UUID": "com.xuru.voip.action.voice_command",
       "Settings": { "port": 8891, "command": "change voice to cyborg" }
+    },
+    "15": {
+      "Name": "Toggle HRTF",
+      "UUID": "com.xuru.voip.action.toggle_hrtf",
+      "Settings": { "port": 8891 }
+    },
+    "16": {
+      "Name": "Toggle Spectrogram",
+      "UUID": "com.xuru.voip.action.toggle_spectrogram",
+      "Settings": { "port": 8891 }
     }
   }
 }

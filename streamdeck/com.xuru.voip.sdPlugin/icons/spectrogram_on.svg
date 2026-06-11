@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+    <rect width="72" height="72" rx="14" fill="#15191d"/>
+    <!-- Spectrogram / EQ bars -->
+    <rect x="18" y="34" width="6" height="18" rx="2" fill="#8b5cf6"/>
+    <rect x="28" y="22" width="6" height="30" rx="2" fill="#8b5cf6"/>
+    <rect x="38" y="16" width="6" height="36" rx="2" fill="#8b5cf6"/>
+    <rect x="48" y="28" width="6" height="24" rx="2" fill="#8b5cf6"/>
+</svg>

@@ -163,6 +163,12 @@ async function handleKeyDown(context, actionInfo) {
         case "com.xuru.voip.action.toggle_translation":
             apiAction = "toggle_translation";
             break;
+        case "com.xuru.voip.action.toggle_hrtf":
+            apiAction = "toggle_hrtf";
+            break;
+        case "com.xuru.voip.action.toggle_spectrogram":
+            apiAction = "toggle_spectrogram";
+            break;
     }
 
     if (!apiAction) return;
@@ -555,6 +561,14 @@ function updateStreamDeckStates(port, status) {
             case "com.xuru.voip.action.toggle_translation":
                 state = status.enableTranslationSubtitles ? 1 : 0;
                 title = status.enableTranslationSubtitles ? "TRANS\nON" : "TRANS\nOFF";
+                break;
+            case "com.xuru.voip.action.toggle_hrtf":
+                state = status.enableHrtf ? 1 : 0;
+                title = status.enableHrtf ? "HRTF\nON" : "HRTF\nOFF";
+                break;
+            case "com.xuru.voip.action.toggle_spectrogram":
+                state = status.enableVisorSpectrogram ? 1 : 0;
+                title = status.enableVisorSpectrogram ? "HUD SPEC\nON" : "HUD SPEC\nOFF";
                 break;
         }
 

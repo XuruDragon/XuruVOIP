@@ -259,6 +259,8 @@ public class CompanionAppService : IDisposable
                     lastRecognizedCommand = _viewModel.VoiceCommandStatusText,
                     hailState = _viewModel.CurrentHailState.ToString(),
                     hailPeerName = _viewModel.HailPeerName,
+                    enableHrtf = _viewModel.Config.Config.EnableHrtf,
+                    enableVisorSpectrogram = _viewModel.Config.Config.EnableVisorSpectrogram,
                     enableTranslationSubtitles = _viewModel.Config.Config.EnableTranslationSubtitles
                 };
 
@@ -404,6 +406,16 @@ public class CompanionAppService : IDisposable
                 break;
             case "toggle_translation":
                 _viewModel.Config.Config.EnableTranslationSubtitles = !_viewModel.Config.Config.EnableTranslationSubtitles;
+                _viewModel.SaveConfig();
+                _viewModel.ApplySettings();
+                break;
+            case "toggle_hrtf":
+                _viewModel.Config.Config.EnableHrtf = !_viewModel.Config.Config.EnableHrtf;
+                _viewModel.SaveConfig();
+                _viewModel.ApplySettings();
+                break;
+            case "toggle_spectrogram":
+                _viewModel.Config.Config.EnableVisorSpectrogram = !_viewModel.Config.Config.EnableVisorSpectrogram;
                 _viewModel.SaveConfig();
                 _viewModel.ApplySettings();
                 break;
