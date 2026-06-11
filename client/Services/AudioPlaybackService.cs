@@ -657,6 +657,38 @@ public class AudioPlaybackService : IDisposable
         return active;
     }
 
+    public bool IsReceivingProximity(double activeTimeoutMs = 400)
+    {
+        lock (_lock)
+        {
+            foreach (var kvp in _tracks)
+            {
+                if (kvp.Key == "__local_chime") continue;
+                if (kvp.Value.IsTransmitting && kvp.Value.LastAudioType == 0x00 && (DateTime.UtcNow - kvp.Value.LastReceivedTime).TotalMilliseconds < activeTimeoutMs)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public bool IsReceivingRadio(double activeTimeoutMs = 400)
+    {
+        lock (_lock)
+        {
+            foreach (var kvp in _tracks)
+            {
+                if (kvp.Key == "__local_chime") continue;
+                if (kvp.Value.IsTransmitting && (kvp.Value.LastAudioType == 0x01 || kvp.Value.LastAudioType == 0x02 || kvp.Value.LastAudioType == 0x03) && (DateTime.UtcNow - kvp.Value.LastReceivedTime).TotalMilliseconds < activeTimeoutMs)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private sealed class PlayerAudioTrack(
         string playerName,
         IOpusDecoder decoder,

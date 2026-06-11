@@ -179,4 +179,8 @@
     <!-- 连接警告 -->
     <sys:String x:Key="WarningGrtprNoPath">Game.log 日志读取器 (GRTPR) 已启用，但未设置 Game.log 文件路径。请在尝试连接服务器之前，在“常规 (General)”设置选项卡中填入您的星际公民 Game.log 路径。</sys:String>
     <sys:String x:Key="TitleWarning">警告</sys:String>
+    
+    <!-- 遥测 -->
+    <sys:String x:Key="LblEnableTelemetry">启用遥测广播 (UDP)</sys:String>
+    <sys:String x:Key="LblTelemetryPort">遥测广播端口</sys:String>
 </ResourceDictionary>

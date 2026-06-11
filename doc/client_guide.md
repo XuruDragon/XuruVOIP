@@ -104,6 +104,16 @@ The Companion App allows you to control XuruVOIP from your smartphone, tablet, o
 
 ---
 
+## 🔌 External Hardware Telemetry (Sim-Pits & Custom Hardware)
+
+For players with custom cockpit simulator setups (sim-pits) or external displays, XuruVOIP can broadcast real-time telemetry.
+
+1. **Enable it:** Go to **Settings**, check **Enable Telemetry Broadcast (UDP)**, and set a port (default: `8895`).
+2. **How it works:** The client will broadcast a JSON payload over UDP to `127.0.0.1:8895` every 100ms.
+3. **Use cases:** Cockpit builders can use simple Arduino, Raspberry Pi, or Stream Deck plugins to read these packets and light up physical LEDs when receiving or transmitting radio messages, or when the suit visor is down.
+
+---
+
 ## ❓ Troubleshooting (FAQ)
 
 ### My friends cannot hear me!

@@ -265,6 +265,20 @@
                                          Style="{StaticResource InputStyle}"/>
                             </StackPanel>
 
+                            <CheckBox x:Name="CbEnableTelemetry"
+                                      Content="{DynamicResource LblEnableTelemetry}"
+                                      IsChecked="{Binding Config.EnableTelemetry, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
+                                      Checked="Telemetry_ToggleChanged" Unchecked="Telemetry_ToggleChanged"/>
+
+                            <StackPanel x:Name="TelemetryPortPanel" Margin="16,4,0,0">
+                                <TextBlock Text="{DynamicResource LblTelemetryPort}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="TxTelemetryPort"
+                                         Text="{Binding Config.TelemetryPort, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+
                             <!-- Immersive Features -->
                             <CheckBox Content="{DynamicResource LblEnableExertionDistortion}"
                                       IsChecked="{Binding Config.EnableExertionDistortion, UpdateSourceTrigger=PropertyChanged}"

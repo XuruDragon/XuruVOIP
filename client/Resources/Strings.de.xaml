@@ -177,6 +177,10 @@
     <sys:String x:Key="TitleInvalidServerAddress">Ungültige Serveradresse</sys:String>
 
     <!-- Verbindungswarnungen -->
-    <sys:String x:Key="WarningGrtprNoPath">Der Game.log-Reader (GRTPR) ist aktiviert, aber der Pfad zur Game.log-Datei ist nicht festgelegt. Bitte tragen Sie den Pfad zu Ihrer Star Citizen Game.log-Datei im Einstellungsreiter "Allgemein" ein, bevor Sie versuchen, eine Verbindung zum Server herzustellen.</sys:String>
+    <sys:String x:Key="WarningGrtprNoPath">Der Game.log-Reader (GRTPR) is aktiviert, aber der Pfad zur Game.log-Datei ist nicht festgelegt. Bitte tragen Sie den Pfad zu Ihrer Star Citizen Game.log-Datei im Einstellungsreiter "Allgemein" ein, bevor Sie versuchen, eine Verbindung zum Server herzustellen.</sys:String>
     <sys:String x:Key="TitleWarning">Warnung</sys:String>
+    
+    <!-- Telemetrie -->
+    <sys:String x:Key="LblEnableTelemetry">Telemetrie-Übertragung (UDP) aktivieren</sys:String>
+    <sys:String x:Key="LblTelemetryPort">Telemetrie-Übertragungsport</sys:String>
 </ResourceDictionary>

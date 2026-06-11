@@ -266,12 +266,17 @@ graph TB
 * **Ship-Wide Audio Broadcast:** Pilots or captains of multi-crew ships can broadcast voice announcements to all crew members sharing the same `ContainerID` (ship) in the same Zone.
 * **PA DSP & Klaxon Chime:** PA transmissions bypass local proximity and radio mutes (except master volume/mute), play mono center-panned, prepend a Sci-Fi dual-tone chime/klaxon alert, and apply a megaphone bandpass & reverberation filter simulating hollow ship interior acoustics.
 
+### 15. 🔌 External Hardware Telemetry (Sim-Pit UDP Sync)
+* **Real-Time UDP Sync:** When enabled, the client broadcasts its VoIP and helmet states in JSON format to `127.0.0.1:8895` (configurable) every 100ms.
+* **Telemetry Payload:** Includes local transmission states (`IsTransmittingProximity`, `IsTransmittingRadio`), remote receiving states (`IsReceivingProximity`, `IsReceivingRadio`), visor state (`HelmetVisorDown`), active channel, and current zone.
+* **Hardware Integration Ready:** Enables sim-pit cockpit builders to connect custom Arduino LEDs, Stream Decks, or physical warning indicators that react to active communications in real-time.
+
 ---
 
 ## 🎮 XuruVoip Client Settings Tab Breakdown
 
 The WPF settings window is structured into six configuration categories:
-1. **General**: Configure languages, tail `Game.log` files, toggle general file logging, and enable/configure the local **Companion App HTTP Server** and Port.
+1. **General**: Configure languages, tail `Game.log` files, toggle general file logging, enable/configure the local **Companion App HTTP Server** and Port, and toggle/configure **External Telemetry Broadcast (UDP)** and Port (disabled by default).
 2. **Connection**: Edit the Target Server IP, Position & Audio ports, Username, User Password, and Server Password.
 3. **Position**: Toggle the location source ("OCR Screen Scanner" vs "Game.log Reader (GRTPR)"), configure monitor indexes, crop regions, OCR intervals, and preview live coordinate text.
 4. **Audio**: Choose input/output hardware, adjust dB gains, select transmission mode (PTT vs VAD), configure VAD thresholds, toggle **Enable 3D Spatial Audio**, configure radio degradation, synthesized local chimes, visor modulator, and select **Voice Changer** presets.

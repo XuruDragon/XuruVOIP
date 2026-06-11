@@ -162,6 +162,16 @@ public partial class SettingsWindow : Window
             CompanionPortPanel.Visibility = Cfg.EnableCompanionApp ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        // Telemetry settings
+        if (CbEnableTelemetry != null)
+        {
+            CbEnableTelemetry.IsChecked = Cfg.EnableTelemetry;
+        }
+        if (TelemetryPortPanel != null)
+        {
+            TelemetryPortPanel.Visibility = Cfg.EnableTelemetry ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         // Ship PA settings
         if (CbEnableShipPa != null)
         {
@@ -380,6 +390,14 @@ public partial class SettingsWindow : Window
         bool enabled = CbEnableCompanionApp.IsChecked == true;
         Cfg.EnableCompanionApp = enabled;
         CompanionPortPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void Telemetry_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || TelemetryPortPanel == null) return;
+        bool enabled = CbEnableTelemetry.IsChecked == true;
+        Cfg.EnableTelemetry = enabled;
+        TelemetryPortPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void ShipPa_ToggleChanged(object sender, RoutedEventArgs e)

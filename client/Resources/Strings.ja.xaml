@@ -179,4 +179,8 @@
     <!-- 接続警告 -->
     <sys:String x:Key="WarningGrtprNoPath">Game.logリーダー (GRTPR) が有効になっていますが、Game.logのファイルパスが設定されていません。サーバーに接続する前に、設定の「全般 (General)」タブでStar CitizenのGame.logパスを入力してください。</sys:String>
     <sys:String x:Key="TitleWarning">警告</sys:String>
+    
+    <!-- テレメトリ -->
+    <sys:String x:Key="LblEnableTelemetry">テレメトリ配信(UDP)を有効化</sys:String>
+    <sys:String x:Key="LblTelemetryPort">テレメトリ配信ポート</sys:String>
 </ResourceDictionary>

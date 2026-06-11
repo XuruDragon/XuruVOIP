@@ -31,6 +31,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
     private readonly GameDetectionService _gameDetector = new();
     public GameDetectionService GameDetector => _gameDetector;
     private CompanionAppService? _companionApp;
+    private TelemetryService? _telemetry;
 
     public PlayerPosition LastSentPos => _lastSentPos;
     public Dictionary<string, PlayerPosition> RemotePositions => _remotePositions;
@@ -360,6 +361,13 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         {
             _companionApp = new CompanionAppService(this);
             _companionApp.Start();
+        }
+
+        // Telemetry Broadcast
+        if (Config.Config.EnableTelemetry)
+        {
+            _telemetry = new TelemetryService(this);
+            _telemetry.Start();
         }
 
         // Position tracking setup
@@ -1171,6 +1179,31 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             }
         }
 
+        // Sync telemetry state
+        if (Config.Config.EnableTelemetry)
+        {
+            if (_telemetry != null && _telemetry.LastPort != Config.Config.TelemetryPort)
+            {
+                LogService.Info("Telemetry port changed, restarting telemetry...");
+                _telemetry.Stop();
+                _telemetry = null;
+            }
+
+            if (_telemetry == null)
+            {
+                _telemetry = new TelemetryService(this);
+                _telemetry.Start();
+            }
+        }
+        else
+        {
+            if (_telemetry != null)
+            {
+                _telemetry.Stop();
+                _telemetry = null;
+            }
+        }
+
         if (AudioConnected)
         {
             LogService.Info("ApplySettings: Re-initializing audio devices with new parameters.");
@@ -1301,6 +1334,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _ocr.Dispose();
         _discordRpc.Dispose();
         _companionApp?.Dispose();
+        _telemetry?.Dispose();
         await _posWs.DisposeAsync();
         await _audioWs.DisposeAsync();
     }

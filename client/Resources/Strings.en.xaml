@@ -179,4 +179,8 @@
     <!-- Connection Warnings -->
     <sys:String x:Key="WarningGrtprNoPath">Game.log Reader (GRTPR) is enabled, but the Game.log file path is not set. Please fill in your Star Citizen Game.log path under the General settings tab before trying to connect to the server.</sys:String>
     <sys:String x:Key="TitleWarning">Warning</sys:String>
+    
+    <!-- Telemetry -->
+    <sys:String x:Key="LblEnableTelemetry">Enable Telemetry Broadcast (UDP)</sys:String>
+    <sys:String x:Key="LblTelemetryPort">Telemetry Broadcast Port</sys:String>
 </ResourceDictionary>

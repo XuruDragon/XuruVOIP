@@ -179,4 +179,8 @@
     <!-- Advertencias de conexión -->
     <sys:String x:Key="WarningGrtprNoPath">El lector de Game.log (GRTPR) está habilitado, pero la ruta del archivo Game.log no está configurada. Por favor, especifique la ruta de su archivo Game.log de Star Citizen en la pestaña de ajustes General antes de intentar conectarse al servidor.</sys:String>
     <sys:String x:Key="TitleWarning">Advertencia</sys:String>
+    
+    <!-- Telemetría -->
+    <sys:String x:Key="LblEnableTelemetry">Activar la transmisión de telemetría (UDP)</sys:String>
+    <sys:String x:Key="LblTelemetryPort">Puerto de transmisión de telemetría</sys:String>
 </ResourceDictionary>

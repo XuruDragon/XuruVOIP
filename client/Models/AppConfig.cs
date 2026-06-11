@@ -75,6 +75,10 @@ public class AppConfig
     public bool EnableCompanionApp { get; set; } = false;
     public int CompanionAppPort { get; set; } = 8891;
 
+    // --- Telemetry Sync ---
+    public bool EnableTelemetry { get; set; } = false;
+    public int TelemetryPort { get; set; } = 8895;
+
     // --- Immersive Features ---
     public bool EnableExertionDistortion { get; set; } = false;
     public bool EnableRadioRepeaters { get; set; } = false;
