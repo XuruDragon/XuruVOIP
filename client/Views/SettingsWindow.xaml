@@ -755,6 +755,36 @@
                 <TabItem Header="{DynamicResource TabIntegrations}">
                     <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="526">
                         <StackPanel Margin="0,4,5,0">
+                            <!-- Voice Commands -->
+                            <CheckBox x:Name="CbEnableVoiceCommands"
+                                      Content="{DynamicResource LblEnableVoiceCommands}"
+                                      IsChecked="{Binding Config.EnableVoiceCommands, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                      Checked="VoiceCommands_ToggleChanged" Unchecked="VoiceCommands_ToggleChanged"/>
+
+                            <StackPanel x:Name="VoiceCommandsSubPanel" Margin="16,4,0,12">
+                                <!-- WARNING Panel -->
+                                <Border x:Name="VoiceCommandWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,4,0,8" Visibility="Collapsed">
+                                    <StackPanel>
+                                        <TextBlock Text="⚠️ Voice Commands Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
+                                        <TextBlock Text="{DynamicResource LblVoiceCommandWarning}" 
+                                                   Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Confidence threshold slider -->
+                                <TextBlock Style="{StaticResource LabelStyle}" Margin="0,4,0,2">
+                                    <Run Text="{DynamicResource LblVoiceCommandConfidence}"/>
+                                    <Run Text=": "/>
+                                    <Run x:Name="VoiceCommandConfidenceLabel" Text="0.5"/>
+                                </TextBlock>
+                                <Slider x:Name="SlVoiceCommandConfidence" Minimum="0.1" Maximum="1.0"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        Foreground="{DynamicResource Accent}"
+                                        ValueChanged="SlVoiceCommandConfidence_Changed" Margin="0,0,0,12"/>
+                            </StackPanel>
+
                             <!-- Companion App -->
                             <CheckBox x:Name="CbEnableCompanionApp"
                                       Content="{DynamicResource LblEnableCompanionApp}"
@@ -856,36 +886,6 @@
                 <TabItem Header="{DynamicResource TabHotkeys}">
                     <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="535">
                         <StackPanel Margin="0,4,5,0">
-                            <!-- Voice Commands -->
-                            <CheckBox x:Name="CbEnableVoiceCommands"
-                                      Content="{DynamicResource LblEnableVoiceCommands}"
-                                      IsChecked="{Binding Config.EnableVoiceCommands, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
-                                      Checked="VoiceCommands_ToggleChanged" Unchecked="VoiceCommands_ToggleChanged"/>
-
-                            <StackPanel x:Name="VoiceCommandsSubPanel" Margin="16,4,0,12">
-                                <!-- WARNING Panel -->
-                                <Border x:Name="VoiceCommandWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,4,0,8" Visibility="Collapsed">
-                                    <StackPanel>
-                                        <TextBlock Text="⚠️ Voice Commands Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
-                                        <TextBlock Text="{DynamicResource LblVoiceCommandWarning}" 
-                                                   Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Confidence threshold slider -->
-                                <TextBlock Style="{StaticResource LabelStyle}" Margin="0,4,0,2">
-                                    <Run Text="{DynamicResource LblVoiceCommandConfidence}"/>
-                                    <Run Text=": "/>
-                                    <Run x:Name="VoiceCommandConfidenceLabel" Text="0.5"/>
-                                </TextBlock>
-                                <Slider x:Name="SlVoiceCommandConfidence" Minimum="0.1" Maximum="1.0"
-                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        Foreground="{DynamicResource Accent}"
-                                        ValueChanged="SlVoiceCommandConfidence_Changed" Margin="0,0,0,12"/>
-                            </StackPanel>
-
                             <!-- Header: Communication Hotkeys -->
                             <TextBlock Text="{DynamicResource HeaderCommHotkeys}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
                             <Grid Margin="0,0,0,10">
