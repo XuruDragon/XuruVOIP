@@ -1613,7 +1613,12 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         // Find a path from sender (index 0) to local player (index n-1)
         // that minimizes the maximum hop distance along the path.
         double[] maxHopDist = new double[n];
-        for (int i = 0; i < n; i++) maxHopDist[i] = double.MaxValue;
+        int[] parent = new int[n];
+        for (int i = 0; i < n; i++)
+        {
+            maxHopDist[i] = double.MaxValue;
+            parent[i] = -1;
+        }
         maxHopDist[0] = 0;
 
         bool[] visited = new bool[n];
@@ -1654,6 +1659,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                     if (currentMaxHop < maxHopDist[v])
                     {
                         maxHopDist[v] = currentMaxHop;
+                        parent[v] = u;
                     }
                 }
             }
@@ -1669,7 +1675,17 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             return Math.Sqrt(directDx * directDx + directDy * directDy + directDz * directDz);
         }
 
-        return routedMaxHop;
+        // Trace path to count hops
+        int hops = 0;
+        int curr = n - 1;
+        while (curr != 0 && parent[curr] != -1)
+        {
+            hops++;
+            curr = parent[curr];
+        }
+
+        double penalty = hops > 1 ? 650.0 * (hops - 1) : 0.0;
+        return routedMaxHop + penalty;
     }
 
     public void SetMockPttPaState(bool isDown)
