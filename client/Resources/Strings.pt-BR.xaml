@@ -208,6 +208,14 @@
     <sys:String x:Key="LblVoiceDoorsKey">Voz: Tecla de Portas da Nave</sys:String>
     <sys:String x:Key="LblVoiceShieldsKey">Voz: Tecla de Redirecionar Escudos para Frente</sys:String>
     <sys:String x:Key="LblVoiceLandingGearKey">Voz: Tecla de Trem de Pouso</sys:String>
+    <sys:String x:Key="LblVoiceEnginesKey">Voz: Tecla de Motores</sys:String>
+    <sys:String x:Key="LblVoiceWeaponsKey">Voz: Tecla de Armas</sys:String>
+    <sys:String x:Key="LblVoiceShieldsToggleKey">Voz: Tecla de Escudos</sys:String>
+    <sys:String x:Key="LblVoiceShieldsResetKey">Voz: Tecla de Equilibrar Escudos</sys:String>
+    <sys:String x:Key="LblVoiceVtolKey">Voz: Tecla de VTOL</sys:String>
+    <sys:String x:Key="LblVoiceQuantumKey">Voz: Tecla de Salto Quântico</sys:String>
+    <sys:String x:Key="LblVoiceCruiseKey">Voz: Tecla de Piloto Automático</sys:String>
+    <sys:String x:Key="LblVoiceLandingRequestKey">Voz: Tecla de Solicitar Pouso</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Limiar de confiança do comando de voz</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">AVISO: A ativação dos comandos de voz offline irá descarregar o modelo de transcrição Whisper (~140MB) na primeira ativação se não estiver presente no computador.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS A ESCUTAR...</sys:String>

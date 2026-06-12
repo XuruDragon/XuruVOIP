@@ -271,6 +271,14 @@ graph TB
     #### Simulated Ship Controls (Star Citizen Related)
     These commands trigger simulated physical keystrokes on your PC to trigger Star Citizen controls:
     * **Toggle Ship Power:** `power`, `toggle power`, `power on`, `power off`, `systems on`, `systems off`
+    * **Toggle Ship Engines:** `engines`, `toggle engines`, `engines on`, `engines off`
+    * **Toggle Weapons:** `weapons`, `toggle weapons`, `weapons on`, `weapons off`
+    * **Toggle Shields:** `shields toggle`, `toggle shields`
+    * **Equalize Shields:** `reset shields`, `shields reset`, `equalize shields`, `shields equalize`
+    * **Toggle VTOL Mode:** `vtol`, `toggle vtol`
+    * **Spool Quantum Drive:** `quantum`, `spool quantum`, `quantum spool`, `quantum drive`, `quantum travel`
+    * **Toggle Cruise Control:** `cruise`, `cruise control`, `toggle cruise`, `cruise speed`, `cruise lock`
+    * **Request Landing / Open Hangar:** `request landing`, `landing request`, `open hangar`, `request hangar`, `call atc`
     * **Toggle Ship Doors/Ramps:** `doors`, `exterior`, `open doors`, `close doors`, `open exterior`, `close exterior`, `toggle doors`, `toggle exterior`
     * **Divert Shields Forward:** `shields`, `shields front`, `shields forward`, `divert shields`, `shields ahead`
     * **Toggle Landing Gear:** `landing gear`, `deploy landing gear`, `retract landing gear`, `toggle landing gear`, `gear`

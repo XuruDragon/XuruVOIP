@@ -99,6 +99,15 @@ public class AppConfig
     public string VoiceCommandDoorsModifier { get; set; } = "Alt";
     public string VoiceCommandShieldsKey { get; set; } = "Up";
     public string VoiceCommandLandingGearKey { get; set; } = "N";
+    public string VoiceCommandEnginesKey { get; set; } = "I";
+    public string VoiceCommandWeaponsKey { get; set; } = "P";
+    public string VoiceCommandShieldsToggleKey { get; set; } = "O";
+    public string VoiceCommandShieldsResetKey { get; set; } = "NumPad5";
+    public string VoiceCommandVtolKey { get; set; } = "K";
+    public string VoiceCommandQuantumKey { get; set; } = "B";
+    public string VoiceCommandCruiseKey { get; set; } = "C";
+    public string VoiceCommandLandingRequestKey { get; set; } = "N";
+    public string VoiceCommandLandingRequestModifier { get; set; } = "Alt";
 
     // --- Discord RPC ---
     public bool EnableDiscordRpc { get; set; } = true;

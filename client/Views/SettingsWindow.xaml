@@ -1054,7 +1054,39 @@
                                              KeyDown="Hotkey_KeyDown"
                                              Margin="0,0,0,10"/>
 
-                                    <!-- Shields Key -->
+                                    <!-- Engines Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceEnginesKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceEnginesKey"
+                                             Text="{Binding Config.VoiceCommandEnginesKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Weapons Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceWeaponsKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceWeaponsKey"
+                                             Text="{Binding Config.VoiceCommandWeaponsKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Shields Toggle Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceShieldsToggleKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceShieldsToggleKey"
+                                             Text="{Binding Config.VoiceCommandShieldsToggleKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Shields Reset Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceShieldsResetKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceShieldsResetKey"
+                                             Text="{Binding Config.VoiceCommandShieldsResetKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Shields Key (Front) -->
                                     <TextBlock Text="{DynamicResource LblVoiceShieldsKey}" Style="{StaticResource LabelStyle}"/>
                                     <TextBox x:Name="TxVoiceShieldsKey"
                                              Text="{Binding Config.VoiceCommandShieldsKey, UpdateSourceTrigger=PropertyChanged}"
@@ -1064,6 +1096,7 @@
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2">
+
                                     <!-- Doors Key -->
                                     <TextBlock Text="{DynamicResource LblVoiceDoorsKey}" Style="{StaticResource LabelStyle}"/>
                                     <Grid Margin="0,0,0,10">
@@ -1085,6 +1118,30 @@
                                         </ComboBox>
                                     </Grid>
 
+                                    <!-- VTOL Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceVtolKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceVtolKey"
+                                             Text="{Binding Config.VoiceCommandVtolKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Quantum Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceQuantumKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceQuantumKey"
+                                             Text="{Binding Config.VoiceCommandQuantumKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Cruise Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceCruiseKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceCruiseKey"
+                                             Text="{Binding Config.VoiceCommandCruiseKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
                                     <!-- Landing Gear Key -->
                                     <TextBlock Text="{DynamicResource LblVoiceLandingGearKey}" Style="{StaticResource LabelStyle}"/>
                                     <TextBox x:Name="TxVoiceLandingGearKey"
@@ -1092,11 +1149,32 @@
                                              Style="{StaticResource InputStyle}"
                                              KeyDown="Hotkey_KeyDown"
                                              Margin="0,0,0,10"/>
+
+                                    <!-- Landing Request Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceLandingRequestKey}" Style="{StaticResource LabelStyle}"/>
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="TxVoiceLandingRequestKey" Grid.Column="0"
+                                                 Text="{Binding Config.VoiceCommandLandingRequestKey, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource InputStyle}"
+                                                 KeyDown="Hotkey_KeyDown"/>
+                                        <ComboBox x:Name="CbVoiceLandingRequestModifier" Grid.Column="1" Style="{StaticResource ComboStyle}" Margin="8,0,0,0"
+                                                  SelectedValue="{Binding Config.VoiceCommandLandingRequestModifier, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedValuePath="Content">
+                                            <ComboBoxItem Content="None"/>
+                                            <ComboBoxItem Content="Alt"/>
+                                            <ComboBoxItem Content="Ctrl"/>
+                                            <ComboBoxItem Content="Shift"/>
+                                        </ComboBox>
+                                    </Grid>
                                 </StackPanel>
                             </Grid>
 
                             <TextBlock Text="{DynamicResource LblRecordInstructionMulti}"
-                                       Foreground="{StaticResource TextSecondary}"
+                                       Foreground="{DynamicResource TextSecondary}"
                                        FontSize="10" Margin="0,8,0,0"/>
                         </StackPanel>
                     </ScrollViewer>

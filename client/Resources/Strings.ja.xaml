@@ -208,6 +208,14 @@
     <sys:String x:Key="LblVoiceDoorsKey">音声: 船体ドア開閉キー</sys:String>
     <sys:String x:Key="LblVoiceShieldsKey">音声: シールド前方偏向キー</sys:String>
     <sys:String x:Key="LblVoiceLandingGearKey">音声: 着陸脚切替キー</sys:String>
+    <sys:String x:Key="LblVoiceEnginesKey">音声: エンジン切替キー</sys:String>
+    <sys:String x:Key="LblVoiceWeaponsKey">音声: 兵器切替キー</sys:String>
+    <sys:String x:Key="LblVoiceShieldsToggleKey">音声: シールド切替キー</sys:String>
+    <sys:String x:Key="LblVoiceShieldsResetKey">音声: シールド均等化キー</sys:String>
+    <sys:String x:Key="LblVoiceVtolKey">音声: VTOL切替キー</sys:String>
+    <sys:String x:Key="LblVoiceQuantumKey">音声: 量子ドライブスプールキー</sys:String>
+    <sys:String x:Key="LblVoiceCruiseKey">音声: クルーズコントロール切替キー</sys:String>
+    <sys:String x:Key="LblVoiceLandingRequestKey">音声: 着陸要請キー</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">音声コマンドの信頼度しきい値</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">警告: オフライン音声コマンドを有効にすると、モデルがまだ存在しない場合、最初の起動時にWhisper文字起こしモデル（~140MB）がダウンロードされます。</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 聴取中...</sys:String>

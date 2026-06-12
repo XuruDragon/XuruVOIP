@@ -21,7 +21,15 @@ public enum VoiceCommandAction
     ShipPowerToggle,
     ShipDoorsToggle,
     ShipShieldsFront,
-    ShipLandingGearToggle
+    ShipLandingGearToggle,
+    ShipEnginesToggle,
+    ShipWeaponsToggle,
+    ShipShieldsToggle,
+    ShipShieldsReset,
+    ShipVtolToggle,
+    ShipQuantumSpool,
+    ShipCruiseControl,
+    ShipLandingRequest
 }
 
 public class VoiceCommandResult
@@ -201,6 +209,94 @@ public class VoiceCommandService
         { "zh", new[] { "起落架", "收放起落架", "放下起落架", "收起起落架" } }
     };
 
+    private static readonly Dictionary<string, string[]> ShipEnginesTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "engines", "toggle engines", "engines on", "engines off", "power engines" } },
+        { "fr", new[] { "moteurs", "basculer moteurs", "allumer moteurs", "eteindre moteurs", "demarrer moteurs", "couper moteurs" } },
+        { "de", new[] { "motoren", "motoren umschalten", "motoren an", "motoren aus" } },
+        { "es", new[] { "motores", "alternar motores", "motores encendidos", "motores apagados" } },
+        { "pt", new[] { "motores", "alternar motores", "motores ligados", "motores desligados" } },
+        { "ja", new[] { "エンジン", "エンジン切り替え", "エンジン起動", "エンジン停止" } },
+        { "zh", new[] { "引擎", "发动机", "切换引擎", "切换发动机", "引擎开启", "引擎关闭" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipWeaponsTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "weapons", "toggle weapons", "weapons on", "weapons off", "power weapons", "weapons online", "weapons offline" } },
+        { "fr", new[] { "armes", "basculer armes", "allumer armes", "eteindre armes", "activer armes", "desactiver armes" } },
+        { "de", new[] { "waffen", "waffen umschalten", "waffen an", "waffen aus", "waffen online", "waffen offline" } },
+        { "es", new[] { "armas", "alternar armas", "armas encendidas", "armas apagadas" } },
+        { "pt", new[] { "armas", "alternar armas", "armas ligadas", "armas desligadas" } },
+        { "ja", new[] { "武器", "武器切り替え", "兵装", "ウェポン" } },
+        { "zh", new[] { "武器", "切换武器", "武器开启" , "武器关闭" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipShieldsToggleTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "shields toggle", "toggle shields", "power shields", "shields on", "shields off" } },
+        { "fr", new[] { "boucliers basculer", "basculer boucliers", "allumer boucliers", "eteindre boucliers", "boucliers" } },
+        { "de", new[] { "schilde umschalten", "schilde an", "schilde aus" } },
+        { "es", new[] { "escudos alternar", "alternar escudos", "escudos encendidos", "escudos apagados" } },
+        { "pt", new[] { "escudos alternar", "alternar escudos", "escudos ligados", "escudos desligados" } },
+        { "ja", new[] { "シールド切り替え", "シールド電源" } },
+        { "zh", new[] { "切换护盾", "护盾开启", "护盾关闭" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipShieldsResetTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "reset shields", "balance shields", "equalize shields", "shields reset", "shields equalize", "shields balance" } },
+        { "fr", new[] { "equilibrer boucliers", "reinitialiser boucliers", "boucliers equilibrer", "boucliers reset" } },
+        { "de", new[] { "schilde zuruecksetzen", "schilde ausgleichen", "schilde reset" } },
+        { "es", new[] { "restablecer escudos", "equilibrar escudos", "escudos equilibrar", "escudos reset" } },
+        { "pt", new[] { "restabelecer escudos", "equilibrar escudos", "escudos equilibrar", "escudos reset" } },
+        { "ja", new[] { "シールドリセット", "シールド均等", "シールドイコライズ" } },
+        { "zh", new[] { "重置护盾", "均等护盾", "平衡护盾" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipVtolTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "vtol", "toggle vtol", "vtol mode", "vertical takeoff", "vtol engines" } },
+        { "fr", new[] { "vtol", "basculer vtol", "mode vtol", "train vtol" } },
+        { "de", new[] { "vtol", "vtol umschalten", "vtol modus" } },
+        { "es", new[] { "vtol", "alternar vtol", "modo vtol" } },
+        { "pt", new[] { "vtol", "alternar vtol", "modo vtol" } },
+        { "ja", new[] { "vtol", "ブイトール", "vtol切り替え", "垂直起降切り替え" } },
+        { "zh", new[] { "vtol", "垂直起降", "切换垂直起降" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipQuantumSpoolTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "quantum", "spool quantum", "spool drive", "quantum drive", "quantum spool", "quantum drive toggle" } },
+        { "fr", new[] { "quantum", "quantum spouler", "moteur quantum", "activer quantum", "spouler quantum" } },
+        { "de", new[] { "quantum", "quantum spoolen", "quantenantrieb", "quantum antrieb" } },
+        { "es", new[] { "quantum", "iniciar quantum", "spool quantum", "motor quantum" } },
+        { "pt", new[] { "quantum", "iniciar quantum", "motor quântico", "modo quântico" } },
+        { "ja", new[] { "クアンタム", "クアンタムスプール", "量子ドライブ" } },
+        { "zh", new[] { "量子", "量子启动", "量子引擎", "启动量子" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipCruiseControlTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "cruise", "cruise control", "toggle cruise", "cruise speed", "cruise lock" } },
+        { "fr", new[] { "croisiere", "vitesse de croisiere", "regulateur de vitesse", "basculer croisiere" } },
+        { "de", new[] { "tempomat", "tempomat umschalten", "cruise control" } },
+        { "es", new[] { "crucero", "control de crucero", "alternar crucero" } },
+        { "pt", new[] { "cruzeiro", "piloto automático", "alternar cruzeiro" } },
+        { "ja", new[] { "クルーズ", "クルーズコントロール", "巡航切り替え" } },
+        { "zh", new[] { "巡航", "定速巡航", "巡航控制", "切换巡航" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipLandingRequestTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "request landing", "landing request", "open hangar", "request hangar", "call atc" } },
+        { "fr", new[] { "demande d'atterrissage", "demande atterrissage", "ouvrir hangar", "demander hangar", "appeler atc" } },
+        { "de", new[] { "landing anfordern", "landung anfordern", "hangar oeffnen", "atc rufen" } },
+        { "es", new[] { "solicitar aterrizaje", "pedir aterrizaje", "abrir hangar", "llamar atc" } },
+        { "pt", new[] { "solicitar pouso", "pedir pouso", "abrir hangar", "chamar atc" } },
+        { "ja", new[] { "着陸要請", "着陸リクエスト", "ハンガー開放", "atc呼出" } },
+        { "zh", new[] { "请求降落", "申请降落", "开启机库", "请求机库", "呼叫atc" } }
+    };
+
     // Voice Changer Profiles localized
     private static readonly string[] ProfileAlienNames = new[] { "alien", "extraterrestre", "alienígena", "エイリアン", "外星人" };
     private static readonly string[] ProfileCyborgNames = new[] { "cyborg", "ciborg", "サイボーグ", "半机械人", "改造人" };
@@ -216,6 +312,14 @@ public class VoiceCommandService
     public event Action? ShipDoorsToggleRequested;
     public event Action? ShipShieldsFrontRequested;
     public event Action? ShipLandingGearToggleRequested;
+    public event Action? ShipEnginesToggleRequested;
+    public event Action? ShipWeaponsToggleRequested;
+    public event Action? ShipShieldsToggleRequested;
+    public event Action? ShipShieldsResetRequested;
+    public event Action? ShipVtolToggleRequested;
+    public event Action? ShipQuantumSpoolRequested;
+    public event Action? ShipCruiseControlRequested;
+    public event Action? ShipLandingRequestRequested;
 
     public VoiceCommandResult ParseAndExecute(string text, string appLang, IEnumerable<string> availableChannels, double confidence = 0.5)
     {
@@ -371,6 +475,62 @@ public class VoiceCommandService
             result.Action = VoiceCommandAction.ShipLandingGearToggle;
             result.Similarity = sim;
             ShipLandingGearToggleRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipEnginesTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipEnginesToggle;
+            result.Similarity = sim;
+            ShipEnginesToggleRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipWeaponsTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipWeaponsToggle;
+            result.Similarity = sim;
+            ShipWeaponsToggleRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipShieldsToggleTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipShieldsToggle;
+            result.Similarity = sim;
+            ShipShieldsToggleRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipShieldsResetTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipShieldsReset;
+            result.Similarity = sim;
+            ShipShieldsResetRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipVtolTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipVtolToggle;
+            result.Similarity = sim;
+            ShipVtolToggleRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipQuantumSpoolTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipQuantumSpool;
+            result.Similarity = sim;
+            ShipQuantumSpoolRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipCruiseControlTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipCruiseControl;
+            result.Similarity = sim;
+            ShipCruiseControlRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipLandingRequestTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipLandingRequest;
+            result.Similarity = sim;
+            ShipLandingRequestRequested?.Invoke();
             return result;
         }
 

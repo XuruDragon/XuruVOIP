@@ -268,6 +268,14 @@ graph TB
     #### Contrôles de vaisseau simulés (Associés à Star Citizen)
     Ces commandes simulent des pressions de touches physiques sur votre PC pour déclencher des contrôles de Star Citizen :
     * **Basculer l'alimentation du vaisseau :** `alimentation`, `basculer alimentation`, `allumer systemes`, `eteindre systemes`, `demarrer systemes`, `couper systemes`
+    * **Basculer les moteurs du vaisseau :** `moteurs`, `basculer moteurs`, `moteurs on`, `moteurs off`
+    * **Basculer les armes :** `armes`, `basculer armes`, `activer armes`, `desactiver armes`
+    * **Basculer les boucliers (ON/OFF) :** `boucliers`, `basculer boucliers`
+    * **Réinitialiser/Équilibrer les boucliers :** `reinitialiser boucliers`, `boucliers reset`, `equilibrer boucliers`
+    * **Basculer le mode VTOL :** `vtol`, `basculer vtol`
+    * **Activer le moteur quantique (Quantum) :** `quantique`, `moteur quantique`, `voyage quantique`
+    * **Basculer le régulateur de vitesse (Cruise Control) :** `croisiere`, `vitesse de croisiere`, `regulateur de vitesse`, `basculer croisiere`
+    * **Demander l'atterrissage / Ouvrir le hangar :** `demande d'atterrissage`, `demande atterrissage`, `ouvrir hangar`, `demander hangar`, `appeler atc`
     * **Basculer les portes/rampes du vaisseau :** `portes`, `exterieur`, `ouvrir portes`, `fermer portes`, `ouvrir exterieur`, `fermer exterieur`, `basculer portes`
     * **Dévier les boucliers vers l'avant :** `boucliers`, `boucliers avant`, `devier boucliers`, `boucliers devant`
     * **Basculer le train d'atterrissage :** `train d'atterrissage`, `deployer train`, `rentrer train`, `train atterrissage`

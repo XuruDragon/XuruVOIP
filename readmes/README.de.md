@@ -268,6 +268,14 @@ graph TB
     #### Simulierte Schiffssteuerungen (Star Citizen-bezogen)
     Diese Befehle simulieren physische Tastendrücke auf Ihrem PC, um Star Citizen-Steuerungen auszulösen:
     * **Schiffsenergie umschalten:** `energie`, `energie umschalten`, `systeme an`, `systeme aus`, `strom an`, `strom aus`
+    * **Schiffstriebwerke umschalten:** `triebwerke`, `triebwerke umschalten`, `triebwerke an`, `triebwerke aus`
+    * **Waffen umschalten:** `waffen`, `waffen umschalten`, `waffen an`, `waffen aus`
+    * **Schilde umschalten (ON/OFF):** `schilde umschalten`, `schilde`
+    * **Schilde ausgleichen:** `schilde zuruecksetzen`, `schilde ausgleichen`
+    * **VTOL-Modus umschalten:** `vtol`, `vtol umschalten`
+    * **Quantenantrieb aktivieren (Quantum):** `quantum`, `quantenantrieb`, `quantenantrieb spulen`, `quantum spool`
+    * **Tempomat umschalten (Cruise Control):** `tempomat`, `tempomat umschalten`, `cruise control`
+    * **Landung anfordern / Hangar öffnen:** `landing anfordern`, `landung anfordern`, `hangar oeffnen`, `atc rufen`
     * **Schiffstüren/-rampen umschalten:** `tueren`, `tueren oeffnen`, `tueren schliessen`, `aussen oeffnen`, `aussen schliessen`
     * **Schilde nach vorne umleiten:** `schilde`, `schilde vorne`, `schilde vorwaerts`, `schilde umleiten`
     * **Fahrwerk umschalten:** `fahrwerk`, `fahrwerk ausfahren`, `fahrwerk einfahren`

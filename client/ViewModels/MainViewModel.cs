@@ -929,6 +929,22 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandShieldsKey);
         _voiceCommand.ShipLandingGearToggleRequested += () => 
             InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandLandingGearKey);
+        _voiceCommand.ShipEnginesToggleRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandEnginesKey);
+        _voiceCommand.ShipWeaponsToggleRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandWeaponsKey);
+        _voiceCommand.ShipShieldsToggleRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandShieldsToggleKey);
+        _voiceCommand.ShipShieldsResetRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandShieldsResetKey);
+        _voiceCommand.ShipVtolToggleRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandVtolKey);
+        _voiceCommand.ShipQuantumSpoolRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandQuantumKey);
+        _voiceCommand.ShipCruiseControlRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandCruiseKey);
+        _voiceCommand.ShipLandingRequestRequested += () => 
+            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandLandingRequestKey, Config.Config.VoiceCommandLandingRequestModifier);
         _voiceCommand.VoiceChangerProfileRequested += profile =>
         {
             Config.Config.EnableVoiceChanger = (profile != "None");
@@ -1877,6 +1893,18 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                     VoiceCommandAction.MicUnmuteAll => "Unmute All",
                     VoiceCommandAction.RadioChannelSwitch => $"Channel: {result.TargetChannel}",
                     VoiceCommandAction.VoiceChangerProfile => $"Voice Changer: {result.TargetProfile}",
+                    VoiceCommandAction.ShipPowerToggle => "Toggle Ship Power",
+                    VoiceCommandAction.ShipDoorsToggle => "Toggle Ship Doors",
+                    VoiceCommandAction.ShipShieldsFront => "Shields Forward",
+                    VoiceCommandAction.ShipLandingGearToggle => "Toggle Landing Gear",
+                    VoiceCommandAction.ShipEnginesToggle => "Toggle Engines",
+                    VoiceCommandAction.ShipWeaponsToggle => "Toggle Weapons",
+                    VoiceCommandAction.ShipShieldsToggle => "Toggle Shields",
+                    VoiceCommandAction.ShipShieldsReset => "Equalize Shields",
+                    VoiceCommandAction.ShipVtolToggle => "Toggle VTOL",
+                    VoiceCommandAction.ShipQuantumSpool => "Spool Quantum Drive",
+                    VoiceCommandAction.ShipCruiseControl => "Toggle Cruise Control",
+                    VoiceCommandAction.ShipLandingRequest => "Request Landing",
                     _ => "Command"
                 };
 

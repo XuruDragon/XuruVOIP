@@ -268,6 +268,14 @@ graph TB
     #### Controles simulados da nave (Relacionados ao Star Citizen)
     Esses comandos simulam pressionamentos de teclas físicas no seu PC para acionar controles de Star Citizen:
     * **Alternar energia da nave:** `energia`, `alternar energia`, `sistemas ligados`, `sistemas desligados`
+    * **Alternar motores da nave:** `motores`, `alternar motores`, `ligar motores`, `desligar motores`
+    * **Alternar armas:** `armas`, `alternar armas`, `ligar armas`, `desligar armas`
+    * **Alternar escudos (ON/OFF):** `alternar escudos`
+    * **Equilibrar escudos:** `restaurar escudos`, `equilibrar escudos`
+    * **Alternar modo VTOL:** `vtol`, `alternar vtol`
+    * **Ativar salto quântico (Quantum):** `quântico`, `salto quântico`, `motor quântico`
+    * **Alternar piloto automático (Cruise Control):** `cruzeiro`, `piloto automático`, `alternar cruzeiro`
+    * **Solicitar pouso / Abrir hangar:** `solicitar pouso`, `pedir pouso`, `abrir hangar`, `chamar atc`
     * **Alternar portas/rampas da nave:** `portas`, `exterior`, `abrir portas`, `fechar portas`, `abrir exterior`, `fechar exterior`
     * **Desviar escudos para a frente:** `escudos`, `escudos na frente`, `escudos para frente`, `desviar escudos`
     * **Alternar trem de pouso:** `trem de pouso`, `desdobrar trem`, `recolher trem`
