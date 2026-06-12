@@ -29,7 +29,7 @@
 
     <!-- Drop shadow outer border -->
     <Border Margin="8" CornerRadius="16"
-            Background="{StaticResource BgSurface}"
+            Background="{DynamicResource BgSurface}"
             BorderBrush="{StaticResource BorderSubtle}"
             BorderThickness="1">
         <Border.Effect>
@@ -50,12 +50,12 @@
 
             <!-- ═══ TITLE BAR ═══════════════════════════════════════ -->
             <Border Grid.Row="0" CornerRadius="16,16,0,0"
-                    Background="{StaticResource BgDeep}"
+                    Background="{DynamicResource BgDeep}"
                     MouseLeftButtonDown="TitleBar_MouseDown">
                 <Grid Margin="16,0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <!-- Logo dot -->
-                        <Ellipse Width="10" Height="10" Fill="{StaticResource Accent}"
+                        <Ellipse Width="10" Height="10" Fill="{DynamicResource Accent}"
                                  Margin="0,0,8,0"/>
                         <TextBlock x:Name="WindowTitleText" Text="XuruVoip" Foreground="{StaticResource TextPrimary}"
                                    FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
@@ -88,7 +88,7 @@
                 <!-- Left Column: Status, Voice Meter, Action Buttons -->
                 <StackPanel Grid.Column="0">
                     <!-- Connection Status -->
-                    <Border Background="{StaticResource BgElevated}" CornerRadius="12"
+                    <Border Background="{DynamicResource BgElevated}" CornerRadius="12"
                             Padding="14,10" Margin="0,0,0,14">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -131,7 +131,7 @@
                     </Border>
 
                     <!-- Talking indicator -->
-                    <Border x:Name="TalkBorder" Background="{StaticResource BgElevated}"
+                    <Border x:Name="TalkBorder" Background="{DynamicResource BgElevated}"
                             CornerRadius="12" Padding="14,12" Margin="0,0,0,14">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -144,11 +144,11 @@
                                                FontSize="11"/>
                                     <TextBlock Text="  —  " Foreground="{StaticResource TextSecondary}"
                                                FontSize="11"/>
-                                    <TextBlock Text="{Binding MicModeText}" Foreground="{StaticResource Accent}"
+                                    <TextBlock Text="{Binding MicModeText}" Foreground="{DynamicResource Accent}"
                                                FontSize="11" FontWeight="SemiBold"/>
                                 </StackPanel>
                                 <!-- VU Meter bar -->
-                                <Border Height="6" Background="{StaticResource BgDeep}"
+                                <Border Height="6" Background="{DynamicResource BgDeep}"
                                         CornerRadius="3" Width="200" HorizontalAlignment="Left">
                                     <Border x:Name="VuBar" HorizontalAlignment="Left"
                                             Height="6" CornerRadius="3" MinWidth="2"
@@ -174,7 +174,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Button x:Name="ConnectBtn" Grid.Column="0" Content="{DynamicResource BtnConnect}"
-                                Style="{StaticResource AccentButton}"
+                                Style="{DynamicResource AccentButton}"
                                 Click="Connect_Click"/>
                         <Button x:Name="DisconnectBtn" Grid.Column="2" Content="{DynamicResource BtnDisconnect}"
                                 Style="{StaticResource GhostButton}"
@@ -182,7 +182,7 @@
                     </Grid>
 
                     <!-- System Console Panel -->
-                    <Border Background="{StaticResource BgDeep}" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1"
+                    <Border Background="{DynamicResource BgDeep}" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1"
                             CornerRadius="12" Padding="14,12" Margin="0,14,0,0" Height="181">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -212,14 +212,14 @@
                 <!-- Right Column: Location Telemetry, Channel Status, Helmet Info -->
                 <StackPanel Grid.Column="2">
                     <!-- Position info -->
-                    <Border Background="{StaticResource BgElevated}" CornerRadius="12"
+                    <Border Background="{DynamicResource BgElevated}" CornerRadius="12"
                             Padding="14,10" Margin="0,0,0,14">
                         <StackPanel>
                             <TextBlock Text="{DynamicResource PanelLocation}"
                                        Foreground="{StaticResource TextSecondary}"
                                        FontSize="11" Margin="0,0,0,4"/>
                             <TextBlock x:Name="ZoneText" Text="{Binding CurrentZone}"
-                                       Foreground="{StaticResource Accent}"
+                                       Foreground="{DynamicResource Accent}"
                                        FontSize="13" FontWeight="SemiBold"
                                        TextTrimming="CharacterEllipsis"/>
                             <TextBlock x:Name="PosText" Text="{Binding CurrentPos}"
@@ -237,18 +237,18 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- Active Radio Channel -->
-                        <Border Grid.Column="0" Background="{StaticResource BgElevated}" CornerRadius="12" Padding="14,10">
+                        <Border Grid.Column="0" Background="{DynamicResource BgElevated}" CornerRadius="12" Padding="14,10">
                             <StackPanel>
                                 <TextBlock Text="{DynamicResource PanelRadioChannel}" Foreground="{StaticResource TextSecondary}"
                                            FontSize="11" Margin="0,0,0,4" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Text="{Binding ActiveChannelName}"
-                                           Foreground="{StaticResource Accent}"
+                                           Foreground="{DynamicResource Accent}"
                                            FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
                         </Border>
 
                         <!-- Helmet Status -->
-                        <Border Grid.Column="2" Background="{StaticResource BgElevated}" CornerRadius="12" Padding="14,10">
+                        <Border Grid.Column="2" Background="{DynamicResource BgElevated}" CornerRadius="12" Padding="14,10">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
@@ -273,7 +273,7 @@
                     </Grid>
 
                     <!-- Channel Mute Status Table -->
-                    <Border Background="{StaticResource BgElevated}" CornerRadius="12" Padding="14,10" Margin="0,0,0,0">
+                    <Border Background="{DynamicResource BgElevated}" CornerRadius="12" Padding="14,10" Margin="0,0,0,0">
                         <StackPanel>
                             <TextBlock Text="{DynamicResource PanelMuteStatus}" Foreground="{StaticResource TextSecondary}"
                                        FontSize="11" Margin="0,0,0,8"/>
@@ -397,7 +397,7 @@
                     </Border>
 
                     <!-- Connection Diagnostics Panel -->
-                    <Border Background="{StaticResource BgElevated}" CornerRadius="12" Padding="14,10" Margin="0,14,0,0" Height="82">
+                    <Border Background="{DynamicResource BgElevated}" CornerRadius="12" Padding="14,10" Margin="0,14,0,0" Height="82">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -418,19 +418,19 @@
                                 <!-- Latency -->
                                 <StackPanel Grid.Column="0" HorizontalAlignment="Center">
                                     <TextBlock Text="{DynamicResource LblLatency}" Foreground="{StaticResource TextSecondary}" FontSize="10" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="{Binding Latency}" Foreground="{StaticResource Accent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                    <TextBlock Text="{Binding Latency}" Foreground="{DynamicResource Accent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
                                 </StackPanel>
 
                                 <!-- Jitter -->
                                 <StackPanel Grid.Column="1" HorizontalAlignment="Center">
                                     <TextBlock Text="{DynamicResource LblJitter}" Foreground="{StaticResource TextSecondary}" FontSize="10" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="{Binding Jitter}" Foreground="{StaticResource Accent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                    <TextBlock Text="{Binding Jitter}" Foreground="{DynamicResource Accent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
                                 </StackPanel>
 
                                 <!-- Packet Loss -->
                                 <StackPanel Grid.Column="2" HorizontalAlignment="Center">
                                     <TextBlock Text="{DynamicResource LblPacketLoss}" Foreground="{StaticResource TextSecondary}" FontSize="10" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="{Binding PacketLoss}" Foreground="{StaticResource Accent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                    <TextBlock Text="{Binding PacketLoss}" Foreground="{DynamicResource Accent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
                                 </StackPanel>
                             </Grid>
                         </Grid>
@@ -439,8 +439,8 @@
             </Grid>
 
             <!-- ═══ UPDATE BANNER ═══════════════════════════════════ -->
-            <Border Grid.Row="2" Background="{StaticResource BgElevated}" 
-                    BorderBrush="{StaticResource Accent}" BorderThickness="0,1,0,0"
+            <Border Grid.Row="2" Background="{DynamicResource BgElevated}" 
+                    BorderBrush="{DynamicResource Accent}" BorderThickness="0,1,0,0"
                     Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVis}}"
                     Padding="16,6">
                 <Grid>
@@ -453,19 +453,19 @@
                         <TextBlock Text="{DynamicResource UpdateBannerText}" Foreground="{StaticResource TextPrimary}" 
                                    FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         <TextBlock Text=" (" Foreground="{StaticResource TextSecondary}" FontSize="11" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding LatestVersion}" Foreground="{StaticResource Accent}" 
+                        <TextBlock Text="{Binding LatestVersion}" Foreground="{DynamicResource Accent}" 
                                    FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
                         <TextBlock Text=")" Foreground="{StaticResource TextSecondary}" FontSize="11" VerticalAlignment="Center"/>
                     </StackPanel>
                     <Button x:Name="UpdateBtn" Grid.Column="1" Content="{DynamicResource BtnDownload}" 
-                            Style="{StaticResource AccentButton}" Padding="10,2" Height="22" FontSize="10"
+                            Style="{DynamicResource AccentButton}" Padding="10,2" Height="22" FontSize="10"
                             Click="DownloadUpdate_Click"/>
                 </Grid>
             </Border>
 
             <!-- ═══ STATUS BAR ═══════════════════════════════════════ -->
             <Border Grid.Row="3" CornerRadius="0,0,16,16"
-                    Background="{StaticResource BgDeep}"
+                    Background="{DynamicResource BgDeep}"
                     Padding="16,6" Margin="0,0,0,4">
                 <TextBlock Foreground="{StaticResource TextSecondary}"
                            FontSize="10"

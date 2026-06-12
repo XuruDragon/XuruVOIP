@@ -25,7 +25,7 @@
                             </Grid.ColumnDefinitions>
 
                             <!-- Sidebar background and tab items list -->
-                            <Border Grid.Column="0" Background="{StaticResource BgDeep}" Padding="12,16,12,16">
+                            <Border Grid.Column="0" Background="{DynamicResource BgDeep}" Padding="12,16,12,16">
                                 <TabPanel IsItemsHost="True" KeyboardNavigation.TabIndex="1"/>
                             </Border>
 
@@ -56,16 +56,16 @@
             <Setter Property="Margin" Value="0,0,0,2"/>
         </Style>
         <Style x:Key="InputStyle" TargetType="TextBox">
-            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Background" Value="{DynamicResource BgElevated}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,6"/>
             <Setter Property="FontSize" Value="13"/>
-            <Setter Property="CaretBrush" Value="{StaticResource Accent}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource Accent}"/>
         </Style>
         <Style x:Key="PwdStyle" TargetType="PasswordBox">
-            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Background" Value="{DynamicResource BgElevated}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -73,7 +73,7 @@
             <Setter Property="FontSize" Value="13"/>
         </Style>
         <Style x:Key="ComboStyle" TargetType="ComboBox">
-            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Background" Value="{DynamicResource BgElevated}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -116,12 +116,12 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="true">
-                                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Accent}" />
-                                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource Accent}" />
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Accent}" />
+                                                <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource Accent}" />
                                             </Trigger>
                                             <Trigger Property="IsChecked" Value="true">
-                                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Accent}" />
-                                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource Accent}" />
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Accent}" />
+                                                <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource Accent}" />
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -150,7 +150,7 @@
                                       MinWidth="{TemplateBinding ActualWidth}"
                                       MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                     <Border x:Name="DropDownBorder"
-                                            Background="{StaticResource BgElevated}"
+                                            Background="{DynamicResource BgElevated}"
                                             BorderBrush="{StaticResource BorderSubtle}"
                                             BorderThickness="1"
                                             CornerRadius="8"
@@ -170,7 +170,7 @@
             </Setter>
         </Style>
         <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Background" Value="{DynamicResource BgElevated}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="8,6"/>
@@ -186,11 +186,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource Accent}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Accent}"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentGlow}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentGlow}"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -201,7 +201,7 @@
     </Window.Resources>
 
     <Border Margin="8" CornerRadius="16"
-            Background="{StaticResource BgSurface}"
+            Background="{DynamicResource BgSurface}"
             BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
         <Border.Effect>
             <DropShadowEffect Color="#000000" BlurRadius="24" ShadowDepth="4" Opacity="0.6"/>
@@ -215,7 +215,7 @@
 
             <!-- Title bar -->
             <Border Grid.Row="0" CornerRadius="16,16,0,0"
-                    Background="{StaticResource BgDeep}"
+                    Background="{DynamicResource BgDeep}"
                     MouseLeftButtonDown="TitleBar_MouseDown">
                 <Grid Margin="16,0">
                     <TextBlock Text="{DynamicResource TitleSettings}" Foreground="{StaticResource TextPrimary}"
@@ -248,11 +248,11 @@
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource BgElevated}"/>
-                                            <Setter Property="Foreground" Value="{StaticResource Accent}"/>
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BgElevated}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
                                         </Trigger>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource BgElevated}"/>
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BgElevated}"/>
                                             <Setter TargetName="Bd" Property="Opacity" Value="0.6"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
@@ -269,6 +269,11 @@
                             <TextBlock Text="{DynamicResource LblLanguage}" Style="{StaticResource LabelStyle}" Margin="0,0,0,2"/>
                             <ComboBox x:Name="CbLanguage" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
                                       SelectionChanged="CbLanguage_SelectionChanged"/>
+
+                            <!-- HUD & App Theme -->
+                            <TextBlock Text="{DynamicResource LblHudTheme}" Style="{StaticResource LabelStyle}"/>
+                            <ComboBox x:Name="CbHudTheme" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
+                                      SelectionChanged="CbHudTheme_SelectionChanged"/>
 
                             <TextBlock Text="{DynamicResource LblGameLogPath}" Style="{StaticResource LabelStyle}" Margin="0,0,0,2"/>
                             <Grid Margin="0,0,0,16">
@@ -358,16 +363,16 @@
                                          Style="{StaticResource InputStyle}" Margin="0,0,0,12"/>
 
                                 <Button Content="{DynamicResource BtnDefineRegion}"
-                                        Style="{StaticResource AccentButton}"
+                                        Style="{DynamicResource AccentButton}"
                                         HorizontalAlignment="Left"
                                         Click="PickRegion_Click" Margin="0,0,0,16"/>
 
-                                <Border Background="{StaticResource BgElevated}" CornerRadius="8" Padding="12,10" Margin="0,0,0,16">
+                                <Border Background="{DynamicResource BgElevated}" CornerRadius="8" Padding="12,10" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="{DynamicResource LblLastOcrOutput}" Foreground="{StaticResource TextSecondary}"
                                                    FontSize="11" Margin="0,0,0,4"/>
                                         <TextBlock x:Name="TbOcrPreview"
-                                                   Foreground="{StaticResource Accent}"
+                                                   Foreground="{DynamicResource Accent}"
                                                    FontSize="12" TextWrapping="Wrap"
                                                    Text="{DynamicResource OcrNoData}"/>
                                     </StackPanel>
@@ -378,9 +383,9 @@
                             </StackPanel>
 
                             <StackPanel x:Name="GrtprControlsPanel" Visibility="Collapsed">
-                                <Border Background="{StaticResource BgElevated}" CornerRadius="12" Padding="16,14" Margin="0,0,0,16">
+                                <Border Background="{DynamicResource BgElevated}" CornerRadius="12" Padding="16,14" Margin="0,0,0,16">
                                     <StackPanel>
-                                        <TextBlock Text="{DynamicResource LblGrtprActive}" Foreground="{StaticResource Accent}" 
+                                        <TextBlock Text="{DynamicResource LblGrtprActive}" Foreground="{DynamicResource Accent}" 
                                                    FontWeight="SemiBold" FontSize="13" Margin="0,0,0,6"/>
                                         <TextBlock Text="{DynamicResource LblGrtprDesc}" Foreground="{StaticResource TextSecondary}" 
                                                    FontSize="11" TextWrapping="Wrap"/>
@@ -407,7 +412,7 @@
                             </TextBlock>
                             <Slider x:Name="SlInputGain" Minimum="-20" Maximum="20"
                                     TickFrequency="5" IsSnapToTickEnabled="True"
-                                    Foreground="{StaticResource Accent}"
+                                    Foreground="{DynamicResource Accent}"
                                     ValueChanged="SlInputGain_Changed" Margin="0,0,0,16"/>
 
                             <!-- Output device -->
@@ -421,7 +426,7 @@
                                 <Run x:Name="OutputGainLabel" Text="100%"/>
                             </TextBlock>
                             <Slider x:Name="SlOutputGain" Minimum="0" Maximum="200"
-                                    Foreground="{StaticResource Accent}"
+                                    Foreground="{DynamicResource Accent}"
                                     ValueChanged="SlOutputGain_Changed" Margin="0,0,0,16"/>
 
                             <!-- Audio mode -->
@@ -454,7 +459,7 @@
                                 <TextBlock Text="{DynamicResource LblVadSens}" Style="{StaticResource LabelStyle}"/>
                                 <Slider x:Name="SlVad" Minimum="0" Maximum="3"
                                         TickFrequency="1" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlVad_Changed" Margin="0,0,0,4"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="0,0,0,12">
                                     <TextBlock Text="{DynamicResource LblSensLow}" Foreground="{StaticResource TextSecondary}" FontSize="10" Width="60"/>
@@ -556,7 +561,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlVoicePitch" Minimum="0.5" Maximum="2.0"
                                         TickFrequency="0.1" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlVoicePitch_Changed" Margin="0,0,0,16"/>
                             </StackPanel>
 
@@ -577,7 +582,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomPitch" Minimum="0.5" Maximum="2.0"
                                         TickFrequency="0.1" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomPitch_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomPitchShift, Mode=TwoWay}"/>
 
@@ -588,7 +593,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomRingFreq" Minimum="20" Maximum="3000"
                                         TickFrequency="20" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomRingFreq_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomRingModFreq, Mode=TwoWay}"/>
 
@@ -599,7 +604,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomRingMix" Minimum="0.0" Maximum="1.0"
                                         TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomRingMix_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomRingModMix, Mode=TwoWay}"/>
 
@@ -610,7 +615,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomFlangerDepth" Minimum="0.0" Maximum="1.0"
                                         TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomFlangerDepth_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomFlangerDepth, Mode=TwoWay}"/>
 
@@ -621,7 +626,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomFlangerRate" Minimum="0.1" Maximum="10.0"
                                         TickFrequency="0.1" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomFlangerRate_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomFlangerRate, Mode=TwoWay}"/>
 
@@ -632,7 +637,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomFlangerFeedback" Minimum="0.0" Maximum="0.95"
                                         TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomFlangerFeedback_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomFlangerFeedback, Mode=TwoWay}"/>
 
@@ -652,7 +657,7 @@
                                     </TextBlock>
                                     <Slider x:Name="SlCustomBitcrushBits" Minimum="2" Maximum="16"
                                             TickFrequency="1" IsSnapToTickEnabled="True"
-                                            Foreground="{StaticResource Accent}"
+                                            Foreground="{DynamicResource Accent}"
                                             ValueChanged="SlCustomBitcrushBits_Changed" Margin="0,0,0,16"
                                             Value="{Binding Config.CustomBitcrushBits, Mode=TwoWay}"/>
                                 </StackPanel>
@@ -699,7 +704,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlRadarRange" Minimum="10" Maximum="200"
                                         TickFrequency="10" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlRadarRange_Changed" Margin="0,0,0,12"/>
                             </StackPanel>
 
@@ -739,7 +744,7 @@
 
                             <!-- Overlay Capabilities Info -->
                             <TextBlock Text="{DynamicResource LblOverlayCapabilities}" Style="{StaticResource LabelStyle}" FontWeight="Bold" Margin="0,12,0,4"/>
-                            <Border Background="{StaticResource BgElevated}" CornerRadius="8" Padding="12" Margin="0,0,0,16">
+                            <Border Background="{DynamicResource BgElevated}" CornerRadius="8" Padding="12" Margin="0,0,0,16">
                                 <TextBlock Text="{DynamicResource LblOverlayCapabilitiesDesc}" Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap"/>
                             </Border>
                         </StackPanel>
@@ -877,12 +882,12 @@
                                 </TextBlock>
                                 <Slider x:Name="SlVoiceCommandConfidence" Minimum="0.1" Maximum="1.0"
                                         TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlVoiceCommandConfidence_Changed" Margin="0,0,0,12"/>
                             </StackPanel>
 
                             <!-- Header: Communication Hotkeys -->
-                            <TextBlock Text="{DynamicResource HeaderCommHotkeys}" Foreground="{StaticResource Accent}" FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
+                            <TextBlock Text="{DynamicResource HeaderCommHotkeys}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -968,7 +973,7 @@
                             </Grid>
 
                             <!-- Header: Mute Hotkeys -->
-                            <TextBlock Text="{DynamicResource HeaderMuteHotkeys}" Foreground="{StaticResource Accent}" FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
+                            <TextBlock Text="{DynamicResource HeaderMuteHotkeys}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -1031,7 +1036,7 @@
 
                             <!-- Voice-Activated Ship Controls -->
                             <TextBlock Text="{DynamicResource LblVoiceShipControlsHeader}" 
-                                       Foreground="{StaticResource Accent}" 
+                                       Foreground="{DynamicResource Accent}" 
                                        FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
@@ -1099,9 +1104,9 @@
             </TabControl>
 
             <!-- Save button -->
-            <Border Grid.Row="2" Padding="16,8" Background="{StaticResource BgDeep}"
+            <Border Grid.Row="2" Padding="16,8" Background="{DynamicResource BgDeep}"
                     CornerRadius="0,0,16,16">
-                <Button Content="{DynamicResource BtnSaveClose}" Style="{StaticResource AccentButton}"
+                <Button Content="{DynamicResource BtnSaveClose}" Style="{DynamicResource AccentButton}"
                         HorizontalAlignment="Right" Click="Save_Click"/>
             </Border>
         </Grid>

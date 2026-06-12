@@ -79,7 +79,7 @@ public class CompanionAppTests
 
             Assert.Equal("TestPlayer", root.GetProperty("username").GetString());
             Assert.False(root.GetProperty("micProximityMuted").GetBoolean());
-            Assert.Equal("Aegis", root.GetProperty("hudTheme").GetString());
+            Assert.Equal("RSI", root.GetProperty("hudTheme").GetString());
             Assert.Equal("TopLeft", root.GetProperty("overlayPosition").GetString());
             Assert.True(root.GetProperty("hudShowRadar").GetBoolean());
             Assert.True(root.GetProperty("hudShowActiveSpeakers").GetBoolean());

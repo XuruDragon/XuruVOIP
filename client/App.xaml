@@ -15,6 +15,7 @@
             <Color x:Key="BgDeepColor">#0D0F14</Color>
             <Color x:Key="BgSurfaceColor">#161A23</Color>
             <Color x:Key="BgElevatedColor">#1E2330</Color>
+            <Color x:Key="HudBackgroundColor">#B80D0F14</Color>
             <Color x:Key="AccentColor">#4E9EFF</Color>
             <Color x:Key="AccentGlowColor">#2A6ECC</Color>
             <Color x:Key="GreenColor">#3DDB85</Color>
@@ -23,11 +24,16 @@
             <Color x:Key="TextSecondaryColor">#8892A4</Color>
             <Color x:Key="BorderSubtleColor">#2A3044</Color>
 
-            <SolidColorBrush x:Key="BgDeep"     Color="{StaticResource BgDeepColor}"/>
-            <SolidColorBrush x:Key="BgSurface"  Color="{StaticResource BgSurfaceColor}"/>
-            <SolidColorBrush x:Key="BgElevated" Color="{StaticResource BgElevatedColor}"/>
-            <SolidColorBrush x:Key="Accent"     Color="{StaticResource AccentColor}"/>
-            <SolidColorBrush x:Key="AccentGlow" Color="{StaticResource AccentGlowColor}"/>
+            <SolidColorBrush x:Key="BgDeep"     Color="{DynamicResource BgDeepColor}"/>
+            <SolidColorBrush x:Key="BgSurface"  Color="{DynamicResource BgSurfaceColor}"/>
+            <SolidColorBrush x:Key="BgElevated" Color="{DynamicResource BgElevatedColor}"/>
+            <SolidColorBrush x:Key="HudBackground" Color="{DynamicResource HudBackgroundColor}"/>
+            <SolidColorBrush x:Key="Accent"     Color="{DynamicResource AccentColor}"/>
+            <SolidColorBrush x:Key="AccentGlow" Color="{DynamicResource AccentGlowColor}"/>
+            <LinearGradientBrush x:Key="AccentGradient" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="{DynamicResource AccentColor}" Offset="0"/>
+                <GradientStop Color="{DynamicResource AccentGlowColor}" Offset="1"/>
+            </LinearGradientBrush>
             <SolidColorBrush x:Key="Green"      Color="{StaticResource GreenColor}"/>
             <SolidColorBrush x:Key="Red"        Color="{StaticResource RedColor}"/>
             <SolidColorBrush x:Key="TextPrimary"   Color="{StaticResource TextPrimaryColor}"/>
@@ -44,14 +50,7 @@
                  BUTTON STYLE
             ══════════════════════════════════════════ -->
             <Style x:Key="AccentButton" TargetType="Button">
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="#4E9EFF" Offset="0"/>
-                            <GradientStop Color="#2A6ECC" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Setter.Value>
-                </Setter>
+                <Setter Property="Background" Value="{DynamicResource AccentGradient}"/>
                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Padding" Value="16,8"/>

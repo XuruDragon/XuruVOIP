@@ -230,5 +230,6 @@
     <sys:String x:Key="LblLatency">Latência</sys:String>
     <sys:String x:Key="LblJitter">Jitter</sys:String>
     <sys:String x:Key="LblPacketLoss">Perda de pacotes</sys:String>
+    <sys:String x:Key="LblHudTheme">Tema do HUD e Aplicativo</sys:String>
 </ResourceDictionary>
 

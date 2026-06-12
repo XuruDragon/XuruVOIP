@@ -117,6 +117,9 @@ public partial class App : Application
             ViewModel = new MainViewModel();
             LogService.EnableGeneralLogs = ViewModel.Config.Config.EnableGeneralLogs;
 
+            // Initialize theme colors globally in WPF Client
+            ThemeManager.ApplyTheme(ViewModel.Config.Config.HudTheme);
+
             // Load and apply language
             string lang = ViewModel.Config.Config.Language;
             if (string.IsNullOrEmpty(lang))

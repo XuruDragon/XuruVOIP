@@ -1442,6 +1442,14 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         LogService.Info("ApplySettings: Applying settings update...");
         // Update general logging switch instantly
         LogService.EnableGeneralLogs = Config.Config.EnableGeneralLogs;
+
+        if (Application.Current != null)
+        {
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                ThemeManager.ApplyTheme(Config.Config.HudTheme);
+            }));
+        }
         _gameDetector.CustomGameLogPath = Config.Config.CustomGameLogPath;
         _playback.EnableSpatialAudio = Config.Config.EnableSpatialAudio; // Sync spatial audio setting
         _playback.EnableHrtfBinaural = Config.Config.EnableHrtf;
