@@ -267,8 +267,7 @@ public class CompanionAppService : IDisposable
                     hudShowRadar = _viewModel.Config.Config.HudShowRadar,
                     hudShowActiveSpeakers = _viewModel.Config.Config.HudShowActiveSpeakers,
                     hudShowChannel = _viewModel.Config.Config.HudShowChannel,
-                    pttChimeType = _viewModel.Config.Config.PttChimeType,
-                    enableAlarmInjection = _viewModel.Config.Config.EnableAlarmInjection
+                    pttChimeType = _viewModel.Config.Config.PttChimeType
                 };
 
                 string json = JsonSerializer.Serialize(status);
@@ -464,11 +463,6 @@ public class CompanionAppService : IDisposable
                     _viewModel.SaveConfig();
                     _viewModel.ApplySettings();
                 }
-                break;
-            case "toggle_alarm_injection":
-                _viewModel.Config.Config.EnableAlarmInjection = !_viewModel.Config.Config.EnableAlarmInjection;
-                _viewModel.SaveConfig();
-                _viewModel.ApplySettings();
                 break;
         }
     }
@@ -865,13 +859,7 @@ public class CompanionAppService : IDisposable
                         <option value="Vintage">Vintage</option>
                     </select>
                 </div>
-                <div class="control-row" style="margin-top:12px;">
-                    <div class="section-title">Ambient Alarm Injection</div>
-                    <button class="btn" id="btn-alarm-injection" onclick="postAction('toggle_alarm_injection')" style="width:100%; flex-direction:row; padding:12px; margin-top:4px;">
-                        <span class="icon">🚨</span>
-                        <span>Enable Cockpit Alarm Mixing</span>
-                    </button>
-                </div>
+
                 <div class="control-row" style="margin-top:12px;">
                     <div class="section-title">Immersive Distortion</div>
                     <button class="btn" id="btn-exertion-dist" onclick="postAction('toggle_exertion_distortion')" style="width:100%; margin-bottom:12px; flex-direction:row; padding:12px;">

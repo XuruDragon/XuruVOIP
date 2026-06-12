@@ -85,7 +85,6 @@ public class CompanionAppTests
             Assert.True(root.GetProperty("hudShowActiveSpeakers").GetBoolean());
             Assert.True(root.GetProperty("hudShowChannel").GetBoolean());
             Assert.Equal("Military", root.GetProperty("pttChimeType").GetString());
-            Assert.True(root.GetProperty("enableAlarmInjection").GetBoolean());
             
             // Map telemetry should be null/disabled by default
             Assert.False(root.GetProperty("enableCompanionMap").GetBoolean());
@@ -158,12 +157,7 @@ public class CompanionAppTests
             var chimeRes = await client.PostAsync("http://localhost:8891/api/action", chimeContent);
             Assert.True(chimeRes.IsSuccessStatusCode);
 
-            var alarmPayload = new { action = "toggle_alarm_injection" };
-            var alarmContent = new StringContent(JsonSerializer.Serialize(alarmPayload), Encoding.UTF8, "application/json");
-            var alarmRes = await client.PostAsync("http://localhost:8891/api/action", alarmContent);
-            Assert.True(alarmRes.IsSuccessStatusCode);
-
-            await Task.Delay(150);
+            // Wait a brief moment for dispatcher to update
 
             // Verify they are updated on ViewModel config
             Assert.Equal("Anvil", vm.Config.Config.HudTheme);
@@ -172,7 +166,6 @@ public class CompanionAppTests
             Assert.False(vm.Config.Config.HudShowActiveSpeakers);
             Assert.False(vm.Config.Config.HudShowChannel);
             Assert.Equal("Industrial", vm.Config.Config.PttChimeType);
-            Assert.False(vm.Config.Config.EnableAlarmInjection);
 
             // 5. Verify status GET reflects the modified settings
             var statusResponse3 = await client.GetAsync("http://localhost:8891/api/status");
@@ -186,7 +179,6 @@ public class CompanionAppTests
             Assert.False(root3.GetProperty("hudShowActiveSpeakers").GetBoolean());
             Assert.False(root3.GetProperty("hudShowChannel").GetBoolean());
             Assert.Equal("Industrial", root3.GetProperty("pttChimeType").GetString());
-            Assert.False(root3.GetProperty("enableAlarmInjection").GetBoolean());
         }
         finally
         {
