@@ -7,7 +7,7 @@
   "Icon": "icons/pluginIcon",
   "Version": "0.4.0.0",
   "Software": {
-    "MinimumVersion": "7.0"
+    "MinimumVersion": "7.4"
   },
   "CodePath": "bin/plugin.js",
   "Nodejs": {

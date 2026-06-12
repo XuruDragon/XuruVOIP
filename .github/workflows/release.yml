@@ -103,6 +103,12 @@ jobs:
               Copy-Item "client/XuruVoipClient-win-x64.zip" -Destination release-binaries/XuruVoipClient-win-x64.zip
           }
           
+          # Update version in manifest.json to match release version
+          $manifestPath = "streamdeck/com.xurudragon.xuruvoip.sdPlugin/manifest.json"
+          $content = Get-Content $manifestPath -Raw
+          $updatedContent = $content -replace '"Version":\s*"[^"]+"', '"Version": "${{ steps.get_version.outputs.VERSION }}"'
+          $updatedContent | Out-File $manifestPath -Encoding utf8 -Force
+
           # Package Stream Deck Plugin using official CLI
           npm install -g @elgato/cli@latest
           streamdeck pack streamdeck/com.xurudragon.xuruvoip.sdPlugin --output release-binaries
