@@ -1,12 +1,31 @@
 {
+  "DeviceModel": "XuruVOIP_plus",
   "Rooms": {
     "0": {
       "Keys": {
-        "0,1": {
+        "1,0": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.toggle-helmet"
+          "Action": "com.xurudragon.xuruvoip.action.radio-mute"
+        },
+        "0,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
+        },
+        "0,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.cycle-radio-dial"
+        },
+        "3,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.intercom-status"
         },
         "1,2": {
           "Settings": {
@@ -20,59 +39,40 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.location-telemetry"
         },
-        "2,2": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.voice-changer-dial"
-        },
-        "3,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.intercom-status"
-        },
-        "0,2": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.cycle-radio-dial"
-        },
-        "0,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
-        },
-        "2,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.audio-proximity-mute"
-        },
-        "1,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.radio-mute"
-        },
         "3,1": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.toggle-translation"
         },
+        "0,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.toggle-helmet"
+        },
         "2,0": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.pa-broadcast"
+        },
+        "2,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.voice-changer-dial"
+        },
+        "2,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.audio-proximity-mute"
         }
       }
     }
   },
+  "DeviceType": 7,
   "Name": "XuruVOIP Captain - Plus",
-  "DeviceModel": "XuruVOIP_plus",
-  "Version": "1.0.0",
-  "DeviceType": 7
+  "Version": "1.0.0"
 }
