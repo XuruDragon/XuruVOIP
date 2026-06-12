@@ -218,6 +218,11 @@
     <sys:String x:Key="LblInitiateHail">Hailing-Initiierungstaste</sys:String>
     <sys:String x:Key="LblAcceptHail">Hailing-Annahmetaste</sys:String>
     <sys:String x:Key="LblDeclineHail">Hailing-Ablehnungs/Endtaste</sys:String>
-    <sys:String x:Key="LblEnableTranslationSubtitles">Visier-HUD Echtzeit-Übersetzungsuntertitel aktivieren</sys:String>
+    <!-- AEGIS Diagnostics Panel -->
+    <sys:String x:Key="PanelAegisSystem">AEGIS-SYSTEMSTATUS</sys:String>
+    <sys:String x:Key="LblGForceLoad">G-Kraft Belastung</sys:String>
+    <sys:String x:Key="LblPhysicalExertion">Physische Anstrengung</sys:String>
+    <sys:String x:Key="LblVoiceSystems">Sprachbefehlssystem</sys:String>
+    <sys:String x:Key="StatusStandby">BEREIT</sys:String>
 </ResourceDictionary>
 

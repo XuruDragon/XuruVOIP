@@ -13,6 +13,8 @@
     <Window.Resources>
         <!-- Style for Vertical TabControl Sidebar -->
         <Style TargetType="TabControl">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabControl">
@@ -32,12 +34,20 @@
 
                             <!-- Content pane -->
                             <Border Grid.Column="1" Background="Transparent" Padding="20,16,20,16">
-                                <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent"/>
+                                <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent"
+                                                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                             </Border>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style x:Key="SettingsScrollViewerStyle" TargetType="ScrollViewer">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
         </Style>
 
         <Style x:Key="LabelStyle" TargetType="TextBlock">
@@ -254,7 +264,7 @@
 
                 <!-- ── TAB 1: GENERAL ── -->
                 <TabItem Header="{DynamicResource TabGeneral}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
                         <StackPanel Margin="0,4,0,0">
                             <TextBlock Text="{DynamicResource LblLanguage}" Style="{StaticResource LabelStyle}" Margin="0,0,0,2"/>
                             <ComboBox x:Name="CbLanguage" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
@@ -289,7 +299,7 @@
 
                 <!-- ── TAB 2: CONNECTION ── -->
                 <TabItem Header="{DynamicResource TabConnection}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
                         <StackPanel Margin="0,4,0,0">
                             <TextBlock Text="{DynamicResource LblServerAddress}" Style="{StaticResource LabelStyle}"/>
                             <TextBox x:Name="TxServer" Text="{Binding Config.ServerAddress, UpdateSourceTrigger=PropertyChanged}"
@@ -332,7 +342,7 @@
 
                 <!-- ── TAB 3: POSITION TRACKING ── -->
                 <TabItem Header="{DynamicResource TabOcr}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
                         <StackPanel Margin="0,4,0,0">
                             <TextBlock Text="{DynamicResource LblPosSource}" Style="{StaticResource LabelStyle}"/>
                             <ComboBox x:Name="CbPosSource" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
@@ -383,7 +393,7 @@
 
                 <!-- ── TAB 4: DEVICES & LEVELS ── -->
                 <TabItem Header="{DynamicResource TabDevices}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
                         <StackPanel Margin="0,4,0,0">
                             <!-- Input device -->
                             <TextBlock Text="{DynamicResource LblInputDevice}" Style="{StaticResource LabelStyle}"/>
@@ -458,7 +468,7 @@
 
                 <!-- ── TAB 5: COMMS & ACOUSTICS ── -->
                 <TabItem Header="{DynamicResource TabAcoustics}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
                         <StackPanel Margin="0,4,0,0">
                             <!-- Spatial audio toggle -->
                             <CheckBox Content="{DynamicResource LblEnableSpatialAudio}"
@@ -517,7 +527,7 @@
 
                 <!-- ── TAB 6: VOICE MODULATION ── -->
                 <TabItem Header="{DynamicResource TabModulation}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
                         <StackPanel Margin="0,4,0,0">
                             <!-- Helmet/Suit modulator toggle -->
                             <CheckBox x:Name="CbEnableHelmetModulator"
@@ -653,7 +663,7 @@
 
                 <!-- ── TAB 7: OVERLAY & HUD ── -->
                 <TabItem Header="{DynamicResource TabOverlay}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
                         <StackPanel Margin="0,4,0,0">
                             <!-- Overlay Toggle -->
                             <CheckBox Content="{DynamicResource LblEnableOverlay}"
@@ -738,7 +748,7 @@
 
                 <!-- ── TAB 8: INTEGRATIONS ── -->
                 <TabItem Header="{DynamicResource TabIntegrations}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
                         <StackPanel Margin="0,4,0,0">
                             <!-- Companion App -->
                             <CheckBox x:Name="CbEnableCompanionApp"
@@ -839,7 +849,7 @@
 
                 <!-- ── TAB 9: HOTKEYS ── -->
                 <TabItem Header="{DynamicResource TabHotkeys}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
                         <StackPanel Margin="0,4,0,0">
                             <!-- Voice Commands -->
                             <CheckBox x:Name="CbEnableVoiceCommands"

@@ -218,6 +218,11 @@
     <sys:String x:Key="LblInitiateHail">通話開始キー</sys:String>
     <sys:String x:Key="LblAcceptHail">通話応答キー</sys:String>
     <sys:String x:Key="LblDeclineHail">通話拒否/終了キー</sys:String>
-    <sys:String x:Key="LblEnableTranslationSubtitles">バイザーHUDリアルタイム翻訳字幕を有効化</sys:String>
+    <!-- AEGIS Diagnostics Panel -->
+    <sys:String x:Key="PanelAegisSystem">AEGIS システムステータス</sys:String>
+    <sys:String x:Key="LblGForceLoad">Gフォース負荷</sys:String>
+    <sys:String x:Key="LblPhysicalExertion">身体的負荷</sys:String>
+    <sys:String x:Key="LblVoiceSystems">音声コマンドシステム</sys:String>
+    <sys:String x:Key="StatusStandby">待機中</sys:String>
 </ResourceDictionary>
 
