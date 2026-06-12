@@ -97,7 +97,7 @@ It enforces space survival mechanics. Forgetting to switch to radio before stepp
 ## 👽 4. Sci-Fi Voice Changer & Suit Modulators
 
 ### Description
-Applies real-time vocal modulations to voice feeds, allowing players to sound like robots, cyborgs, or alien species.
+Applies real-time vocal modulations to voice feeds, allowing players to sound like robots, cyborgs, or alien species, or define their own custom parameters.
 
 ### How It Works
 * Uses time-domain digital signal processing (DSP) chains:
@@ -105,11 +105,17 @@ Applies real-time vocal modulations to voice feeds, allowing players to sound li
   * **Ring Modulation:** Multiplies the audio carrier signal by a sine wave to create metallic, robotic tones.
   * **Bitcrushing:** Reduces sample depth to 8-bit or less to simulate low-fidelity synthesized voice lines.
   * **Flanger & Distortion:** Applies micro-delays and hyperbolic tangent (`tanh`) soft clipping for grit.
+* **Custom Vocal Modulator Editor:** Allows fine-grained control of all DSP components via manual sliders in the client UI.
 
 ### How to Use
 1. Go to the **Audio** tab in Settings.
 2. Select an active preset under **Voice Changer**: **Alien**, **Cyborg**, or **Robotic**.
-3. You can also toggle and adjust settings in real-time via the Companion App dashboard or Stream Deck keys.
+3. Alternatively, check **Enable Custom Vocal Modulator** to open a slider panel:
+   * **Pitch Shift** (0.5x to 2.0x)
+   * **Ring Modulator Frequency** (0Hz to 2000Hz) & **Mix** (0% to 100%)
+   * **Flanger Depth** (0% to 100%), **Rate** (0.1Hz to 10.0Hz) & **Feedback** (0% to 100%)
+   * **Bitcrush Toggle** & **Bits** (2 to 16 bits)
+4. You can also toggle and adjust settings in real-time via the Companion App dashboard or Stream Deck keys.
 
 ### Why It's Good to Have
 Perfect for roleplay organizations, hostile alien scenarios, or simply adding a unique audio signature to players operating heavy mechanized power suits.
@@ -119,19 +125,19 @@ Perfect for roleplay organizations, hostile alien scenarios, or simply adding a 
 ## 📻 5. Immersive Radio Degradation & Chimes
 
 ### Description
-Simulates analog radio transmissions with bandpass filters, static noise, and mechanical chimes.
+Simulates analog radio transmissions with bandpass filters, static noise, distance delay, and custom/mechanical chimes.
 
 ### How It Works
 * **Radio Bandpass:** Incoming radio packets are restricted to a communication frequency band (e.g. 400Hz to 3400Hz) to replicate radio hardware.
 * **Signal Degradation:** Calculates distance between the speaker and listener. As they approach the transmitter's maximum range, the bandpass limits narrow and static white noise is dynamically blended in.
-* **PTT Chimes & Squelch Tail:** Triggers mechanical key-down and key-up chimes when transmitting on radio channels. Supports four distinct mathematical profiles selectable in settings or the Companion App:
-  * **Military:** Clean, authentic sine sweeps (900Hz to 700Hz key-down, 3.5ms squelch tail).
-  * **Industrial:** Heavy mechanical clanks (metallic frequency modulations and resonant bandpassed noise).
-  * **Alien:** Harmonic ring-modulated sweeps simulating bio-organic neural link clicks.
-  * **Vintage:** Distorted, low-fidelity analog relay clicks with slow decay.
+* **PTT Chimes & Squelch Tail:** Triggers mechanical key-down and key-up chimes when transmitting on radio channels. Supports four distinct mathematical profiles selectable in settings or the Companion App (Military, Industrial, Alien, and Vintage).
+* **Planetary Distance-Based Radio Delay:** Simulates signal propagation delay using the speed of light ($\approx 3.3\text{ ms}$ per kilometer, computed as `delayMs = distance * 0.0033`). Dequeued radio packets are buffered and delayed dynamically, capped up to 3000ms.
+* **Custom PTT Chime Uploads:** Allows players to upload custom WAV/MP3 files (`radio_key_down` and `radio_key_up`) into the `Resources/` folder. The client automatically downmixes and resamples these files to 48kHz mono.
 
 ### How to Use
 * Set a key for **Radio PTT** in the **Hotkeys** tab and communicate on an active radio channel.
+* Enable **Enable Planetary Distance-Based Radio Delay** in Settings -> Audio tab to turn on speed-of-light delays.
+* Place `radio_key_down.wav` / `.mp3` and `radio_key_up.wav` / `.mp3` in the `Resources/` directory and check **Enable Custom PTT Chimes** in Settings -> Audio tab to use custom chimes.
 
 ### Why It's Good to Have
 Brings military-grade communication realism. The audio cues (chimes and squelch) provide positive feedback that a transmission has started or ended, preventing overlapping communication.
@@ -164,19 +170,18 @@ Keeps bridge crew communication organized without manual radio switching. During
 ## 📡 7. Vulkan-Compatible HUD Overlay & 2D Tactical Radar
 
 ### Description
-An in-game HUD overlay displaying active channels, speaker states, real-time speech-to-text subtitles, and a 2D tactical radar.
+An in-game HUD overlay displaying active channels, speaker states, real-time speech-to-text subtitles, and a 2D tactical radar with vertical elevation metrics.
 
 ### How It Works
 * **Win32 Click-Through Overlay:** A borderless overlay window positioned over the game. It uses low-level Win32 window flags (`WS_EX_TRANSPARENT` and `WS_EX_NOACTIVATE`) to remain clickable-through.
-* **Interactive HUD Customizer:** Allows real-time theme, positioning, and component visibility customization via the client settings or companion app:
-  * **Themes:** Selectable color schemes matching manufacturer aesthetics: Aegis (Cyan), Anvil (Orange), Drake (Green), RSI (Light Blue), and Origin (Magenta).
-  * **Positioning:** Instantly align the HUD panel to any screen corner or center (Top Left, Top Center, Top Right, Bottom Left, Bottom Center, Bottom Right).
-  * **Visibility Toggles:** Independent control to show/hide the mini-radar, active speakers list, or the connection channel header.
+* **Interactive HUD Customizer:** Allows real-time theme, positioning, and component visibility customization via the client settings or companion app.
 * **Tactical Mini-Radar:** Resolves the player's heading and relative speaker coordinates to render a 2D radar overlay with pulsating rings representing voice activity.
+* **3D Elevation Indicators:** Calculates the vertical height delta: `dz = remotePos.Z - localPos.Z`. If the height difference is 2.0 meters or more, a vertical arrow indicator and height offset (e.g. `Bob (▲ 12m)` or `Alice (▼ 8m)`) are appended to their radar tag.
 * **Speech-to-Text Subtitles:** Decoded incoming audio packets are sent to a background thread running a lightweight, offline Whisper model (`ggml-tiny.bin`) to generate real-time HUD subtitles.
 
 ### How to Use
 * Configure this in the **Overlay** tab in Settings. Set the HUD placement (e.g., Bottom Center, Top Left) and adjust the maximum radar scale.
+* Elevation markers are rendered automatically on the radar when coordinates are active and the vertical distance exceeds 2 meters.
 
 ### Why It's Good to Have
 Allows players to keep track of communications visually without minimizing the game client. Real-time subtitles are invaluable for hearing-impaired players or during chaotic combat operations when audio is cluttered with explosions.
@@ -262,15 +267,17 @@ Allows hands-on physical access to communication controls and essential ship tel
 ## 🔌 11. Discord Voice Bridge
 
 ### Description
-Connects community members on Discord directly with in-game tactical channels.
+Connects community members on Discord directly with in-game tactical channels, supporting active frequency mirroring.
 
 ### How It Works
 * Integrates a Discord bot client inside the Go server.
 * Relays audio bidirectionally between the Go server radio channel and a designated Discord voice channel.
 * Maps Discord SSRC audio packets to Go server player nicknames.
+* **Dynamic Frequency Tracking:** Instead of anchoring to a static channel, the server can dynamically mirror the bridge channel to follow the active channel of a leader in-game.
 
 ### How to Use
 * Configure the bot credentials, server ID, and target channel name inside the server's `.env` configuration file.
+* Enable dynamic tracking by setting `XURUVOIP_DISCORD_DYNAMIC_TRACKING=1` and `XURUVOIP_DISCORD_LEADER_USERNAME=Username` in the `.env` configuration file.
 
 ### Why It's Good to Have
 Allows coordinators, command staffs, or community members to participate in operations directly from Discord without running the Star Citizen game client.

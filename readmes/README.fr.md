@@ -217,11 +217,14 @@ graph TB
 ### 4. 🎙️ Changeur de voix et modulateurs de combinaison de science-fiction
 * **Filtres DSP en temps réel :** Changement de hauteur dans le domaine temporel, flanger, modulation en anneau, saturation soft-tanh et bitcrushing 8 bits.
 * **Préréglages atmosphériques :** Chargez instantanément des profils vocaux prédéfinis, notamment **Alien**, **Cyborg**, **Robotic** ou **Custom Pitch Shift** (0,5x à 2,0x).
+* **Curseurs de modulateur personnalisés :** Ajustez précisément la hauteur de ton, la fréquence/mixage de la modulation en anneau, la profondeur/taux/feedback du flanger, et le bitcrushing via les curseurs de paramètres.
 
 ### 5. 📻 Dégradation radio immersive et carillons
 * **Filtrage passe-bande :** Modèles de filtres radio avec coupures basse/haute lors de l'utilisation de canaux radio ou lorsque les visières des combinaisons sont baissées.
 * **Dégradation du signal radio :** Bandes de coupure étroites et mélanges de bruit statique filtré passe-bande à mesure que la distance entre les joueurs s'approche de la limite de l'émetteur radio.
 * **Carillons radio acoustiques :** Joue des bips mécaniques à l'activation et à la désactivation lors de la transmission sur les canaux radio. Prend en charge quatre profils mathématiques distincts sélectionnables dans les paramètres ou l'application compagnon : Militaire (balayages sinusoïdaux), Industriel (cliquetis mécaniques), Extraterrestre (balayages modulés en anneau) et Vintage (cliquetis de relais analogiques).
+* **Délai radio basé sur la distance planétaire :** Simule le délai de propagation du signal en utilisant la vitesse de la lumière ($\approx 3,3\text{ ms}$ par kilomètre, jusqu'à 3000 ms maximum) pour un décalage de communication réaliste.
+* **Carillons PTT personnalisés :** Télécharge et rééchantillonne les fichiers WAV/MP3 personnalisés (`radio_key_down` et `radio_key_up`) depuis le dossier `Resources/` pour servir de carillons fournis par l'utilisateur.
 
 ### 6. 💬 Système d'interphone automatique pour navire
 * **Canaux d'interphone des véhicules :** Monter à bord d'un véhicule abonne automatiquement les joueurs à un canal radio dynamique « Intercom_<ContainerID> ».
@@ -238,6 +241,7 @@ graph TB
 * **Personnaliseur de HUD interactif :** Permet de personnaliser en temps réel le thème (Aegis, Anvil, Drake, RSI, Origin), le positionnement (coins/centre) et la visibilité des composants (mini-radar, liste des haut-parleurs, en-tête de connexion) via les paramètres ou l'application compagnon.
 * **Indicateur d'état de l'interphone :** Affiche des avertissements tels que `⚡ INTERCOM: DEGRADED` (avec détails du sous-état comme `[Power Loss]`, `[Quantum]` ou `[Static Pop]`) sur l'affichage tête haute (HUD) lorsque la dégradation de l'interphone est active.
 * **Mini-radar tactique :** Comprend un radar HUD 2D aligné sur le cap qui affiche les joueurs parlant de manière relative, dessinant des anneaux sonores pulsés autour d'eux.
+* **Indicateurs d'élévation 3D :** Ajoute des flèches de direction verticales et des écarts de hauteur de pont (ex: `Bob (▲ 12m)`) à côté des icônes du radar lorsque la séparation verticale dépasse 2 mètres.
 * **Sous-titres parole-texte :** transcrit l'audio de radio/proximité entrant en sous-titres HUD localisés à l'aide d'un modèle Whisper léger et hors ligne (`ggml-tiny.bin`).
 * **Commandes vocales PTT mains libres :** Maintenir la touche dédiée aux commandes vocales désactive temporairement les flux vocaux de proximité/radio sortants et met en mémoire tampon l'audio du micro. Au relâchement, la voix est transcrite localement via le modèle Whisper pour déclencher des actions du vaisseau :
   * **Commandes prises en charge :** Bascule visière/casque, sourdine micro (proximité/radio/profil/tout), sélection du canal radio actif et préréglages du changeur de voix.
@@ -258,6 +262,7 @@ graph TB
 ### 10. 🔌 Pont vocal Discord
 * **Relais audio bidirectionnel :** Relaye les communications entre un canal radio du serveur Go et un canal vocal Discord.
 * **Mappage des surnoms :** capture le discours Discord et mappe les identifiants SSRC aux surnoms du serveur.
+* **Suivi dynamique de la fréquence :** Déplace automatiquement la connexion vocale du pont Discord pour suivre et refléter le canal actif des leaders configurés ou des profils Command/Leader.
 
 ### 11. 🛡️ Radar de sécurité, de rotation des journaux et de toile d'administration
 * **Rotation quotidienne des journaux :** L'archiveur de journaux de démarrage ne conserve que les 5 journaux les plus récents.

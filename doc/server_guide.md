@@ -79,6 +79,9 @@ The server includes an optional feature called the **Discord Voice Bridge**. Whe
    * Copy your Discord Server's ID (Right-click your server icon in Discord, click **Copy Server ID**) and paste it into **`DISCORD_GUILD_ID`**.
    * Set **`DISCORD_CHANNEL_MAPPINGS`** to define which radio channels map to which Discord voice channels.
      * *Example format:* `General:123456789012345678,SquadA:876543210987654321` (where the numbers are the Discord Voice Channel IDs).
+   * Optionally, configure **Dynamic Frequency Tracking**:
+     * Set **`XURUVOIP_DISCORD_DYNAMIC_TRACKING`** to `1` (enabled) or `0` (disabled, default).
+     * Set **`XURUVOIP_DISCORD_LEADER_USERNAME`** to the in-game username of the leader you wish to track. When the leader (or any player with the `Command` or `Leader` profile) changes their active radio channel, the Discord voice bridge will dynamically move the bot/relay to mirror their new active frequency.
 4. **Save and Restart:**
    * Save the `.env` file and restart the server program. The bot should now appear online in your Discord server and join voice channels automatically!
 

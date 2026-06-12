@@ -217,11 +217,14 @@ graph TB
 ### 4. 🎙️ Sci-Fi-Stimmenverzerrer und Anzugmodulatoren
 * **Echtzeit-DSP-Filter:** Tonhöhenverschiebung im Zeitbereich, Flanger, Ringmodulation, Soft-Tanh-Sättigung und 8-Bit-Bitcrushing.
 * **Atmosphärische Voreinstellungen:** Laden Sie sofort voreingestellte Sprachprofile, einschließlich **Alien**, **Cyborg**, **Robotic** oder **Custom Pitch Shift** (0,5x bis 2,0x).
+* **Benutzerdefinierte Modulator-Schieberegler:** Passen Sie Tonhöhe, Ringmodulationsfrequenz/-mischung, Flanger-Tiefe/-Rate/-Feedback und Bitcrush-Einstellungen über Schieberegler an.
 
 ### 5. 📻 Immersive Radiodegradation & Glockenspiele
 * **Bandpassfilterung:** Modelliert Funkfilter mit niedrigen/hohen Grenzwerten bei der Nutzung von Funkkanälen oder bei heruntergeklappten Anzugvisieren.
 * **Verschlechterung des Funksignals:** Schmale Grenzbänder und Mischungen mit bandpassgefiltertem statischem Rauschen, wenn sich die Grenze des Funksenders nähert.
 * **Akustische Funkglockenspiele:** Spielt mechanische Key-Down- und Key-Up-Glockenspiele beim Senden auf Funkkanälen. Unterstützt vier verschiedene mathematische Profile, die in den Einstellungen oder der Companion App ausgewählt werden können: Militär (Sinusschwankungen), Industrie (mechanisches Klacken), Alien (ringmodulierte Frequenzschwankungen) und Vintage (analoge Relais-Klicks).
+* **Entfernungsabhängige Funkverzögerung:** Simuliert die Signallaufzeit basierend auf der Lichtgeschwindigkeit ($\approx 3,3\text{ ms}$ pro Kilometer, bis zu 3000 ms max.) für eine realistische Verzögerung.
+* **Benutzerdefinierte PTT-Chimes:** Lädt und resampelt eigene WAV/MP3-Dateien (`radio_key_down` und `radio_key_up`) aus dem Ordner `Resources/`, um sie als benutzerdefinierte Chimes zu verwenden.
 
 ### 6. 💬 Automatisches Schiffs-Gegensprechsystem
 * **Fahrzeug-Intercom-Kanäle:** Durch das Einsteigen in ein Fahrzeug abonnieren Spieler automatisch einen dynamischen „Intercom_<ContainerID>“-Funkkanal.
@@ -238,6 +241,7 @@ graph TB
 * **Interaktiver HUD-Customizer:** Ermöglicht die Echtzeit-Anpassung von Thema (Aegis, Anvil, Drake, RSI, Origin), Positionierung (Ecken/Mitte) und Sichtbarkeit der Komponenten (Miniradar, Sprecherliste, Verbindungskopf) über die Einstellungen oder die Companion App.
 * **Gegensprech-Statusanzeige:** Zeigt Warnmeldungen wie `⚡ INTERCOM: DEGRADED` (mit Details wie `[Power Loss]`, `[Quantum]` oder `[Static Pop]`) auf dem HUD-Overlay an, wenn die Intercom-Verschlechterung aktiv ist.
 * **Taktisches Mini-Radar:** Verfügt über ein auf den Kurs ausgerichtetes 2D-HUD-Radar, das relativ sprechende Spieler anzeigt und pulsierende Tonringe um sie herum zeichnet.
+* **3D-Höhenindikatoren:** Fügt vertikale Richtungspfeile und Deckhöhen-Deltas (z. B. `Bob (▲ 12m)`) neben Radarblips hinzu, wenn die vertikale Trennung 2 Meter überschreitet.
 * **Speech-to-Text-Untertitel:** Transkribiert eingehende Radio-/Proximity-Audiodaten mithilfe eines Offline-, leichten Whisper-Modells („ggml-tiny.bin“) in lokalisierte HUD-Untertitel.
 * **Freihändige PTT-Sprachbefehle:** Das Halten der zugewiesenen Sprachbefehlstaste stummt vorübergehend die ausgehenden Proximity-/Radio-Sprachübertragungen und puffert das Mikrofon-Audio. Beim Loslassen wird die Sprache lokal über das Whisper-Modell transkribiert, um Schiffsaktionen auszulösen:
   * **Unterstützte Befehle:** Visier-/Helm-Umschaltung, Mikrofon-Stummschaltung (Proximity/Radio/Profil/Alle), Auswahl des aktiven Funkkanals und Stimmenverzerrer-Voreinstellungen.
@@ -258,6 +262,7 @@ graph TB
 ### 10. 🔌 Discord Voice Bridge
 * **Bidirektionale Audioweiterleitung:** Leitet die Kommunikation zwischen einem Go-Server-Funkkanal und einem Discord-Sprachkanal weiter.
 * **Spitznamenzuordnung:** Erfasst Discord-Sprache und ordnet SSRC-IDs Server-Spitznamen zu.
+* **Dynamische Frequenzverfolgung:** Verschiebt die Discord-Bridge-Verbindung automatisch, um dem aktiven Kanal des konfigurierten Anführers oder Command/Leader-Profils zu folgen.
 
 ### 11. 🛡️ Sicherheit, Protokollrotation und Admin-Canvas-Radar
 * **Tägliche Protokollrotation:** Startprotokollarchivierer behält nur die 5 neuesten Protokolle bei.
