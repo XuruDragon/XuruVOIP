@@ -111,6 +111,8 @@
     <sys:String x:Key="LblEnablePttChimes">無線マイクのクリック音とスケルチテールを有効化</sys:String>
     <sys:String x:Key="LblEnableEnvironmentalAcoustics">環境音響を有効にする (遮蔽 &amp; 残響)</sys:String>
     <sys:String x:Key="LblEnableAtmosphereSimulation">惑星大気シミュレーションを有効にする (消音 &amp; 伝搬距離)</sys:String>
+    <sys:String x:Key="LblEnableRadioDelay">惑星間距離に基づく無線遅延を有効化</sys:String>
+    <sys:String x:Key="LblEnableCustomChimes">カスタムPTTチャイムを有効化 (Resources/ 内の radio_key_down/up)</sys:String>
 
     <!-- 設定: オーバーレイ -->
     <sys:String x:Key="TabOverlay">オーバーレイ</sys:String>

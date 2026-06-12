@@ -111,6 +111,8 @@
     <sys:String x:Key="LblEnablePttChimes">启用无线电麦克风咔哒声和静噪尾音</sys:String>
     <sys:String x:Key="LblEnableEnvironmentalAcoustics">启用环境音效 (遮挡 &amp; 混响)</sys:String>
     <sys:String x:Key="LblEnableAtmosphereSimulation">启用行星大气模拟 (消音 &amp; 传播距离)</sys:String>
+    <sys:String x:Key="LblEnableRadioDelay">启用基于行星距离的无线电延迟</sys:String>
+    <sys:String x:Key="LblEnableCustomChimes">启用自定义PTT提示音 (Resources/ 目录下的 radio_key_down/up)</sys:String>
 
     <!-- 设置: 覆盖层 -->
     <sys:String x:Key="TabOverlay">覆盖层</sys:String>

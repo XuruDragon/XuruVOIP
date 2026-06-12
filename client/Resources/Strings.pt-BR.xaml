@@ -111,6 +111,8 @@
     <sys:String x:Key="LblEnablePttChimes">Habilitar cliques de microfone e caudas de silenciamento</sys:String>
     <sys:String x:Key="LblEnableEnvironmentalAcoustics">Ativar acústica ambiental (oclusão e reverberação)</sys:String>
     <sys:String x:Key="LblEnableAtmosphereSimulation">Ativar simulação de atmosfera planetária (abafamento e alcance)</sys:String>
+    <sys:String x:Key="LblEnableRadioDelay">Habilitar atraso de rádio baseado na distância planetária</sys:String>
+    <sys:String x:Key="LblEnableCustomChimes">Habilitar chimes PTT personalizados (radio_key_down/up em Resources/)</sys:String>
 
     <!-- Configurações: Overlay -->
     <sys:String x:Key="TabOverlay">Overlay</sys:String>

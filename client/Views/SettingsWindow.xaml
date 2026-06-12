@@ -502,7 +502,7 @@
 
                             <!-- Custom PTT chimes toggle -->
                             <CheckBox x:Name="CbEnableCustomChimes"
-                                      Content="Enable Custom PTT Chimes (radio_key_down/up in Resources/)"
+                                      Content="{DynamicResource LblEnableCustomChimes}"
                                       IsChecked="{Binding Config.EnableCustomChimes, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
@@ -521,7 +521,7 @@
 
                             <!-- Distance-based radio delay toggle -->
                             <CheckBox x:Name="CbEnableRadioDelay"
-                                      Content="Enable Planetary Distance-Based Radio Delay"
+                                      Content="{DynamicResource LblEnableRadioDelay}"
                                       IsChecked="{Binding Config.EnableRadioDelay, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
