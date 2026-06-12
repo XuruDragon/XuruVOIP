@@ -472,10 +472,18 @@ public partial class OverlayWindow : Window
             Canvas.SetTop(blip, cy - 3);
             RadarCanvas.Children.Add(blip);
 
-            // Draw player name tag
+            // Draw player name tag with elevation indication if delta is >= 2m
+            double dz = remotePos.Z - localPos.Z;
+            string tagText = remoteName;
+            if (Math.Abs(dz) >= 2.0)
+            {
+                string arrow = dz > 0 ? "▲" : "▼";
+                tagText += $" ({arrow} {Math.Abs(dz):F0}m)";
+            }
+
             var nameText = new TextBlock
             {
-                Text = remoteName,
+                Text = tagText,
                 Foreground = Brushes.White,
                 FontSize = 8.5,
                 FontWeight = FontWeights.SemiBold,
