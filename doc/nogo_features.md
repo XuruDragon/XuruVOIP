@@ -33,3 +33,16 @@ This file tracks features that are proposed but rejected or marked as "no-go". T
 ## 8. Feature 8: Tactical Radio Direction Finder (RDF) Scanner
 * **Status:** No-Go
 * **Description:** Add distress beacons and RDF scanner to HUD to track approximate bearing of radio transmissions.
+
+## 9. Feature 9: Dynamic Cockpit Reverb
+* **Status:** No-Go
+* **Description:** Applying room impulse responses and acoustic models dynamically to cockpit communications.
+
+## 10. Feature 10: 3D Hologram AAR Playback
+* **Status:** No-Go
+* **Description:** Recording player position and vocal coordinates for 3D holographic playback of after-action reviews.
+
+## 11. Feature 11: Radio Jamming / ECM
+* **Status:** No-Go
+* **Description:** Injecting server-side static noise or complete jamming of radio channels based on nearby hostile ships.
+
