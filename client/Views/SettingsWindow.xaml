@@ -2,31 +2,70 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{DynamicResource TitleSettings}"
-        Width="520" Height="620"
-        MinHeight="620"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
-        ResizeMode="NoResize"
-        Icon="pack://application:,,,/XuruVoipClient;component/Resources/logo.png">
+         Width="800" Height="560"
+         MinWidth="800" MinHeight="560"
+         WindowStyle="None"
+         AllowsTransparency="True"
+         Background="Transparent"
+         ResizeMode="NoResize"
+         Icon="pack://application:,,,/XuruVoipClient;component/Resources/logo.png">
 
     <Window.Resources>
+        <!-- Style for Vertical TabControl Sidebar -->
+        <Style TargetType="TabControl">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Sidebar background and tab items list -->
+                            <Border Grid.Column="0" Background="{DynamicResource BgDeep}" Padding="12,16,12,16">
+                                <TabPanel IsItemsHost="True" KeyboardNavigation.TabIndex="1"/>
+                            </Border>
+
+                            <!-- Vertical Divider -->
+                            <Border Grid.Column="0" HorizontalAlignment="Right" Width="1" Background="{StaticResource BorderSubtle}"/>
+
+                            <!-- Content pane -->
+                            <Border Grid.Column="1" Background="Transparent" Padding="20,16,20,16">
+                                <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent"
+                                                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SettingsScrollViewerStyle" TargetType="ScrollViewer">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+        </Style>
+
         <Style x:Key="LabelStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="Margin" Value="0,0,0,2"/>
         </Style>
         <Style x:Key="InputStyle" TargetType="TextBox">
-            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Background" Value="{DynamicResource BgElevated}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,6"/>
             <Setter Property="FontSize" Value="13"/>
-            <Setter Property="CaretBrush" Value="{StaticResource Accent}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource Accent}"/>
         </Style>
         <Style x:Key="PwdStyle" TargetType="PasswordBox">
-            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Background" Value="{DynamicResource BgElevated}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -34,7 +73,7 @@
             <Setter Property="FontSize" Value="13"/>
         </Style>
         <Style x:Key="ComboStyle" TargetType="ComboBox">
-            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Background" Value="{DynamicResource BgElevated}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -77,12 +116,12 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="true">
-                                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Accent}" />
-                                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource Accent}" />
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Accent}" />
+                                                <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource Accent}" />
                                             </Trigger>
                                             <Trigger Property="IsChecked" Value="true">
-                                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Accent}" />
-                                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource Accent}" />
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Accent}" />
+                                                <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource Accent}" />
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -111,7 +150,7 @@
                                       MinWidth="{TemplateBinding ActualWidth}"
                                       MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                     <Border x:Name="DropDownBorder"
-                                            Background="{StaticResource BgElevated}"
+                                            Background="{DynamicResource BgElevated}"
                                             BorderBrush="{StaticResource BorderSubtle}"
                                             BorderThickness="1"
                                             CornerRadius="8"
@@ -131,7 +170,7 @@
             </Setter>
         </Style>
         <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+            <Setter Property="Background" Value="{DynamicResource BgElevated}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="8,6"/>
@@ -147,11 +186,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource Accent}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Accent}"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentGlow}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentGlow}"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -162,7 +201,7 @@
     </Window.Resources>
 
     <Border Margin="8" CornerRadius="16"
-            Background="{StaticResource BgSurface}"
+            Background="{DynamicResource BgSurface}"
             BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
         <Border.Effect>
             <DropShadowEffect Color="#000000" BlurRadius="24" ShadowDepth="4" Opacity="0.6"/>
@@ -176,7 +215,7 @@
 
             <!-- Title bar -->
             <Border Grid.Row="0" CornerRadius="16,16,0,0"
-                    Background="{StaticResource BgDeep}"
+                    Background="{DynamicResource BgDeep}"
                     MouseLeftButtonDown="TitleBar_MouseDown">
                 <Grid Margin="16,0">
                     <TextBlock Text="{DynamicResource TitleSettings}" Foreground="{StaticResource TextPrimary}"
@@ -186,30 +225,35 @@
                             HorizontalAlignment="Right" Click="Close_Click"/>
                 </Grid>
             </Border>
-
             <!-- Tabs -->
             <TabControl x:Name="SettingsTabControl" Grid.Row="1" Background="Transparent"
-                        BorderThickness="0" Margin="16,12,16,0">
+                        BorderThickness="0" Margin="0" TabStripPlacement="Left">
                 <TabControl.Resources>
                     <Style TargetType="TabItem">
                         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
                         <Setter Property="FontSize" Value="12"/>
-                        <Setter Property="Padding" Value="12,6"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Padding" Value="14,10"/>
                         <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="TabItem">
                                     <Border x:Name="Bd" CornerRadius="8" Padding="{TemplateBinding Padding}"
-                                            Background="Transparent" Margin="0,0,4,0">
+                                            Background="Transparent" Margin="0,0,0,6">
                                         <ContentPresenter ContentSource="Header"
-                                                          HorizontalAlignment="Center"
+                                                          HorizontalAlignment="Left"
                                                           VerticalAlignment="Center"/>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource BgElevated}"/>
-                                            <Setter Property="Foreground" Value="{StaticResource Accent}"/>
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BgElevated}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BgElevated}"/>
+                                            <Setter TargetName="Bd" Property="Opacity" Value="0.6"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -218,14 +262,18 @@
                     </Style>
                 </TabControl.Resources>
 
-                <!-- ── TAB 0: GENERAL ── -->
+                <!-- ── TAB 1: GENERAL ── -->
                 <TabItem Header="{DynamicResource TabGeneral}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="0,12,0,0">
-
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="482">
+                        <StackPanel Margin="0,4,0,0">
                             <TextBlock Text="{DynamicResource LblLanguage}" Style="{StaticResource LabelStyle}" Margin="0,0,0,2"/>
                             <ComboBox x:Name="CbLanguage" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
                                       SelectionChanged="CbLanguage_SelectionChanged"/>
+
+                            <!-- HUD & App Theme -->
+                            <TextBlock Text="{DynamicResource LblHudTheme}" Style="{StaticResource LabelStyle}"/>
+                            <ComboBox x:Name="CbHudTheme" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
+                                      SelectionChanged="CbHudTheme_SelectionChanged"/>
 
                             <TextBlock Text="{DynamicResource LblGameLogPath}" Style="{StaticResource LabelStyle}" Margin="0,0,0,2"/>
                             <Grid Margin="0,0,0,16">
@@ -244,146 +292,25 @@
                             <CheckBox Content="{DynamicResource LblEnableLogging}"
                                       IsChecked="{Binding Config.EnableGeneralLogs, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,0"/>
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
 
                             <CheckBox Content="{DynamicResource LblEnableDiscordRpc}"
                                       IsChecked="{Binding Config.EnableDiscordRpc, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"/>
-
-                            <CheckBox x:Name="CbEnableCompanionApp"
-                                      Content="{DynamicResource LblEnableCompanionApp}"
-                                      IsChecked="{Binding Config.EnableCompanionApp, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
-                                      Checked="CompanionApp_ToggleChanged" Unchecked="CompanionApp_ToggleChanged"/>
-
-                            <StackPanel x:Name="CompanionPortPanel" Margin="16,4,0,0">
-                                <TextBlock Text="{DynamicResource LblCompanionAppPort}" Style="{StaticResource LabelStyle}"/>
-                                <TextBox x:Name="TxCompanionPort"
-                                         Text="{Binding Config.CompanionAppPort, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource InputStyle}"/>
-                            </StackPanel>
-
-                            <CheckBox x:Name="CbEnableCompanionMap"
-                                      Content="{DynamicResource LblEnableCompanionMap}"
-                                      IsChecked="{Binding Config.EnableCompanionMap, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="16,8,0,0"/>
-
-                            <CheckBox x:Name="CbEnableTelemetry"
-                                      Content="{DynamicResource LblEnableTelemetry}"
-                                      IsChecked="{Binding Config.EnableTelemetry, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
-                                      Checked="Telemetry_ToggleChanged" Unchecked="Telemetry_ToggleChanged"/>
-
-                            <StackPanel x:Name="TelemetryPortPanel" Margin="16,4,0,0">
-                                <TextBlock Text="{DynamicResource LblTelemetryPort}" Style="{StaticResource LabelStyle}"/>
-                                <TextBox x:Name="TxTelemetryPort"
-                                         Text="{Binding Config.TelemetryPort, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource InputStyle}"/>
-                            </StackPanel>
-
-                            <!-- Immersive Features -->
-                            <CheckBox Content="{DynamicResource LblEnableExertionDistortion}"
-                                      IsChecked="{Binding Config.EnableExertionDistortion, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"/>
-
-                            <CheckBox Content="{DynamicResource LblEnableRadioRepeaters}"
-                                      IsChecked="{Binding Config.EnableRadioRepeaters, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"/>
-
-                            <CheckBox Content="{DynamicResource LblIsRadioRepeater}"
-                                      IsChecked="{Binding Config.IsRadioRepeater, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"/>
-
-                            <CheckBox x:Name="CbEnableShipPa"
-                                      Content="{DynamicResource LblEnableShipPa}"
-                                      IsChecked="{Binding Config.EnableShipPa, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
-                                      Checked="ShipPa_ToggleChanged" Unchecked="ShipPa_ToggleChanged"/>
-
-                            <StackPanel x:Name="ShipPaPanel" Margin="16,4,0,0">
-                                <TextBlock Text="{DynamicResource LblPttPaKey}" Style="{StaticResource LabelStyle}"/>
-                                <TextBox x:Name="TxPttPaKey"
-                                         Text="{Binding Config.PttPaKey, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource InputStyle}"/>
-                            </StackPanel>
-
-                            <CheckBox x:Name="CbEnableIntercomDegradation"
-                                      Content="{DynamicResource LblEnableIntercomDegradation}"
-                                      IsChecked="{Binding Config.EnableIntercomDegradation, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
-                                      Checked="IntercomDegradation_ToggleChanged" Unchecked="IntercomDegradation_ToggleChanged"/>
-
-                            <StackPanel x:Name="IntercomDegradationSubPanel" Margin="16,4,0,0">
-                                <CheckBox x:Name="CbIntercomShieldHits"
-                                          Content="{DynamicResource LblIntercomShieldHits}"
-                                          IsChecked="{Binding Config.IntercomShieldHitsEnabled, UpdateSourceTrigger=PropertyChanged}"
-                                          Foreground="{StaticResource TextPrimary}"
-                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,0"/>
-
-                                <CheckBox x:Name="CbIntercomCriticalPower"
-                                          Content="{DynamicResource LblIntercomCriticalPower}"
-                                          IsChecked="{Binding Config.IntercomCriticalPowerEnabled, UpdateSourceTrigger=PropertyChanged}"
-                                          Foreground="{StaticResource TextPrimary}"
-                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,6,0,0"/>
-                                <CheckBox x:Name="CbIntercomQuantumTravel"
-                                          Content="{DynamicResource LblIntercomQuantumTravel}"
-                                          IsChecked="{Binding Config.IntercomQuantumTravelEnabled, UpdateSourceTrigger=PropertyChanged}"
-                                          Foreground="{StaticResource TextPrimary}"
-                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,6,0,0"/>
-                            </StackPanel>
-
-                            <!-- Voice Commands -->
-                            <CheckBox x:Name="CbEnableVoiceCommands"
-                                      Content="{DynamicResource LblEnableVoiceCommands}"
-                                      IsChecked="{Binding Config.EnableVoiceCommands, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,0"
-                                      Checked="VoiceCommands_ToggleChanged" Unchecked="VoiceCommands_ToggleChanged"/>
-
-                            <StackPanel x:Name="VoiceCommandsSubPanel" Margin="16,4,0,0">
-                                <!-- WARNING Panel -->
-                                <Border x:Name="VoiceCommandWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,4,0,8" Visibility="Collapsed">
-                                    <StackPanel>
-                                        <TextBlock Text="⚠️ Voice Commands Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
-                                        <TextBlock Text="{DynamicResource LblVoiceCommandWarning}" 
-                                                   Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Confidence threshold slider -->
-                                <TextBlock Style="{StaticResource LabelStyle}" Margin="0,4,0,2">
-                                    <Run Text="{DynamicResource LblVoiceCommandConfidence}"/>
-                                    <Run Text=": "/>
-                                    <Run x:Name="VoiceCommandConfidenceLabel" Text="0.5"/>
-                                </TextBlock>
-                                <Slider x:Name="SlVoiceCommandConfidence" Minimum="0.1" Maximum="1.0"
-                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
-                                        ValueChanged="SlVoiceCommandConfidence_Changed" Margin="0,0,0,12"/>
-                            </StackPanel>
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- ── TAB 1: CONNECTION ── -->
+                <!-- ── TAB 2: CONNECTION ── -->
                 <TabItem Header="{DynamicResource TabConnection}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="0,12,0,0">
-
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="351">
+                        <StackPanel Margin="0,4,0,0">
                             <TextBlock Text="{DynamicResource LblServerAddress}" Style="{StaticResource LabelStyle}"/>
                             <TextBox x:Name="TxServer" Text="{Binding Config.ServerAddress, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}" Margin="0,0,0,10"/>
+                                     Style="{StaticResource InputStyle}" Margin="0,0,0,12"/>
 
-                            <Grid Margin="0,0,0,10">
+                            <Grid Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="12"/>
@@ -403,13 +330,13 @@
 
                             <TextBlock Text="{DynamicResource LblUsername}" Style="{StaticResource LabelStyle}"/>
                             <TextBox x:Name="TxUsername" Text="{Binding Config.Username, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}" Margin="0,0,0,10"/>
+                                     Style="{StaticResource InputStyle}" Margin="0,0,0,12"/>
 
                             <TextBlock Text="{DynamicResource LblUserPassword}" Style="{StaticResource LabelStyle}"/>
-                            <PasswordBox x:Name="PbUserPassword" Style="{StaticResource PwdStyle}" Margin="0,0,0,10"/>
+                            <PasswordBox x:Name="PbUserPassword" Style="{StaticResource PwdStyle}" Margin="0,0,0,12"/>
 
                             <TextBlock Text="{DynamicResource LblServerPassword}" Style="{StaticResource LabelStyle}"/>
-                            <PasswordBox x:Name="PbPassword" Style="{StaticResource PwdStyle}" Margin="0,0,0,10"/>
+                            <PasswordBox x:Name="PbPassword" Style="{StaticResource PwdStyle}" Margin="0,0,0,12"/>
 
                             <TextBlock Text="{DynamicResource LblHwid}" Style="{StaticResource LabelStyle}"/>
                             <TextBox Text="{Binding Config.Hwid}" IsReadOnly="True"
@@ -418,35 +345,34 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- ── TAB 2: POSITION TRACKING ── -->
+                <!-- ── TAB 3: POSITION TRACKING ── -->
                 <TabItem Header="{DynamicResource TabOcr}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="0,12,0,0">
-
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
+                        <StackPanel Margin="0,4,0,0" Width="534">
                             <TextBlock Text="{DynamicResource LblPosSource}" Style="{StaticResource LabelStyle}"/>
                             <ComboBox x:Name="CbPosSource" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
                                       SelectionChanged="CbPosSource_SelectionChanged"/>
 
                             <StackPanel x:Name="OcrControlsPanel">
                                 <TextBlock Text="{DynamicResource LblMonitor}" Style="{StaticResource LabelStyle}"/>
-                                <ComboBox x:Name="CbMonitor" Style="{StaticResource ComboStyle}"
+                                <ComboBox x:Name="CbMonitor" Style="{StaticResource ComboStyle}" Margin="0,0,0,12"
                                           SelectionChanged="CbMonitor_SelectionChanged"/>
 
                                 <TextBlock Text="{DynamicResource LblOcrInterval}" Style="{StaticResource LabelStyle}"/>
                                 <TextBox Text="{Binding Config.OcrIntervalMs, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource InputStyle}"/>
+                                         Style="{StaticResource InputStyle}" Margin="0,0,0,12"/>
 
                                 <Button Content="{DynamicResource BtnDefineRegion}"
-                                        Style="{StaticResource AccentButton}"
+                                        Style="{DynamicResource AccentButton}"
                                         HorizontalAlignment="Left"
-                                        Click="PickRegion_Click"/>
+                                        Click="PickRegion_Click" Margin="0,0,0,16"/>
 
-                                <Border Background="{StaticResource BgElevated}" CornerRadius="8" Padding="10,8">
+                                <Border Background="{DynamicResource BgElevated}" CornerRadius="8" Padding="12,10" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="{DynamicResource LblLastOcrOutput}" Foreground="{StaticResource TextSecondary}"
                                                    FontSize="11" Margin="0,0,0,4"/>
                                         <TextBlock x:Name="TbOcrPreview"
-                                                   Foreground="{StaticResource Accent}"
+                                                   Foreground="{DynamicResource Accent}"
                                                    FontSize="12" TextWrapping="Wrap"
                                                    Text="{DynamicResource OcrNoData}"/>
                                     </StackPanel>
@@ -457,9 +383,9 @@
                             </StackPanel>
 
                             <StackPanel x:Name="GrtprControlsPanel" Visibility="Collapsed">
-                                <Border Background="{StaticResource BgElevated}" CornerRadius="12" Padding="16,14" Margin="0,0,0,16">
+                                <Border Background="{DynamicResource BgElevated}" CornerRadius="12" Padding="16,14" Margin="0,0,0,16">
                                     <StackPanel>
-                                        <TextBlock Text="{DynamicResource LblGrtprActive}" Foreground="{StaticResource Accent}" 
+                                        <TextBlock Text="{DynamicResource LblGrtprActive}" Foreground="{DynamicResource Accent}" 
                                                    FontWeight="SemiBold" FontSize="13" Margin="0,0,0,6"/>
                                         <TextBlock Text="{DynamicResource LblGrtprDesc}" Foreground="{StaticResource TextSecondary}" 
                                                    FontSize="11" TextWrapping="Wrap"/>
@@ -470,10 +396,85 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- ── TAB 3: AUDIO ── -->
-                <TabItem Header="{DynamicResource TabAudio}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="0,12,0,0">
+                <!-- ── TAB 4: DEVICES & LEVELS ── -->
+                <TabItem Header="{DynamicResource TabDevices}">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="518">
+                        <StackPanel Margin="0,4,0,0">
+                            <!-- Input device -->
+                            <TextBlock Text="{DynamicResource LblInputDevice}" Style="{StaticResource LabelStyle}"/>
+                            <ComboBox x:Name="CbInput" Style="{StaticResource ComboStyle}" Margin="0,0,0,12"
+                                      SelectionChanged="CbInput_SelectionChanged"/>
+
+                            <!-- Input gain -->
+                            <TextBlock Style="{StaticResource LabelStyle}">
+                                <Run Text="{DynamicResource LblInputGain}"/>
+                                <Run x:Name="InputGainLabel" Text="0 dB"/>
+                            </TextBlock>
+                            <Slider x:Name="SlInputGain" Minimum="-20" Maximum="20"
+                                    TickFrequency="5" IsSnapToTickEnabled="True"
+                                    Foreground="{DynamicResource Accent}"
+                                    ValueChanged="SlInputGain_Changed" Margin="0,0,0,16"/>
+
+                            <!-- Output device -->
+                            <TextBlock Text="{DynamicResource LblOutputDevice}" Style="{StaticResource LabelStyle}"/>
+                            <ComboBox x:Name="CbOutput" Style="{StaticResource ComboStyle}" Margin="0,0,0,12"
+                                      SelectionChanged="CbOutput_SelectionChanged"/>
+
+                            <!-- Output gain -->
+                            <TextBlock Style="{StaticResource LabelStyle}">
+                                <Run Text="{DynamicResource LblOutputVolume}"/>
+                                <Run x:Name="OutputGainLabel" Text="100%"/>
+                            </TextBlock>
+                            <Slider x:Name="SlOutputGain" Minimum="0" Maximum="200"
+                                    Foreground="{DynamicResource Accent}"
+                                    ValueChanged="SlOutputGain_Changed" Margin="0,0,0,16"/>
+
+                            <!-- Audio mode -->
+                            <TextBlock Text="{DynamicResource LblTransMode}" Style="{StaticResource LabelStyle}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <RadioButton x:Name="RbPtt" Content="{DynamicResource RbPtt}"
+                                             Foreground="{StaticResource TextPrimary}"
+                                             FontSize="13" Margin="0,0,12,0"
+                                             Checked="AudioMode_Changed"/>
+                                <RadioButton x:Name="RbVad" Content="{DynamicResource RbVad}"
+                                             Foreground="{StaticResource TextPrimary}"
+                                             FontSize="13"
+                                             Checked="AudioMode_Changed"/>
+                            </StackPanel>
+
+                            <!-- PTT key -->
+                            <StackPanel x:Name="PttPanel">
+                                <TextBlock Text="{DynamicResource LblPttProximity}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="TxPttKey"
+                                         Text="{Binding Config.PttProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"
+                                         KeyDown="Hotkey_KeyDown" Margin="0,0,0,4"/>
+                                <TextBlock Text="{DynamicResource LblRecordInstruction}"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           FontSize="10" Margin="0,0,0,12"/>
+                            </StackPanel>
+
+                            <!-- VAD sensitivity -->
+                            <StackPanel x:Name="VadPanel">
+                                <TextBlock Text="{DynamicResource LblVadSens}" Style="{StaticResource LabelStyle}"/>
+                                <Slider x:Name="SlVad" Minimum="0" Maximum="3"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Foreground="{DynamicResource Accent}"
+                                        ValueChanged="SlVad_Changed" Margin="0,0,0,4"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="0,0,0,12">
+                                    <TextBlock Text="{DynamicResource LblSensLow}" Foreground="{StaticResource TextSecondary}" FontSize="10" Width="60"/>
+                                    <TextBlock Text="{DynamicResource LblSensHigh}" Foreground="{StaticResource TextSecondary}" FontSize="10"
+                                               HorizontalAlignment="Right" Width="60"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── TAB 5: COMMS & ACOUSTICS ── -->
+                <TabItem Header="{DynamicResource TabAcoustics}">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="523">
+                        <StackPanel Margin="0,4,0,0">
                             <!-- Spatial audio toggle -->
                             <CheckBox Content="{DynamicResource LblEnableSpatialAudio}"
                                       IsChecked="{Binding Config.EnableSpatialAudio, UpdateSourceTrigger=PropertyChanged}"
@@ -488,9 +489,28 @@
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="16,4,0,8"/>
 
+                            <!-- Environmental acoustics toggle -->
+                            <CheckBox Content="{DynamicResource LblEnableEnvironmentalAcoustics}"
+                                      IsChecked="{Binding Config.EnableEnvironmentalAcoustics, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
+                            <!-- Planetary atmosphere simulation toggle -->
+                            <CheckBox Content="{DynamicResource LblEnableAtmosphereSimulation}"
+                                      IsChecked="{Binding Config.EnableAtmosphereSimulation, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
                             <!-- Radio degradation toggle -->
                             <CheckBox Content="{DynamicResource LblEnableRadioDegradation}"
                                       IsChecked="{Binding Config.EnableRadioDegradation, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
+                            <!-- Distance-based radio delay toggle -->
+                            <CheckBox x:Name="CbEnableRadioDelay"
+                                      Content="{DynamicResource LblEnableRadioDelay}"
+                                      IsChecked="{Binding Config.EnableRadioDelay, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
 
@@ -506,26 +526,14 @@
                                       IsChecked="{Binding Config.EnableCustomChimes, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
 
-                            <!-- Environmental acoustics toggle -->
-                            <CheckBox Content="{DynamicResource LblEnableEnvironmentalAcoustics}"
-                                      IsChecked="{Binding Config.EnableEnvironmentalAcoustics, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
-
-                            <!-- Planetary atmosphere simulation toggle -->
-                            <CheckBox Content="{DynamicResource LblEnableAtmosphereSimulation}"
-                                      IsChecked="{Binding Config.EnableAtmosphereSimulation, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
-
-                            <!-- Distance-based radio delay toggle -->
-                            <CheckBox x:Name="CbEnableRadioDelay"
-                                      Content="{DynamicResource LblEnableRadioDelay}"
-                                      IsChecked="{Binding Config.EnableRadioDelay, UpdateSourceTrigger=PropertyChanged}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
-
+                <!-- ── TAB 6: VOICE MODULATION ── -->
+                <TabItem Header="{DynamicResource TabModulation}">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="523">
+                        <StackPanel Margin="0,4,0,0">
                             <!-- Helmet/Suit modulator toggle -->
                             <CheckBox x:Name="CbEnableHelmetModulator"
                                       Content="Enable Helmet/Suit Comms Modulator"
@@ -553,10 +561,10 @@
                                 </TextBlock>
                                 <Slider x:Name="SlVoicePitch" Minimum="0.5" Maximum="2.0"
                                         TickFrequency="0.1" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlVoicePitch_Changed" Margin="0,0,0,16"/>
                             </StackPanel>
- 
+
                             <!-- Custom Vocal Modulator toggle -->
                             <CheckBox x:Name="CbEnableCustomModulator"
                                       Content="Enable Custom Vocal Modulator (Overrides presets)"
@@ -574,7 +582,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomPitch" Minimum="0.5" Maximum="2.0"
                                         TickFrequency="0.1" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomPitch_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomPitchShift, Mode=TwoWay}"/>
 
@@ -585,7 +593,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomRingFreq" Minimum="20" Maximum="3000"
                                         TickFrequency="20" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomRingFreq_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomRingModFreq, Mode=TwoWay}"/>
 
@@ -596,7 +604,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomRingMix" Minimum="0.0" Maximum="1.0"
                                         TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomRingMix_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomRingModMix, Mode=TwoWay}"/>
 
@@ -607,7 +615,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomFlangerDepth" Minimum="0.0" Maximum="1.0"
                                         TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomFlangerDepth_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomFlangerDepth, Mode=TwoWay}"/>
 
@@ -618,7 +626,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomFlangerRate" Minimum="0.1" Maximum="10.0"
                                         TickFrequency="0.1" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomFlangerRate_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomFlangerRate, Mode=TwoWay}"/>
 
@@ -629,7 +637,7 @@
                                 </TextBlock>
                                 <Slider x:Name="SlCustomFlangerFeedback" Minimum="0.0" Maximum="0.95"
                                         TickFrequency="0.05" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
+                                        Foreground="{DynamicResource Accent}"
                                         ValueChanged="SlCustomFlangerFeedback_Changed" Margin="0,0,0,8"
                                         Value="{Binding Config.CustomFlangerFeedback, Mode=TwoWay}"/>
 
@@ -649,87 +657,19 @@
                                     </TextBlock>
                                     <Slider x:Name="SlCustomBitcrushBits" Minimum="2" Maximum="16"
                                             TickFrequency="1" IsSnapToTickEnabled="True"
-                                            Foreground="{StaticResource Accent}"
+                                            Foreground="{DynamicResource Accent}"
                                             ValueChanged="SlCustomBitcrushBits_Changed" Margin="0,0,0,16"
                                             Value="{Binding Config.CustomBitcrushBits, Mode=TwoWay}"/>
-                                </StackPanel>
-                            </StackPanel>
-
-                            <!-- Input device -->
-                            <TextBlock Text="{DynamicResource LblInputDevice}" Style="{StaticResource LabelStyle}"/>
-                            <ComboBox x:Name="CbInput" Style="{StaticResource ComboStyle}"
-                                      SelectionChanged="CbInput_SelectionChanged"/>
-
-                            <!-- Input gain -->
-                            <TextBlock Style="{StaticResource LabelStyle}">
-                                <Run Text="{DynamicResource LblInputGain}"/>
-                                <Run x:Name="InputGainLabel" Text="0 dB"/>
-                            </TextBlock>
-                            <Slider x:Name="SlInputGain" Minimum="-20" Maximum="20"
-                                    TickFrequency="5" IsSnapToTickEnabled="True"
-                                    Foreground="{StaticResource Accent}"
-                                    ValueChanged="SlInputGain_Changed"/>
-
-                            <!-- Output device -->
-                            <TextBlock Text="{DynamicResource LblOutputDevice}" Style="{StaticResource LabelStyle}"/>
-                            <ComboBox x:Name="CbOutput" Style="{StaticResource ComboStyle}"
-                                      SelectionChanged="CbOutput_SelectionChanged"/>
-
-                            <!-- Output gain -->
-                            <TextBlock Style="{StaticResource LabelStyle}">
-                                <Run Text="{DynamicResource LblOutputVolume}"/>
-                                <Run x:Name="OutputGainLabel" Text="100%"/>
-                            </TextBlock>
-                            <Slider x:Name="SlOutputGain" Minimum="0" Maximum="200"
-                                    Foreground="{StaticResource Accent}"
-                                    ValueChanged="SlOutputGain_Changed"/>
-
-                            <!-- Audio mode -->
-                            <TextBlock Text="{DynamicResource LblTransMode}" Style="{StaticResource LabelStyle}"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <RadioButton x:Name="RbPtt" Content="{DynamicResource RbPtt}"
-                                             Foreground="{StaticResource TextPrimary}"
-                                             FontSize="13" Margin="0,0,12,0"
-                                             Checked="AudioMode_Changed"/>
-                                <RadioButton x:Name="RbVad" Content="{DynamicResource RbVad}"
-                                             Foreground="{StaticResource TextPrimary}"
-                                             FontSize="13"
-                                             Checked="AudioMode_Changed"/>
-                            </StackPanel>
-
-                            <!-- PTT key -->
-                            <StackPanel x:Name="PttPanel">
-                                <TextBlock Text="{DynamicResource LblPttProximity}" Style="{StaticResource LabelStyle}"/>
-                                <TextBox x:Name="TxPttKey"
-                                         Text="{Binding Config.PttProximityKey, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource InputStyle}"
-                                         KeyDown="Hotkey_KeyDown"/>
-                                <TextBlock Text="{DynamicResource LblRecordInstruction}"
-                                           Foreground="{StaticResource TextSecondary}"
-                                           FontSize="10" Margin="0,4,0,0"/>
-                            </StackPanel>
-
-                            <!-- VAD sensitivity -->
-                            <StackPanel x:Name="VadPanel">
-                                <TextBlock Text="{DynamicResource LblVadSens}" Style="{StaticResource LabelStyle}"/>
-                                <Slider x:Name="SlVad" Minimum="0" Maximum="3"
-                                        TickFrequency="1" IsSnapToTickEnabled="True"
-                                        Foreground="{StaticResource Accent}"
-                                        ValueChanged="SlVad_Changed"/>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                    <TextBlock Text="{DynamicResource LblSensLow}" Foreground="{StaticResource TextSecondary}" FontSize="10" Width="60"/>
-                                    <TextBlock Text="{DynamicResource LblSensHigh}" Foreground="{StaticResource TextSecondary}" FontSize="10"
-                                               HorizontalAlignment="Right" Width="60"/>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- ── TAB 4: OVERLAY ── -->
+                <!-- ── TAB 7: OVERLAY & HUD ── -->
                 <TabItem Header="{DynamicResource TabOverlay}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="0,12,0,0">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
+                        <StackPanel Margin="0,4,0,0">
                             <!-- Overlay Toggle -->
                             <CheckBox Content="{DynamicResource LblEnableOverlay}"
                                       IsChecked="{Binding Config.EnableOverlay, UpdateSourceTrigger=PropertyChanged}"
@@ -748,242 +688,412 @@
                             <ComboBox x:Name="CbOverlayPosition" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
                                       SelectionChanged="CbOverlayPosition_SelectionChanged"/>
 
-                             <!-- Tactical Radar Toggle -->
-                             <CheckBox x:Name="CbEnableRadar"
-                                       Content="Enable Tactical HUD Mini-Radar"
-                                       IsChecked="{Binding Config.EnableRadar, UpdateSourceTrigger=PropertyChanged}"
-                                       Foreground="{StaticResource TextPrimary}"
-                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
-                                       Checked="Radar_ToggleChanged" Unchecked="Radar_ToggleChanged"/>
+                            <!-- Tactical Radar Toggle -->
+                            <CheckBox x:Name="CbEnableRadar"
+                                      Content="Enable Tactical HUD Mini-Radar"
+                                      IsChecked="{Binding Config.EnableRadar, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                      Checked="Radar_ToggleChanged" Unchecked="Radar_ToggleChanged"/>
 
-                             <!-- Radar Range Slider -->
-                             <StackPanel x:Name="RadarControlsPanel" Margin="16,0,0,12" Visibility="Collapsed">
-                                 <TextBlock Style="{StaticResource LabelStyle}">
-                                     <Run Text="Radar Maximum Range: "/>
-                                     <Run x:Name="RadarRangeLabel" Text="50m"/>
-                                 </TextBlock>
-                                 <Slider x:Name="SlRadarRange" Minimum="10" Maximum="200"
-                                         TickFrequency="10" IsSnapToTickEnabled="True"
-                                         Foreground="{StaticResource Accent}"
-                                         ValueChanged="SlRadarRange_Changed" Margin="0,0,0,12"/>
-                             </StackPanel>
+                            <!-- Radar Range Slider -->
+                            <StackPanel x:Name="RadarControlsPanel" Margin="16,0,0,12" Visibility="Collapsed">
+                                <TextBlock Style="{StaticResource LabelStyle}">
+                                    <Run Text="Radar Maximum Range: "/>
+                                    <Run x:Name="RadarRangeLabel" Text="50m"/>
+                                </TextBlock>
+                                <Slider x:Name="SlRadarRange" Minimum="10" Maximum="200"
+                                        TickFrequency="10" IsSnapToTickEnabled="True"
+                                        Foreground="{DynamicResource Accent}"
+                                        ValueChanged="SlRadarRange_Changed" Margin="0,0,0,12"/>
+                            </StackPanel>
 
-                             <!-- Speech-to-Text Captions Toggle -->
-                             <CheckBox x:Name="CbEnableStt"
-                                       Content="Enable Real-Time HUD Captions (Speech-to-Text)"
-                                       IsChecked="{Binding Config.EnableStt, UpdateSourceTrigger=PropertyChanged}"
-                                       Foreground="{StaticResource TextPrimary}"
-                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
-                                       Checked="Stt_ToggleChanged" Unchecked="Stt_ToggleChanged"/>
+                            <!-- Speech-to-Text Captions Toggle -->
+                            <CheckBox x:Name="CbEnableStt"
+                                      Content="Enable Real-Time HUD Captions (Speech-to-Text)"
+                                      IsChecked="{Binding Config.EnableStt, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                      Checked="Stt_ToggleChanged" Unchecked="Stt_ToggleChanged"/>
 
-                             <!-- STT Download Warning Message -->
-                             <Border x:Name="SttWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="16,4,0,16" Visibility="Collapsed">
-                                 <StackPanel>
-                                     <TextBlock Text="⚠️ Speech-to-Text Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
-                                     <TextBlock Text="Enabling HUD Captions will automatically download a lightweight 75MB speech recognition model (ggml-tiny.bin) on first use. The download occurs in the background, and progress is shown directly on the HUD. Internet connection is required for initial setup." 
-                                                Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
-                                 </StackPanel>
-                             </Border>
+                            <!-- STT Download Warning Message -->
+                            <Border x:Name="SttWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="16,4,0,16" Visibility="Collapsed">
+                                <StackPanel>
+                                    <TextBlock Text="⚠️ Speech-to-Text Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBlock Text="Enabling HUD Captions will automatically download a lightweight 75MB speech recognition model (ggml-tiny.bin) on first use. The download occurs in the background, and progress is shown directly on the HUD. Internet connection is required for initial setup." 
+                                               Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
 
-                             <!-- Real-Time HUD Translation Subtitles Toggle -->
-                             <CheckBox x:Name="CbEnableTranslationSubtitles"
-                                       Content="{DynamicResource LblEnableTranslationSubtitles}"
-                                       IsChecked="{Binding Config.EnableTranslationSubtitles, UpdateSourceTrigger=PropertyChanged}"
-                                       Foreground="{StaticResource TextPrimary}"
-                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
-                                       Checked="TranslationSubtitles_ToggleChanged" Unchecked="TranslationSubtitles_ToggleChanged"/>
+                            <!-- Real-Time HUD Translation Subtitles Toggle -->
+                            <CheckBox x:Name="CbEnableTranslationSubtitles"
+                                      Content="{DynamicResource LblEnableTranslationSubtitles}"
+                                      IsChecked="{Binding Config.EnableTranslationSubtitles, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                      Checked="TranslationSubtitles_ToggleChanged" Unchecked="TranslationSubtitles_ToggleChanged"/>
 
-                             <!-- Translation Download Warning Message -->
-                             <Border x:Name="TranslationWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="16,4,0,16" Visibility="Collapsed">
-                                 <StackPanel>
-                                     <TextBlock Text="⚠️ Translation Engine Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
-                                     <TextBlock Text="Enabling translation subtitles requires the Whisper speech recognition model (ggml-tiny.bin) to transcribe incoming foreign audio. If not already downloaded, enabling this feature will automatically start downloading the model (75MB) in the background. Progress will be displayed on the HUD." 
-                                                Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
-                                 </StackPanel>
-                             </Border>
+                            <!-- Translation Download Warning Message -->
+                            <Border x:Name="TranslationWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="16,4,0,16" Visibility="Collapsed">
+                                <StackPanel>
+                                    <TextBlock Text="⚠️ Translation Engine Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBlock Text="Enabling translation subtitles requires the Whisper speech recognition model (ggml-tiny.bin) to transcribe incoming foreign audio. If not already downloaded, enabling this feature will automatically start downloading the model (75MB) in the background. Progress will be displayed on the HUD." 
+                                               Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
 
                             <!-- Overlay Capabilities Info -->
                             <TextBlock Text="{DynamicResource LblOverlayCapabilities}" Style="{StaticResource LabelStyle}" FontWeight="Bold" Margin="0,12,0,4"/>
-                            <Border Background="{StaticResource BgElevated}" CornerRadius="8" Padding="12" Margin="0,0,0,16">
+                            <Border Background="{DynamicResource BgElevated}" CornerRadius="8" Padding="12" Margin="0,0,0,16">
                                 <TextBlock Text="{DynamicResource LblOverlayCapabilitiesDesc}" Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap"/>
                             </Border>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- ── TAB: HOTKEYS ── -->
+                <!-- ── TAB 8: INTEGRATIONS ── -->
+                <TabItem Header="{DynamicResource TabIntegrations}">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="526">
+                        <StackPanel Margin="0,4,5,0">
+                            <!-- Companion App -->
+                            <CheckBox x:Name="CbEnableCompanionApp"
+                                      Content="{DynamicResource LblEnableCompanionApp}"
+                                      IsChecked="{Binding Config.EnableCompanionApp, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                      Checked="CompanionApp_ToggleChanged" Unchecked="CompanionApp_ToggleChanged"/>
+
+                            <StackPanel x:Name="CompanionPortPanel" Margin="16,4,0,0">
+                                <TextBlock Text="{DynamicResource LblCompanionAppPort}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="TxCompanionPort"
+                                         Text="{Binding Config.CompanionAppPort, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+
+                            <CheckBox x:Name="CbEnableCompanionMap"
+                                      Content="{DynamicResource LblEnableCompanionMap}"
+                                      IsChecked="{Binding Config.EnableCompanionMap, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="16,8,0,0"/>
+
+                            <!-- Telemetry -->
+                            <CheckBox x:Name="CbEnableTelemetry"
+                                      Content="{DynamicResource LblEnableTelemetry}"
+                                      IsChecked="{Binding Config.EnableTelemetry, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,8"
+                                      Checked="Telemetry_ToggleChanged" Unchecked="Telemetry_ToggleChanged"/>
+
+                            <StackPanel x:Name="TelemetryPortPanel" Margin="16,4,0,0">
+                                <TextBlock Text="{DynamicResource LblTelemetryPort}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="TxTelemetryPort"
+                                         Text="{Binding Config.TelemetryPort, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+
+                            <!-- Immersive Features -->
+                            <CheckBox Content="{DynamicResource LblEnableExertionDistortion}"
+                                      IsChecked="{Binding Config.EnableExertionDistortion, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,8"/>
+
+                            <CheckBox Content="{DynamicResource LblEnableRadioRepeaters}"
+                                      IsChecked="{Binding Config.EnableRadioRepeaters, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,8"/>
+
+                            <CheckBox Content="{DynamicResource LblIsRadioRepeater}"
+                                      IsChecked="{Binding Config.IsRadioRepeater, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,8"/>
+
+                            <!-- Ship PA -->
+                            <CheckBox x:Name="CbEnableShipPa"
+                                      Content="{DynamicResource LblEnableShipPa}"
+                                      IsChecked="{Binding Config.EnableShipPa, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,8"
+                                      Checked="ShipPa_ToggleChanged" Unchecked="ShipPa_ToggleChanged"/>
+
+                            <StackPanel x:Name="ShipPaPanel" Margin="16,4,0,0">
+                                <TextBlock Text="{DynamicResource LblPttPaKey}" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="TxPttPaKey"
+                                         Text="{Binding Config.PttPaKey, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+
+                            <!-- Intercom Degradation -->
+                            <CheckBox x:Name="CbEnableIntercomDegradation"
+                                      Content="{DynamicResource LblEnableIntercomDegradation}"
+                                      IsChecked="{Binding Config.EnableIntercomDegradation, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,8,0,8"
+                                      Checked="IntercomDegradation_ToggleChanged" Unchecked="IntercomDegradation_ToggleChanged"/>
+
+                            <StackPanel x:Name="IntercomDegradationSubPanel" Margin="16,4,0,0">
+                                <CheckBox x:Name="CbIntercomShieldHits"
+                                          Content="{DynamicResource LblIntercomShieldHits}"
+                                          IsChecked="{Binding Config.IntercomShieldHitsEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,4"/>
+
+                                <CheckBox x:Name="CbIntercomCriticalPower"
+                                          Content="{DynamicResource LblIntercomCriticalPower}"
+                                          IsChecked="{Binding Config.IntercomCriticalPowerEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,6,0,4"/>
+                                <CheckBox x:Name="CbIntercomQuantumTravel"
+                                          Content="{DynamicResource LblIntercomQuantumTravel}"
+                                          IsChecked="{Binding Config.IntercomQuantumTravelEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="12" Margin="0,6,0,4"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── TAB 9: HOTKEYS ── -->
                 <TabItem Header="{DynamicResource TabHotkeys}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="0,12,0,0">
-                            <!-- PTT Proximity -->
-                            <TextBlock Text="{DynamicResource LblPttProximity}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxPttProximity"
-                                     Text="{Binding Config.PttProximityKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="535">
+                        <StackPanel Margin="0,4,5,0">
+                            <!-- Voice Commands -->
+                            <CheckBox x:Name="CbEnableVoiceCommands"
+                                      Content="{DynamicResource LblEnableVoiceCommands}"
+                                      IsChecked="{Binding Config.EnableVoiceCommands, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                      Checked="VoiceCommands_ToggleChanged" Unchecked="VoiceCommands_ToggleChanged"/>
 
-                            <!-- PTT Radio -->
-                            <TextBlock Text="{DynamicResource LblPttRadio}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxPttRadio"
-                                     Text="{Binding Config.PttRadioKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                            <StackPanel x:Name="VoiceCommandsSubPanel" Margin="16,4,0,12">
+                                <!-- WARNING Panel -->
+                                <Border x:Name="VoiceCommandWarningPanel" Background="#33FF9800" BorderBrush="#80FF9800" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,4,0,8" Visibility="Collapsed">
+                                    <StackPanel>
+                                        <TextBlock Text="⚠️ Voice Commands Notice" Foreground="#FFFF9800" FontWeight="Bold" FontSize="11" Margin="0,0,0,4"/>
+                                        <TextBlock Text="{DynamicResource LblVoiceCommandWarning}" 
+                                                   Foreground="{StaticResource TextSecondary}" FontSize="10" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
 
-                            <!-- PTT Profile -->
-                            <TextBlock Text="{DynamicResource LblPttProfile}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxPttProfile"
-                                     Text="{Binding Config.PttProfileKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                <!-- Confidence threshold slider -->
+                                <TextBlock Style="{StaticResource LabelStyle}" Margin="0,4,0,2">
+                                    <Run Text="{DynamicResource LblVoiceCommandConfidence}"/>
+                                    <Run Text=": "/>
+                                    <Run x:Name="VoiceCommandConfidenceLabel" Text="0.5"/>
+                                </TextBlock>
+                                <Slider x:Name="SlVoiceCommandConfidence" Minimum="0.1" Maximum="1.0"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        Foreground="{DynamicResource Accent}"
+                                        ValueChanged="SlVoiceCommandConfidence_Changed" Margin="0,0,0,12"/>
+                            </StackPanel>
 
-                            <!-- Helmet Toggle -->
-                            <TextBlock Text="{DynamicResource LblHelmetToggle}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxHelmetToggle"
-                                     Text="{Binding Config.HelmetToggleKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Radio Cycle -->
-                            <TextBlock Text="{DynamicResource LblRadioCycle}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxRadioCycle"
-                                     Text="{Binding Config.RadioCycleKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Mute Proximity -->
-                            <TextBlock Text="{DynamicResource LblMuteProximity}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteProximity"
-                                     Text="{Binding Config.MuteProximityKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Mute Radio -->
-                            <TextBlock Text="{DynamicResource LblMuteRadio}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteRadio"
-                                     Text="{Binding Config.MuteRadioKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Mute Profile -->
-                            <TextBlock Text="{DynamicResource LblMuteProfile}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteProfile"
-                                     Text="{Binding Config.MuteProfileKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Mute Audio Proximity -->
-                            <TextBlock Text="{DynamicResource LblMuteAudioProximity}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteAudioProximity"
-                                     Text="{Binding Config.MuteAudioProximityKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Mute Audio Radio -->
-                            <TextBlock Text="{DynamicResource LblMuteAudioRadio}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteAudioRadio"
-                                     Text="{Binding Config.MuteAudioRadioKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Mute Audio Profile -->
-                            <TextBlock Text="{DynamicResource LblMuteAudioProfile}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteAudioProfile"
-                                     Text="{Binding Config.MuteAudioProfileKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Voice Command Key (PTT) -->
-                            <TextBlock Text="{DynamicResource LblVoiceCommandHotkey}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxVoiceCommandHotkey"
-                                     Text="{Binding Config.VoiceCommandHotkey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Voice-Activated Ship Controls -->
-                            <TextBlock Text="{DynamicResource LblVoiceShipControlsHeader}" 
-                                       Foreground="{StaticResource Accent}" 
-                                       FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
-
-                            <!-- Power Key -->
-                            <TextBlock Text="{DynamicResource LblVoicePowerKey}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxVoicePowerKey"
-                                     Text="{Binding Config.VoiceCommandPowerKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Doors Key -->
-                            <TextBlock Text="{DynamicResource LblVoiceDoorsKey}" Style="{StaticResource LabelStyle}"/>
+                            <!-- Header: Communication Hotkeys -->
+                            <TextBlock Text="{DynamicResource HeaderCommHotkeys}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="TxVoiceDoorsKey" Grid.Column="0"
-                                         Text="{Binding Config.VoiceCommandDoorsKey, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource InputStyle}"
-                                         KeyDown="Hotkey_KeyDown"/>
-                                <ComboBox x:Name="CbVoiceDoorsModifier" Grid.Column="1" Style="{StaticResource ComboStyle}" Margin="8,0,0,0"
-                                          SelectedValue="{Binding Config.VoiceCommandDoorsModifier, UpdateSourceTrigger=PropertyChanged}"
-                                          SelectedValuePath="Content">
-                                    <ComboBoxItem Content="None"/>
-                                    <ComboBoxItem Content="Alt"/>
-                                    <ComboBoxItem Content="Ctrl"/>
-                                    <ComboBoxItem Content="Shift"/>
-                                </ComboBox>
+
+                                <StackPanel Grid.Column="0">
+                                    <!-- PTT Proximity -->
+                                    <TextBlock Text="{DynamicResource LblPttProximity}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxPttProximity"
+                                             Text="{Binding Config.PttProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- PTT Radio -->
+                                    <TextBlock Text="{DynamicResource LblPttRadio}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxPttRadio"
+                                             Text="{Binding Config.PttRadioKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- PTT Profile -->
+                                    <TextBlock Text="{DynamicResource LblPttProfile}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxPttProfile"
+                                             Text="{Binding Config.PttProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Voice Command Key (PTT) -->
+                                    <TextBlock Text="{DynamicResource LblVoiceCommandHotkey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceCommandHotkey"
+                                             Text="{Binding Config.VoiceCommandHotkey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <!-- Helmet Toggle -->
+                                    <TextBlock Text="{DynamicResource LblHelmetToggle}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxHelmetToggle"
+                                             Text="{Binding Config.HelmetToggleKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Radio Cycle -->
+                                    <TextBlock Text="{DynamicResource LblRadioCycle}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxRadioCycle"
+                                             Text="{Binding Config.RadioCycleKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Initiate Hail Key -->
+                                    <TextBlock Text="{DynamicResource LblInitiateHail}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxInitiateHail"
+                                             Text="{Binding Config.InitiateHailKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Accept Hail Key -->
+                                    <TextBlock Text="{DynamicResource LblAcceptHail}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxAcceptHail"
+                                             Text="{Binding Config.AcceptHailKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Decline Hail Key -->
+                                    <TextBlock Text="{DynamicResource LblDeclineHail}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxDeclineHail"
+                                             Text="{Binding Config.DeclineHailKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
                             </Grid>
 
-                            <!-- Shields Key -->
-                            <TextBlock Text="{DynamicResource LblVoiceShieldsKey}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxVoiceShieldsKey"
-                                     Text="{Binding Config.VoiceCommandShieldsKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                            <!-- Header: Mute Hotkeys -->
+                            <TextBlock Text="{DynamicResource HeaderMuteHotkeys}" Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                            <!-- Landing Gear Key -->
-                            <TextBlock Text="{DynamicResource LblVoiceLandingGearKey}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxVoiceLandingGearKey"
-                                     Text="{Binding Config.VoiceCommandLandingGearKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                <StackPanel Grid.Column="0">
+                                    <!-- Mute Proximity -->
+                                    <TextBlock Text="{DynamicResource LblMuteProximity}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteProximity"
+                                             Text="{Binding Config.MuteProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
-                            <!-- Initiate Hail Key -->
-                            <TextBlock Text="{DynamicResource LblInitiateHail}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxInitiateHail"
-                                     Text="{Binding Config.InitiateHailKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                    <!-- Mute Radio -->
+                                    <TextBlock Text="{DynamicResource LblMuteRadio}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteRadio"
+                                             Text="{Binding Config.MuteRadioKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
-                            <!-- Accept Hail Key -->
-                            <TextBlock Text="{DynamicResource LblAcceptHail}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxAcceptHail"
-                                     Text="{Binding Config.AcceptHailKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                    <!-- Mute Profile -->
+                                    <TextBlock Text="{DynamicResource LblMuteProfile}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteProfile"
+                                             Text="{Binding Config.MuteProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
 
-                            <!-- Decline Hail Key -->
-                            <TextBlock Text="{DynamicResource LblDeclineHail}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxDeclineHail"
-                                     Text="{Binding Config.DeclineHailKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                <StackPanel Grid.Column="2">
+                                    <!-- Mute Audio Proximity -->
+                                    <TextBlock Text="{DynamicResource LblMuteAudioProximity}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteAudioProximity"
+                                             Text="{Binding Config.MuteAudioProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Mute Audio Radio -->
+                                    <TextBlock Text="{DynamicResource LblMuteAudioRadio}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteAudioRadio"
+                                             Text="{Binding Config.MuteAudioRadioKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Mute Audio Profile -->
+                                    <TextBlock Text="{DynamicResource LblMuteAudioProfile}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteAudioProfile"
+                                             Text="{Binding Config.MuteAudioProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Voice-Activated Ship Controls -->
+                            <TextBlock Text="{DynamicResource LblVoiceShipControlsHeader}" 
+                                       Foreground="{DynamicResource Accent}" 
+                                       FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <!-- Power Key -->
+                                    <TextBlock Text="{DynamicResource LblVoicePowerKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoicePowerKey"
+                                             Text="{Binding Config.VoiceCommandPowerKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Shields Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceShieldsKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceShieldsKey"
+                                             Text="{Binding Config.VoiceCommandShieldsKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <!-- Doors Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceDoorsKey}" Style="{StaticResource LabelStyle}"/>
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="TxVoiceDoorsKey" Grid.Column="0"
+                                                 Text="{Binding Config.VoiceCommandDoorsKey, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource InputStyle}"
+                                                 KeyDown="Hotkey_KeyDown"/>
+                                        <ComboBox x:Name="CbVoiceDoorsModifier" Grid.Column="1" Style="{StaticResource ComboStyle}" Margin="8,0,0,0"
+                                                  SelectedValue="{Binding Config.VoiceCommandDoorsModifier, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedValuePath="Content">
+                                            <ComboBoxItem Content="None"/>
+                                            <ComboBoxItem Content="Alt"/>
+                                            <ComboBoxItem Content="Ctrl"/>
+                                            <ComboBoxItem Content="Shift"/>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <!-- Landing Gear Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceLandingGearKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceLandingGearKey"
+                                             Text="{Binding Config.VoiceCommandLandingGearKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
+                            </Grid>
 
                             <TextBlock Text="{DynamicResource LblRecordInstructionMulti}"
                                        Foreground="{StaticResource TextSecondary}"
@@ -994,9 +1104,9 @@
             </TabControl>
 
             <!-- Save button -->
-            <Border Grid.Row="2" Padding="16,8" Background="{StaticResource BgDeep}"
+            <Border Grid.Row="2" Padding="16,8" Background="{DynamicResource BgDeep}"
                     CornerRadius="0,0,16,16">
-                <Button Content="{DynamicResource BtnSaveClose}" Style="{StaticResource AccentButton}"
+                <Button Content="{DynamicResource BtnSaveClose}" Style="{DynamicResource AccentButton}"
                         HorizontalAlignment="Right" Click="Save_Click"/>
             </Border>
         </Grid>

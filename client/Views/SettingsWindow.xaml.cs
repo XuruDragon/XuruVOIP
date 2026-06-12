@@ -126,6 +126,17 @@ public partial class SettingsWindow : Window
         CbOverlayPosition.SelectedValuePath = "Code";
         CbOverlayPosition.SelectedValue = Cfg.OverlayPosition;
 
+        // HUD Theme
+        CbHudTheme.Items.Clear();
+        CbHudTheme.Items.Add(new { Code = "Aegis", Name = "Aegis (Milspec Green)" });
+        CbHudTheme.Items.Add(new { Code = "Anvil", Name = "Anvil (Crimson Red)" });
+        CbHudTheme.Items.Add(new { Code = "Drake", Name = "Drake (Amber/Rust)" });
+        CbHudTheme.Items.Add(new { Code = "RSI", Name = "RSI (Pioneer Cobalt Blue)" });
+        CbHudTheme.Items.Add(new { Code = "Origin", Name = "Origin (Luxury Ice Blue)" });
+        CbHudTheme.DisplayMemberPath = "Name";
+        CbHudTheme.SelectedValuePath = "Code";
+        CbHudTheme.SelectedValue = Cfg.HudTheme ?? "Aegis";
+
         // Voice Changer settings
         CbVoiceChangerType.Items.Clear();
         CbVoiceChangerType.Items.Add(new { Code = "None", Name = "None" });
@@ -290,6 +301,12 @@ public partial class SettingsWindow : Window
     {
         if (Cfg == null || CbOverlayPosition.SelectedValue == null) return;
         Cfg.OverlayPosition = (string)CbOverlayPosition.SelectedValue;
+    }
+
+    private void CbHudTheme_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (Cfg == null || CbHudTheme.SelectedValue == null) return;
+        Cfg.HudTheme = (string)CbHudTheme.SelectedValue;
     }
 
     // ─── Events ──────────────────────────────────────────────────────────────

@@ -248,6 +248,29 @@ graph TB
   * **Correspondance de mots-clés multilingue :** Prise en charge dans 8 langues (anglais, français, allemand, espagnol, portugais, japonais et chinois).
   * **Filtre de seuil de confiance :** Un curseur configurable permet de filtrer les correspondances à faible confiance ou les bruits de fond.
   * *Désactivé par défaut ; l'activer lancera le téléchargement en arrière-plan du modèle de transcription hors ligne Whisper (~140 Mo) s'il n'est pas déjà présent.*
+  * **Liste de référence des commandes vocales :**
+    Voici la liste de toutes les commandes vocales PTT mains libres prises en charge, divisée en contrôles de l'application XuruVOIP et raccourcis clavier associés à Star Citizen :
+    
+    #### Contrôles de l'application XuruVOIP (Exclusifs à XuruVOIP)
+    Ces commandes contrôlent directement dans XuruVOIP l'état de votre casque/visière, la sourdine des canaux, les fréquences radio ou les modulations de voix :
+    * **Basculer casque/visière :** `visiere`, `casque`, `basculer la visiere`, `basculer le casque`, `toggle visiere`
+    * **Sourdine canal de proximité :** `muet proximite`, `couper proximite`, `silencer proximite`
+    * **Activer canal de proximité :** `activer proximite`, `retablir proximite`, `unmute proximite`
+    * **Sourdine canal radio :** `muet radio`, `couper radio`, `silencer radio`
+    * **Activer canal radio :** `activer radio`, `retablir radio`, `unmute radio`
+    * **Sourdine canal de profil :** `muet profil`, `couper profil`, `silencer profil`
+    * **Activer canal de profil :** `activer profil`, `retablir profil`, `unmute profil`
+    * **Sourdine microphone (Global) :** `couper tout`, `muet tout`, `couper micro`, `muet micro`
+    * **Activer microphone (Global) :** `activer tout`, `retablir tout`, `activer micro`, `unmute micro`
+    * **Changer de canal radio :** `changer de canal`, `canal vers`, `basculer sur le canal`, `canal` suivi du nom du canal (ex: *"changer de canal Alpha"*)
+    * **Modifier le profil du changeur de voix :** `modificateur de voix`, `profil de voix`, `modifier voix`, `voix` suivi d'un profil : `alien` (ou `extraterrestre`), `cyborg`, `robotic` (ou `robot`, `robotique`), `pitchshift` (ou `pitch shift`, `hauteur`, `pitch`), `none` (ou `off`, `normal`, `desactive`, `aucun`)
+    
+    #### Contrôles de vaisseau simulés (Associés à Star Citizen)
+    Ces commandes simulent des pressions de touches physiques sur votre PC pour déclencher des contrôles de Star Citizen :
+    * **Basculer l'alimentation du vaisseau :** `alimentation`, `basculer alimentation`, `allumer systemes`, `eteindre systemes`, `demarrer systemes`, `couper systemes`
+    * **Basculer les portes/rampes du vaisseau :** `portes`, `exterieur`, `ouvrir portes`, `fermer portes`, `ouvrir exterieur`, `fermer exterieur`, `basculer portes`
+    * **Dévier les boucliers vers l'avant :** `boucliers`, `boucliers avant`, `devier boucliers`, `boucliers devant`
+    * **Basculer le train d'atterrissage :** `train d'atterrissage`, `deployer train`, `rentrer train`, `train atterrissage`
 
 ### 8. 📱 Application compagnon et API REST
 * **Serveur Web HTTP local :** Héberge un tableau de bord local sur un port configurable (par défaut : `8891`, désactivé par défaut).

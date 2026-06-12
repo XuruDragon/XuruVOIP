@@ -49,6 +49,10 @@
     <sys:String x:Key="TabConnection">Connection</sys:String>
     <sys:String x:Key="TabOcr">OCR</sys:String>
     <sys:String x:Key="TabAudio">Audio</sys:String>
+    <sys:String x:Key="TabDevices">Devices &amp; Levels</sys:String>
+    <sys:String x:Key="TabAcoustics">Comms &amp; Acoustics</sys:String>
+    <sys:String x:Key="TabModulation">Voice Modulation</sys:String>
+    <sys:String x:Key="TabIntegrations">Integrations</sys:String>
     <sys:String x:Key="TabHotkeys">Hotkeys</sys:String>
 
     <!-- Settings: Connection -->
@@ -214,5 +218,19 @@
     <sys:String x:Key="LblInitiateHail">Initiate Hail Key</sys:String>
     <sys:String x:Key="LblAcceptHail">Accept Hail Key</sys:String>
     <sys:String x:Key="LblDeclineHail">Decline/End Hail Key</sys:String>
-    <sys:String x:Key="LblEnableTranslationSubtitles">Enable Visor HUD Real-Time Translation Subtitles</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">Enable Real-Time HUD Translation Subtitles</sys:String>
+
+    <sys:String x:Key="HeaderCommHotkeys">Communication &amp; General Keys</sys:String>
+    <sys:String x:Key="HeaderMuteHotkeys">Mute Toggle Keys</sys:String>
+    <!-- System Console Panel -->
+    <sys:String x:Key="PanelConsoleLog">SYSTEM CONSOLE</sys:String>
+
+    <!-- Connection Diagnostics Panel -->
+    <sys:String x:Key="PanelDiagnostics">CONNECTION QUALITY</sys:String>
+    <sys:String x:Key="LblLatency">Latency</sys:String>
+    <sys:String x:Key="LblJitter">Jitter</sys:String>
+    <sys:String x:Key="LblPacketLoss">Packet Loss</sys:String>
+    <sys:String x:Key="LblHudTheme">HUD &amp; App Theme</sys:String>
 </ResourceDictionary>
+
+

@@ -486,6 +486,7 @@ public class CompanionAppService : IDisposable
             --card-bg: rgba(26, 26, 36, 0.45);
             --border-color: rgba(255, 255, 255, 0.08);
             --primary: #00f2fe;
+            --primary-rgb: 0, 242, 254;
             --primary-glow: rgba(0, 242, 254, 0.4);
             --accent: #4facfe;
             --danger: #ff4e6a;
@@ -494,6 +495,8 @@ public class CompanionAppService : IDisposable
             --text-title: #ffffff;
             --green: #3ddb85;
             --green-glow: rgba(61, 219, 133, 0.4);
+            --bg-glow-1: rgba(0, 242, 254, 0.08);
+            --bg-glow-2: rgba(79, 172, 254, 0.08);
         }
         * {
             box-sizing: border-box;
@@ -505,8 +508,8 @@ public class CompanionAppService : IDisposable
         body {
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 10% 20%, rgba(0, 242, 254, 0.08) 0px, transparent 50%),
-                radial-gradient(at 90% 80%, rgba(79, 172, 254, 0.08) 0px, transparent 50%);
+                radial-gradient(at 10% 20%, var(--bg-glow-1) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, var(--bg-glow-2) 0px, transparent 50%);
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
@@ -911,13 +914,13 @@ public class CompanionAppService : IDisposable
             <div class="section-title">HUD Layout & Customization</div>
             <div class="controls-list">
                 <div class="control-row">
-                    <div class="section-title">HUD Theme</div>
+                    <div class="section-title">HUD &amp; App Theme</div>
                     <select id="sel-hud-theme" onchange="postAction('set_hud_theme', { theme: this.value })">
-                        <option value="Aegis">Aegis (Cyan)</option>
-                        <option value="Anvil">Anvil (Orange)</option>
-                        <option value="Drake">Drake (Green)</option>
-                        <option value="RSI">RSI (Light Blue)</option>
-                        <option value="Origin">Origin (Magenta)</option>
+                        <option value="Aegis">Aegis (Milspec Green)</option>
+                        <option value="Anvil">Anvil (Crimson Red)</option>
+                        <option value="Drake">Drake (Amber/Rust)</option>
+                        <option value="RSI">RSI (Pioneer Cobalt Blue)</option>
+                        <option value="Origin">Origin (Luxury Ice Blue)</option>
                     </select>
                 </div>
                 <div class="control-row" style="margin-top:12px;">
@@ -991,6 +994,80 @@ public class CompanionAppService : IDisposable
         let heading = { x: 0, y: 1 };
         let remotePositions = {};
         let activeSpeakers = [];
+
+        function applyThemeColors(theme) {
+            let primary = '#00e676';
+            let primaryRgb = '0, 230, 118';
+            let primaryGlow = 'rgba(0, 230, 118, 0.4)';
+            let accent = '#008e3c';
+            let glow1 = 'rgba(0, 230, 118, 0.08)';
+            let glow2 = 'rgba(0, 142, 60, 0.08)';
+            let bgColor = '#0a0f0d';
+            let cardBg = 'rgba(18, 26, 21, 0.45)';
+
+            switch (theme) {
+                case 'Anvil':
+                    primary = '#ff1744';
+                    primaryRgb = '255, 23, 68';
+                    primaryGlow = 'rgba(255, 23, 68, 0.4)';
+                    accent = '#b7001e';
+                    glow1 = 'rgba(255, 23, 68, 0.08)';
+                    glow2 = 'rgba(183, 0, 30, 0.08)';
+                    bgColor = '#100c0d';
+                    cardBg = 'rgba(27, 19, 21, 0.45)';
+                    break;
+                case 'Drake':
+                    primary = '#ff7300';
+                    primaryRgb = '255, 115, 0';
+                    primaryGlow = 'rgba(255, 115, 0, 0.4)';
+                    accent = '#c24100';
+                    glow1 = 'rgba(255, 115, 0, 0.08)';
+                    glow2 = 'rgba(194, 65, 0, 0.08)';
+                    bgColor = '#0f0d0c';
+                    cardBg = 'rgba(26, 21, 19, 0.45)';
+                    break;
+                case 'RSI':
+                    primary = '#0066ff';
+                    primaryRgb = '0, 102, 255';
+                    primaryGlow = 'rgba(0, 102, 255, 0.4)';
+                    accent = '#0033b3';
+                    glow1 = 'rgba(0, 102, 255, 0.08)';
+                    glow2 = 'rgba(0, 51, 179, 0.08)';
+                    bgColor = '#070b12';
+                    cardBg = 'rgba(15, 20, 32, 0.45)';
+                    break;
+                case 'Origin':
+                    primary = '#00e5ff';
+                    primaryRgb = '0, 229, 255';
+                    primaryGlow = 'rgba(0, 229, 255, 0.4)';
+                    accent = '#007b99';
+                    glow1 = 'rgba(0, 229, 255, 0.08)';
+                    glow2 = 'rgba(0, 123, 153, 0.08)';
+                    bgColor = '#090e10';
+                    cardBg = 'rgba(17, 26, 30, 0.45)';
+                    break;
+                default: // Aegis / Default
+                    primary = '#00e676';
+                    primaryRgb = '0, 230, 118';
+                    primaryGlow = 'rgba(0, 230, 118, 0.4)';
+                    accent = '#008e3c';
+                    glow1 = 'rgba(0, 230, 118, 0.08)';
+                    glow2 = 'rgba(0, 142, 60, 0.08)';
+                    bgColor = '#0a0f0d';
+                    cardBg = 'rgba(18, 26, 21, 0.45)';
+                    break;
+            }
+
+            const root = document.documentElement;
+            root.style.setProperty('--primary', primary);
+            root.style.setProperty('--primary-rgb', primaryRgb);
+            root.style.setProperty('--primary-glow', primaryGlow);
+            root.style.setProperty('--accent', accent);
+            root.style.setProperty('--bg-glow-1', glow1);
+            root.style.setProperty('--bg-glow-2', glow2);
+            root.style.setProperty('--bg-color', bgColor);
+            root.style.setProperty('--card-bg', cardBg);
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1075,6 +1152,7 @@ public class CompanionAppService : IDisposable
                 // Update HUD Theme & Position
                 const selTheme = document.getElementById('sel-hud-theme');
                 if (selTheme) selTheme.value = data.hudTheme || 'Aegis';
+                applyThemeColors(data.hudTheme || 'Aegis');
 
                 const selPos = document.getElementById('sel-hud-position');
                 if (selPos) selPos.value = data.overlayPosition || 'TopLeft';
@@ -1220,10 +1298,12 @@ public class CompanionAppService : IDisposable
                 const cy = height / 2;
                 const radius = Math.min(width, height) / 2 - 20;
 
+                const primaryRgb = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim() || '0, 242, 254';
+
                 ctx.clearRect(0, 0, width, height);
 
                 // 1. Draw static background grid (rings)
-                ctx.strokeStyle = 'rgba(0, 242, 254, 0.08)';
+                ctx.strokeStyle = 'rgba(' + primaryRgb + ', 0.08)';
                 ctx.lineWidth = 1;
                 for (let r = 0.25; r <= 1.00; r += 0.25) {
                     ctx.beginPath();
@@ -1231,7 +1311,7 @@ public class CompanionAppService : IDisposable
                     ctx.stroke();
                     
                     // Draw range label
-                    ctx.fillStyle = 'rgba(0, 242, 254, 0.3)';
+                    ctx.fillStyle = 'rgba(' + primaryRgb + ', 0.3)';
                     ctx.font = '8px monospace';
                     ctx.textBaseline = 'middle';
                     ctx.textAlign = 'center';
@@ -1250,14 +1330,14 @@ public class CompanionAppService : IDisposable
                 }
 
                 // Draw crosshairs (radial axes)
-                ctx.strokeStyle = 'rgba(0, 242, 254, 0.05)';
+                ctx.strokeStyle = 'rgba(' + primaryRgb + ', 0.05)';
                 ctx.beginPath();
                 ctx.moveTo(cx - radius, cy); ctx.lineTo(cx + radius, cy);
                 ctx.moveTo(cx, cy - radius); ctx.lineTo(cx, cy + radius);
                 ctx.stroke();
 
                 // Draw compass letters
-                ctx.fillStyle = 'rgba(0, 242, 254, 0.5)';
+                ctx.fillStyle = 'rgba(' + primaryRgb + ', 0.5)';
                 ctx.font = 'bold 10px Outfit';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -1327,13 +1407,13 @@ public class CompanionAppService : IDisposable
                     ctx.moveTo(cx, cy);
                     ctx.arc(cx, cy, radius, angle, angle + (arcSize / trailSteps));
                     ctx.closePath();
-                    ctx.fillStyle = `rgba(0, 242, 254, ${alpha})`;
+                    ctx.fillStyle = `rgba(${primaryRgb}, ${alpha})`;
                     ctx.fill();
                 }
                 ctx.beginPath();
                 ctx.moveTo(cx, cy);
                 ctx.lineTo(cx + Math.cos(sweepAngle) * radius, cy + Math.sin(sweepAngle) * radius);
-                ctx.strokeStyle = 'rgba(0, 242, 254, 0.25)';
+                ctx.strokeStyle = 'rgba(' + primaryRgb + ', 0.25)';
                 ctx.lineWidth = 1;
                 ctx.stroke();
 

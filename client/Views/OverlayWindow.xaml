@@ -17,7 +17,7 @@
                 Margin="20"
                 Padding="16,12"
                 CornerRadius="12"
-                Background="#B80E1116"
+                Background="{DynamicResource HudBackground}"
                 BorderThickness="1"
                 BorderBrush="#30FFFFFF"
                 MinWidth="180">
@@ -122,7 +122,7 @@
                 Width="180"
                 Height="180"
                 CornerRadius="90"
-                Background="#B80E1116"
+                Background="{DynamicResource HudBackground}"
                 BorderThickness="2"
                 BorderBrush="#803DDB85">
             <Border.Effect>
@@ -151,7 +151,7 @@
                 Margin="0,20,0,0"
                 Padding="20,12"
                 CornerRadius="8"
-                Background="#E60E1116"
+                Background="{DynamicResource HudBackground}"
                 BorderThickness="2"
                 BorderBrush="#FFFF9800"
                 MinWidth="280"
@@ -190,7 +190,7 @@
                       MaxWidth="600">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="#D80E1116" 
+                    <Border Background="{DynamicResource HudBackground}" 
                             CornerRadius="6" 
                             Padding="10,6" 
                             Margin="0,3"
@@ -231,7 +231,7 @@
                 Margin="0,0,0,60"
                 Padding="16,8"
                 CornerRadius="8"
-                Background="#E60E1116"
+                Background="{DynamicResource HudBackground}"
                 BorderThickness="1.5"
                 BorderBrush="#8000D2FF"
                 Visibility="Collapsed">

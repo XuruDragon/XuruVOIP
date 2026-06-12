@@ -49,6 +49,10 @@
     <sys:String x:Key="TabConnection">Conexión</sys:String>
     <sys:String x:Key="TabOcr">OCR</sys:String>
     <sys:String x:Key="TabAudio">Audio</sys:String>
+    <sys:String x:Key="TabDevices">Dispositivos y Niveles</sys:String>
+    <sys:String x:Key="TabAcoustics">Comunicaciones y Acústica</sys:String>
+    <sys:String x:Key="TabModulation">Modulación de Voz</sys:String>
+    <sys:String x:Key="TabIntegrations">Integraciones</sys:String>
     <sys:String x:Key="TabHotkeys">Teclas rápidas</sys:String>
 
     <!-- Ajustes: Conexión -->
@@ -214,5 +218,18 @@
     <sys:String x:Key="LblInitiateHail">Tecla de iniciar llamada</sys:String>
     <sys:String x:Key="LblAcceptHail">Tecla de aceptar llamada</sys:String>
     <sys:String x:Key="LblDeclineHail">Tecla de rechazar/terminar llamada</sys:String>
-    <sys:String x:Key="LblEnableTranslationSubtitles">Activar traducción de subtítulos en tiempo real en HUD de visor</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">Activar subtítulos de traducción HUD en tiempo real</sys:String>
+
+    <sys:String x:Key="HeaderCommHotkeys">Teclas de comunicación y generales</sys:String>
+    <sys:String x:Key="HeaderMuteHotkeys">Teclas de silencio</sys:String>
+    <!-- System Console Panel -->
+    <sys:String x:Key="PanelConsoleLog">CONSOLA DEL SISTEMA</sys:String>
+
+    <!-- Connection Diagnostics Panel -->
+    <sys:String x:Key="PanelDiagnostics">CALIDAD DE CONEXIÓN</sys:String>
+    <sys:String x:Key="LblLatency">Latencia</sys:String>
+    <sys:String x:Key="LblJitter">Jitter</sys:String>
+    <sys:String x:Key="LblPacketLoss">Pérdida de paquetes</sys:String>
+    <sys:String x:Key="LblHudTheme">Tema de HUD y aplicación</sys:String>
 </ResourceDictionary>
+

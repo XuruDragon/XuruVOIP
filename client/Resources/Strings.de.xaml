@@ -49,6 +49,10 @@
     <sys:String x:Key="TabConnection">Verbindung</sys:String>
     <sys:String x:Key="TabOcr">OCR</sys:String>
     <sys:String x:Key="TabAudio">Audio</sys:String>
+    <sys:String x:Key="TabDevices">Geräte &amp; Pegel</sys:String>
+    <sys:String x:Key="TabAcoustics">Kommunikation &amp; Akustik</sys:String>
+    <sys:String x:Key="TabModulation">Stimmenmodulation</sys:String>
+    <sys:String x:Key="TabIntegrations">Integrationen</sys:String>
     <sys:String x:Key="TabHotkeys">Tastenkürzel</sys:String>
 
     <!-- Einstellungen: Verbindung -->
@@ -214,5 +218,18 @@
     <sys:String x:Key="LblInitiateHail">Hailing-Initiierungstaste</sys:String>
     <sys:String x:Key="LblAcceptHail">Hailing-Annahmetaste</sys:String>
     <sys:String x:Key="LblDeclineHail">Hailing-Ablehnungs/Endtaste</sys:String>
-    <sys:String x:Key="LblEnableTranslationSubtitles">Visier-HUD Echtzeit-Übersetzungsuntertitel aktivieren</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">Echtzeit-HUD-Übersetzungsuntertitel aktivieren</sys:String>
+
+    <sys:String x:Key="HeaderCommHotkeys">Kommunikations- &amp; allgemeine Tasten</sys:String>
+    <sys:String x:Key="HeaderMuteHotkeys">Stummschalttasten</sys:String>
+    <!-- System Console Panel -->
+    <sys:String x:Key="PanelConsoleLog">SYSTEMKONSOLE</sys:String>
+
+    <!-- Connection Diagnostics Panel -->
+    <sys:String x:Key="PanelDiagnostics">VERBINDUNGSQUALITÄT</sys:String>
+    <sys:String x:Key="LblLatency">Latenz</sys:String>
+    <sys:String x:Key="LblJitter">Jitter</sys:String>
+    <sys:String x:Key="LblPacketLoss">Paketverlust</sys:String>
+    <sys:String x:Key="LblHudTheme">HUD- &amp; App-Design</sys:String>
 </ResourceDictionary>
+

@@ -248,6 +248,29 @@ graph TB
   * **Mehrsprachige Schlüsselwort-Erkennung:** Unterstützt in 8 Sprachen (Englisch, Französisch, Deutsch, Spanisch, Portugiesisch, Japanisch und Chinesisch).
   * **Konfidenzschwellenwert-Filter:** Ein konfigurierbarer Schieberegler filtert Erkennungen mit geringer Zuverlässigkeit oder Nebengeräusche heraus.
   * *Standardmäßig deaktiviert; die Aktivierung lädt das Offline-Whisper-Transkriptionsmodell (~140 MB) herunter, falls es noch nicht vorhanden ist.*
+  * **Referenzliste für Sprachbefehle:**
+    Nachfolgend finden Sie die Liste aller unterstützten freihändigen PTT-Sprachbefehle, unterteilt in XuruVOIP-Anwendungssteuerungen und Star Citizen-Tastenbelegungen:
+    
+    #### XuruVOIP-Anwendungssteuerungen (Exklusiv für XuruVOIP)
+    Diese Befehle steuern Ihren Helm-/Visierstatus, Kanalschaltungen, Radiofrequenzen oder Sprachmodulationen direkt in XuruVOIP:
+    * **Helm/Visier umschalten:** `visier`, `helm`, `visier umschalten`, `helm umschalten`
+    * **Nähe-Kanal stummschalten:** `naehe stummschalten`, `proximity stummschalten`
+    * **Nähe-Kanal lautschalten:** `naehe lautschalten`, `proximity lautschalten`
+    * **Funk-Kanal stummschalten:** `funk stummschalten`, `radio stummschalten`
+    * **Funk-Kanal lautschalten:** `funk lautschalten`, `radio lautschalten`
+    * **Profil-Kanal stummschalten:** `profil stummschalten`
+    * **Profil-Kanal lautschalten:** `profil lautschalten`
+    * **Mikrofon stummschalten (Global):** `alles stummschalten`, `mikrofon stummschalten`, `mikro stummschalten`
+    * **Mikrofon lautschalten (Global):** `alles lautschalten`, `mikrofon lautschalten`, `mikro lautschalten`
+    * **Funkkanal wechseln:** `kanal wechseln`, `schalte kanal`, `kanal auf`, `kanal` gefolgt vom Kanalnamen (z. B. *"kanal wechseln Alpha"*)
+    * **Stimmenverzerrer-Profil einstellen:** `stimmenverzerrer`, `stimmprofil`, `stimme` gefolgt von einem Profil: `alien`, `cyborg`, `robotic` (oder `robot`), `pitchshift` (oder `pitch shift`, `pitch`), `none` (oder `off`, `normal`, `aus`)
+    
+    #### Simulierte Schiffssteuerungen (Star Citizen-bezogen)
+    Diese Befehle simulieren physische Tastendrücke auf Ihrem PC, um Star Citizen-Steuerungen auszulösen:
+    * **Schiffsenergie umschalten:** `energie`, `energie umschalten`, `systeme an`, `systeme aus`, `strom an`, `strom aus`
+    * **Schiffstüren/-rampen umschalten:** `tueren`, `tueren oeffnen`, `tueren schliessen`, `aussen oeffnen`, `aussen schliessen`
+    * **Schilde nach vorne umleiten:** `schilde`, `schilde vorne`, `schilde vorwaerts`, `schilde umleiten`
+    * **Fahrwerk umschalten:** `fahrwerk`, `fahrwerk ausfahren`, `fahrwerk einfahren`
 
 ### 8. 📱 Begleit-App und REST-API
 * **Lokaler HTTP-Webserver:** Hostet ein lokales Dashboard auf einem konfigurierbaren Port (Standard: „8891“, standardmäßig deaktiviert).

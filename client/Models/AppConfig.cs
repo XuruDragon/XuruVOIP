@@ -81,7 +81,7 @@ public class AppConfig
     // --- Borderless Overlay ---
     public bool EnableOverlay { get; set; } = false;
     public string OverlayPosition { get; set; } = "TopLeft";
-    public string HudTheme { get; set; } = "Aegis";
+    public string HudTheme { get; set; } = "RSI";
     public bool HudShowRadar { get; set; } = true;
     public bool HudShowActiveSpeakers { get; set; } = true;
     public bool HudShowChannel { get; set; } = true;
