@@ -48,4 +48,36 @@ public class UiTests
 
         window.Close();
     }
+
+    [StaFact]
+    public async Task ConnectionDiagnostics_ShouldShowPlaceholdersWhenDisconnected_AndValuesWhenConnected()
+    {
+        // GIVEN
+        await using var vm = new MainViewModel();
+
+        // THEN (Disconnected by default)
+        Assert.Equal("--", vm.Latency);
+        Assert.Equal("--", vm.Jitter);
+        Assert.Equal("--", vm.PacketLoss);
+
+        // WHEN (Connected)
+        vm.PosConnected = true;
+        vm.AudioConnected = true;
+        vm.UpdateDiagnostics();
+
+        // THEN (Should have simulated metrics)
+        Assert.NotEqual("--", vm.Latency);
+        Assert.NotEqual("--", vm.Jitter);
+        Assert.NotEqual("--", vm.PacketLoss);
+
+        // WHEN (Disconnected again)
+        vm.PosConnected = false;
+        vm.AudioConnected = false;
+        vm.UpdateDiagnostics();
+
+        // THEN (Should reset to placeholders)
+        Assert.Equal("--", vm.Latency);
+        Assert.Equal("--", vm.Jitter);
+        Assert.Equal("--", vm.PacketLoss);
+    }
 }

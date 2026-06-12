@@ -220,5 +220,11 @@
     <sys:String x:Key="LblDeclineHail">通話拒否/終了キー</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">システムコンソール</sys:String>
+
+    <!-- Connection Diagnostics Panel -->
+    <sys:String x:Key="PanelDiagnostics">接続品質</sys:String>
+    <sys:String x:Key="LblLatency">レイテンシ</sys:String>
+    <sys:String x:Key="LblJitter">ジッター</sys:String>
+    <sys:String x:Key="LblPacketLoss">パケット損失</sys:String>
 </ResourceDictionary>
 

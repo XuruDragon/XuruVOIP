@@ -220,5 +220,11 @@
     <sys:String x:Key="LblDeclineHail">Hailing-Ablehnungs/Endtaste</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">SYSTEMKONSOLE</sys:String>
+
+    <!-- Connection Diagnostics Panel -->
+    <sys:String x:Key="PanelDiagnostics">VERBINDUNGSQUALITÄT</sys:String>
+    <sys:String x:Key="LblLatency">Latenz</sys:String>
+    <sys:String x:Key="LblJitter">Jitter</sys:String>
+    <sys:String x:Key="LblPacketLoss">Paketverlust</sys:String>
 </ResourceDictionary>
 

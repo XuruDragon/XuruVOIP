@@ -220,5 +220,11 @@
     <sys:String x:Key="LblDeclineHail">拒绝/结束呼叫快捷键</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">系统控制台</sys:String>
+
+    <!-- Connection Diagnostics Panel -->
+    <sys:String x:Key="PanelDiagnostics">连接质量</sys:String>
+    <sys:String x:Key="LblLatency">延迟</sys:String>
+    <sys:String x:Key="LblJitter">抖动</sys:String>
+    <sys:String x:Key="LblPacketLoss">丢包率</sys:String>
 </ResourceDictionary>
 

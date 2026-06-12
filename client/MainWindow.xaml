@@ -395,6 +395,46 @@
                             </Grid>
                         </StackPanel>
                     </Border>
+
+                    <!-- Connection Diagnostics Panel -->
+                    <Border Background="{StaticResource BgElevated}" CornerRadius="12" Padding="14,10" Margin="0,14,0,0" Height="110">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <!-- Panel Header -->
+                            <TextBlock Grid.Row="0" Text="{DynamicResource PanelDiagnostics}" Foreground="{StaticResource TextSecondary}"
+                                       FontSize="11" FontWeight="Bold" Margin="0,0,0,8"/>
+
+                            <!-- Diagnostics Grid -->
+                            <Grid Grid.Row="1" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Latency -->
+                                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                    <TextBlock Text="{DynamicResource LblLatency}" Foreground="{StaticResource TextSecondary}" FontSize="10" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Latency}" Foreground="{StaticResource Accent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <!-- Jitter -->
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                    <TextBlock Text="{DynamicResource LblJitter}" Foreground="{StaticResource TextSecondary}" FontSize="10" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Jitter}" Foreground="{StaticResource Accent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <!-- Packet Loss -->
+                                <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                    <TextBlock Text="{DynamicResource LblPacketLoss}" Foreground="{StaticResource TextSecondary}" FontSize="10" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding PacketLoss}" Foreground="{StaticResource Accent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
                 </StackPanel>
             </Grid>
 

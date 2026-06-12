@@ -220,5 +220,11 @@
     <sys:String x:Key="LblDeclineHail">Touche de rejet/fin d'appel</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">CONSOLE SYSTÈME</sys:String>
+
+    <!-- Connection Diagnostics Panel -->
+    <sys:String x:Key="PanelDiagnostics">QUALITÉ DE CONNEXION</sys:String>
+    <sys:String x:Key="LblLatency">Latence</sys:String>
+    <sys:String x:Key="LblJitter">Jitter</sys:String>
+    <sys:String x:Key="LblPacketLoss">Pertes de paquets</sys:String>
 </ResourceDictionary>
 

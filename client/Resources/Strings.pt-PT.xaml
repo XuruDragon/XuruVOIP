@@ -220,5 +220,11 @@
     <sys:String x:Key="LblDeclineHail">Tecla de recusar/encerrar chamada</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">CONSOLA DO SISTEMA</sys:String>
+
+    <!-- Connection Diagnostics Panel -->
+    <sys:String x:Key="PanelDiagnostics">QUALIDADE DA CONEXÃO</sys:String>
+    <sys:String x:Key="LblLatency">Latência</sys:String>
+    <sys:String x:Key="LblJitter">Jitter</sys:String>
+    <sys:String x:Key="LblPacketLoss">Perda de pacotes</sys:String>
 </ResourceDictionary>
 
