@@ -75,6 +75,7 @@ public class AppConfig
     public bool CustomBitcrushEnabled { get; set; } = false;
     public int CustomBitcrushBits { get; set; } = 16;
     public bool EnableAtmosphereSimulation { get; set; } = false;
+    public bool EnableRadioDelay { get; set; } = false;
 
     // --- Borderless Overlay ---
     public bool EnableOverlay { get; set; } = false;

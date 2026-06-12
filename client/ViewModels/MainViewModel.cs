@@ -1089,6 +1089,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableStt = cfg.EnableStt;
         _playback.EnableShipPa = cfg.EnableShipPa;
         _playback.EnableVisorSpectrogram = cfg.EnableVisorSpectrogram;
+        _playback.EnableRadioDelay = cfg.EnableRadioDelay;
         _playback.Start(cfg.OutputDeviceIndex, cfg.OutputGainPercent);
         
         // Synchronize mute states
@@ -1372,6 +1373,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableStt = Config.Config.EnableStt;
         _playback.EnableShipPa = Config.Config.EnableShipPa;
         _playback.EnableVisorSpectrogram = Config.Config.EnableVisorSpectrogram;
+        _playback.EnableRadioDelay = Config.Config.EnableRadioDelay;
         _playback.EnableIntercomDegradation = Config.Config.EnableIntercomDegradation;
         _playback.IntercomShieldHitsEnabled = Config.Config.IntercomShieldHitsEnabled;
         _playback.IntercomCriticalPowerEnabled = Config.Config.IntercomCriticalPowerEnabled;

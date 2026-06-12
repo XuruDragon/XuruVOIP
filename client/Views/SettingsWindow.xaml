@@ -512,6 +512,13 @@
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
 
+                            <!-- Distance-based radio delay toggle -->
+                            <CheckBox x:Name="CbEnableRadioDelay"
+                                      Content="Enable Planetary Distance-Based Radio Delay"
+                                      IsChecked="{Binding Config.EnableRadioDelay, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
                             <!-- Helmet/Suit modulator toggle -->
                             <CheckBox x:Name="CbEnableHelmetModulator"
                                       Content="Enable Helmet/Suit Comms Modulator"

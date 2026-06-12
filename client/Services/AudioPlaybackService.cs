@@ -133,6 +133,7 @@ public class AudioPlaybackService : IDisposable
     public bool IntercomCriticalPowerEnabled { get; set; } = true;
     public bool IntercomQuantumTravelEnabled { get; set; } = true;
     public IntercomDegradationState CurrentIntercomState { get; set; } = IntercomDegradationState.Normal;
+    public bool EnableRadioDelay { get; set; } = false;
 
     public event Action<string, float[], byte>? SttAudioChunkReady;
 
@@ -353,24 +354,33 @@ public class AudioPlaybackService : IDisposable
                 track = CreateTrack(playerName);
                 _tracks[playerName] = track;
             }
+
+            // Track last active time
+            track.LastReceivedTime = DateTime.UtcNow;
+
+            var packet = new AudioPacket
+            {
+                SequenceNumber = seq,
+                AudioType = audioType,
+                OpusData = opusData,
+                ApplyRadioEffect = applyRadioEffect,
+                Metadata = metadata,
+                Distance = distance,
+                SpeakerZone = speakerZone,
+                ListenerZone = listenerZone,
+                IsIntercom = isIntercom
+            };
+
+            if (EnableRadioDelay && distance > 0)
+            {
+                double delayMs = Math.Min(3000.0, distance * 0.0033);
+                track.DelayedPackets.Add((packet, DateTime.UtcNow.AddMilliseconds(delayMs)));
+            }
+            else
+            {
+                track.Jitter.Enqueue(packet);
+            }
         }
-
-        // Track last active time
-        track.LastReceivedTime = DateTime.UtcNow;
-
-        // Enqueue into Jitter Buffer
-        track.Jitter.Enqueue(new AudioPacket
-        {
-            SequenceNumber = seq,
-            AudioType = audioType,
-            OpusData = opusData,
-            ApplyRadioEffect = applyRadioEffect,
-            Metadata = metadata,
-            Distance = distance,
-            SpeakerZone = speakerZone,
-            ListenerZone = listenerZone,
-            IsIntercom = isIntercom
-        });
     }
 
     private async System.Threading.Tasks.Task PlaybackLoopAsync(System.Threading.CancellationToken ct)
@@ -394,6 +404,23 @@ public class AudioPlaybackService : IDisposable
     {
         lock (_lock)
         {
+            // Process delayed packets that are now ready to be enqueued
+            foreach (var kvp in _tracks)
+            {
+                var track = kvp.Value;
+                if (kvp.Key == "__local_chime") continue;
+
+                for (int i = track.DelayedPackets.Count - 1; i >= 0; i--)
+                {
+                    var (packet, playableTime) = track.DelayedPackets[i];
+                    if (DateTime.UtcNow >= playableTime)
+                    {
+                        track.Jitter.Enqueue(packet);
+                        track.DelayedPackets.RemoveAt(i);
+                    }
+                }
+            }
+
             // Pass 1: Dequeue packets and update transmitter/intercom states for each track
             foreach (var kvp in _tracks)
             {
@@ -1037,6 +1064,7 @@ public class AudioPlaybackService : IDisposable
         public bool IsTransmitting { get; set; } = false;
         public DateTime LastReceivedTime { get; set; } = DateTime.MinValue;
         public JitterBuffer Jitter { get; } = new();
+        public List<(AudioPacket Packet, DateTime PlayableTime)> DelayedPackets { get; } = new();
         public string LastSpeakerZone { get; set; } = string.Empty;
         public string LastListenerZone { get; set; } = string.Empty;
 

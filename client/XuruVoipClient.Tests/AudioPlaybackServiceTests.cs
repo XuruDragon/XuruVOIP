@@ -279,4 +279,73 @@ public class AudioPlaybackServiceTests
         byte lastAudioType = (byte)lastAudioTypeProp!.GetValue(captainTrack)!;
         Assert.Equal(0x03, lastAudioType);
     }
+
+    [Fact]
+    public async Task AudioPlaybackService_ShouldDelayRadioPackets()
+    {
+        // GIVEN
+        var service = new AudioPlaybackService();
+        var mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 2)) { ReadFully = true };
+        var mixerField = typeof(AudioPlaybackService).GetField("_mixer", BindingFlags.NonPublic | BindingFlags.Instance);
+        mixerField!.SetValue(service, mixer);
+
+        service.EnableRadioDelay = true;
+
+        var encoder = Concentus.OpusCodecFactory.CreateEncoder(48000, 1, Concentus.Enums.OpusApplication.OPUS_APPLICATION_VOIP);
+        var pcm = new short[960];
+        var outBuf = new byte[4000];
+        int encodedLen = encoder.Encode(pcm, pcm.Length, outBuf, outBuf.Length);
+        var validOpus = new byte[encodedLen];
+        Array.Copy(outBuf, validOpus, encodedLen);
+
+        // Distance 10000m (10km) -> 33ms delay
+        for (ushort seq = 42; seq <= 44; seq++)
+        {
+            service.ReceiveOpusFrame(
+                playerName: "DelayedBob",
+                opusData: validOpus,
+                audioType: 0x01, // Radio
+                applyRadioEffect: true,
+                metadata: null,
+                distance: 10000.0,
+                speakerZone: "Stanton",
+                listenerZone: "Stanton",
+                seq: seq,
+                isIntercom: false
+            );
+        }
+
+        var tracksField = typeof(AudioPlaybackService).GetField("_tracks", BindingFlags.NonPublic | BindingFlags.Instance);
+        var tracks = (System.Collections.IDictionary)tracksField!.GetValue(service)!;
+
+        Assert.True(tracks.Contains("DelayedBob"));
+        var track = tracks["DelayedBob"]!;
+
+        var delayedPacketsField = track.GetType().GetProperty("DelayedPackets");
+        var delayedPackets = (System.Collections.IList)delayedPacketsField!.GetValue(track)!;
+
+        // Verify packets are delayed
+        Assert.Equal(3, delayedPackets.Count);
+
+        var tickMethod = typeof(AudioPlaybackService).GetMethod("TickPlayback", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        // Tick immediately: packets should NOT be processed yet as delay hasn't elapsed
+        tickMethod!.Invoke(service, null);
+        Assert.Equal(3, delayedPackets.Count);
+
+        // Wait for 50ms so that playableTime (33ms) has passed
+        await Task.Delay(50);
+
+        // Tick again: packets should be dispatched to Jitter Buffer and removed from DelayedPackets
+        tickMethod!.Invoke(service, null);
+        Assert.Empty(delayedPackets);
+
+        var isTransmittingProp = track.GetType().GetProperty("IsTransmitting");
+        bool isTransmitting = (bool)isTransmittingProp!.GetValue(track)!;
+        Assert.True(isTransmitting);
+
+        var lastAudioTypeProp = track.GetType().GetProperty("LastAudioType");
+        byte lastAudioType = (byte)lastAudioTypeProp!.GetValue(track)!;
+        Assert.Equal(0x01, lastAudioType);
+    }
 }
