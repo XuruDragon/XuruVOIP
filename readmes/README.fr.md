@@ -231,7 +231,6 @@ graph TB
   * **Alimentation critique (Critical Power) :** Bourdonnement électrique basse tension, distorsion de saturation et baisse de hauteur de ton par rééchantillonnage.
   * **Voyage quantique (Quantum Travel) :** Balayage de filtre en peigne (flanger/phaser) et sifflement haute fréquence.
   * *Tous ces sous-effets peuvent être activés/désactivés individuellement dans les paramètres généraux et sont désactivés par défaut.*
-* **Injection d'alarmes de cockpit ambiantes :** Lorsque l'injection d'alarme est active et que le vaisseau entre en état d'alerte (impact de bouclier ou alimentation critique), le client de l'utilisateur synthétise automatiquement des alarmes d'avertissement de faible amplitude (<0,01) (boucle de sirène d'urgence ou boucle d'avertissement de double bip rapide) et les mélange directement au flux du micro sortant pour un retour d'urgence réaliste du cockpit.
 * **Cooldown de nettoyage :** compte à rebours 5 minutes après que le dernier joueur ait quitté le navire avant de supprimer le canal intercom, maximisant ainsi les performances du serveur.
 
 ### 7. 📡 Superposition HUD et radar tactique 2D compatibles Vulkan
@@ -314,7 +313,7 @@ graph TB
 
 ### 23. 🛰️ Lecture AAR 3D côté serveur
 * **Journalisation des coordonnées :** Le serveur enregistre les coordonnées et les zones du joueur dans un fichier `<session_id>_positions.jsonl` toutes les 500 ms.
-* **Canvas de lecture synchronisé :** Visualise le chemin du joueur et les anneaux d'impulsion de parole sur une carte HTML5 Canvas basée sur le Web, entièrement synchronisée avec l'audio Ogg/Opus enregistré.
+* **Relecture WebGL 3D synchronisée :** Visualise la trajectoire 3D du joueur et les anneaux d'impulsion de parole sur une carte interactive Three.js WebGL 3D avec panoramique, zoom et rotation à la souris, entièrement synchronisée avec l'audio Ogg/Opus enregistré.
 
 ---
 

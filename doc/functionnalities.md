@@ -150,10 +150,6 @@ Automatically groups ship crews into private, localized intercom channels that r
   * **Shield Hits (Static Burst):** Blends in sharp, random voltage spikes and white noise (lasts 2.5 seconds).
   * **Critical Power (Power Loss):** Heavy soft-clipping saturation, pitch resampled down to 0.78x, and a 60Hz AC hum.
   * **Quantum Travel (Quantum Wave):** Flanger/phaser sweep via an LFO and an 1800Hz resonant whine.
-* **Ambient Cockpit Alarm Injection:** When Enable Alarm Injection is active and the ship enters warning states (Shield Hit or Critical Power), the client automatically synthesizes low-amplitude (<0.01) warning alarms:
-  * **Shield Hit State:** A sweeping emergency siren loop (filtered through a 1500Hz LPF).
-  * **Critical Power State:** Rapid double-beeps warning loop.
-  These alarms are mixed directly into the outgoing microphone stream to give remote listeners immediate acoustic feedback of your ship's emergency status.
 * **Cleanup Cooldown:** Unused intercom channels are deleted by the Go server 5 minutes after the last player disembarks.
 
 ### How to Use
@@ -507,12 +503,13 @@ Integrates real-time player coordinates logging and spatial 3D visualization wit
 
 ### How It Works
 * **Positions Log:** The Go server records player coordinates and zones to a `<session_id>_positions.jsonl` file every 500ms during active recording.
-* **3D Replay Canvas:** An interactive HTML5 Canvas dashboard in the admin portal fetches this log and visualizes the player's trail over time.
-* **Synchronized Playback:** Animates player positions and speaking pulse rings on the canvas, synchronized with the playback timeline of the recorded Ogg/Opus audio.
+* **WebGL (Three.js) 3D Replay:** An interactive WebGL 3D tactical holographic dashboard powered by Three.js in the admin portal. It fetches coordinates log data and projects 3D spatial points, rendering a full 3D interactive flight path.
+* **OrbitControls Navigation:** Allows administrators to rotate, pan, and zoom the 3D space with the mouse to analyze movement from any angle.
+* **Synchronized Playback:** Animates player positions (wireframe 3D meshes) and speaking pulse rings (concentric wireframe circles radiating in 3D space) synchronized with the playback timeline of the recorded Ogg/Opus audio.
 
 ### How to Use
 1. Log into the Admin Web Portal.
-2. Under the **Archives** tab, click **▶ 3D Replay** on any recorded segment.
-3. The 3D Playback modal will open, displaying the player's path and speaking pulses on the map.
+2. Under the **Aar Archives** tab, click **▶ 3D Replay** on any recorded segment.
+3. The 3D Playback modal will open, displaying the player's path and speaking pulses in interactive 3D. Drag to rotate, right-click to pan, and scroll to zoom.
 
 

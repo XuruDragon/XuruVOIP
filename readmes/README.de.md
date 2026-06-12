@@ -231,7 +231,6 @@ graph TB
   * **Kritische Energie (Critical Power):** Niederspannungs-Wechselstrombrummen, Soft-Clipping-Verzerrung und Tonhöhenabfall (Resampling).
   * **Quantenreise (Quantum Travel):** Kammfilter-Flanger/Phaser-Effekt und hochfrequentes Pfeifen.
   * *Alle Untereffekte können in den allgemeinen Einstellungen einzeln ein- oder ausgeschaltet werden und sind standardmäßig deaktiviert.*
-* **Cockpit-Alarm-Mischung:** Wenn die Alarm-Mischung aktiv ist und das Schiff in Warnzustände übergeht (Schildtreffer oder kritische Energie), synthetisiert der Client automatisch Warnalarme mit niedriger Amplitude (<0,01) (eine ansteigende Sirene oder schnelles Doppel-Piepen) und mischt sie direkt in den ausgehenden Mikrofonstrom für ein realistisches akustisches Notfall-Feedback des Cockpits.
 * **Aufräum-Abklingzeit:** Zählt 5 Minuten herunter, nachdem der letzte Spieler das Schiff verlassen hat, bevor der Intercom-Kanal gelöscht wird, um die Serverleistung zu maximieren.
 
 ### 7. 📡 Vulkan-kompatibles HUD-Overlay und taktisches 2D-Radar
@@ -314,7 +313,7 @@ graph TB
 
 ### 23. 🛰️ Serverseitige AAR 3D-Wiedergabe
 * **Koordinatenprotokollierung:** Der Server protokolliert Spielerkoordinaten und Zonen alle 500 ms in einer `<session_id>_positions.jsonl`-Datei.
-* **Synchronisierte Wiedergabe-Canvas:** Visualisiert den Pfad des Spielers und Sprech-Pulsringe auf einer webbasierten HTML5-Canvas-Karte, die vollständig mit der aufgezeichneten Ogg/Opus-Audiodatei synchronisiert ist.
+* **Synchronisierte WebGL-3D-Wiedergabe:** Visualisiert den 3D-Pfad des Spielers und Sprech-Pulsringe auf einer interaktiven Three.js WebGL-3D-Karte mit Maus-Schwenken, -Zoomen und -Drehen, die vollständig mit der aufgezeichneten Ogg/Opus-Audiodatei synchronisiert ist.
 
 ---
 

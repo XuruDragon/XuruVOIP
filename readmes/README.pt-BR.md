@@ -231,7 +231,6 @@ graph TB
   * **Energia Crítica (Critical Power):** Zumbido elétrico de corrente alternada de baixa tensão, distorção de saturação (soft-clipping) e queda de tom de voz (resampling).
   * **Viagem Quântica (Quantum Travel):** Varredura de filtro comb (flanger/phaser) e zumbido de alta frequência.
   * *Todos os subefeitos podem ser alternados individualmente nas Configurações Gerais e vêm desativados por padrão.*
-* **Injeção de alarmes de cockpit ambientes:** Quando a injeção de alarmes está ativa e a nave entra em estados de alerta (impacto no escudo ou energia crítica), o cliente sintetiza automaticamente alarmes de alerta de baixa amplitude (<0,01) (loop de sirene de emergência ou loop de bipe duplo rápido) e os mistura diretamente na transmissão de microfone de saída para um feedback de emergência de cockpit realista.
 * **Recarga de limpeza:** Faz uma contagem regressiva de 5 minutos após o último jogador deixar a nave antes de excluir o canal de intercomunicação, maximizando o desempenho do servidor.
 
 ### 7. 📡 Sobreposição de HUD compatível com Vulkan e radar tático 2D
@@ -314,7 +313,7 @@ graph TB
 
 ### 23. 🛰️ Reprodução AAR 3D no servidor
 * **Registro de coordenadas:** O servidor registra coordenadas e zonas dos jogadores em um arquivo `<session_id>_positions.jsonl` a cada 500 ms.
-* **Canvas de reprodução sincronizada:** Visualiza a trilha do jogador e os anéis concêntricos de fala em um mapa HTML5 Canvas baseado na web, totalmente sincronizado com o áudio Ogg/Opus gravado.
+* **Reprodução WebGL 3D Sincronizada:** Visualiza a trajetória 3D do jogador e os anéis de fala concêntricos em um mapa interativo Three.js WebGL 3D com rotação, pan e zoom pelo mouse, totalmente sincronizado com o áudio Ogg/Opus gravado.
 
 ---
 

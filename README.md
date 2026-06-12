@@ -234,7 +234,6 @@ graph TB
   * **Critical Power:** Low-voltage AC hum, soft-clipping distortion, and pitch-resampling drop.
   * **Quantum Travel:** Comb-filter flanger/phaser sweep and high-frequency whine.
   * *All sub-effects can be toggled individually in the General Settings and are disabled by default.*
-* **Ambient Cockpit Alarm Injection:** When Enable Alarm Injection is active and the ship enters warning states (Shield Hit or Critical Power), the client automatically synthesizes low-amplitude (<0.01) warning alarms (sweeping emergency siren loop or rapid double-beeps warning loop) and mixes them directly into the outgoing microphone stream for realistic cockpit emergency feedback.
 * **Cleanup Cooldown:** Counts down 5 minutes after the last player leaves the ship before deleting the intercom channel, maximizing server performance.
 
 ### 7. 📡 Vulkan-Compatible HUD Overlay & 2D Tactical Radar
@@ -320,7 +319,8 @@ graph TB
 
 ### 23. 🛰️ Server-Side AAR 3D Playback
 * **Coordinates Logging:** Server logs player coordinates and zones to a `<session_id>_positions.jsonl` file every 500ms.
-* **Synchronized Playback Canvas:** Visualizes the player's path and speaking pulse rings on a web-based HTML5 Canvas map, fully synchronized with the recorded Ogg/Opus audio.
+* **Synchronized WebGL 3D Replay:** Visualizes the player's 3D path and speaking pulse rings on an interactive Three.js WebGL 3D map with mouse panning, zooming, and rotating, fully synchronized with the recorded Ogg/Opus audio.
+
 
 ---
 
