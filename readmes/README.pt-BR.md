@@ -288,6 +288,17 @@ graph TB
     * **Lançar chamariz/isca:** `isca`, `lancar isca`, `lancar chamariz`
     * **Lançar ruído/chaff:** `ruido`, `lancar ruido`, `chaff`, `lancar chaff`
     * **Alternar luzes da nave:** `luzes`, `farois`, `ligar luzes`, `desligar luzes`
+    * **Mirar Inimigo mais Próximo:** `mirar inimigo`, `inimigo mais proximo`, `travar inimigo`
+    * **Ciclar Subsistemas:** `ciclar subsistemas`, `mirar subsistema`, `mirar motores`, `mirar escudos`
+    * **Alternar Modo Cardan:** `modo cardan`, `alternar cardan`, `gimbal`
+    * **Fixar Alvo:** `fixar alvo`, `salvar alvo`
+    * **Alternar Modo Desacoplado:** `modo desacoplado`, `desacoplar`
+    * **Alternar G-Safe:** `seguranca g`, `alternar gsafe`, `gsafe`
+    * **Alternar Limitador de Velocidade:** `limitador de velocidade`, `alternar limitador`
+    * **Aumentar Rajada de Iscas:** `aumentar iscas`, `mais iscas`
+    * **Restabelecer Rajada de Iscas:** `restabelecer iscas`
+    * **Limpar Viseira:** `limpar visera`, `limpar capacete`
+    * **Chamar Alvo:** `chamar alvo`, `chamar nave`
 
 ### 8. 📱 Aplicativo complementar e API REST
 * **Servidor Web HTTP local:** Hospeda um painel local em uma porta configurável (padrão: `8891`, desabilitado por padrão).

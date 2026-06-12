@@ -227,6 +227,17 @@
     <sys:String x:Key="LblVoiceDecoyKey">Voice: Launch Flare/Decoy Key</sys:String>
     <sys:String x:Key="LblVoiceNoiseKey">Voice: Launch Chaff/Noise Key</sys:String>
     <sys:String x:Key="LblVoiceLightsKey">Voice: Toggle Ship Lights Key</sys:String>
+    <sys:String x:Key="LblVoiceTargetHostileKey">Voice: Target Nearest Hostile Key</sys:String>
+    <sys:String x:Key="LblVoiceCycleSubsystemsKey">Voice: Cycle Subsystems Key</sys:String>
+    <sys:String x:Key="LblVoiceGimbalModeKey">Voice: Toggle Gimbal Mode Key</sys:String>
+    <sys:String x:Key="LblVoicePinTargetKey">Voice: Pin Target Key</sys:String>
+    <sys:String x:Key="LblVoiceDecoupledKey">Voice: Toggle Decoupled Mode Key</sys:String>
+    <sys:String x:Key="LblVoiceGSafeKey">Voice: Toggle G-Safe Key</sys:String>
+    <sys:String x:Key="LblVoiceSpeedLimiterKey">Voice: Toggle Speed Limiter Key</sys:String>
+    <sys:String x:Key="LblVoiceDecoyBurstKey">Voice: Increase Decoy Burst Key</sys:String>
+    <sys:String x:Key="LblVoiceDecoyResetKey">Voice: Reset Decoy Burst Key</sys:String>
+    <sys:String x:Key="LblVoiceWipeVisorKey">Voice: Wipe Visor Key</sys:String>
+    <sys:String x:Key="LblVoiceHailTargetKey">Voice: Hail Target Key</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Voice Command Confidence Threshold</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">WARNING: Enabling Offline Voice Commands will download the Whisper transcription model (~140MB) on first activation if not already present on your machine.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS LISTENING...</sys:String>

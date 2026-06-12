@@ -288,6 +288,17 @@ graph TB
     * **Lanzar señuelo/bengala:** `señuelo`, `lanzar señuelo`, `bengala`, `lanzar bengala`
     * **Lanzar ruido/chaff:** `ruido`, `lanzar ruido`, `chaff`, `lanzar chaff`
     * **Alternar luces de nave:** `luces`, `faros`, `encender luces`, `apagar luces`
+    * **Enemigo más cercano:** `fijar enemigo`, `enemigo mas cercano`, `bloquear enemigo`
+    * **Ciclar subsistemas:** `ciclar subsistemas`, `cibler subsistema`, `apuntar motores`, `apuntar escudos`
+    * **Alternar modo cardán:** `modo cardan`, `alternar cardan`, `gimbal`
+    * **Fijar blanco:** `fijar blanco`, `guardar blanco`
+    * **Modo desacoplado:** `modo desacoplado`, `desacoplar`
+    * **Alternar G-Safe:** `seguridad g`, `alternar gsafe`, `gsafe`
+    * **Alternar limitador de velocidad:** `limitador de velocidad`, `alternar limitador`
+    * **Aumentar ráfaga de señuelos:** `aumentar señuelos`, `mas señuelos`
+    * **Restablecer ráfaga de señuelos:** `restablecer señuelos`
+    * **Limpiar visera:** `limpiar visera`, `limpiar casco`
+    * **Llamar objetivo:** `llamar objetivo`, `llamar nave`
 
 ### 8. 📱 Aplicación complementaria y API REST
 * **Servidor web HTTP local:** Alberga un panel local en un puerto configurable (predeterminado: `8891`, deshabilitado de forma predeterminada).

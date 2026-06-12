@@ -119,6 +119,17 @@ public class AppConfig
     public string VoiceCommandDecoyKey { get; set; } = "H";
     public string VoiceCommandNoiseKey { get; set; } = "J";
     public string VoiceCommandLightsKey { get; set; } = "L";
+    public string VoiceCommandTargetHostileKey { get; set; } = "5";
+    public string VoiceCommandCycleSubsystemsKey { get; set; } = "8";
+    public string VoiceCommandGimbalModeKey { get; set; } = "G";
+    public string VoiceCommandPinTargetKey { get; set; } = "1";
+    public string VoiceCommandDecoupledKey { get; set; } = "Alt + C";
+    public string VoiceCommandGSafeKey { get; set; } = "None";
+    public string VoiceCommandSpeedLimiterKey { get; set; } = "None";
+    public string VoiceCommandDecoyBurstKey { get; set; } = "Alt + H";
+    public string VoiceCommandDecoyResetKey { get; set; } = "Alt + J";
+    public string VoiceCommandWipeVisorKey { get; set; } = "Alt + X";
+    public string VoiceCommandHailTargetKey { get; set; } = "6";
 
     // --- Discord RPC ---
     public bool EnableDiscordRpc { get; set; } = true;

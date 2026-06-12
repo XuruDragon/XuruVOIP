@@ -227,6 +227,17 @@
     <sys:String x:Key="LblVoiceDecoyKey">Voz: Tecla de Lançar Chamariz/Isca</sys:String>
     <sys:String x:Key="LblVoiceNoiseKey">Voz: Tecla de Lançar Ruído/Chaff</sys:String>
     <sys:String x:Key="LblVoiceLightsKey">Voz: Tecla de Luzes da Nave</sys:String>
+    <sys:String x:Key="LblVoiceTargetHostileKey">Voz: Mirar Inimigo mais Próximo</sys:String>
+    <sys:String x:Key="LblVoiceCycleSubsystemsKey">Voz: Ciclar Subsistemas</sys:String>
+    <sys:String x:Key="LblVoiceGimbalModeKey">Voz: Alternar Modo Cardan</sys:String>
+    <sys:String x:Key="LblVoicePinTargetKey">Voz: Fixar Alvo</sys:String>
+    <sys:String x:Key="LblVoiceDecoupledKey">Voz: Alternar Modo Desacoplado</sys:String>
+    <sys:String x:Key="LblVoiceGSafeKey">Voz: Alternar G-Safe</sys:String>
+    <sys:String x:Key="LblVoiceSpeedLimiterKey">Voz: Alternar Limitador de Velocidade</sys:String>
+    <sys:String x:Key="LblVoiceDecoyBurstKey">Voz: Aumentar Rajada de Iscas</sys:String>
+    <sys:String x:Key="LblVoiceDecoyResetKey">Voz: Restabelecer Rajada de Iscas</sys:String>
+    <sys:String x:Key="LblVoiceWipeVisorKey">Voz: Limpar Viseira</sys:String>
+    <sys:String x:Key="LblVoiceHailTargetKey">Voz: Chamar Alvo</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Limiar de confiança do comando de voz</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">AVISO: A ativação dos comandos de voz offline irá descarregar o modelo de transcrição Whisper (~140MB) na primeira ativação se não estiver presente no computador.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS A ESCUTAR...</sys:String>

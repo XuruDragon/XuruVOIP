@@ -290,6 +290,17 @@ graph TB
     * **Lancer Leurre :** `leurre`, `lancer leurre`, `lancer un leurre`
     * **Lancer Brouillage (Paillettes) :** `brouillage`, `lancer brouillage`, `paillettes`, `lancer paillettes`
     * **Basculer les phares :** `phares`, `lumiere`, `allumer phares`, `eteindre phares`, `lumiere vaisseau`
+    * **Cibler hostile le plus proche :** `cible hostile`, `hostile le plus proche`, `verrouiller hostile`
+    * **Cibler sous-système :** `cibler sous systeme`, `sous systeme`, `cibler moteurs`, `cibler boucliers`, `cibler armes`
+    * **Basculer mode cardan :** `mode cardan`, `basculer cardan`, `gimbal`
+    * **Épingler cible :** `epingler cible`, `sauvegarder cible`
+    * **Basculer mode découplé :** `mode decouple`, `decouple`, `basculer couplage`
+    * **Basculer G-Safe :** `g safe`, `securite g`, `basculer gsafe`
+    * **Basculer limiteur de vitesse :** `limiteur de vitesse`, `basculer limiteur`, `limite vitesse`
+    * **Augmenter leurres :** `augmenter leurres`, `plus de leurres`
+    * **Réinitialiser leurres :** `reinitialiser leurres`, `remettre les leurres`
+    * **Essuyer visière :** `essuyer visiere`, `nettoyer visiere`, `essuyer le casque`
+    * **Appeler la cible :** `appeler la cible`, `appeler vaisseau`
 
 ### 8. 📱 Application compagnon et API REST
 * **Serveur Web HTTP local :** Héberge un tableau de bord local sur un port configurable (par défaut : `8891`, désactivé par défaut).

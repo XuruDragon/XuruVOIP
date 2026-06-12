@@ -1141,6 +1141,54 @@
                                              Style="{StaticResource InputStyle}"
                                              KeyDown="Hotkey_KeyDown"
                                              Margin="0,0,0,10"/>
+
+                                    <!-- Target Hostile Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceTargetHostileKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceTargetHostileKey"
+                                             Text="{Binding Config.VoiceCommandTargetHostileKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Cycle Subsystems Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceCycleSubsystemsKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceCycleSubsystemsKey"
+                                             Text="{Binding Config.VoiceCommandCycleSubsystemsKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Gimbal Mode Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceGimbalModeKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceGimbalModeKey"
+                                             Text="{Binding Config.VoiceCommandGimbalModeKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Pin Target Key -->
+                                    <TextBlock Text="{DynamicResource LblVoicePinTargetKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoicePinTargetKey"
+                                             Text="{Binding Config.VoiceCommandPinTargetKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Decoupled Mode Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceDecoupledKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceDecoupledKey"
+                                             Text="{Binding Config.VoiceCommandDecoupledKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- G-Safe Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceGSafeKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceGSafeKey"
+                                             Text="{Binding Config.VoiceCommandGSafeKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2">
@@ -1228,6 +1276,46 @@
                                     <TextBlock Text="{DynamicResource LblVoiceLightsKey}" Style="{StaticResource LabelStyle}"/>
                                     <TextBox x:Name="TxVoiceLightsKey"
                                              Text="{Binding Config.VoiceCommandLightsKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Speed Limiter Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceSpeedLimiterKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceSpeedLimiterKey"
+                                             Text="{Binding Config.VoiceCommandSpeedLimiterKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Decoy Burst Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceDecoyBurstKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceDecoyBurstKey"
+                                             Text="{Binding Config.VoiceCommandDecoyBurstKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Decoy Reset Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceDecoyResetKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceDecoyResetKey"
+                                             Text="{Binding Config.VoiceCommandDecoyResetKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Wipe Visor Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceWipeVisorKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceWipeVisorKey"
+                                             Text="{Binding Config.VoiceCommandWipeVisorKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Hail Target Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceHailTargetKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceHailTargetKey"
+                                             Text="{Binding Config.VoiceCommandHailTargetKey, UpdateSourceTrigger=PropertyChanged}"
                                              Style="{StaticResource InputStyle}"
                                              KeyDown="Hotkey_KeyDown"
                                              Margin="0,0,0,10"/>

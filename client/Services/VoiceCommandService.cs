@@ -40,7 +40,18 @@ public enum VoiceCommandAction
     ShipPowerReset,
     ShipDecoy,
     ShipNoise,
-    ShipLights
+    ShipLights,
+    ShipTargetHostile,
+    ShipCycleSubsystems,
+    ShipGimbalMode,
+    ShipPinTarget,
+    ShipDecoupledMode,
+    ShipGSafeToggle,
+    ShipSpeedLimiterToggle,
+    ShipDecoyBurstIncrease,
+    ShipDecoyBurstReset,
+    ShipWipeVisor,
+    ShipHailTarget
 }
 
 public class VoiceCommandResult
@@ -429,6 +440,127 @@ public class VoiceCommandService
         { "zh", new[] { "大灯", "切换大灯", "开启大灯", "关闭大灯" } }
     };
 
+    private static readonly Dictionary<string, string[]> ShipTargetHostileTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "target hostile", "nearest hostile", "lock hostile", "target nearest hostile" } },
+        { "fr", new[] { "cible hostile", "hostile le plus proche", "verrouiller hostile" } },
+        { "de", new[] { "feind anvisieren", "naechster feind", "feind aufschalten" } },
+        { "es", new[] { "fijar enemigo", "enemigo mas cercano", "bloquear enemigo" } },
+        { "pt", new[] { "mirar inimigo", "inimigo mais proximo", "travar inimigo" } },
+        { "ja", new[] { "敵ターゲット", "最寄りの敵", "敵をロック" } },
+        { "zh", new[] { "锁定敌机", "最近敌机", "锁定最近敌机" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipCycleSubsystemsTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "cycle subsystems", "target subsystem", "subsystem", "target engines", "target shields", "target weapons" } },
+        { "fr", new[] { "cibler sous systeme", "sous systeme", "cibler moteurs", "cibler boucliers", "cibler armes" } },
+        { "de", new[] { "subsysteme durchwechseln", "subsystem anvisieren", "triebwerke anvisieren", "schilde anvisieren" } },
+        { "es", new[] { "ciclar subsistemas", "cibler subsistema", "apuntar motores", "apuntar escudos" } },
+        { "pt", new[] { "ciclar subsistemas", "mirar subsistema", "mirar motores", "mirar escudos" } },
+        { "ja", new[] { "サブシステム切り替え", "サブシステムターゲット", "エンジンターゲット" } },
+        { "zh", new[] { "循环子系统", "瞄准子系统", "瞄准引擎", "瞄准护盾" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipGimbalModeTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "gimbal mode", "toggle gimbal", "gimbals" } },
+        { "fr", new[] { "mode cardan", "basculer cardan", "gimbal" } },
+        { "de", new[] { "gimbal modus", "gimbal umschalten", "gimbal" } },
+        { "es", new[] { "modo cardan", "alternar cardan", "gimbal" } },
+        { "pt", new[] { "modo cardan", "alternar cardan", "gimbal" } },
+        { "ja", new[] { "ジンバルモード", "ジンバル切り替え" } },
+        { "zh", new[] { "辅助瞄准", "切换辅助瞄准", "云台模式" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipPinTargetTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "pin target", "save target", "pin current target" } },
+        { "fr", new[] { "epingler cible", "sauvegarder cible" } },
+        { "de", new[] { "ziel anpinnen", "ziel speichern" } },
+        { "es", new[] { "fijar blanco", "guardar blanco" } },
+        { "pt", new[] { "fixar alvo", "salvar alvo" } },
+        { "ja", new[] { "ターゲット固定", "ターゲット保存" } },
+        { "zh", new[] { "钉住目标", "保存目标" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipDecoupledModeTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "decoupled mode", "toggle coupling", "decouple" } },
+        { "fr", new[] { "mode decouple", "decouple", "basculer couplage" } },
+        { "de", new[] { "entkoppelter modus", "kopplung aufheben", "entkoppeln" } },
+        { "es", new[] { "modo desacoplado", "desacoplar" } },
+        { "pt", new[] { "modo desacoplado", "desacoplar" } },
+        { "ja", new[] { "デカップルモード", "デカップル" } },
+        { "zh", new[] { "无辅助驾驶", "脱钩模式", "解耦模式" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipGSafeToggleTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "gsafe", "g safe", "toggle gsafe", "g force safety" } },
+        { "fr", new[] { "g safe", "securite g", "basculer gsafe" } },
+        { "de", new[] { "gsafe umschalten", "g safe" } },
+        { "es", new[] { "seguridad g", "alternar gsafe", "gsafe" } },
+        { "pt", new[] { "seguranca g", "alternar gsafe", "gsafe" } },
+        { "ja", new[] { "gセーフ", "gセーフ切り替え" } },
+        { "zh", new[] { "g力安全", "切换g力安全", "防晕厥安全" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipSpeedLimiterToggleTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "speed limiter", "toggle speed limiter", "speed limit" } },
+        { "fr", new[] { "limiteur de vitesse", "basculer limiteur", "limite vitesse" } },
+        { "de", new[] { "geschwindigkeitsbegrenzer", "tempobegrenzer" } },
+        { "es", new[] { "limitador de velocidad", "alternar limitador" } },
+        { "pt", new[] { "limitador de velocidade", "alternar limitador" } },
+        { "ja", new[] { "速度制限", "スピードリミッター" } },
+        { "zh", new[] { "速度限制", "切换速度限制", "限速器" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipDecoyBurstIncreaseTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "increase decoy burst", "more decoys", "decoy burst size" } },
+        { "fr", new[] { "augmenter leurres", "plus de leurres" } },
+        { "de", new[] { "taeuschkoerper anzahl erhoehen", "mehr taeuschkoerper" } },
+        { "es", new[] { "aumentar señuelos", "mas señuelos" } },
+        { "pt", new[] { "aumentar iscas", "mais iscas" } },
+        { "ja", new[] { "デコイバースト増加", "デコイ増加" } },
+        { "zh", new[] { "增加干扰弹数量", "更多干扰弹" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipDecoyBurstResetTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "reset decoy burst", "clear decoy burst", "reset decoys" } },
+        { "fr", new[] { "reinitialiser leurres", "remettre les leurres" } },
+        { "de", new[] { "taeuschkoerper zuruecksetzen" } },
+        { "es", new[] { "restablecer señuelos" } },
+        { "pt", new[] { "restabelecer iscas" } },
+        { "ja", new[] { "デコイバーストクリア", "デコイリセット" } },
+        { "zh", new[] { "重置干扰弹数量", "重置干扰弹" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipWipeVisorTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "wipe visor", "clean visor", "wipe helmet" } },
+        { "fr", new[] { "essuyer visiere", "nettoyer visiere", "essuyer le casque" } },
+        { "de", new[] { "visier wischen", "visier reinigen" } },
+        { "es", new[] { "limpiar visera", "limpiar casco" } },
+        { "pt", new[] { "limpar visera", "limpar capacete" } },
+        { "ja", new[] { "バイザーを拭く", "バイザーをきれいにする" } },
+        { "zh", new[] { "擦拭面罩", "清洁面罩", "擦面罩" } }
+    };
+
+    private static readonly Dictionary<string, string[]> ShipHailTargetTriggers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "en", new[] { "hail target", "hail ship", "call target", "call locked ship" } },
+        { "fr", new[] { "appeler la cible", "appeler vaisseau" } },
+        { "de", new[] { "ziel rufen", "schiff rufen" } },
+        { "es", new[] { "llamar objetivo", "llamar nave" } },
+        { "pt", new[] { "chamar alvo", "chamar nave" } },
+        { "ja", new[] { "ターゲット呼出", "通信開始" } },
+        { "zh", new[] { "呼叫目标", "呼叫飞船" } }
+    };
+
     // Voice Changer Profiles localized
     private static readonly string[] ProfileAlienNames = new[] { "alien", "extraterrestre", "alienígena", "エイリアン", "外星人" };
     private static readonly string[] ProfileCyborgNames = new[] { "cyborg", "ciborg", "サイボーグ", "半机械人", "改造人" };
@@ -463,6 +595,17 @@ public class VoiceCommandService
     public event Action? ShipDecoyRequested;
     public event Action? ShipNoiseRequested;
     public event Action? ShipLightsRequested;
+    public event Action? ShipTargetHostileRequested;
+    public event Action? ShipCycleSubsystemsRequested;
+    public event Action? ShipGimbalModeRequested;
+    public event Action? ShipPinTargetRequested;
+    public event Action? ShipDecoupledModeRequested;
+    public event Action? ShipGSafeToggleRequested;
+    public event Action? ShipSpeedLimiterToggleRequested;
+    public event Action? ShipDecoyBurstIncreaseRequested;
+    public event Action? ShipDecoyBurstResetRequested;
+    public event Action? ShipWipeVisorRequested;
+    public event Action? ShipHailTargetRequested;
 
     public VoiceCommandResult ParseAndExecute(string text, string appLang, IEnumerable<string> availableChannels, double confidence = 0.5)
     {
@@ -476,8 +619,17 @@ public class VoiceCommandService
 
         var result = new VoiceCommandResult { RawText = text };
 
+        // 1a. Wipe Visor (evaluate before generic Visor Toggle to avoid substring collision)
+        if (MatchesTrigger(cleanText, lang, ShipWipeVisorTriggers, confidence, out double sim))
+        {
+            result.Action = VoiceCommandAction.ShipWipeVisor;
+            result.Similarity = sim;
+            ShipWipeVisorRequested?.Invoke();
+            return result;
+        }
+
         // 1. Visor Toggle
-        if (MatchesTrigger(cleanText, lang, VisorTriggers, confidence, out double sim))
+        if (MatchesTrigger(cleanText, lang, VisorTriggers, confidence, out sim))
         {
             result.Action = VoiceCommandAction.VisorToggle;
             result.Similarity = sim;
@@ -592,6 +744,77 @@ public class VoiceCommandService
         }
 
         // 5. Voice Ship Controls
+        if (MatchesTrigger(cleanText, lang, ShipTargetHostileTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipTargetHostile;
+            result.Similarity = sim;
+            ShipTargetHostileRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipCycleSubsystemsTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipCycleSubsystems;
+            result.Similarity = sim;
+            ShipCycleSubsystemsRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipGimbalModeTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipGimbalMode;
+            result.Similarity = sim;
+            ShipGimbalModeRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipPinTargetTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipPinTarget;
+            result.Similarity = sim;
+            ShipPinTargetRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipDecoupledModeTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipDecoupledMode;
+            result.Similarity = sim;
+            ShipDecoupledModeRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipGSafeToggleTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipGSafeToggle;
+            result.Similarity = sim;
+            ShipGSafeToggleRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipSpeedLimiterToggleTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipSpeedLimiterToggle;
+            result.Similarity = sim;
+            ShipSpeedLimiterToggleRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipDecoyBurstIncreaseTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipDecoyBurstIncrease;
+            result.Similarity = sim;
+            ShipDecoyBurstIncreaseRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipDecoyBurstResetTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipDecoyBurstReset;
+            result.Similarity = sim;
+            ShipDecoyBurstResetRequested?.Invoke();
+            return result;
+        }
+        if (MatchesTrigger(cleanText, lang, ShipHailTargetTriggers, confidence, out sim))
+        {
+            result.Action = VoiceCommandAction.ShipHailTarget;
+            result.Similarity = sim;
+            ShipHailTargetRequested?.Invoke();
+            return result;
+        }
+
         if (MatchesTrigger(cleanText, lang, ShipFlyModeTriggers, confidence, out sim))
         {
             result.Action = VoiceCommandAction.ShipFlyMode;

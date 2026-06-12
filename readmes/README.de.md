@@ -290,6 +290,17 @@ graph TB
     * **Täuschkörper Werfen:** `taeuschkoerper`, `taeuschkoerper abfeuern`, `flare`
     * **Rauschen Auswerfen:** `chaff`, `chaff abfeuern`, `rauschen`
     * **Schiffscheinwerfer umschalten:** `licht`, `scheinwerfer`, `licht an`, `licht aus`
+    * **Nächsten Feind anvisieren:** `feind anvisieren`, `naechster feind`, `feind aufschalten`
+    * **Subsysteme durchwechseln:** `subsysteme durchwechseln`, `subsystem anvisieren`, `triebwerke anvisieren`, `schilde anvisieren`
+    * **Gimbal-Modus umschalten:** `gimbal modus`, `gimbal umschalten`, `gimbal`
+    * **Ziel anpinnen:** `ziel anpinnen`, `ziel speichern`
+    * **Entkoppelten Modus umschalten:** `entkoppelter modus`, `kopplung aufheben`, `entkoppeln`
+    * **G-Safe umschalten:** `gsafe`, `g safe`, `gsafe umschalten`
+    * **Geschwindigkeitsbegrenzer umschalten:** `geschwindigkeitsbegrenzer`, `tempobegrenzer`
+    * **Täuschkörper-Anzahl erhöhen:** `taeuschkoerper anzahl erhoehen`, `mehr taeuschkoerper`
+    * **Täuschkörper zurücksetzen:** `taeuschkoerper zuruecksetzen`
+    * **Visier wischen:** `visier wischen`, `visier reinigen`
+    * **Ziel rufen:** `ziel rufen`, `schiff rufen`
 
 ### 8. 📱 Begleit-App und REST-API
 * **Lokaler HTTP-Webserver:** Hostet ein lokales Dashboard auf einem konfigurierbaren Port (Standard: „8891“, standardmäßig deaktiviert).

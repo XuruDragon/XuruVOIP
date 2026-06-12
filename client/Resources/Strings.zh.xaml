@@ -227,6 +227,17 @@
     <sys:String x:Key="LblVoiceDecoyKey">语音: 发射干扰弹按键</sys:String>
     <sys:String x:Key="LblVoiceNoiseKey">语音: 发射噪声弹按键</sys:String>
     <sys:String x:Key="LblVoiceLightsKey">语音: 飞船大灯开关按键</sys:String>
+    <sys:String x:Key="LblVoiceTargetHostileKey">语音: 锁定最近敌机</sys:String>
+    <sys:String x:Key="LblVoiceCycleSubsystemsKey">语音: 循环子系统</sys:String>
+    <sys:String x:Key="LblVoiceGimbalModeKey">语音: 切换辅助瞄准</sys:String>
+    <sys:String x:Key="LblVoicePinTargetKey">语音: 钉住目标</sys:String>
+    <sys:String x:Key="LblVoiceDecoupledKey">语音: 切换脱钩模式</sys:String>
+    <sys:String x:Key="LblVoiceGSafeKey">语音: 切换G力安全</sys:String>
+    <sys:String x:Key="LblVoiceSpeedLimiterKey">语音: 切换限速器</sys:String>
+    <sys:String x:Key="LblVoiceDecoyBurstKey">语音: 增加干扰弹数量</sys:String>
+    <sys:String x:Key="LblVoiceDecoyResetKey">语音: 重置干扰弹数量</sys:String>
+    <sys:String x:Key="LblVoiceWipeVisorKey">语音: 擦拭面罩</sys:String>
+    <sys:String x:Key="LblVoiceHailTargetKey">语音: 呼叫目标</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">语音命令置信度阈值</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">警告：启用离线语音命令将在首次激活时下载 Whisper 转录模型（约 140MB，如果您的机器上尚不存在）。</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 正在聆听...</sys:String>

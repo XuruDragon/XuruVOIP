@@ -293,6 +293,17 @@ graph TB
     * **Launch Decoy/Flare:** `decoy`, `launch decoy`, `flare`, `launch flare`
     * **Launch Noise/Chaff:** `noise`, `launch noise`, `chaff`, `launch chaff`
     * **Toggle Ship Lights:** `lights`, `headlights`, `toggle lights`, `lights on`, `lights off`, `ship lights`
+    * **Target Nearest Hostile:** `target hostile`, `nearest hostile`, `lock hostile`, `target nearest hostile`
+    * **Cycle Subsystems:** `cycle subsystems`, `target subsystem`, `subsystem`, `target engines`, `target shields`, `target weapons`
+    * **Toggle Gimbal Mode:** `gimbal mode`, `toggle gimbal`, `gimbals`
+    * **Pin Target:** `pin target`, `save target`, `pin current target`
+    * **Toggle Decoupled Mode:** `decoupled mode`, `toggle coupling`, `decouple`
+    * **Toggle G-Safe:** `gsafe`, `g safe`, `toggle gsafe`, `g force safety`
+    * **Toggle Speed Limiter:** `speed limiter`, `toggle speed limiter`, `speed limit`
+    * **Increase Decoy Burst:** `increase decoy burst`, `more decoys`, `decoy burst size`
+    * **Reset Decoy Burst:** `reset decoy burst`, `clear decoy burst`, `reset decoys`
+    * **Wipe Visor:** `wipe visor`, `clean visor`, `wipe helmet`
+    * **Hail Target:** `hail target`, `hail ship`, `call target`, `call locked ship`
 
 ### 8. 📱 Companion App & REST API
 * **Local HTTP Web Server:** Hosts a local dashboard on a configurable port (default: `8891`, disabled by default).

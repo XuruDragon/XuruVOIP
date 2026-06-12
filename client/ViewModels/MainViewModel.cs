@@ -1072,6 +1072,28 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             InputSimulator.SimulateHotkey(Config.Config.VoiceCommandNoiseKey);
         _voiceCommand.ShipLightsRequested += () => 
             InputSimulator.SimulateHotkey(Config.Config.VoiceCommandLightsKey);
+        _voiceCommand.ShipTargetHostileRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandTargetHostileKey);
+        _voiceCommand.ShipCycleSubsystemsRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandCycleSubsystemsKey);
+        _voiceCommand.ShipGimbalModeRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandGimbalModeKey);
+        _voiceCommand.ShipPinTargetRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandPinTargetKey);
+        _voiceCommand.ShipDecoupledModeRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandDecoupledKey);
+        _voiceCommand.ShipGSafeToggleRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandGSafeKey);
+        _voiceCommand.ShipSpeedLimiterToggleRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandSpeedLimiterKey);
+        _voiceCommand.ShipDecoyBurstIncreaseRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandDecoyBurstKey);
+        _voiceCommand.ShipDecoyBurstResetRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandDecoyResetKey);
+        _voiceCommand.ShipWipeVisorRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandWipeVisorKey);
+        _voiceCommand.ShipHailTargetRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandHailTargetKey);
         _voiceCommand.VoiceChangerProfileRequested += profile =>
         {
             Config.Config.EnableVoiceChanger = (profile != "None");

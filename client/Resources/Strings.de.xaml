@@ -227,6 +227,17 @@
     <sys:String x:Key="LblVoiceDecoyKey">Sprache: Täuschkörper Werfen Taste</sys:String>
     <sys:String x:Key="LblVoiceNoiseKey">Sprache: Rauschen Auswerfen Taste</sys:String>
     <sys:String x:Key="LblVoiceLightsKey">Sprache: Schiffscheinwerfer Taste</sys:String>
+    <sys:String x:Key="LblVoiceTargetHostileKey">Sprache: Nächsten Feind anvisieren</sys:String>
+    <sys:String x:Key="LblVoiceCycleSubsystemsKey">Sprache: Subsysteme durchwechseln</sys:String>
+    <sys:String x:Key="LblVoiceGimbalModeKey">Sprache: Gimbal-Modus umschalten</sys:String>
+    <sys:String x:Key="LblVoicePinTargetKey">Sprache: Ziel anpinnen</sys:String>
+    <sys:String x:Key="LblVoiceDecoupledKey">Sprache: Entkoppelten Modus umschalten</sys:String>
+    <sys:String x:Key="LblVoiceGSafeKey">Sprache: G-Safe umschalten</sys:String>
+    <sys:String x:Key="LblVoiceSpeedLimiterKey">Sprache: Geschwindigkeitsbegrenzer umschalten</sys:String>
+    <sys:String x:Key="LblVoiceDecoyBurstKey">Sprache: Täuschkörper-Anzahl erhöhen</sys:String>
+    <sys:String x:Key="LblVoiceDecoyResetKey">Sprache: Täuschkörper zurücksetzen</sys:String>
+    <sys:String x:Key="LblVoiceWipeVisorKey">Sprache: Visier wischen</sys:String>
+    <sys:String x:Key="LblVoiceHailTargetKey">Sprache: Ziel rufen</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Sprachbefehl-Konfidenzschwellenwert</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">WARNUNG: Die Aktivierung von Offline-Sprachbefehlen lädt bei der ersten Aktivierung das Whisper-Transkriptionsmodell (~140 MB) herunter, falls es noch nicht vorhanden ist.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS HÖRT ZU...</sys:String>

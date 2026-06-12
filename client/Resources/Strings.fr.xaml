@@ -227,6 +227,17 @@
     <sys:String x:Key="LblVoiceDecoyKey">Voix : Touche Lancer Leurre</sys:String>
     <sys:String x:Key="LblVoiceNoiseKey">Voix : Touche Lancer Brouillage</sys:String>
     <sys:String x:Key="LblVoiceLightsKey">Voix : Touche Phares</sys:String>
+    <sys:String x:Key="LblVoiceTargetHostileKey">Vocal : Touche cibler hostile le plus proche</sys:String>
+    <sys:String x:Key="LblVoiceCycleSubsystemsKey">Vocal : Touche cibler sous-système</sys:String>
+    <sys:String x:Key="LblVoiceGimbalModeKey">Vocal : Touche basculer mode cardan (gimbal)</sys:String>
+    <sys:String x:Key="LblVoicePinTargetKey">Vocal : Touche épingler cible</sys:String>
+    <sys:String x:Key="LblVoiceDecoupledKey">Vocal : Touche mode découplé</sys:String>
+    <sys:String x:Key="LblVoiceGSafeKey">Vocal : Touche basculer G-Safe</sys:String>
+    <sys:String x:Key="LblVoiceSpeedLimiterKey">Vocal : Touche limiteur de vitesse</sys:String>
+    <sys:String x:Key="LblVoiceDecoyBurstKey">Vocal : Touche augmenter leurres</sys:String>
+    <sys:String x:Key="LblVoiceDecoyResetKey">Vocal : Touche réinitialiser leurres</sys:String>
+    <sys:String x:Key="LblVoiceWipeVisorKey">Vocal : Touche essuyer visière</sys:String>
+    <sys:String x:Key="LblVoiceHailTargetKey">Vocal : Touche appeler la cible</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Seuil de confiance des commandes vocales</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">ATTENTION : L'activation des commandes vocales hors ligne téléchargera le modèle de transcription Whisper (~140 Mo) lors du premier démarrage s'il n'est pas déjà présent.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS À L'ÉCOUTE...</sys:String>

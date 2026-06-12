@@ -227,6 +227,17 @@
     <sys:String x:Key="LblVoiceDecoyKey">音声: デコイ射出キー</sys:String>
     <sys:String x:Key="LblVoiceNoiseKey">音声: ノイズ射出キー</sys:String>
     <sys:String x:Key="LblVoiceLightsKey">音声: 船体ライト切替キー</sys:String>
+    <sys:String x:Key="LblVoiceTargetHostileKey">音声: 最寄りの敵ターゲット</sys:String>
+    <sys:String x:Key="LblVoiceCycleSubsystemsKey">音声: サブシステム切り替え</sys:String>
+    <sys:String x:Key="LblVoiceGimbalModeKey">音声: ジンバルモード切り替え</sys:String>
+    <sys:String x:Key="LblVoicePinTargetKey">音声: ターゲット固定</sys:String>
+    <sys:String x:Key="LblVoiceDecoupledKey">音声: デカップルモード切り替え</sys:String>
+    <sys:String x:Key="LblVoiceGSafeKey">音声: Gセーフ切り替え</sys:String>
+    <sys:String x:Key="LblVoiceSpeedLimiterKey">音声: スピードリミッター切り替え</sys:String>
+    <sys:String x:Key="LblVoiceDecoyBurstKey">音声: デコイバースト増加</sys:String>
+    <sys:String x:Key="LblVoiceDecoyResetKey">音声: デコイバーストクリア</sys:String>
+    <sys:String x:Key="LblVoiceWipeVisorKey">音声: バイザーを拭く</sys:String>
+    <sys:String x:Key="LblVoiceHailTargetKey">音声: ターゲット呼出</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">音声コマンドの信頼度しきい値</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">警告: オフライン音声コマンドを有効にすると、モデルがまだ存在しない場合、最初の起動時にWhisper文字起こしモデル（~140MB）がダウンロードされます。</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 聴取中...</sys:String>

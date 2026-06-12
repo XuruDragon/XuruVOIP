@@ -384,4 +384,94 @@ public class VoiceCommandParserTests
         Assert.True(lightsFired);
         Assert.Equal(VoiceCommandAction.ShipLights, r3.Action);
     }
+
+    [Fact]
+    public void ParseAndExecute_NewSimulatedCommands_ShouldTriggerEvents()
+    {
+        var service = new VoiceCommandService();
+
+        bool targetHostileFired = false;
+        service.ShipTargetHostileRequested += () => targetHostileFired = true;
+        var r1 = service.ParseAndExecute("target nearest hostile", "en", new List<string>(), 0.5);
+        Assert.True(targetHostileFired);
+        Assert.Equal(VoiceCommandAction.ShipTargetHostile, r1.Action);
+
+        bool cycleSubsystemsFired = false;
+        service.ShipCycleSubsystemsRequested += () => cycleSubsystemsFired = true;
+        var r2 = service.ParseAndExecute("target engines", "en", new List<string>(), 0.5);
+        Assert.True(cycleSubsystemsFired);
+        Assert.Equal(VoiceCommandAction.ShipCycleSubsystems, r2.Action);
+
+        bool gimbalModeFired = false;
+        service.ShipGimbalModeRequested += () => gimbalModeFired = true;
+        var r3 = service.ParseAndExecute("toggle gimbal", "en", new List<string>(), 0.5);
+        Assert.True(gimbalModeFired);
+        Assert.Equal(VoiceCommandAction.ShipGimbalMode, r3.Action);
+
+        bool pinTargetFired = false;
+        service.ShipPinTargetRequested += () => pinTargetFired = true;
+        var r4 = service.ParseAndExecute("pin target", "en", new List<string>(), 0.5);
+        Assert.True(pinTargetFired);
+        Assert.Equal(VoiceCommandAction.ShipPinTarget, r4.Action);
+
+        bool decoupledFired = false;
+        service.ShipDecoupledModeRequested += () => decoupledFired = true;
+        var r5 = service.ParseAndExecute("toggle coupling", "en", new List<string>(), 0.5);
+        Assert.True(decoupledFired);
+        Assert.Equal(VoiceCommandAction.ShipDecoupledMode, r5.Action);
+
+        bool gsafeFired = false;
+        service.ShipGSafeToggleRequested += () => gsafeFired = true;
+        var r6 = service.ParseAndExecute("g safe", "en", new List<string>(), 0.5);
+        Assert.True(gsafeFired);
+        Assert.Equal(VoiceCommandAction.ShipGSafeToggle, r6.Action);
+
+        bool speedLimiterFired = false;
+        service.ShipSpeedLimiterToggleRequested += () => speedLimiterFired = true;
+        var r7 = service.ParseAndExecute("toggle speed limiter", "en", new List<string>(), 0.5);
+        Assert.True(speedLimiterFired);
+        Assert.Equal(VoiceCommandAction.ShipSpeedLimiterToggle, r7.Action);
+
+        bool decoyBurstFired = false;
+        service.ShipDecoyBurstIncreaseRequested += () => decoyBurstFired = true;
+        var r8 = service.ParseAndExecute("more decoys", "en", new List<string>(), 0.5);
+        Assert.True(decoyBurstFired);
+        Assert.Equal(VoiceCommandAction.ShipDecoyBurstIncrease, r8.Action);
+
+        bool decoyResetFired = false;
+        service.ShipDecoyBurstResetRequested += () => decoyResetFired = true;
+        var r9 = service.ParseAndExecute("clear decoy burst", "en", new List<string>(), 0.5);
+        Assert.True(decoyResetFired);
+        Assert.Equal(VoiceCommandAction.ShipDecoyBurstReset, r9.Action);
+
+        bool wipeVisorFired = false;
+        service.ShipWipeVisorRequested += () => wipeVisorFired = true;
+        var r10 = service.ParseAndExecute("wipe visor", "en", new List<string>(), 0.5);
+        Assert.True(wipeVisorFired);
+        Assert.Equal(VoiceCommandAction.ShipWipeVisor, r10.Action);
+
+        bool hailTargetFired = false;
+        service.ShipHailTargetRequested += () => hailTargetFired = true;
+        var r11 = service.ParseAndExecute("hail target", "en", new List<string>(), 0.5);
+        Assert.True(hailTargetFired);
+        Assert.Equal(VoiceCommandAction.ShipHailTarget, r11.Action);
+    }
+
+    [Fact]
+    public void ParseAndExecute_NewSimulatedCommandsFrench_ShouldTriggerEvents()
+    {
+        var service = new VoiceCommandService();
+
+        bool targetHostileFired = false;
+        service.ShipTargetHostileRequested += () => targetHostileFired = true;
+        var r1 = service.ParseAndExecute("verrouiller hostile", "fr", new List<string>(), 0.5);
+        Assert.True(targetHostileFired);
+        Assert.Equal(VoiceCommandAction.ShipTargetHostile, r1.Action);
+
+        bool wipeVisorFired = false;
+        service.ShipWipeVisorRequested += () => wipeVisorFired = true;
+        var r10 = service.ParseAndExecute("essuyer visiere", "fr", new List<string>(), 0.5);
+        Assert.True(wipeVisorFired);
+        Assert.Equal(VoiceCommandAction.ShipWipeVisor, r10.Action);
+    }
 }

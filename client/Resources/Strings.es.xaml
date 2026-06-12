@@ -227,6 +227,17 @@
     <sys:String x:Key="LblVoiceDecoyKey">Voz: Tecla de Lanzar Señuelo/Bengala</sys:String>
     <sys:String x:Key="LblVoiceNoiseKey">Voz: Tecla de Lanzar Ruido/Chaff</sys:String>
     <sys:String x:Key="LblVoiceLightsKey">Voz: Tecla de Luces de Nave</sys:String>
+    <sys:String x:Key="LblVoiceTargetHostileKey">Vocal: Enemigo más cercano</sys:String>
+    <sys:String x:Key="LblVoiceCycleSubsystemsKey">Vocal: Ciclar subsistemas</sys:String>
+    <sys:String x:Key="LblVoiceGimbalModeKey">Vocal: Alternar modo cardán</sys:String>
+    <sys:String x:Key="LblVoicePinTargetKey">Vocal: Fijar blanco</sys:String>
+    <sys:String x:Key="LblVoiceDecoupledKey">Vocal: Modo desacoplado</sys:String>
+    <sys:String x:Key="LblVoiceGSafeKey">Vocal: Alternar G-Safe</sys:String>
+    <sys:String x:Key="LblVoiceSpeedLimiterKey">Vocal: Alternar limitador de velocidad</sys:String>
+    <sys:String x:Key="LblVoiceDecoyBurstKey">Vocal: Aumentar ráfaga de señuelos</sys:String>
+    <sys:String x:Key="LblVoiceDecoyResetKey">Vocal: Restablecer ráfaga de señuelos</sys:String>
+    <sys:String x:Key="LblVoiceWipeVisorKey">Vocal: Limpiar visera</sys:String>
+    <sys:String x:Key="LblVoiceHailTargetKey">Vocal: Llamar objetivo</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Umbral de confianza del comando de voz</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">ADVERTENCIA: La activación de comandos de voz sin conexión descargará el modelo de transcripción Whisper (~140 MB) en la primera activación si aún no está presente en su máquina.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS ESCUCHANDO...</sys:String>
