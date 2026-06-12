@@ -50,28 +50,26 @@ This file tracks features that are proposed but rejected or marked as "no-go". T
 * **Status:** No-Go
 * **Description:** Injecting server-side static noise or complete jamming of radio channels based on nearby hostile ships.
 
-## 12. Feature 12: Proximity Occlusion by Vehicle Hatch
+## 12. Feature 12: Ship Hatch & Cargo Ramp Proximity Occlusion (Proximity Occlusion)
 * **Status:** No-Go
-* **Description:** Low-pass filter and attenuate proximity voice audio when the physical boundary/hatch of a ship is closed.
+* **Description:** Low-pass filter (muffle) and attenuate Proximity audio when the structural boundary between two players is closed (e.g., ship hatches, cargo ramps, cockpits).
 
-## 13. Feature 13: Speech-to-Text Operational Log Exporter
+## 13. Feature 13: Speech-to-Text Military Operational Log Exporter (STT Log Exporter)
 * **Status:** No-Go
-* **Description:** Write transcribed/translated radio message texts into local operational files.
+* **Description:** Expose transcribed text logs from the voice engine subtitles directly to a structured local JSON file for log exporting.
 
-## 14. Feature 14: Visor HUD Sync for Intercom Glitches
+## 14. Feature 14: HUD Intercom Glitches and Signal Degradation (HUD Intercom Glitches)
 * **Status:** No-Go
-* **Description:** Render visual static flickering on the HUD overlay synchronized with audio intercom degradation events.
+* **Description:** Injecting simulated signal glitches and digital artifacts directly into HUD spatial voice or radio communications.
 
-## 15. Feature 15: Acoustic Absorption by Suit/Armor Type
+## 15. Feature 15: Suit Armor Sound Absorption (Suit Armor Absorption)
 * **Status:** No-Go
-* **Description:** Modify proximity dampening levels depending on light/medium/heavy armor worn by speakers.
+* **Description:** Adjusting frequency response and volume of local proximity voices depending on equipped suit or combat armor thickness.
 
-## 16. Feature 16: Voice-Command Confirmation Sound FX
+## 16. Feature 16: Voice-Command Audio Validation Feedback (Voice Command Sound FX)
 * **Status:** No-Go
-* **Description:** Play a mechanical confirmation chime when a voice command is successfully parsed.
+* **Description:** Playing localized confirmation beeps, computer hums, or visor sounds when a voice command is successfully parsed.
 
-## 17. Feature 17: Personalization of HRTF Head-geometry
+## 17. Feature 17: Calibrated Binaural HRTF Head-geometry Customization (Head-Geometry HRTF Calibration)
 * **Status:** No-Go
-* **Description:** Configure binaural audio ITD parameters using head-size and ear-spacing sliders.
-
-
+* **Description:** Providing manual interaural time difference (ITD) spacing sliders in the settings window to calibrate binaural spatialization equations.
