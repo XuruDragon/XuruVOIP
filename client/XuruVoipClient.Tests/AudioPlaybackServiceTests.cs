@@ -28,7 +28,7 @@ public class AudioPlaybackServiceTests
         Assert.Equal(2400, chime.Length);
 
         // Ensure there is actual signal generated (not all zeros)
-        Assert.True(chime.Any(s => s != 0f));
+        Assert.Contains(chime, s => s != 0f);
 
         // Ensure samples are within quiet range (<= 15% gain as designed)
         foreach (var sample in chime)
@@ -54,7 +54,7 @@ public class AudioPlaybackServiceTests
         Assert.Equal(8640, chime.Length);
 
         // Ensure there is noise generated
-        Assert.True(chime.Any(s => s != 0f));
+        Assert.Contains(chime, s => s != 0f);
 
         // Ensure samples are within squelch tail gain limits (<= 25% gain)
         foreach (var sample in chime)

@@ -36,8 +36,8 @@ public class ChimeProfileTests
 
         Assert.Equal(2880, indKd.Length); // 60ms @ 48kHz
         Assert.Equal(5760, indKu.Length); // 120ms @ 48kHz
-        Assert.True(indKd.Any(s => s != 0f));
-        Assert.True(indKu.Any(s => s != 0f));
+        Assert.Contains(indKd, s => s != 0f);
+        Assert.Contains(indKu, s => s != 0f);
 
         // WHEN: Change to Alien
         service.PttChimeType = "Alien";
@@ -46,8 +46,8 @@ public class ChimeProfileTests
 
         Assert.Equal(3840, alienKd.Length); // 80ms @ 48kHz
         Assert.Equal(4800, alienKu.Length); // 100ms @ 48kHz
-        Assert.True(alienKd.Any(s => s != 0f));
-        Assert.True(alienKu.Any(s => s != 0f));
+        Assert.Contains(alienKd, s => s != 0f);
+        Assert.Contains(alienKu, s => s != 0f);
 
         // WHEN: Change to Vintage
         service.PttChimeType = "Vintage";
@@ -56,7 +56,7 @@ public class ChimeProfileTests
 
         Assert.Equal(1920, vinKd.Length); // 40ms @ 48kHz
         Assert.Equal(3840, vinKu.Length); // 80ms @ 48kHz
-        Assert.True(vinKd.Any(s => s != 0f));
-        Assert.True(vinKu.Any(s => s != 0f));
+        Assert.Contains(vinKd, s => s != 0f);
+        Assert.Contains(vinKu, s => s != 0f);
     }
 }
