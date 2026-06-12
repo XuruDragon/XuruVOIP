@@ -115,3 +115,67 @@ func TestInjectRadioAudio(t *testing.T) {
 		t.Errorf("Expected audio data %v, got %v", dummyOpus, audioData)
 	}
 }
+
+func TestDiscordBridgeChannelSwitching(t *testing.T) {
+	// Initialize configurations
+	core.DiscordDynamicTracking = true
+	core.DiscordLeaderUsername = "CommanderBob"
+	core.EnableDiscordBridge = true
+	SetDiscordBridgeChannel("General")
+
+	// Call StartDiscordBridge to bind the core.OnPlayerChannelChanged callback
+	StartDiscordBridge()
+
+	// Setup Hub and Player
+	core.ActiveHub = core.Hub{
+		Players: make(map[string]*core.ActivePlayer),
+	}
+
+	bob := &core.ActivePlayer{
+		Name:          "CommanderBob",
+		ActiveChannel: "General",
+		Profile:       "Soldier",
+	}
+	core.ActiveHub.Players["CommanderBob"] = bob
+
+	// Scenario 1: A leader (CommanderBob) changes channel -> Bridge channel should update
+	core.ActiveHub.UpdateChannel("CommanderBob", "Squad_Alpha")
+	time.Sleep(50 * time.Millisecond) // wait for async goroutine callback to run
+
+	ch := GetDiscordBridgeChannel()
+	if ch != "Squad_Alpha" {
+		t.Errorf("Expected bridge channel to switch to 'Squad_Alpha', got '%s'", ch)
+	}
+
+	// Scenario 2: A non-leader with profile "Command" changes channel -> Bridge channel should update
+	charlie := &core.ActivePlayer{
+		Name:          "Charlie",
+		ActiveChannel: "General",
+		Profile:       "Command",
+	}
+	core.ActiveHub.Players["Charlie"] = charlie
+
+	core.ActiveHub.UpdateChannel("Charlie", "Op_Delta")
+	time.Sleep(50 * time.Millisecond)
+
+	ch = GetDiscordBridgeChannel()
+	if ch != "Op_Delta" {
+		t.Errorf("Expected bridge channel to switch to 'Op_Delta' for Command profile, got '%s'", ch)
+	}
+
+	// Scenario 3: A non-leader normal player changes channel -> Bridge channel should NOT update
+	soldier := &core.ActivePlayer{
+		Name:          "Joe",
+		ActiveChannel: "General",
+		Profile:       "Soldier",
+	}
+	core.ActiveHub.Players["Joe"] = soldier
+
+	core.ActiveHub.UpdateChannel("Joe", "General")
+	time.Sleep(50 * time.Millisecond)
+
+	ch = GetDiscordBridgeChannel()
+	if ch != "Op_Delta" {
+		t.Errorf("Expected bridge channel to remain 'Op_Delta', got '%s'", ch)
+	}
+}

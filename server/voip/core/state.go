@@ -10,6 +10,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var OnPlayerChannelChanged func(name string, profile string, newChannel string)
+
 // ActivePlayer represents the runtime state of a connected player
 type ActivePlayer struct {
 	Name              string
@@ -362,6 +364,9 @@ func (h *Hub) UpdateChannel(name string, channel string) bool {
 	p.ActiveChannel = channel
 	p.LastSeen = time.Now()
 	_ = DBSavePlayerState(name, p.Profile, p.ActiveChannel, p.ListeningChannels)
+	if OnPlayerChannelChanged != nil {
+		go OnPlayerChannelChanged(name, p.Profile, channel)
+	}
 	return true
 }
 
