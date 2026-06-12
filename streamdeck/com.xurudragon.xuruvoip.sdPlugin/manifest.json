@@ -1,4 +1,5 @@
 {
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "SDKVersion": 3,
   "Author": "XuruDragon",
   "Description": "Control mutes, active channel, and helmet state for XuruVOIP",
