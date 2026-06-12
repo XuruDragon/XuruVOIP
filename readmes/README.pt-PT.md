@@ -279,6 +279,17 @@ graph TB
     * **Alternar portas/rampas da nave:** `portas`, `exterior`, `abrir portas`, `fechar portas`, `abrir exterior`, `fechar exterior`
     * **Desviar escudos para a frente:** `escudos`, `escudos na frente`, `escudos para frente`, `desviar escudos`
     * **Alternar trem de pouso:** `trem de pouso`, `desdobrar trem`, `recolher trem`
+    * **Modo de voo (SCM/NAV):** `modo de voo`, `modo voo`, `modo navegacao`
+    * **Modo escaneamento:** `modo de varredura`, `modo escaneamento`, `escaner`, `ativar escaner`
+    * **Modo mineração:** `modo mineracao`, `iniciar mineracao`, `mineracao`
+    * **Modo reciclagem:** `modo de reciclagem`, `modo salvamento`, `reciclagem`
+    * **Energia máxima para armas:** `energia para armas`, `armas no maximo`, `maximo armas`
+    * **Energia máxima para escudos:** `energia para escudos`, `escudos no maximo`, `maximo escudos`
+    * **Energia máxima para motores:** `energia para motores`, `motores no maximo`, `maximo motores`
+    * **Restabelecer/Equilibrar energia:** `restabelecer energia`, `equilibrar energia`, `energia reset`
+    * **Lançar chamariz/isca:** `isca`, `lancar isca`, `lancar chamariz`
+    * **Lançar ruído/chaff:** `ruido`, `lancar ruido`, `chaff`, `lancar chaff`
+    * **Alternar luzes da nave:** `luzes`, `farois`, `ligar luzes`, `desligar luzes`
 
 ### 8. 📱 Aplicativo complementar e API REST
 * **Servidor Web HTTP local:** Hospeda um painel local em uma porta configurável (padrão: `8891`, desabilitado por padrão).

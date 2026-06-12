@@ -216,6 +216,17 @@
     <sys:String x:Key="LblVoiceQuantumKey">语音: 量子引擎启动按键</sys:String>
     <sys:String x:Key="LblVoiceCruiseKey">语音: 定速巡航开关按键</sys:String>
     <sys:String x:Key="LblVoiceLandingRequestKey">语音: 请求降落按键</sys:String>
+    <sys:String x:Key="LblVoiceFlyModeKey">语音: 飞行模式开关按键</sys:String>
+    <sys:String x:Key="LblVoiceScanModeKey">语音: 扫描模式开关按键</sys:String>
+    <sys:String x:Key="LblVoiceMiningModeKey">语音: 采矿模式开关按键</sys:String>
+    <sys:String x:Key="LblVoiceSalvageModeKey">语音: 回收模式开关按键</sys:String>
+    <sys:String x:Key="LblVoicePowerWeaponsKey">语音: 武器分配最大化按键</sys:String>
+    <sys:String x:Key="LblVoicePowerShieldsKey">语音: 护盾分配最大化按键</sys:String>
+    <sys:String x:Key="LblVoicePowerEnginesKey">语音: 引擎分配最大化按键</sys:String>
+    <sys:String x:Key="LblVoicePowerResetKey">语音: 重置/平衡分配按键</sys:String>
+    <sys:String x:Key="LblVoiceDecoyKey">语音: 发射干扰弹按键</sys:String>
+    <sys:String x:Key="LblVoiceNoiseKey">语音: 发射噪声弹按键</sys:String>
+    <sys:String x:Key="LblVoiceLightsKey">语音: 飞船大灯开关按键</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">语音命令置信度阈值</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">警告：启用离线语音命令将在首次激活时下载 Whisper 转录模型（约 140MB，如果您的机器上尚不存在）。</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 正在聆听...</sys:String>

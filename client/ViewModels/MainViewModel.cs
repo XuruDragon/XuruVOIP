@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Windows;
@@ -14,6 +15,74 @@ namespace XuruVoipClient.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
 {
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern short GetKeyState(int nVirtKey);
+
+    private static (Key MainKey, bool Ctrl, bool Alt, bool Shift) ParseHotkey(string hotkeyStr)
+    {
+        if (string.IsNullOrWhiteSpace(hotkeyStr) || hotkeyStr.Equals("None", StringComparison.OrdinalIgnoreCase))
+        {
+            return (Key.None, false, false, false);
+        }
+
+        var parts = hotkeyStr.Split('+').Select(p => p.Trim()).ToList();
+        bool ctrl = false;
+        bool alt = false;
+        bool shift = false;
+        Key mainKey = Key.None;
+
+        foreach (var part in parts)
+        {
+            if (part.Equals("Ctrl", StringComparison.OrdinalIgnoreCase) || part.Equals("Control", StringComparison.OrdinalIgnoreCase))
+                ctrl = true;
+            else if (part.Equals("Alt", StringComparison.OrdinalIgnoreCase))
+                alt = true;
+            else if (part.Equals("Shift", StringComparison.OrdinalIgnoreCase))
+                shift = true;
+            else
+            {
+                if (Enum.TryParse<Key>(part, true, out var key))
+                {
+                    mainKey = key;
+                }
+                else
+                {
+                    string sanitized = part.Replace(" ", "");
+                    if (Enum.TryParse<Key>(sanitized, true, out key))
+                    {
+                        mainKey = key;
+                    }
+                }
+            }
+        }
+
+        return (mainKey, ctrl, alt, shift);
+    }
+
+    private bool IsHotkeyTriggered(string hotkeyString, Key pressedKey)
+    {
+        if (string.IsNullOrEmpty(hotkeyString) || hotkeyString.Equals("None", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var (mainKey, ctrl, alt, shift) = ParseHotkey(hotkeyString);
+        if (pressedKey != mainKey) return false;
+
+        bool ctrlDown = _keyHook.MockCtrlPressed || (GetKeyState(0x11) & 0x8000) != 0;
+        bool altDown = _keyHook.MockAltPressed || (GetKeyState(0x12) & 0x8000) != 0;
+        bool shiftDown = _keyHook.MockShiftPressed || (GetKeyState(0x10) & 0x8000) != 0;
+
+        return (ctrl == ctrlDown) && (alt == altDown) && (shift == shiftDown);
+    }
+
+    private bool IsHotkeyMainKey(string hotkeyString, Key pressedKey)
+    {
+        if (string.IsNullOrEmpty(hotkeyString) || hotkeyString.Equals("None", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var (mainKey, _, _, _) = ParseHotkey(hotkeyString);
+        return pressedKey == mainKey;
+    }
+
     // ─── Services ────────────────────────────────────────────────────────────
     public ConfigService Config { get; } = new();
     private readonly OcrService _ocr = new();
@@ -369,93 +438,129 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         // Hotkeys configuration
         _keyHook.KeyEvent += (key, isDown) =>
         {
-            string keyStr = key.ToString();
             var cfg = Config.Config;
 
-            if (cfg.EnableVoiceCommands && keyStr == cfg.VoiceCommandHotkey)
+            if (cfg.EnableVoiceCommands)
             {
-                if (_stt.IsModelReady)
+                if (isDown && IsHotkeyTriggered(cfg.VoiceCommandHotkey, key))
                 {
-                    HandleVoiceCommandHotkey(isDown);
+                    if (_stt.IsModelReady)
+                    {
+                        HandleVoiceCommandHotkey(true);
+                    }
+                    return;
                 }
-                return;
+                else if (!isDown && IsHotkeyMainKey(cfg.VoiceCommandHotkey, key))
+                {
+                    if (_stt.IsModelReady)
+                    {
+                        HandleVoiceCommandHotkey(false);
+                    }
+                    return;
+                }
             }
 
-            if (keyStr == cfg.PttProximityKey)
+            if (isDown)
             {
-                _isPttProximityDown = isDown;
-                UpdatePttState();
+                if (IsHotkeyTriggered(cfg.PttProximityKey, key))
+                {
+                    _isPttProximityDown = true;
+                    UpdatePttState();
+                }
+                else if (IsHotkeyTriggered(cfg.PttRadioKey, key))
+                {
+                    _isPttRadioDown = true;
+                    UpdatePttState();
+                }
+                else if (IsHotkeyTriggered(cfg.PttProfileKey, key))
+                {
+                    _isPttProfileDown = true;
+                    UpdatePttState();
+                }
+                else if (IsHotkeyTriggered(cfg.PttPaKey, key))
+                {
+                    _isPttPaDown = true;
+                    UpdatePttState();
+                }
+                else if (IsHotkeyTriggered(cfg.InitiateHailKey, key))
+                {
+                    InitiateHailCall();
+                }
+                else if (IsHotkeyTriggered(cfg.AcceptHailKey, key))
+                {
+                    AcceptHailCall();
+                }
+                else if (IsHotkeyTriggered(cfg.DeclineHailKey, key))
+                {
+                    DeclineHailCall();
+                }
+                else if (IsHotkeyTriggered(cfg.HelmetToggleKey, key))
+                {
+                    ToggleHelmet();
+                }
+                else if (IsHotkeyTriggered(cfg.RadioCycleKey, key))
+                {
+                    CycleRadioChannel();
+                }
+                else if (IsHotkeyTriggered(cfg.MuteProximityKey, key))
+                {
+                    MicProximityMuted = !MicProximityMuted;
+                    string msgKey = MicProximityMuted ? "MsgMicProximityMuted" : "MsgMicProximityUnmuted";
+                    StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Microphone Proximity: {(MicProximityMuted ? "MUTED" : "UNMUTED")}";
+                }
+                else if (IsHotkeyTriggered(cfg.MuteRadioKey, key))
+                {
+                    MicRadioMuted = !MicRadioMuted;
+                    string msgKey = MicRadioMuted ? "MsgMicRadioMuted" : "MsgMicRadioUnmuted";
+                    StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Microphone Radio: {(MicRadioMuted ? "MUTED" : "UNMUTED")}";
+                }
+                else if (IsHotkeyTriggered(cfg.MuteProfileKey, key))
+                {
+                    MicProfileMuted = !MicProfileMuted;
+                    string msgKey = MicProfileMuted ? "MsgMicProfileMuted" : "MsgMicProfileUnmuted";
+                    StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Microphone Profile: {(MicProfileMuted ? "MUTED" : "UNMUTED")}";
+                }
+                else if (IsHotkeyTriggered(cfg.MuteAudioProximityKey, key))
+                {
+                    AudioProximityMuted = !AudioProximityMuted;
+                    string msgKey = AudioProximityMuted ? "MsgAudioProximityMuted" : "MsgAudioProximityUnmuted";
+                    StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Proximity audio: {(AudioProximityMuted ? "MUTED" : "UNMUTED")}";
+                }
+                else if (IsHotkeyTriggered(cfg.MuteAudioRadioKey, key))
+                {
+                    AudioRadioMuted = !AudioRadioMuted;
+                    string msgKey = AudioRadioMuted ? "MsgAudioRadioMuted" : "MsgAudioRadioUnmuted";
+                    StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Radio audio: {(AudioRadioMuted ? "MUTED" : "UNMUTED")}";
+                }
+                else if (IsHotkeyTriggered(cfg.MuteAudioProfileKey, key))
+                {
+                    AudioProfileMuted = !AudioProfileMuted;
+                    string msgKey = AudioProfileMuted ? "MsgAudioProfileMuted" : "MsgAudioProfileUnmuted";
+                    StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Profile audio: {(AudioProfileMuted ? "MUTED" : "UNMUTED")}";
+                }
             }
-            else if (keyStr == cfg.PttRadioKey)
+            else
             {
-                _isPttRadioDown = isDown;
-                UpdatePttState();
-            }
-            else if (keyStr == cfg.PttProfileKey)
-            {
-                _isPttProfileDown = isDown;
-                UpdatePttState();
-            }
-            else if (keyStr == cfg.PttPaKey)
-            {
-                _isPttPaDown = isDown;
-                UpdatePttState();
-            }
-            else if (keyStr == cfg.InitiateHailKey && isDown)
-            {
-                InitiateHailCall();
-            }
-            else if (keyStr == cfg.AcceptHailKey && isDown)
-            {
-                AcceptHailCall();
-            }
-            else if (keyStr == cfg.DeclineHailKey && isDown)
-            {
-                DeclineHailCall();
-            }
-            else if (keyStr == cfg.HelmetToggleKey && isDown)
-            {
-                ToggleHelmet();
-            }
-            else if (keyStr == cfg.RadioCycleKey && isDown)
-            {
-                CycleRadioChannel();
-            }
-            else if (keyStr == cfg.MuteProximityKey && isDown)
-            {
-                MicProximityMuted = !MicProximityMuted;
-                string msgKey = MicProximityMuted ? "MsgMicProximityMuted" : "MsgMicProximityUnmuted";
-                StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Microphone Proximity: {(MicProximityMuted ? "MUTED" : "UNMUTED")}";
-            }
-            else if (keyStr == cfg.MuteRadioKey && isDown)
-            {
-                MicRadioMuted = !MicRadioMuted;
-                string msgKey = MicRadioMuted ? "MsgMicRadioMuted" : "MsgMicRadioUnmuted";
-                StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Microphone Radio: {(MicRadioMuted ? "MUTED" : "UNMUTED")}";
-            }
-            else if (keyStr == cfg.MuteProfileKey && isDown)
-            {
-                MicProfileMuted = !MicProfileMuted;
-                string msgKey = MicProfileMuted ? "MsgMicProfileMuted" : "MsgMicProfileUnmuted";
-                StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Microphone Profile: {(MicProfileMuted ? "MUTED" : "UNMUTED")}";
-            }
-            else if (keyStr == cfg.MuteAudioProximityKey && isDown)
-            {
-                AudioProximityMuted = !AudioProximityMuted;
-                string msgKey = AudioProximityMuted ? "MsgAudioProximityMuted" : "MsgAudioProximityUnmuted";
-                StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Proximity audio: {(AudioProximityMuted ? "MUTED" : "UNMUTED")}";
-            }
-            else if (keyStr == cfg.MuteAudioRadioKey && isDown)
-            {
-                AudioRadioMuted = !AudioRadioMuted;
-                string msgKey = AudioRadioMuted ? "MsgAudioRadioMuted" : "MsgAudioRadioUnmuted";
-                StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Radio audio: {(AudioRadioMuted ? "MUTED" : "UNMUTED")}";
-            }
-            else if (keyStr == cfg.MuteAudioProfileKey && isDown)
-            {
-                AudioProfileMuted = !AudioProfileMuted;
-                string msgKey = AudioProfileMuted ? "MsgAudioProfileMuted" : "MsgAudioProfileUnmuted";
-                StatusMessage = Application.Current?.TryFindResource(msgKey) as string ?? $"Profile audio: {(AudioProfileMuted ? "MUTED" : "UNMUTED")}";
+                if (IsHotkeyMainKey(cfg.PttProximityKey, key))
+                {
+                    _isPttProximityDown = false;
+                    UpdatePttState();
+                }
+                if (IsHotkeyMainKey(cfg.PttRadioKey, key))
+                {
+                    _isPttRadioDown = false;
+                    UpdatePttState();
+                }
+                if (IsHotkeyMainKey(cfg.PttProfileKey, key))
+                {
+                    _isPttProfileDown = false;
+                    UpdatePttState();
+                }
+                if (IsHotkeyMainKey(cfg.PttPaKey, key))
+                {
+                    _isPttPaDown = false;
+                    UpdatePttState();
+                }
             }
         };
         _keyHook.Install();
@@ -922,29 +1027,51 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _voiceCommand.VisorToggleRequested += () => ToggleHelmet();
         _voiceCommand.ChannelChangeRequested += chan => _ = ChangeRadioChannelAsync(chan);
         _voiceCommand.ShipPowerToggleRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandPowerKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandPowerKey);
         _voiceCommand.ShipDoorsToggleRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandDoorsKey, Config.Config.VoiceCommandDoorsModifier);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandDoorsKey);
         _voiceCommand.ShipShieldsFrontRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandShieldsKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandShieldsKey);
         _voiceCommand.ShipLandingGearToggleRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandLandingGearKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandLandingGearKey);
         _voiceCommand.ShipEnginesToggleRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandEnginesKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandEnginesKey);
         _voiceCommand.ShipWeaponsToggleRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandWeaponsKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandWeaponsKey);
         _voiceCommand.ShipShieldsToggleRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandShieldsToggleKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandShieldsToggleKey);
         _voiceCommand.ShipShieldsResetRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandShieldsResetKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandShieldsResetKey);
         _voiceCommand.ShipVtolToggleRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandVtolKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandVtolKey);
         _voiceCommand.ShipQuantumSpoolRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandQuantumKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandQuantumKey);
         _voiceCommand.ShipCruiseControlRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandCruiseKey);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandCruiseKey);
         _voiceCommand.ShipLandingRequestRequested += () => 
-            InputSimulator.SimulateKeyPress(Config.Config.VoiceCommandLandingRequestKey, Config.Config.VoiceCommandLandingRequestModifier);
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandLandingRequestKey);
+        _voiceCommand.ShipFlyModeRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandFlyModeKey);
+        _voiceCommand.ShipScanModeRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandScanModeKey);
+        _voiceCommand.ShipMiningModeRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandMiningModeKey);
+        _voiceCommand.ShipSalvageModeRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandSalvageModeKey);
+        _voiceCommand.ShipPowerWeaponsRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandPowerWeaponsKey);
+        _voiceCommand.ShipPowerShieldsRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandPowerShieldsKey);
+        _voiceCommand.ShipPowerEnginesRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandPowerEnginesKey);
+        _voiceCommand.ShipPowerResetRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandPowerResetKey);
+        _voiceCommand.ShipDecoyRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandDecoyKey);
+        _voiceCommand.ShipNoiseRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandNoiseKey);
+        _voiceCommand.ShipLightsRequested += () => 
+            InputSimulator.SimulateHotkey(Config.Config.VoiceCommandLightsKey);
         _voiceCommand.VoiceChangerProfileRequested += profile =>
         {
             Config.Config.EnableVoiceChanger = (profile != "None");
@@ -1905,6 +2032,17 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                     VoiceCommandAction.ShipQuantumSpool => "Spool Quantum Drive",
                     VoiceCommandAction.ShipCruiseControl => "Toggle Cruise Control",
                     VoiceCommandAction.ShipLandingRequest => "Request Landing",
+                    VoiceCommandAction.ShipFlyMode => "Flight Mode",
+                    VoiceCommandAction.ShipScanMode => "Scanning Mode",
+                    VoiceCommandAction.ShipMiningMode => "Mining Mode",
+                    VoiceCommandAction.ShipSalvageMode => "Salvage Mode",
+                    VoiceCommandAction.ShipPowerWeapons => "Power Weapons",
+                    VoiceCommandAction.ShipPowerShields => "Power Shields",
+                    VoiceCommandAction.ShipPowerEngines => "Power Engines",
+                    VoiceCommandAction.ShipPowerReset => "Balance Power",
+                    VoiceCommandAction.ShipDecoy => "Launch Decoy",
+                    VoiceCommandAction.ShipNoise => "Launch Noise",
+                    VoiceCommandAction.ShipLights => "Toggle Lights",
                     _ => "Command"
                 };
 

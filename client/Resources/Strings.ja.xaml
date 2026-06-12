@@ -216,6 +216,17 @@
     <sys:String x:Key="LblVoiceQuantumKey">音声: 量子ドライブスプールキー</sys:String>
     <sys:String x:Key="LblVoiceCruiseKey">音声: クルーズコントロール切替キー</sys:String>
     <sys:String x:Key="LblVoiceLandingRequestKey">音声: 着陸要請キー</sys:String>
+    <sys:String x:Key="LblVoiceFlyModeKey">音声: 飛行モード切替キー</sys:String>
+    <sys:String x:Key="LblVoiceScanModeKey">音声: スキャンモード切替キー</sys:String>
+    <sys:String x:Key="LblVoiceMiningModeKey">音声: 採掘モード切替キー</sys:String>
+    <sys:String x:Key="LblVoiceSalvageModeKey">音声: 回収モード切替キー</sys:String>
+    <sys:String x:Key="LblVoicePowerWeaponsKey">音声: 武器電力最大化キー</sys:String>
+    <sys:String x:Key="LblVoicePowerShieldsKey">音声: シールド電力最大化キー</sys:String>
+    <sys:String x:Key="LblVoicePowerEnginesKey">音声: エンジン電力最大化キー</sys:String>
+    <sys:String x:Key="LblVoicePowerResetKey">音声: 電力バランスキー</sys:String>
+    <sys:String x:Key="LblVoiceDecoyKey">音声: デコイ射出キー</sys:String>
+    <sys:String x:Key="LblVoiceNoiseKey">音声: ノイズ射出キー</sys:String>
+    <sys:String x:Key="LblVoiceLightsKey">音声: 船体ライト切替キー</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">音声コマンドの信頼度しきい値</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">警告: オフライン音声コマンドを有効にすると、モデルがまだ存在しない場合、最初の起動時にWhisper文字起こしモデル（~140MB）がダウンロードされます。</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS 聴取中...</sys:String>

@@ -277,6 +277,17 @@ graph TB
     * **Alternar puertas/rampas de la nave:** `puertas`, `exterior`, `abrir puertas`, `cerrar puertas`, `abrir exterior`, `cerrar exterior`
     * **Desviar escudos hacia adelante:** `escudos`, `escudos al frente`, `escudos adelante`, `desviar escudos`
     * **Alternar tren de aterrizaje:** `tren de aterrizaje`, `desplegar tren`, `retraer tren`
+    * **Modo de vuelo (SCM/NAV):** `modo de vuelo`, `modo vuelo`, `modo navegacion`
+    * **Modo escaneo:** `modo de escaneo`, `modo escaneo`, `escaner`, `activar escaner`
+    * **Modo minería:** `modo mineria`, `iniciar mineria`, `mineria`
+    * **Modo desguace:** `modo de desguace`, `modo salvamento`, `desguace`
+    * **Potencia máxima a armas:** `energia a las armas`, `armas al maximo`, `maximo armas`
+    * **Potencia máxima a escudos:** `energia a los escudos`, `escudos al maximo`, `maximo escudos`
+    * **Potencia máxima a motores:** `energia a los motores`, `motores al maximo`, `maximo motores`
+    * **Restablecer/Equilibrar potencia:** `restablecer energia`, `equilibrar energia`, `energia reset`
+    * **Lanzar señuelo/bengala:** `señuelo`, `lanzar señuelo`, `bengala`, `lanzar bengala`
+    * **Lanzar ruido/chaff:** `ruido`, `lanzar ruido`, `chaff`, `lanzar chaff`
+    * **Alternar luces de nave:** `luces`, `faros`, `encender luces`, `apagar luces`
 
 ### 8. 📱 Aplicación complementaria y API REST
 * **Servidor web HTTP local:** Alberga un panel local en un puerto configurable (predeterminado: `8891`, deshabilitado de forma predeterminada).

@@ -1093,30 +1093,64 @@
                                              Style="{StaticResource InputStyle}"
                                              KeyDown="Hotkey_KeyDown"
                                              Margin="0,0,0,10"/>
+
+                                    <!-- Fly Mode Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceFlyModeKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceFlyModeKey"
+                                             Text="{Binding Config.VoiceCommandFlyModeKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Scan Mode Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceScanModeKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceScanModeKey"
+                                             Text="{Binding Config.VoiceCommandScanModeKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Mining Mode Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceMiningModeKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceMiningModeKey"
+                                             Text="{Binding Config.VoiceCommandMiningModeKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Salvage Mode Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceSalvageModeKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceSalvageModeKey"
+                                             Text="{Binding Config.VoiceCommandSalvageModeKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Decoy Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceDecoyKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceDecoyKey"
+                                             Text="{Binding Config.VoiceCommandDecoyKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Noise Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceNoiseKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceNoiseKey"
+                                             Text="{Binding Config.VoiceCommandNoiseKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2">
-
                                     <!-- Doors Key -->
                                     <TextBlock Text="{DynamicResource LblVoiceDoorsKey}" Style="{StaticResource LabelStyle}"/>
-                                    <Grid Margin="0,0,0,10">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="100"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBox x:Name="TxVoiceDoorsKey" Grid.Column="0"
-                                                 Text="{Binding Config.VoiceCommandDoorsKey, UpdateSourceTrigger=PropertyChanged}"
-                                                 Style="{StaticResource InputStyle}"
-                                                 KeyDown="Hotkey_KeyDown"/>
-                                        <ComboBox x:Name="CbVoiceDoorsModifier" Grid.Column="1" Style="{StaticResource ComboStyle}" Margin="8,0,0,0"
-                                                  SelectedValue="{Binding Config.VoiceCommandDoorsModifier, UpdateSourceTrigger=PropertyChanged}"
-                                                  SelectedValuePath="Content">
-                                            <ComboBoxItem Content="None"/>
-                                            <ComboBoxItem Content="Alt"/>
-                                            <ComboBoxItem Content="Ctrl"/>
-                                            <ComboBoxItem Content="Shift"/>
-                                        </ComboBox>
-                                    </Grid>
+                                    <TextBox x:Name="TxVoiceDoorsKey"
+                                             Text="{Binding Config.VoiceCommandDoorsKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
                                     <!-- VTOL Key -->
                                     <TextBlock Text="{DynamicResource LblVoiceVtolKey}" Style="{StaticResource LabelStyle}"/>
@@ -1152,24 +1186,51 @@
 
                                     <!-- Landing Request Key -->
                                     <TextBlock Text="{DynamicResource LblVoiceLandingRequestKey}" Style="{StaticResource LabelStyle}"/>
-                                    <Grid Margin="0,0,0,10">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="100"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBox x:Name="TxVoiceLandingRequestKey" Grid.Column="0"
-                                                 Text="{Binding Config.VoiceCommandLandingRequestKey, UpdateSourceTrigger=PropertyChanged}"
-                                                 Style="{StaticResource InputStyle}"
-                                                 KeyDown="Hotkey_KeyDown"/>
-                                        <ComboBox x:Name="CbVoiceLandingRequestModifier" Grid.Column="1" Style="{StaticResource ComboStyle}" Margin="8,0,0,0"
-                                                  SelectedValue="{Binding Config.VoiceCommandLandingRequestModifier, UpdateSourceTrigger=PropertyChanged}"
-                                                  SelectedValuePath="Content">
-                                            <ComboBoxItem Content="None"/>
-                                            <ComboBoxItem Content="Alt"/>
-                                            <ComboBoxItem Content="Ctrl"/>
-                                            <ComboBoxItem Content="Shift"/>
-                                        </ComboBox>
-                                    </Grid>
+                                    <TextBox x:Name="TxVoiceLandingRequestKey"
+                                             Text="{Binding Config.VoiceCommandLandingRequestKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Power Weapons Key -->
+                                    <TextBlock Text="{DynamicResource LblVoicePowerWeaponsKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoicePowerWeaponsKey"
+                                             Text="{Binding Config.VoiceCommandPowerWeaponsKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Power Shields Key -->
+                                    <TextBlock Text="{DynamicResource LblVoicePowerShieldsKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoicePowerShieldsKey"
+                                             Text="{Binding Config.VoiceCommandPowerShieldsKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Power Engines Key -->
+                                    <TextBlock Text="{DynamicResource LblVoicePowerEnginesKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoicePowerEnginesKey"
+                                             Text="{Binding Config.VoiceCommandPowerEnginesKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Power Reset Key -->
+                                    <TextBlock Text="{DynamicResource LblVoicePowerResetKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoicePowerResetKey"
+                                             Text="{Binding Config.VoiceCommandPowerResetKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Lights Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceLightsKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceLightsKey"
+                                             Text="{Binding Config.VoiceCommandLightsKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
                                 </StackPanel>
                             </Grid>
 

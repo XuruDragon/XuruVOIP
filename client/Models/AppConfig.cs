@@ -108,6 +108,17 @@ public class AppConfig
     public string VoiceCommandCruiseKey { get; set; } = "C";
     public string VoiceCommandLandingRequestKey { get; set; } = "N";
     public string VoiceCommandLandingRequestModifier { get; set; } = "Alt";
+    public string VoiceCommandFlyModeKey { get; set; } = "V";
+    public string VoiceCommandScanModeKey { get; set; } = "Tab";
+    public string VoiceCommandMiningModeKey { get; set; } = "M";
+    public string VoiceCommandSalvageModeKey { get; set; } = "M";
+    public string VoiceCommandPowerWeaponsKey { get; set; } = "F7";
+    public string VoiceCommandPowerShieldsKey { get; set; } = "F6";
+    public string VoiceCommandPowerEnginesKey { get; set; } = "F5";
+    public string VoiceCommandPowerResetKey { get; set; } = "F8";
+    public string VoiceCommandDecoyKey { get; set; } = "H";
+    public string VoiceCommandNoiseKey { get; set; } = "J";
+    public string VoiceCommandLightsKey { get; set; } = "L";
 
     // --- Discord RPC ---
     public bool EnableDiscordRpc { get; set; } = true;

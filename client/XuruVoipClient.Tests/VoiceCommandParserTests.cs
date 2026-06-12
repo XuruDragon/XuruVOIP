@@ -300,4 +300,88 @@ public class VoiceCommandParserTests
         Assert.True(eventFired);
         Assert.Equal(VoiceCommandAction.ShipLandingRequest, result.Action);
     }
+
+    [Fact]
+    public void ParseAndExecute_FlyScanMiningSalvage_ShouldTriggerEvents()
+    {
+        var service = new VoiceCommandService();
+        
+        bool flyFired = false;
+        service.ShipFlyModeRequested += () => flyFired = true;
+        var r1 = service.ParseAndExecute("flight mode", "en", new List<string>(), 0.5);
+        Assert.True(flyFired);
+        Assert.Equal(VoiceCommandAction.ShipFlyMode, r1.Action);
+
+        bool scanFired = false;
+        service.ShipScanModeRequested += () => scanFired = true;
+        var r2 = service.ParseAndExecute("scan mode", "en", new List<string>(), 0.5);
+        Assert.True(scanFired);
+        Assert.Equal(VoiceCommandAction.ShipScanMode, r2.Action);
+
+        bool miningFired = false;
+        service.ShipMiningModeRequested += () => miningFired = true;
+        var r3 = service.ParseAndExecute("start mining", "en", new List<string>(), 0.5);
+        Assert.True(miningFired);
+        Assert.Equal(VoiceCommandAction.ShipMiningMode, r3.Action);
+
+        bool salvageFired = false;
+        service.ShipSalvageModeRequested += () => salvageFired = true;
+        var r4 = service.ParseAndExecute("salvage mode", "en", new List<string>(), 0.5);
+        Assert.True(salvageFired);
+        Assert.Equal(VoiceCommandAction.ShipSalvageMode, r4.Action);
+    }
+
+    [Fact]
+    public void ParseAndExecute_PowerTriangle_ShouldTriggerEvents()
+    {
+        var service = new VoiceCommandService();
+
+        bool weaponsFired = false;
+        service.ShipPowerWeaponsRequested += () => weaponsFired = true;
+        var r1 = service.ParseAndExecute("max weapons", "en", new List<string>(), 0.5);
+        Assert.True(weaponsFired);
+        Assert.Equal(VoiceCommandAction.ShipPowerWeapons, r1.Action);
+
+        bool shieldsFired = false;
+        service.ShipPowerShieldsRequested += () => shieldsFired = true;
+        var r2 = service.ParseAndExecute("power shields", "en", new List<string>(), 0.5);
+        Assert.True(shieldsFired);
+        Assert.Equal(VoiceCommandAction.ShipPowerShields, r2.Action);
+
+        bool enginesFired = false;
+        service.ShipPowerEnginesRequested += () => enginesFired = true;
+        var r3 = service.ParseAndExecute("max engines", "en", new List<string>(), 0.5);
+        Assert.True(enginesFired);
+        Assert.Equal(VoiceCommandAction.ShipPowerEngines, r3.Action);
+
+        bool resetFired = false;
+        service.ShipPowerResetRequested += () => resetFired = true;
+        var r4 = service.ParseAndExecute("reset power", "en", new List<string>(), 0.5);
+        Assert.True(resetFired);
+        Assert.Equal(VoiceCommandAction.ShipPowerReset, r4.Action);
+    }
+
+    [Fact]
+    public void ParseAndExecute_DecoyNoiseLights_ShouldTriggerEvents()
+    {
+        var service = new VoiceCommandService();
+
+        bool decoyFired = false;
+        service.ShipDecoyRequested += () => decoyFired = true;
+        var r1 = service.ParseAndExecute("launch decoy", "en", new List<string>(), 0.5);
+        Assert.True(decoyFired);
+        Assert.Equal(VoiceCommandAction.ShipDecoy, r1.Action);
+
+        bool noiseFired = false;
+        service.ShipNoiseRequested += () => noiseFired = true;
+        var r2 = service.ParseAndExecute("launch noise", "en", new List<string>(), 0.5);
+        Assert.True(noiseFired);
+        Assert.Equal(VoiceCommandAction.ShipNoise, r2.Action);
+
+        bool lightsFired = false;
+        service.ShipLightsRequested += () => lightsFired = true;
+        var r3 = service.ParseAndExecute("lights on", "en", new List<string>(), 0.5);
+        Assert.True(lightsFired);
+        Assert.Equal(VoiceCommandAction.ShipLights, r3.Action);
+    }
 }

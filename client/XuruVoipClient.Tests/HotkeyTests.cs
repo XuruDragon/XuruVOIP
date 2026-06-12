@@ -205,4 +205,37 @@ public class HotkeyTests
         vm.KeyHook.SimulateKeyEvent(Key.X, true);
         Assert.Equal("Ending call...", vm.StatusMessage);
     }
+
+    [StaFact]
+    public async Task Hotkey_WithModifiers_ShouldTriggerOnlyWithModifiersActive()
+    {
+        // GIVEN
+        await using var vm = new MainViewModel();
+        vm.Config.Config.HelmetToggleKey = "Ctrl + Alt + H";
+        var initialState = vm.IsHelmetOn;
+
+        // WHEN: We press H without modifiers
+        vm.KeyHook.MockCtrlPressed = false;
+        vm.KeyHook.MockAltPressed = false;
+        vm.KeyHook.SimulateKeyEvent(Key.H, true);
+
+        // THEN: Helmet state should NOT toggle
+        Assert.Equal(initialState, vm.IsHelmetOn);
+
+        // WHEN: We press H with only Ctrl
+        vm.KeyHook.MockCtrlPressed = true;
+        vm.KeyHook.MockAltPressed = false;
+        vm.KeyHook.SimulateKeyEvent(Key.H, true);
+
+        // THEN: Helmet state should NOT toggle
+        Assert.Equal(initialState, vm.IsHelmetOn);
+
+        // WHEN: We press H with Ctrl + Alt
+        vm.KeyHook.MockCtrlPressed = true;
+        vm.KeyHook.MockAltPressed = true;
+        vm.KeyHook.SimulateKeyEvent(Key.H, true);
+
+        // THEN: Helmet state SHOULD toggle
+        Assert.NotEqual(initialState, vm.IsHelmetOn);
+    }
 }

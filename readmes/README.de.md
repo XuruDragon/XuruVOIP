@@ -279,6 +279,17 @@ graph TB
     * **Schiffstüren/-rampen umschalten:** `tueren`, `tueren oeffnen`, `tueren schliessen`, `aussen oeffnen`, `aussen schliessen`
     * **Schilde nach vorne umleiten:** `schilde`, `schilde vorne`, `schilde vorwaerts`, `schilde umleiten`
     * **Fahrwerk umschalten:** `fahrwerk`, `fahrwerk ausfahren`, `fahrwerk einfahren`
+    * **Flugmodus (SCM/NAV):** `flugmodus`, `navigationsmodus`, `nav modus`
+    * **Scanmodus:** `scanmodus`, `scanner aktivieren`, `scan modus`
+    * **Bergbaumodus:** `bergbaumodus`, `minenmodus`, `mining`
+    * **Bergungsmodus:** `bergungsmodus`, `recyclingmodus`, `salvage`
+    * **Max Energie Waffen:** `energie waffen`, `max waffen`, `volle waffen`, `energie auf waffen`
+    * **Max Energie Schilde:** `energie schilde`, `max schilde`, `volle schilde`, `energie auf schilde`
+    * **Max Energie Triebwerke:** `energie motoren`, `max motoren`, `volle motoren`, `energie auf triebwerke`
+    * **Energie Ausgleichen:** `energie zuruecksetzen`, `energie ausgleichen`, `energie reset`
+    * **Täuschkörper Werfen:** `taeuschkoerper`, `taeuschkoerper abfeuern`, `flare`
+    * **Rauschen Auswerfen:** `chaff`, `chaff abfeuern`, `rauschen`
+    * **Schiffscheinwerfer umschalten:** `licht`, `scheinwerfer`, `licht an`, `licht aus`
 
 ### 8. 📱 Begleit-App und REST-API
 * **Lokaler HTTP-Webserver:** Hostet ein lokales Dashboard auf einem konfigurierbaren Port (Standard: „8891“, standardmäßig deaktiviert).

@@ -216,6 +216,17 @@
     <sys:String x:Key="LblVoiceQuantumKey">Voice: Spool Quantum Drive Key</sys:String>
     <sys:String x:Key="LblVoiceCruiseKey">Voice: Toggle Cruise Control Key</sys:String>
     <sys:String x:Key="LblVoiceLandingRequestKey">Voice: Request Landing Key</sys:String>
+    <sys:String x:Key="LblVoiceFlyModeKey">Voice: Flight Mode Key</sys:String>
+    <sys:String x:Key="LblVoiceScanModeKey">Voice: Scanning Mode Key</sys:String>
+    <sys:String x:Key="LblVoiceMiningModeKey">Voice: Mining Mode Key</sys:String>
+    <sys:String x:Key="LblVoiceSalvageModeKey">Voice: Salvage Mode Key</sys:String>
+    <sys:String x:Key="LblVoicePowerWeaponsKey">Voice: Max Power to Weapons Key</sys:String>
+    <sys:String x:Key="LblVoicePowerShieldsKey">Voice: Max Power to Shields Key</sys:String>
+    <sys:String x:Key="LblVoicePowerEnginesKey">Voice: Max Power to Engines Key</sys:String>
+    <sys:String x:Key="LblVoicePowerResetKey">Voice: Reset/Balance Power Key</sys:String>
+    <sys:String x:Key="LblVoiceDecoyKey">Voice: Launch Flare/Decoy Key</sys:String>
+    <sys:String x:Key="LblVoiceNoiseKey">Voice: Launch Chaff/Noise Key</sys:String>
+    <sys:String x:Key="LblVoiceLightsKey">Voice: Toggle Ship Lights Key</sys:String>
     <sys:String x:Key="LblVoiceCommandConfidence">Voice Command Confidence Threshold</sys:String>
     <sys:String x:Key="LblVoiceCommandWarning">WARNING: Enabling Offline Voice Commands will download the Whisper transcription model (~140MB) on first activation if not already present on your machine.</sys:String>
     <sys:String x:Key="TxtVoiceListening">🎙️ AEGIS LISTENING...</sys:String>

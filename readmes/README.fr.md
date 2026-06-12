@@ -279,6 +279,17 @@ graph TB
     * **Basculer les portes/rampes du vaisseau :** `portes`, `exterieur`, `ouvrir portes`, `fermer portes`, `ouvrir exterieur`, `fermer exterieur`, `basculer portes`
     * **Dévier les boucliers vers l'avant :** `boucliers`, `boucliers avant`, `devier boucliers`, `boucliers devant`
     * **Basculer le train d'atterrissage :** `train d'atterrissage`, `deployer train`, `rentrer train`, `train atterrissage`
+    * **Mode de Vol (SCM/NAV) :** `mode de vol`, `mode vol`, `navigation`, `mode navigation`
+    * **Mode Scan :** `mode scan`, `mode scanneur`, `scanneur`, `activer le scanneur`
+    * **Mode Minage :** `mode minage`, `activer minage`, `commencer le minage`, `minage`
+    * **Mode Recyclage :** `mode recyclage`, `mode salvage`, `commencer le recyclage`, `recyclage`
+    * **Puissance Max Armes :** `puissance armes`, `max armes`, `armes au maximum`, `energie aux armes`
+    * **Puissance Max Boucliers :** `puissance boucliers`, `max boucliers`, `boucliers au maximum`, `energie aux boucliers`
+    * **Puissance Max Moteurs :** `puissance moteurs`, `max moteurs`, `moteurs au maximum`, `energie aux moteurs`
+    * **Équilibrer l'Énergie :** `reinitialiser puissance`, `equilibrer puissance`, `energie equilibree`
+    * **Lancer Leurre :** `leurre`, `lancer leurre`, `lancer un leurre`
+    * **Lancer Brouillage (Paillettes) :** `brouillage`, `lancer brouillage`, `paillettes`, `lancer paillettes`
+    * **Basculer les phares :** `phares`, `lumiere`, `allumer phares`, `eteindre phares`, `lumiere vaisseau`
 
 ### 8. 📱 Application compagnon et API REST
 * **Serveur Web HTTP local :** Héberge un tableau de bord local sur un port configurable (par défaut : `8891`, désactivé par défaut).

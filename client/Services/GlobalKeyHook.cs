@@ -35,6 +35,10 @@ public sealed class GlobalKeyHook : IDisposable
     public event Action<Key, bool>? KeyEvent; // (key, isDown)
     public Key PttKey { get; set; } = Key.CapsLock;
 
+    public bool MockCtrlPressed { get; set; }
+    public bool MockAltPressed { get; set; }
+    public bool MockShiftPressed { get; set; }
+
     public void SimulateKeyEvent(Key key, bool isDown)
     {
         KeyEvent?.Invoke(key, isDown);

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -89,6 +90,57 @@ public static class InputSimulator
         {
             Thread.Sleep(15);
             keybd_event(mod, 0, KEYEVENTF_KEYUP, 0);
+        }
+    }
+
+    /// <summary>
+    /// Simulates pressing a combination of keys with modifiers, e.g., "Ctrl + Alt + N".
+    /// </summary>
+    public static void SimulateHotkey(string hotkeyStr)
+    {
+        if (string.IsNullOrWhiteSpace(hotkeyStr) || hotkeyStr.Equals("None", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        var parts = hotkeyStr.Split('+').Select(p => p.Trim().ToUpperInvariant()).ToList();
+        byte mainVk = 0;
+        var modifiers = new System.Collections.Generic.List<byte>();
+
+        foreach (var part in parts)
+        {
+            if (part == "CTRL" || part == "CONTROL")
+                modifiers.Add(0x11);
+            else if (part == "ALT")
+                modifiers.Add(0x12);
+            else if (part == "SHIFT")
+                modifiers.Add(0x10);
+            else
+            {
+                byte vk = GetVirtualKey(part);
+                if (vk != 0) mainVk = vk;
+            }
+        }
+
+        if (mainVk == 0) return;
+
+        // Press modifiers
+        foreach (var mod in modifiers)
+        {
+            keybd_event(mod, 0, 0, 0);
+            Thread.Sleep(15);
+        }
+
+        // Press main key
+        keybd_event(mainVk, 0, 0, 0);
+        Thread.Sleep(50);
+
+        // Release main key
+        keybd_event(mainVk, 0, KEYEVENTF_KEYUP, 0);
+
+        // Release modifiers in reverse order
+        for (int i = modifiers.Count - 1; i >= 0; i--)
+        {
+            Thread.Sleep(15);
+            keybd_event(modifiers[i], 0, KEYEVENTF_KEYUP, 0);
         }
     }
 }
