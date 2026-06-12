@@ -392,10 +392,34 @@ public partial class SettingsWindow : Window
     private void Hotkey_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         e.Handled = true;
-        var keyName = e.Key == Key.System ? e.SystemKey.ToString() : e.Key.ToString();
+        var key = e.Key == Key.System ? e.SystemKey : e.Key;
+
+        // If it is just a modifier key, don't record it yet (wait for the actual key)
+        if (key == Key.LeftCtrl || key == Key.RightCtrl ||
+            key == Key.LeftAlt || key == Key.RightAlt ||
+            key == Key.LeftShift || key == Key.RightShift ||
+            key == Key.LWin || key == Key.RWin)
+        {
+            return;
+        }
+
+        var modifierKeys = e.KeyboardDevice.Modifiers;
+        var parts = new System.Collections.Generic.List<string>();
+
+        if (modifierKeys.HasFlag(ModifierKeys.Control))
+            parts.Add("Ctrl");
+        if (modifierKeys.HasFlag(ModifierKeys.Alt))
+            parts.Add("Alt");
+        if (modifierKeys.HasFlag(ModifierKeys.Shift))
+            parts.Add("Shift");
+
+        parts.Add(key.ToString());
+
+        string hotkeyStr = string.Join(" + ", parts);
+
         if (sender is System.Windows.Controls.TextBox tb)
         {
-            tb.Text = keyName;
+            tb.Text = hotkeyStr;
             var binding = tb.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty);
             binding?.UpdateSource();
         }

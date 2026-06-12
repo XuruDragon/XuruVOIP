@@ -203,6 +203,8 @@ function Get-XLBase($rolePilot, $roleInfantry) {
     $keys["15"] = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-translation"; Settings = @{ port = $port } }
     $keys["16"] = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-hrtf"; Settings = @{ port = $port } }
     $keys["17"] = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-spectrogram"; Settings = @{ port = $port } }
+    $keys["25"] = @{ UUID = "com.xurudragon.xuruvoip.action.toggle-voice-commands"; Settings = @{ port = $port } }
+    $keys["26"] = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-theme"; Settings = @{ port = $port } }
     
     return $keys
 }
@@ -252,6 +254,7 @@ $plusPilot = @{
     "8" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio-dial"; Settings = @{ port = $port } }
     "9" = @{ UUID = "com.xurudragon.xuruvoip.action.adjust-exertion"; Settings = @{ port = $port } }
     "10" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-changer-dial"; Settings = @{ port = $port } }
+    "11" = @{ UUID = "com.xurudragon.xuruvoip.action.theme-dial"; Settings = @{ port = $port } }
 }
 $plusInfantry = @{
     "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
@@ -266,6 +269,7 @@ $plusInfantry = @{
     "8" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio-dial"; Settings = @{ port = $port } }
     "9" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-changer-dial"; Settings = @{ port = $port } }
     "10" = @{ UUID = "com.xurudragon.xuruvoip.action.adjust-exertion"; Settings = @{ port = $port } }
+    "11" = @{ UUID = "com.xurudragon.xuruvoip.action.theme-dial"; Settings = @{ port = $port } }
 }
 $plusCaptain = @{
     "0" = @{ UUID = "com.xurudragon.xuruvoip.action.proximity-mute"; Settings = @{ port = $port } }
@@ -280,6 +284,7 @@ $plusCaptain = @{
     "8" = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio-dial"; Settings = @{ port = $port } }
     "9" = @{ UUID = "com.xurudragon.xuruvoip.action.adjust-exertion"; Settings = @{ port = $port } }
     "10" = @{ UUID = "com.xurudragon.xuruvoip.action.voice-changer-dial"; Settings = @{ port = $port } }
+    "11" = @{ UUID = "com.xurudragon.xuruvoip.action.theme-dial"; Settings = @{ port = $port } }
 }
 
 Write-ProfileManifest "plus" "pilot" "XuruVOIP Pilot - Plus" 7 $plusPilot
@@ -298,6 +303,7 @@ function Get-PlusXLBase($keysMap) {
     $keys["36"] = @{ UUID = "com.xurudragon.xuruvoip.action.cycle-radio-dial"; Settings = @{ port = $port } }
     $keys["37"] = @{ UUID = "com.xurudragon.xuruvoip.action.adjust-exertion"; Settings = @{ port = $port } }
     $keys["38"] = @{ UUID = "com.xurudragon.xuruvoip.action.voice-changer-dial"; Settings = @{ port = $port } }
+    $keys["39"] = @{ UUID = "com.xurudragon.xuruvoip.action.theme-dial"; Settings = @{ port = $port } }
     return $keys
 }
 

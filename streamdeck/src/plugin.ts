@@ -107,6 +107,17 @@ async function updateStreamDeckStates(port: number, status: any) {
           indicatorVal = Math.round((profIdx / (profiles.length - 1)) * 100);
           break;
         }
+        case "com.xurudragon.xuruvoip.action.theme-dial": {
+          const themes = ["Aegis", "Anvil", "Drake", "RSI", "Origin"];
+          const curTheme = status.hudTheme || "RSI";
+          let themeIdx = themes.indexOf(curTheme);
+          if (themeIdx === -1) themeIdx = 3;
+          
+          titleStr = "HUD Theme";
+          valueStr = curTheme;
+          indicatorVal = Math.round((themeIdx / (themes.length - 1)) * 100);
+          break;
+        }
       }
 
       if (titleStr) {
@@ -225,6 +236,14 @@ async function updateStreamDeckStates(port: number, status: any) {
       case "com.xurudragon.xuruvoip.action.toggle-spectrogram":
         state = status.enableVisorSpectrogram ? 1 : 0;
         title = status.enableVisorSpectrogram ? "HUD SPEC\nON" : "HUD SPEC\nOFF";
+        break;
+      case "com.xurudragon.xuruvoip.action.toggle-voice-commands":
+        state = status.voiceCommandsEnabled ? 1 : 0;
+        title = status.voiceCommandsEnabled ? "VOICE\nON" : "VOICE\nOFF";
+        break;
+      case "com.xurudragon.xuruvoip.action.cycle-theme":
+        state = 0;
+        title = `THEME:\n${status.hudTheme || "RSI"}`;
         break;
     }
 
@@ -402,6 +421,50 @@ export class ToggleSpectrogramAction extends SingletonAction {
   }
 }
 
+@action({ UUID: "com.xurudragon.xuruvoip.action.toggle-voice-commands" })
+export class ToggleVoiceCommandsAction extends SingletonAction {
+  async onKeyDown(ev: KeyDownEvent): Promise<void> {
+    const settings = await ev.action.getSettings<{ port?: number }>();
+    await postAction(settings.port || 8891, "toggle_voice_commands", {}, ev.action);
+  }
+}
+
+@action({ UUID: "com.xurudragon.xuruvoip.action.cycle-theme" })
+export class CycleThemeAction extends SingletonAction {
+  async onKeyDown(ev: KeyDownEvent): Promise<void> {
+    const settings = await ev.action.getSettings<{ port?: number }>();
+    await postAction(settings.port || 8891, "cycle_hud_theme", {}, ev.action);
+  }
+}
+
+@action({ UUID: "com.xurudragon.xuruvoip.action.theme-dial" })
+export class ThemeDialAction extends SingletonAction {
+  async onDialRotate(ev: DialRotateEvent): Promise<void> {
+    const settings = await ev.action.getSettings<{ port?: number }>();
+    const port = settings.port || 8891;
+    const status = latestStatusByPort[port] || {};
+    const themes = ["Aegis", "Anvil", "Drake", "RSI", "Origin"];
+    const curTheme = status.hudTheme || "RSI";
+    let idx = themes.indexOf(curTheme);
+    if (idx === -1) idx = 3;
+    
+    idx = (idx + ev.payload.ticks) % themes.length;
+    if (idx < 0) idx += themes.length;
+
+    await postAction(port, "set_hud_theme", { theme: themes[idx] }, ev.action);
+  }
+
+  async onDialDown(ev: DialDownEvent): Promise<void> {
+    const settings = await ev.action.getSettings<{ port?: number }>();
+    await postAction(settings.port || 8891, "cycle_hud_theme", {}, ev.action);
+  }
+
+  async onTouchTap(ev: TouchTapEvent): Promise<void> {
+    const settings = await ev.action.getSettings<{ port?: number }>();
+    await postAction(settings.port || 8891, "cycle_hud_theme", {}, ev.action);
+  }
+}
+
 // ENCODERS (Dials)
 @action({ UUID: "com.xurudragon.xuruvoip.action.cycle-radio-dial" })
 export class CycleRadioDialAction extends SingletonAction {
@@ -520,6 +583,9 @@ streamDeck.actions.registerAction(new HailDeclineAction());
 streamDeck.actions.registerAction(new ToggleTranslationAction());
 streamDeck.actions.registerAction(new ToggleHrtfAction());
 streamDeck.actions.registerAction(new ToggleSpectrogramAction());
+streamDeck.actions.registerAction(new ToggleVoiceCommandsAction());
+streamDeck.actions.registerAction(new CycleThemeAction());
+streamDeck.actions.registerAction(new ThemeDialAction());
 
 // Initialize plugin and start polling
 async function main() {

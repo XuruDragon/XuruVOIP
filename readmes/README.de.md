@@ -268,9 +268,39 @@ graph TB
     #### Simulierte Schiffssteuerungen (Star Citizen-bezogen)
     Diese Befehle simulieren physische Tastendrücke auf Ihrem PC, um Star Citizen-Steuerungen auszulösen:
     * **Schiffsenergie umschalten:** `energie`, `energie umschalten`, `systeme an`, `systeme aus`, `strom an`, `strom aus`
+    * **Schiffstriebwerke umschalten:** `triebwerke`, `triebwerke umschalten`, `triebwerke an`, `triebwerke aus`
+    * **Waffen umschalten:** `waffen`, `waffen umschalten`, `waffen an`, `waffen aus`
+    * **Schilde umschalten (ON/OFF):** `schilde umschalten`, `schilde`
+    * **Schilde ausgleichen:** `schilde zuruecksetzen`, `schilde ausgleichen`
+    * **VTOL-Modus umschalten:** `vtol`, `vtol umschalten`
+    * **Quantenantrieb aktivieren (Quantum):** `quantum`, `quantenantrieb`, `quantenantrieb spulen`, `quantum spool`
+    * **Tempomat umschalten (Cruise Control):** `tempomat`, `tempomat umschalten`, `cruise control`
+    * **Landung anfordern / Hangar öffnen:** `landing anfordern`, `landung anfordern`, `hangar oeffnen`, `atc rufen`
     * **Schiffstüren/-rampen umschalten:** `tueren`, `tueren oeffnen`, `tueren schliessen`, `aussen oeffnen`, `aussen schliessen`
     * **Schilde nach vorne umleiten:** `schilde`, `schilde vorne`, `schilde vorwaerts`, `schilde umleiten`
     * **Fahrwerk umschalten:** `fahrwerk`, `fahrwerk ausfahren`, `fahrwerk einfahren`
+    * **Flugmodus (SCM/NAV):** `flugmodus`, `navigationsmodus`, `nav modus`
+    * **Scanmodus:** `scanmodus`, `scanner aktivieren`, `scan modus`
+    * **Bergbaumodus:** `bergbaumodus`, `minenmodus`, `mining`
+    * **Bergungsmodus:** `bergungsmodus`, `recyclingmodus`, `salvage`
+    * **Max Energie Waffen:** `energie waffen`, `max waffen`, `volle waffen`, `energie auf waffen`
+    * **Max Energie Schilde:** `energie schilde`, `max schilde`, `volle schilde`, `energie auf schilde`
+    * **Max Energie Triebwerke:** `energie motoren`, `max motoren`, `volle motoren`, `energie auf triebwerke`
+    * **Energie Ausgleichen:** `energie zuruecksetzen`, `energie ausgleichen`, `energie reset`
+    * **Täuschkörper Werfen:** `taeuschkoerper`, `taeuschkoerper abfeuern`, `flare`
+    * **Rauschen Auswerfen:** `chaff`, `chaff abfeuern`, `rauschen`
+    * **Schiffscheinwerfer umschalten:** `licht`, `scheinwerfer`, `licht an`, `licht aus`
+    * **Nächsten Feind anvisieren:** `feind anvisieren`, `naechster feind`, `feind aufschalten`
+    * **Subsysteme durchwechseln:** `subsysteme durchwechseln`, `subsystem anvisieren`, `triebwerke anvisieren`, `schilde anvisieren`
+    * **Gimbal-Modus umschalten:** `gimbal modus`, `gimbal umschalten`, `gimbal`
+    * **Ziel anpinnen:** `ziel anpinnen`, `ziel speichern`
+    * **Entkoppelten Modus umschalten:** `entkoppelter modus`, `kopplung aufheben`, `entkoppeln`
+    * **G-Safe umschalten:** `gsafe`, `g safe`, `gsafe umschalten`
+    * **Geschwindigkeitsbegrenzer umschalten:** `geschwindigkeitsbegrenzer`, `tempobegrenzer`
+    * **Täuschkörper-Anzahl erhöhen:** `taeuschkoerper anzahl erhoehen`, `mehr taeuschkoerper`
+    * **Täuschkörper zurücksetzen:** `taeuschkoerper zuruecksetzen`
+    * **Visier wischen:** `visier wischen`, `visier reinigen`
+    * **Ziel rufen:** `ziel rufen`, `schiff rufen`
 
 ### 8. 📱 Begleit-App und REST-API
 * **Lokaler HTTP-Webserver:** Hostet ein lokales Dashboard auf einem konfigurierbaren Port (Standard: „8891“, standardmäßig deaktiviert).

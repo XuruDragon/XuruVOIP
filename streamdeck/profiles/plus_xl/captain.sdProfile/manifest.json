@@ -1,13 +1,21 @@
 {
+  "Name": "XuruVOIP Captain - Plus XL",
   "DeviceModel": "XuruVOIP_plus_xl",
+  "Version": "1.0.0",
   "Rooms": {
     "0": {
       "Keys": {
-        "0,4": {
+        "7,2": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.cycle-radio-dial"
+          "Action": "com.xurudragon.xuruvoip.action.toggle-voice-commands"
+        },
+        "3,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.toggle-helmet"
         },
         "7,0": {
           "Settings": {
@@ -15,99 +23,11 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.intercom-status"
         },
-        "6,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.toggle-translation"
-        },
-        "1,2": {
-          "Settings": {
-            "command": "status check",
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.voice-command"
-        },
-        "4,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.hail-accept"
-        },
-        "1,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.radio-mute"
-        },
         "6,0": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.beacon-repeater"
-        },
-        "8,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.location-telemetry"
-        },
-        "3,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.hail-initiate"
-        },
-        "4,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.cycle-radio"
-        },
-        "1,3": {
-          "Settings": {
-            "command": "simulate power loss",
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.voice-command"
-        },
-        "0,3": {
-          "Settings": {
-            "command": "simulate shield hit",
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.voice-command"
-        },
-        "5,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.pa-broadcast"
-        },
-        "0,2": {
-          "Settings": {
-            "command": "power up shields",
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.voice-command"
-        },
-        "1,4": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.adjust-exertion"
-        },
-        "5,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.hail-decline"
-        },
-        "2,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.profile-mute"
         },
         "8,1": {
           "Settings": {
@@ -115,16 +35,46 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.toggle-spectrogram"
         },
+        "0,4": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.cycle-radio-dial"
+        },
+        "8,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.location-telemetry"
+        },
+        "2,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.audio-profile-mute"
+        },
+        "8,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.cycle-theme"
+        },
+        "6,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.toggle-translation"
+        },
         "0,1": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.audio-proximity-mute"
         },
-        "2,3": {
+        "0,3": {
           "Settings": {
-            "command": "simulate quantum spool",
-            "port": 8891
+            "port": 8891,
+            "command": "simulate shield hit"
           },
           "Action": "com.xurudragon.xuruvoip.action.voice-command"
         },
@@ -134,17 +84,11 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.toggle-hrtf"
         },
-        "0,0": {
+        "4,1": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
-        },
-        "2,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.audio-profile-mute"
+          "Action": "com.xurudragon.xuruvoip.action.hail-accept"
         },
         "2,4": {
           "Settings": {
@@ -158,16 +102,90 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.audio-radio-mute"
         },
-        "3,0": {
+        "2,3": {
+          "Settings": {
+            "port": 8891,
+            "command": "simulate quantum spool"
+          },
+          "Action": "com.xurudragon.xuruvoip.action.voice-command"
+        },
+        "5,1": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.toggle-helmet"
+          "Action": "com.xurudragon.xuruvoip.action.hail-decline"
+        },
+        "5,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.pa-broadcast"
+        },
+        "1,4": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.adjust-exertion"
+        },
+        "1,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.radio-mute"
+        },
+        "0,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
+        },
+        "3,4": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.theme-dial"
+        },
+        "1,3": {
+          "Settings": {
+            "port": 8891,
+            "command": "simulate power loss"
+          },
+          "Action": "com.xurudragon.xuruvoip.action.voice-command"
+        },
+        "4,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.cycle-radio"
+        },
+        "2,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.profile-mute"
+        },
+        "0,2": {
+          "Settings": {
+            "port": 8891,
+            "command": "power up shields"
+          },
+          "Action": "com.xurudragon.xuruvoip.action.voice-command"
+        },
+        "3,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.hail-initiate"
+        },
+        "1,2": {
+          "Settings": {
+            "port": 8891,
+            "command": "status check"
+          },
+          "Action": "com.xurudragon.xuruvoip.action.voice-command"
         }
       }
     }
   },
-  "DeviceType": 2,
-  "Name": "XuruVOIP Captain - Plus XL",
-  "Version": "1.0.0"
+  "DeviceType": 2
 }

@@ -266,9 +266,39 @@ graph TB
     #### Controles simulados de la nave (Relacionados con Star Citizen)
     Estos comandos simulan pulsaciones de teclas físicas en su PC para activar controles de Star Citizen:
     * **Alternar energía de la nave:** `energia`, `alternar energia`, `sistemas encendidos`, `sistemas apagados`
+    * **Alternar motores de la nave:** `motores`, `alternar motores`, `motores encender`, `motores apagar`
+    * **Alternar armas:** `armas`, `alternar armas`, `activar armas`, `desactivar armas`
+    * **Alternar escudos:** `alternar escudos`
+    * **Equilibrar/Restablecer escudos:** `restablecer escudos`, `equilibrar escudos`
+    * **Alternar modo VTOL:** `vtol`, `alternar vtol`
+    * **Activar motor cuántico (Quantum):** `cuántico`, `motor cuántico`, `viaje cuántico`
+    * **Alternar control de crucero (Cruise Control):** `crucero`, `control de crucero`, `alternar crucero`
+    * **Solicitar aterrizaje / Abrir hangar:** `solicitar aterrizaje`, `pedir aterrizaje`, `abrir hangar`, `llamar atc`
     * **Alternar puertas/rampas de la nave:** `puertas`, `exterior`, `abrir puertas`, `cerrar puertas`, `abrir exterior`, `cerrar exterior`
     * **Desviar escudos hacia adelante:** `escudos`, `escudos al frente`, `escudos adelante`, `desviar escudos`
     * **Alternar tren de aterrizaje:** `tren de aterrizaje`, `desplegar tren`, `retraer tren`
+    * **Modo de vuelo (SCM/NAV):** `modo de vuelo`, `modo vuelo`, `modo navegacion`
+    * **Modo escaneo:** `modo de escaneo`, `modo escaneo`, `escaner`, `activar escaner`
+    * **Modo minería:** `modo mineria`, `iniciar mineria`, `mineria`
+    * **Modo desguace:** `modo de desguace`, `modo salvamento`, `desguace`
+    * **Potencia máxima a armas:** `energia a las armas`, `armas al maximo`, `maximo armas`
+    * **Potencia máxima a escudos:** `energia a los escudos`, `escudos al maximo`, `maximo escudos`
+    * **Potencia máxima a motores:** `energia a los motores`, `motores al maximo`, `maximo motores`
+    * **Restablecer/Equilibrar potencia:** `restablecer energia`, `equilibrar energia`, `energia reset`
+    * **Lanzar señuelo/bengala:** `señuelo`, `lanzar señuelo`, `bengala`, `lanzar bengala`
+    * **Lanzar ruido/chaff:** `ruido`, `lanzar ruido`, `chaff`, `lanzar chaff`
+    * **Alternar luces de nave:** `luces`, `faros`, `encender luces`, `apagar luces`
+    * **Enemigo más cercano:** `fijar enemigo`, `enemigo mas cercano`, `bloquear enemigo`
+    * **Ciclar subsistemas:** `ciclar subsistemas`, `cibler subsistema`, `apuntar motores`, `apuntar escudos`
+    * **Alternar modo cardán:** `modo cardan`, `alternar cardan`, `gimbal`
+    * **Fijar blanco:** `fijar blanco`, `guardar blanco`
+    * **Modo desacoplado:** `modo desacoplado`, `desacoplar`
+    * **Alternar G-Safe:** `seguridad g`, `alternar gsafe`, `gsafe`
+    * **Alternar limitador de velocidad:** `limitador de velocidad`, `alternar limitador`
+    * **Aumentar ráfaga de señuelos:** `aumentar señuelos`, `mas señuelos`
+    * **Restablecer ráfaga de señuelos:** `restablecer señuelos`
+    * **Limpiar visera:** `limpiar visera`, `limpiar casco`
+    * **Llamar objetivo:** `llamar objetivo`, `llamar nave`
 
 ### 8. 📱 Aplicación complementaria y API REST
 * **Servidor web HTTP local:** Alberga un panel local en un puerto configurable (predeterminado: `8891`, deshabilitado de forma predeterminada).

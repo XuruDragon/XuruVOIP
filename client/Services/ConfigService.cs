@@ -58,6 +58,18 @@ public class ConfigService
                 {
                     Config.OcrRegion = new System.Windows.Rect(Config.OcrRegion.X, Config.OcrRegion.Y, Config.OcrRegion.Width, 200);
                 }
+
+                // Migration logic for old key + modifier settings
+                if (!string.IsNullOrEmpty(Config.VoiceCommandDoorsModifier) && Config.VoiceCommandDoorsModifier != "None" && !Config.VoiceCommandDoorsKey.Contains("+"))
+                {
+                    Config.VoiceCommandDoorsKey = $"{Config.VoiceCommandDoorsModifier} + {Config.VoiceCommandDoorsKey}";
+                    Config.VoiceCommandDoorsModifier = "None";
+                }
+                if (!string.IsNullOrEmpty(Config.VoiceCommandLandingRequestModifier) && Config.VoiceCommandLandingRequestModifier != "None" && !Config.VoiceCommandLandingRequestKey.Contains("+"))
+                {
+                    Config.VoiceCommandLandingRequestKey = $"{Config.VoiceCommandLandingRequestModifier} + {Config.VoiceCommandLandingRequestKey}";
+                    Config.VoiceCommandLandingRequestModifier = "None";
+                }
                 
                 LogService.Info("Configuration loaded successfully from: " + ConfigPath);
             }

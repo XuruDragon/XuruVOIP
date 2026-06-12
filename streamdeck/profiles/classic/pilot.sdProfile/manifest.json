@@ -1,8 +1,28 @@
 {
+  "Name": "XuruVOIP Pilot - Classic",
   "DeviceModel": "XuruVOIP_classic",
+  "Version": "1.0.0",
   "Rooms": {
     "0": {
       "Keys": {
+        "3,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.cycle-radio"
+        },
+        "1,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.radio-mute"
+        },
+        "0,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
+        },
         "4,2": {
           "Settings": {
             "port": 8891
@@ -21,23 +41,29 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.hail-accept"
         },
-        "1,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.radio-mute"
-        },
         "3,1": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.hail-initiate"
         },
-        "4,0": {
+        "1,1": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.toggle-helmet"
+          "Action": "com.xurudragon.xuruvoip.action.toggle-translation"
+        },
+        "0,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.pa-broadcast"
+        },
+        "2,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.audio-radio-mute"
         },
         "0,2": {
           "Settings": {
@@ -51,52 +77,26 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.intercom-status"
         },
-        "2,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.profile-mute"
-        },
-        "0,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.pa-broadcast"
-        },
-        "0,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
-        },
         "3,2": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.audio-profile-mute"
         },
-        "2,2": {
+        "2,0": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.audio-radio-mute"
+          "Action": "com.xurudragon.xuruvoip.action.profile-mute"
         },
-        "1,1": {
+        "4,0": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.toggle-translation"
-        },
-        "3,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.cycle-radio"
+          "Action": "com.xurudragon.xuruvoip.action.toggle-helmet"
         }
       }
     }
   },
-  "DeviceType": 0,
-  "Name": "XuruVOIP Pilot - Classic",
-  "Version": "1.0.0"
+  "DeviceType": 0
 }

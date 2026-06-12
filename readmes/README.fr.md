@@ -268,9 +268,39 @@ graph TB
     #### Contrôles de vaisseau simulés (Associés à Star Citizen)
     Ces commandes simulent des pressions de touches physiques sur votre PC pour déclencher des contrôles de Star Citizen :
     * **Basculer l'alimentation du vaisseau :** `alimentation`, `basculer alimentation`, `allumer systemes`, `eteindre systemes`, `demarrer systemes`, `couper systemes`
+    * **Basculer les moteurs du vaisseau :** `moteurs`, `basculer moteurs`, `moteurs on`, `moteurs off`
+    * **Basculer les armes :** `armes`, `basculer armes`, `activer armes`, `desactiver armes`
+    * **Basculer les boucliers (ON/OFF) :** `boucliers`, `basculer boucliers`
+    * **Réinitialiser/Équilibrer les boucliers :** `reinitialiser boucliers`, `boucliers reset`, `equilibrer boucliers`
+    * **Basculer le mode VTOL :** `vtol`, `basculer vtol`
+    * **Activer le moteur quantique (Quantum) :** `quantique`, `moteur quantique`, `voyage quantique`
+    * **Basculer le régulateur de vitesse (Cruise Control) :** `croisiere`, `vitesse de croisiere`, `regulateur de vitesse`, `basculer croisiere`
+    * **Demander l'atterrissage / Ouvrir le hangar :** `demande d'atterrissage`, `demande atterrissage`, `ouvrir hangar`, `demander hangar`, `appeler atc`
     * **Basculer les portes/rampes du vaisseau :** `portes`, `exterieur`, `ouvrir portes`, `fermer portes`, `ouvrir exterieur`, `fermer exterieur`, `basculer portes`
     * **Dévier les boucliers vers l'avant :** `boucliers`, `boucliers avant`, `devier boucliers`, `boucliers devant`
     * **Basculer le train d'atterrissage :** `train d'atterrissage`, `deployer train`, `rentrer train`, `train atterrissage`
+    * **Mode de Vol (SCM/NAV) :** `mode de vol`, `mode vol`, `navigation`, `mode navigation`
+    * **Mode Scan :** `mode scan`, `mode scanneur`, `scanneur`, `activer le scanneur`
+    * **Mode Minage :** `mode minage`, `activer minage`, `commencer le minage`, `minage`
+    * **Mode Recyclage :** `mode recyclage`, `mode salvage`, `commencer le recyclage`, `recyclage`
+    * **Puissance Max Armes :** `puissance armes`, `max armes`, `armes au maximum`, `energie aux armes`
+    * **Puissance Max Boucliers :** `puissance boucliers`, `max boucliers`, `boucliers au maximum`, `energie aux boucliers`
+    * **Puissance Max Moteurs :** `puissance moteurs`, `max moteurs`, `moteurs au maximum`, `energie aux moteurs`
+    * **Équilibrer l'Énergie :** `reinitialiser puissance`, `equilibrer puissance`, `energie equilibree`
+    * **Lancer Leurre :** `leurre`, `lancer leurre`, `lancer un leurre`
+    * **Lancer Brouillage (Paillettes) :** `brouillage`, `lancer brouillage`, `paillettes`, `lancer paillettes`
+    * **Basculer les phares :** `phares`, `lumiere`, `allumer phares`, `eteindre phares`, `lumiere vaisseau`
+    * **Cibler hostile le plus proche :** `cible hostile`, `hostile le plus proche`, `verrouiller hostile`
+    * **Cibler sous-système :** `cibler sous systeme`, `sous systeme`, `cibler moteurs`, `cibler boucliers`, `cibler armes`
+    * **Basculer mode cardan :** `mode cardan`, `basculer cardan`, `gimbal`
+    * **Épingler cible :** `epingler cible`, `sauvegarder cible`
+    * **Basculer mode découplé :** `mode decouple`, `decouple`, `basculer couplage`
+    * **Basculer G-Safe :** `g safe`, `securite g`, `basculer gsafe`
+    * **Basculer limiteur de vitesse :** `limiteur de vitesse`, `basculer limiteur`, `limite vitesse`
+    * **Augmenter leurres :** `augmenter leurres`, `plus de leurres`
+    * **Réinitialiser leurres :** `reinitialiser leurres`, `remettre les leurres`
+    * **Essuyer visière :** `essuyer visiere`, `nettoyer visiere`, `essuyer le casque`
+    * **Appeler la cible :** `appeler la cible`, `appeler vaisseau`
 
 ### 8. 📱 Application compagnon et API REST
 * **Serveur Web HTTP local :** Héberge un tableau de bord local sur un port configurable (par défaut : `8891`, désactivé par défaut).

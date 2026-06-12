@@ -29,7 +29,7 @@ Getting the plugin installed into your Stream Deck software is very simple.
    * Your Elgato Stream Deck software will open and show a message asking if you want to install it. Click **Install**.
 3. **Verify:**
    * In your Elgato Stream Deck desktop app, look at the list of actions on the right side.
-   * Scroll down until you see a category named **XuruVOIP** containing 22 actions.
+   * Scroll down until you see a category named **XuruVOIP** containing 25 actions.
 
 ---
 
@@ -105,12 +105,13 @@ Ship-wide communications and beacons.
 | **PA Broadcast** | `com.xurudragon.xuruvoip.action.pa-broadcast` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/pa_idle.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/pa_active.svg" width="32" height="32" /> | Hold to broadcast on Ship Public Address (cyan equalizer). |
 | **Beacon Mode** | `com.xurudragon.xuruvoip.action.beacon-repeater` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/repeater_inactive.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/repeater_active.svg" width="32" height="32" /> | Toggles Radio Repeater / Beacon mode (active waves). |
 
-### 🎙️ Voice Command Macro
-Custom voice macro executor.
+### 🎙️ Voice Control & Command Macros
+Speech recognition and macro execution.
 
-| Action | UUID | Icon (Ready) | Icon (Listening) | Visual Feedback & Use |
+| Action | UUID | Icon (Ready / Off) | Icon (Listening / On) | Visual Feedback & Use |
 | :--- | :--- | :---: | :---: | :--- |
 | **Voice Command Macro** | `com.xurudragon.xuruvoip.action.voice-command` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/voice_ready.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/voice_listening.svg" width="32" height="32" /> | Triggers custom voice macros (green listening badge). |
+| **Toggle Voice Commands** | `com.xurudragon.xuruvoip.action.toggle-voice-commands` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/voice_ready.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/voice_listening.svg" width="32" height="32" /> | Toggles offline voice commands listening state (green badge when listening/active). |
 
 ### 💬 Intercom Status (Multi-State)
 Monitors intercom telemetry simulation states.
@@ -150,6 +151,12 @@ HUD immersive rendering controls.
 | **Toggle HRTF** | `com.xurudragon.xuruvoip.action.toggle-hrtf` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/hrtf_off.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/hrtf_on.svg" width="32" height="32" /> | Toggle Binaural HRTF Spatial Audio. |
 | **Toggle Spectrogram** | `com.xurudragon.xuruvoip.action.toggle-spectrogram` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/spectrogram_off.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/spectrogram_on.svg" width="32" height="32" /> | Toggle 3D spectrogram visualizer. |
 
+### 🎨 HUD Themes & Accent Styling
+Manufacturer theme visualization controls.
+
+| Action | UUID | Icon | Visual Feedback & Use |
+| :--- | :--- | :---: | :--- |
+| **Cycle HUD Theme** | `com.xurudragon.xuruvoip.action.cycle-theme` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/telemetry.svg" width="32" height="32" /> | Cycles through manufacturer accent themes (Aegis, Anvil, Drake, RSI, Origin). Displays the active theme name. |
 
 ---
 
@@ -207,21 +214,23 @@ The standard layout for a 15-key Stream Deck device.
 ### 3. Stream Deck XL (9x4 Grid)
 Provides a high-density 36-key layout for maximum physical control.
 
-*   **Common Keypad Base (Rows 1 & 2):**
+*   **Common Keypad Base (Rows 1, 2, & 3):**
     | | Col 1 | Col 2 | Col 3 | Col 4 | Col 5 | Col 6 | Col 7 | Col 8 | Col 9 |
     | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
     | **Row 1** | Prox Mute | Radio Mute | Profile Mute | Toggle Helmet | Cycle Radio | PA Broadcast | Beacon Mode | Intercom Status | Location Telemetry |
     | **Row 2** | Audio Prox Mute | Audio Radio Mute | Audio Profile Mute | Initiate Hail | Accept/Answer Hail | Decline/End Hail | Toggle Translation | Toggle HRTF | Toggle Spectrogram |
+    | **Row 3** | *(Role-Specific)* | *(Role-Specific)* | *(Role-Specific)* | *(Role-Specific)* | - | - | - | Toggle Voice Commands | Cycle Theme |
 
-*   **Pilot Specializations (Rows 3 & 4):**
-    *   **Row 3:** *Macro: Open Hangar* (Col 1), *Macro: Req Landing* (Col 2), *Macro: Status Report* (Col 3), *Macro: Close Visor* (Col 4)
-    *   **Row 4:** *Macro: Power Up Shields* (Col 1)
-*   **Infantry Specializations (Rows 3 & 4):**
-    *   **Row 3:** *Macro: Status Report* (Col 1), *Macro: Mute Prox* (Col 2), *Macro: Unmute Prox* (Col 3)
-    *   **Row 4:** *Macro: Ch Alpha* (Col 1), *Macro: Ch Beta* (Col 2), *Macro: Toggle Changer* (Col 3), *Macro: Voice Cyborg* (Col 4)
-*   **Captain Specializations (Rows 3 & 4):**
-    *   **Row 3:** *Macro: Power Up Shields* (Col 1), *Macro: Status Check* (Col 2)
-    *   **Row 4:** *Simulate Shield Hit* (Col 1), *Simulate Power Loss* (Col 2), *Simulate Quantum* (Col 3)
+*   **Role-Specific Mappings (Row 3 & 4):**
+    *   **Pilot:**
+        *   **Row 3:** *Macro: Open Hangar* (Col 1), *Macro: Req Landing* (Col 2), *Macro: Status Report* (Col 3), *Macro: Close Visor* (Col 4)
+        *   **Row 4:** *Macro: Power Up Shields* (Col 1)
+    *   **Infantry:**
+        *   **Row 3:** *Macro: Status Report* (Col 1), *Macro: Mute Prox* (Col 2), *Macro: Unmute Prox* (Col 3)
+        *   **Row 4:** *Macro: Ch Alpha* (Col 1), *Macro: Ch Beta* (Col 2), *Macro: Toggle Changer* (Col 3), *Macro: Voice Cyborg* (Col 4)
+    *   **Captain:**
+        *   **Row 3:** *Macro: Power Up Shields* (Col 1), *Macro: Status Check* (Col 2)
+        *   **Row 4:** *Simulate Shield Hit* (Col 1), *Simulate Power Loss* (Col 2), *Simulate Quantum* (Col 3)
 
 *Profile templates folder: [streamdeck/profiles/xl](../streamdeck/profiles/xl)*
 
@@ -236,7 +245,7 @@ Combines physical keys with rotary encoders and a touch strip display.
     | **Row 1 (Pilot)** | Proximity Mute | Radio Mute | Profile Mute | Toggle Helmet |
     | **Row 2 (Pilot)** | PA Broadcast | Beacon Mode | Intercom Status | Location Telemetry |
     | **Row 1 (Infantry)** | Proximity Mute | Radio Mute | Toggle Helmet | Location Telemetry |
-    | **Row 2 (Infantry)** | Audio Prox Mute | Audio Radio Mute | PA Broadcast | *Macro: Status Report* |
+    | **Row 2 (Infantry)** | Audio Prox Mute | Audio Radio Mute | PA Broadcast | Toggle Voice Commands |
     | **Row 1 (Captain)** | Proximity Mute | Radio Mute | PA Broadcast | Intercom Status |
     | **Row 2 (Captain)** | Toggle Helmet | Location Telemetry | Audio Prox Mute | Audio Radio Mute |
 
@@ -257,7 +266,11 @@ Combines physical keys with rotary encoders and a touch strip display.
         *   *Rotate:* Cycle through active voice changer profiles (None, Alien, Cyborg, Robotic, PitchShift).
         *   *Push / Touch Screen Tap:* Toggle voice changer on/off.
         *   *Display:* Active voice profile name or `Disabled`.
-    4.  **Dial 4:** Unassigned / Reserved.
+    4.  **Dial 4: Theme Selector Dial** (`com.xurudragon.xuruvoip.action.theme-dial`)
+        *   **Icon:** <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/telemetry.svg" width="24" height="24" align="middle" />
+        *   *Rotate:* Cycle through active manufacturer accent themes (Aegis, Anvil, Drake, RSI, Origin).
+        *   *Push / Touch Screen Tap:* Cycle through manufacturer accent themes.
+        *   *Display:* Active theme name.
 
 *Profile templates folder: [streamdeck/profiles/plus](../streamdeck/profiles/plus)*
 
@@ -267,7 +280,7 @@ Combines physical keys with rotary encoders and a touch strip display.
 The ultimate layout, offering the full 36-key keypad grid of the XL along with 6 dials.
 
 *   **Keypad Layout:** Identical layout mapping to the standard **Stream Deck XL** keypad.
-*   **Rotary Dials:** Dial 1, 2, and 3 are mapped identically to the **Stream Deck +** (Radio Channel, G-Force/Exertion, Voice Changer). Dials 4, 5, and 6 are unassigned / reserved.
+*   **Rotary Dials:** Dial 1, 2, and 3 are mapped identically to the **Stream Deck +** (Radio Channel, G-Force/Exertion, Voice Changer). Dial 4 is mapped to the Theme Selector Dial. Dials 5 and 6 are unassigned / reserved.
 
 *Profile templates folder: [streamdeck/profiles/plus_xl](../streamdeck/profiles/plus_xl)*
 

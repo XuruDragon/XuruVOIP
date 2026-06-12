@@ -99,6 +99,37 @@ public class AppConfig
     public string VoiceCommandDoorsModifier { get; set; } = "Alt";
     public string VoiceCommandShieldsKey { get; set; } = "Up";
     public string VoiceCommandLandingGearKey { get; set; } = "N";
+    public string VoiceCommandEnginesKey { get; set; } = "I";
+    public string VoiceCommandWeaponsKey { get; set; } = "P";
+    public string VoiceCommandShieldsToggleKey { get; set; } = "O";
+    public string VoiceCommandShieldsResetKey { get; set; } = "NumPad5";
+    public string VoiceCommandVtolKey { get; set; } = "K";
+    public string VoiceCommandQuantumKey { get; set; } = "B";
+    public string VoiceCommandCruiseKey { get; set; } = "C";
+    public string VoiceCommandLandingRequestKey { get; set; } = "N";
+    public string VoiceCommandLandingRequestModifier { get; set; } = "Alt";
+    public string VoiceCommandFlyModeKey { get; set; } = "V";
+    public string VoiceCommandScanModeKey { get; set; } = "Tab";
+    public string VoiceCommandMiningModeKey { get; set; } = "M";
+    public string VoiceCommandSalvageModeKey { get; set; } = "M";
+    public string VoiceCommandPowerWeaponsKey { get; set; } = "F7";
+    public string VoiceCommandPowerShieldsKey { get; set; } = "F6";
+    public string VoiceCommandPowerEnginesKey { get; set; } = "F5";
+    public string VoiceCommandPowerResetKey { get; set; } = "F8";
+    public string VoiceCommandDecoyKey { get; set; } = "H";
+    public string VoiceCommandNoiseKey { get; set; } = "J";
+    public string VoiceCommandLightsKey { get; set; } = "L";
+    public string VoiceCommandTargetHostileKey { get; set; } = "5";
+    public string VoiceCommandCycleSubsystemsKey { get; set; } = "8";
+    public string VoiceCommandGimbalModeKey { get; set; } = "G";
+    public string VoiceCommandPinTargetKey { get; set; } = "1";
+    public string VoiceCommandDecoupledKey { get; set; } = "Alt + C";
+    public string VoiceCommandGSafeKey { get; set; } = "None";
+    public string VoiceCommandSpeedLimiterKey { get; set; } = "None";
+    public string VoiceCommandDecoyBurstKey { get; set; } = "Alt + H";
+    public string VoiceCommandDecoyResetKey { get; set; } = "Alt + J";
+    public string VoiceCommandWipeVisorKey { get; set; } = "Alt + X";
+    public string VoiceCommandHailTargetKey { get; set; } = "6";
 
     // --- Discord RPC ---
     public bool EnableDiscordRpc { get; set; } = true;
