@@ -38,16 +38,10 @@ public class AudioCaptureService : IDisposable
     private double _exertionBreathPhase = 0;
     private readonly PitchShifter _gforcePitchShifter = new();
 
-    private double _alarmTimeSeconds = 0;
-    private double _alarmPhase = 0;
-    private IntercomDegradationState _prevIntercomState = IntercomDegradationState.Normal;
-    private readonly BiquadFilter _alarmLp = new();
-
     public AudioCaptureService()
     {
         _breathHp.SetHpCoefficients(650, SampleRate);
         _breathLp.SetLpCoefficients(1600, SampleRate);
-        _alarmLp.SetLpCoefficients(1000, SampleRate);
     }
 
     // Rolling buffer to accumulate exactly one Opus frame worth of PCM
@@ -394,54 +388,6 @@ public class AudioCaptureService : IDisposable
             if (config != null && config.EnableVoiceChanger)
             {
                 _voiceModulator.Process(floatBuf, FrameSamples, config.VoiceChangerType, config.VoicePitchFactor);
-            }
-
-            // Apply cockpit alarm loop injection if enabled and warning state active
-            var intercomState = App.ViewModel?.IntercomState ?? IntercomDegradationState.Normal;
-            bool enableAlarm = config?.EnableAlarmInjection ?? true;
-            if (intercomState != _prevIntercomState)
-            {
-                _alarmTimeSeconds = 0;
-                _alarmPhase = 0;
-                _prevIntercomState = intercomState;
-            }
-
-            if (enableAlarm && (intercomState == IntercomDegradationState.ShieldHit || intercomState == IntercomDegradationState.CriticalPower))
-            {
-                for (int i = 0; i < FrameSamples; i++)
-                {
-                    double t = _alarmTimeSeconds;
-                    _alarmTimeSeconds += 1.0 / SampleRate;
-
-                    float alarmSample = 0.0f;
-                    if (intercomState == IntercomDegradationState.ShieldHit)
-                    {
-                        // Sweeping frequency siren: 400Hz to 800Hz sweep over 1.5s
-                        double freq = 600.0 + 200.0 * Math.Sin(2.0 * Math.PI * t / 1.5);
-                        _alarmPhase += 2.0 * Math.PI * freq / SampleRate;
-                        if (_alarmPhase > 2.0 * Math.PI) _alarmPhase -= 2.0 * Math.PI;
-                        alarmSample = (float)Math.Sin(_alarmPhase) * 0.008f;
-                    }
-                    else if (intercomState == IntercomDegradationState.CriticalPower)
-                    {
-                        // Double beep loop: 100ms beep, 100ms gap, 100ms beep, 700ms gap
-                        double timeInCycle = t % 1.0;
-                        bool isBeeping = (timeInCycle >= 0.0 && timeInCycle < 0.1) || (timeInCycle >= 0.2 && timeInCycle < 0.3);
-                        if (isBeeping)
-                        {
-                            _alarmPhase += 2.0 * Math.PI * 500.0 / SampleRate;
-                            if (_alarmPhase > 2.0 * Math.PI) _alarmPhase -= 2.0 * Math.PI;
-                            alarmSample = (float)Math.Sin(_alarmPhase) * 0.008f;
-                        }
-                        else
-                        {
-                            _alarmPhase = 0;
-                        }
-                    }
-
-                    alarmSample = _alarmLp.Process(alarmSample);
-                    floatBuf[i] += alarmSample;
-                }
             }
 
             // Convert back to PCM
