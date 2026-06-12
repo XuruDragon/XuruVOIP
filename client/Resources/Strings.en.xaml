@@ -49,6 +49,10 @@
     <sys:String x:Key="TabConnection">Connection</sys:String>
     <sys:String x:Key="TabOcr">OCR</sys:String>
     <sys:String x:Key="TabAudio">Audio</sys:String>
+    <sys:String x:Key="TabDevices">Devices &amp; Levels</sys:String>
+    <sys:String x:Key="TabAcoustics">Comms &amp; Acoustics</sys:String>
+    <sys:String x:Key="TabModulation">Voice Modulation</sys:String>
+    <sys:String x:Key="TabIntegrations">Integrations</sys:String>
     <sys:String x:Key="TabHotkeys">Hotkeys</sys:String>
 
     <!-- Settings: Connection -->
@@ -216,3 +220,4 @@
     <sys:String x:Key="LblDeclineHail">Decline/End Hail Key</sys:String>
     <sys:String x:Key="LblEnableTranslationSubtitles">Enable Visor HUD Real-Time Translation Subtitles</sys:String>
 </ResourceDictionary>
+

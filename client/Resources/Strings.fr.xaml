@@ -49,6 +49,10 @@
     <sys:String x:Key="TabConnection">Connexion</sys:String>
     <sys:String x:Key="TabOcr">OCR</sys:String>
     <sys:String x:Key="TabAudio">Audio</sys:String>
+    <sys:String x:Key="TabDevices">Périphériques &amp; Niveaux</sys:String>
+    <sys:String x:Key="TabAcoustics">Comms &amp; Acoustique</sys:String>
+    <sys:String x:Key="TabModulation">Modulation Vocale</sys:String>
+    <sys:String x:Key="TabIntegrations">Intégrations</sys:String>
     <sys:String x:Key="TabHotkeys">Raccourcis</sys:String>
 
     <!-- Paramètres : Connexion -->
@@ -216,3 +220,4 @@
     <sys:String x:Key="LblDeclineHail">Touche de rejet/fin d'appel</sys:String>
     <sys:String x:Key="LblEnableTranslationSubtitles">Activer la traduction des sous-titres du HUD de la visière</sys:String>
 </ResourceDictionary>
+

@@ -49,6 +49,10 @@
     <sys:String x:Key="TabConnection">Verbindung</sys:String>
     <sys:String x:Key="TabOcr">OCR</sys:String>
     <sys:String x:Key="TabAudio">Audio</sys:String>
+    <sys:String x:Key="TabDevices">Geräte &amp; Pegel</sys:String>
+    <sys:String x:Key="TabAcoustics">Kommunikation &amp; Akustik</sys:String>
+    <sys:String x:Key="TabModulation">Stimmenmodulation</sys:String>
+    <sys:String x:Key="TabIntegrations">Integrationen</sys:String>
     <sys:String x:Key="TabHotkeys">Tastenkürzel</sys:String>
 
     <!-- Einstellungen: Verbindung -->
@@ -216,3 +220,4 @@
     <sys:String x:Key="LblDeclineHail">Hailing-Ablehnungs/Endtaste</sys:String>
     <sys:String x:Key="LblEnableTranslationSubtitles">Visier-HUD Echtzeit-Übersetzungsuntertitel aktivieren</sys:String>
 </ResourceDictionary>
+

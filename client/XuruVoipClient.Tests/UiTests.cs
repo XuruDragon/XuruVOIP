@@ -38,7 +38,7 @@ public class UiTests
         Assert.NotNull(tabControl);
 
         // THEN
-        Assert.Equal(6, tabControl.Items.Count);
+        Assert.Equal(9, tabControl.Items.Count);
 
         tabControl.SelectedIndex = 1;
         Assert.Equal(1, tabControl.SelectedIndex);

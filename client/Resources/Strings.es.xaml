@@ -49,6 +49,10 @@
     <sys:String x:Key="TabConnection">Conexión</sys:String>
     <sys:String x:Key="TabOcr">OCR</sys:String>
     <sys:String x:Key="TabAudio">Audio</sys:String>
+    <sys:String x:Key="TabDevices">Dispositivos y Niveles</sys:String>
+    <sys:String x:Key="TabAcoustics">Comunicaciones y Acústica</sys:String>
+    <sys:String x:Key="TabModulation">Modulación de Voz</sys:String>
+    <sys:String x:Key="TabIntegrations">Integraciones</sys:String>
     <sys:String x:Key="TabHotkeys">Teclas rápidas</sys:String>
 
     <!-- Ajustes: Conexión -->
@@ -216,3 +220,4 @@
     <sys:String x:Key="LblDeclineHail">Tecla de rechazar/terminar llamada</sys:String>
     <sys:String x:Key="LblEnableTranslationSubtitles">Activar traducción de subtítulos en tiempo real en HUD de visor</sys:String>
 </ResourceDictionary>
+

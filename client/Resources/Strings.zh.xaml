@@ -49,6 +49,10 @@
     <sys:String x:Key="TabConnection">连接</sys:String>
     <sys:String x:Key="TabOcr">OCR</sys:String>
     <sys:String x:Key="TabAudio">音频</sys:String>
+    <sys:String x:Key="TabDevices">设备与音量</sys:String>
+    <sys:String x:Key="TabAcoustics">通信与环境音效</sys:String>
+    <sys:String x:Key="TabModulation">声音调制</sys:String>
+    <sys:String x:Key="TabIntegrations">外部集成</sys:String>
     <sys:String x:Key="TabHotkeys">热键</sys:String>
 
     <!-- Settings: Connection -->
@@ -216,3 +220,4 @@
     <sys:String x:Key="LblDeclineHail">拒绝/结束呼叫快捷键</sys:String>
     <sys:String x:Key="LblEnableTranslationSubtitles">启用面罩HUD实时翻译字幕</sys:String>
 </ResourceDictionary>
+
