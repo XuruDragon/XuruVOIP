@@ -1,26 +1,59 @@
 {
+  "Name": "XuruVOIP Pilot - XL",
   "DeviceModel": "XuruVOIP_xl",
+  "Version": "1.0.0",
   "Rooms": {
     "0": {
       "Keys": {
-        "7,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.intercom-status"
-        },
         "6,1": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.toggle-translation"
         },
-        "1,2": {
+        "6,0": {
           "Settings": {
-            "command": "request landing",
             "port": 8891
           },
+          "Action": "com.xurudragon.xuruvoip.action.beacon-repeater"
+        },
+        "7,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.intercom-status"
+        },
+        "0,3": {
+          "Settings": {
+            "port": 8891,
+            "command": "power up shields"
+          },
           "Action": "com.xurudragon.xuruvoip.action.voice-command"
+        },
+        "3,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.toggle-helmet"
+        },
+        "1,2": {
+          "Settings": {
+            "port": 8891,
+            "command": "request landing"
+          },
+          "Action": "com.xurudragon.xuruvoip.action.voice-command"
+        },
+        "0,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
+        },
+        "5,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.pa-broadcast"
         },
         "4,1": {
           "Settings": {
@@ -34,17 +67,11 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.radio-mute"
         },
-        "6,0": {
+        "1,1": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.beacon-repeater"
-        },
-        "8,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.toggle-spectrogram"
+          "Action": "com.xurudragon.xuruvoip.action.audio-radio-mute"
         },
         "8,0": {
           "Settings": {
@@ -52,11 +79,43 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.location-telemetry"
         },
-        "3,1": {
+        "0,1": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.hail-initiate"
+          "Action": "com.xurudragon.xuruvoip.action.audio-proximity-mute"
+        },
+        "2,2": {
+          "Settings": {
+            "port": 8891,
+            "command": "status report"
+          },
+          "Action": "com.xurudragon.xuruvoip.action.voice-command"
+        },
+        "8,2": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.cycle-theme"
+        },
+        "3,2": {
+          "Settings": {
+            "port": 8891,
+            "command": "close visor"
+          },
+          "Action": "com.xurudragon.xuruvoip.action.voice-command"
+        },
+        "8,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.toggle-spectrogram"
+        },
+        "2,1": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.audio-profile-mute"
         },
         "4,0": {
           "Settings": {
@@ -64,23 +123,22 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.cycle-radio"
         },
-        "0,3": {
+        "3,1": {
           "Settings": {
-            "command": "power up shields",
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.voice-command"
+          "Action": "com.xurudragon.xuruvoip.action.hail-initiate"
         },
-        "5,0": {
+        "7,2": {
           "Settings": {
             "port": 8891
           },
-          "Action": "com.xurudragon.xuruvoip.action.pa-broadcast"
+          "Action": "com.xurudragon.xuruvoip.action.toggle-voice-commands"
         },
         "0,2": {
           "Settings": {
-            "command": "open hangar",
-            "port": 8891
+            "port": 8891,
+            "command": "open hangar"
           },
           "Action": "com.xurudragon.xuruvoip.action.voice-command"
         },
@@ -96,60 +154,14 @@
           },
           "Action": "com.xurudragon.xuruvoip.action.profile-mute"
         },
-        "0,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.audio-proximity-mute"
-        },
-        "3,2": {
-          "Settings": {
-            "command": "close visor",
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.voice-command"
-        },
         "7,1": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.toggle-hrtf"
-        },
-        "0,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
-        },
-        "2,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.audio-profile-mute"
-        },
-        "2,2": {
-          "Settings": {
-            "command": "status report",
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.voice-command"
-        },
-        "1,1": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.audio-radio-mute"
-        },
-        "3,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.toggle-helmet"
         }
       }
     }
   },
-  "DeviceType": 2,
-  "Name": "XuruVOIP Pilot - XL",
-  "Version": "1.0.0"
+  "DeviceType": 2
 }

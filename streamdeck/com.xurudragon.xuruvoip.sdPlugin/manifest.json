@@ -465,6 +465,67 @@
       "PropertyInspectorPath": "pi/pi.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Toggle Visor HUD Spectrogram Visualizer"
+    },
+    {
+      "UUID": "com.xurudragon.xuruvoip.action.toggle-voice-commands",
+      "Name": "Toggle Voice Commands",
+      "Icon": "icons/voice_ready",
+      "States": [
+        {
+          "Image": "icons/voice_ready",
+          "Title": "",
+          "ShowTitle": true
+        },
+        {
+          "Image": "icons/voice_listening",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Toggle offline voice commands listening state"
+    },
+    {
+      "UUID": "com.xurudragon.xuruvoip.action.cycle-theme",
+      "Name": "Cycle HUD Theme",
+      "Icon": "icons/telemetry",
+      "States": [
+        {
+          "Image": "icons/telemetry",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "PropertyInspectorPath": "pi/pi.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Cycle through ship manufacturer accent themes"
+    },
+    {
+      "UUID": "com.xurudragon.xuruvoip.action.theme-dial",
+      "Name": "Theme Selector Dial",
+      "Icon": "icons/telemetry",
+      "PropertyInspectorPath": "pi/pi.html",
+      "States": [
+        {
+          "Image": "icons/telemetry",
+          "Title": "",
+          "ShowTitle": true
+        }
+      ],
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$X1",
+        "TriggerDescription": {
+          "Rotate": "Rotate to cycle HUD Theme",
+          "Push": "Push to cycle HUD Theme",
+          "Touch": "Tap to cycle HUD Theme"
+        }
+      },
+      "SupportedInMultiActions": false,
+      "Tooltip": "Rotate to change active manufacturer accent theme, press to cycle"
     }
   ]
 }

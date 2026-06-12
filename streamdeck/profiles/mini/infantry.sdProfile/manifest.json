@@ -1,32 +1,34 @@
 {
+  "Name": "XuruVOIP Infantry - Mini",
   "DeviceModel": "XuruVOIP_mini",
+  "Version": "1.0.0",
   "Rooms": {
     "0": {
       "Keys": {
+        "1,1": {
+          "Settings": {
+            "port": 8891,
+            "command": "status report"
+          },
+          "Action": "com.xurudragon.xuruvoip.action.voice-command"
+        },
         "1,0": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.radio-mute"
         },
-        "0,0": {
-          "Settings": {
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
-        },
-        "1,1": {
-          "Settings": {
-            "command": "status report",
-            "port": 8891
-          },
-          "Action": "com.xurudragon.xuruvoip.action.voice-command"
-        },
         "0,1": {
           "Settings": {
             "port": 8891
           },
           "Action": "com.xurudragon.xuruvoip.action.cycle-radio"
+        },
+        "0,0": {
+          "Settings": {
+            "port": 8891
+          },
+          "Action": "com.xurudragon.xuruvoip.action.proximity-mute"
         },
         "2,0": {
           "Settings": {
@@ -43,7 +45,5 @@
       }
     }
   },
-  "DeviceType": 1,
-  "Name": "XuruVOIP Infantry - Mini",
-  "Version": "1.0.0"
+  "DeviceType": 1
 }

@@ -433,6 +433,23 @@ public class CompanionAppService : IDisposable
                     _viewModel.ApplySettings();
                 }
                 break;
+            case "toggle_voice_commands":
+                _viewModel.Config.Config.EnableVoiceCommands = !_viewModel.Config.Config.EnableVoiceCommands;
+                _viewModel.SaveConfig();
+                _viewModel.ApplySettings();
+                break;
+            case "cycle_hud_theme":
+                {
+                    var themes = new[] { "Aegis", "Anvil", "Drake", "RSI", "Origin" };
+                    string currentTheme = _viewModel.Config.Config.HudTheme ?? "RSI";
+                    int idx = Array.IndexOf(themes, currentTheme);
+                    if (idx == -1) idx = 3; // default RSI
+                    idx = (idx + 1) % themes.Length;
+                    _viewModel.Config.Config.HudTheme = themes[idx];
+                    _viewModel.SaveConfig();
+                    _viewModel.ApplySettings();
+                }
+                break;
             case "set_hud_position":
                 if (root.TryGetProperty("position", out var posProp))
                 {

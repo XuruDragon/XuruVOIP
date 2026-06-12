@@ -179,6 +179,35 @@ public class CompanionAppTests
             Assert.False(root3.GetProperty("hudShowActiveSpeakers").GetBoolean());
             Assert.False(root3.GetProperty("hudShowChannel").GetBoolean());
             Assert.Equal("Industrial", root3.GetProperty("pttChimeType").GetString());
+
+            // 6. Test POST toggle_voice_commands
+            bool initialVoiceCommands = vm.Config.Config.EnableVoiceCommands;
+            var voiceCmdPayload = new { action = "toggle_voice_commands" };
+            var voiceCmdContent = new StringContent(JsonSerializer.Serialize(voiceCmdPayload), Encoding.UTF8, "application/json");
+            var voiceCmdRes = await client.PostAsync("http://localhost:8891/api/action", voiceCmdContent);
+            Assert.True(voiceCmdRes.IsSuccessStatusCode);
+
+            // 7. Test POST cycle_hud_theme
+            var cycleThemePayload = new { action = "cycle_hud_theme" };
+            var cycleThemeContent = new StringContent(JsonSerializer.Serialize(cycleThemePayload), Encoding.UTF8, "application/json");
+            var cycleThemeRes = await client.PostAsync("http://localhost:8891/api/action", cycleThemeContent);
+            Assert.True(cycleThemeRes.IsSuccessStatusCode);
+
+            // Wait a brief moment for dispatcher to update
+            await Task.Delay(150);
+
+            // Verify they are updated on ViewModel config
+            Assert.Equal("Drake", vm.Config.Config.HudTheme);
+            Assert.Equal(!initialVoiceCommands, vm.Config.Config.EnableVoiceCommands);
+
+            // 8. Verify status GET reflects the modified settings
+            var statusResponse4 = await client.GetAsync("http://localhost:8891/api/status");
+            Assert.True(statusResponse4.IsSuccessStatusCode);
+            string statusJson4 = await statusResponse4.Content.ReadAsStringAsync();
+            using var doc4 = JsonDocument.Parse(statusJson4);
+            var root4 = doc4.RootElement;
+            Assert.Equal("Drake", root4.GetProperty("hudTheme").GetString());
+            Assert.Equal(!initialVoiceCommands, root4.GetProperty("voiceCommandsEnabled").GetBoolean());
         }
         finally
         {
