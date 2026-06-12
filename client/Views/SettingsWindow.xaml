@@ -264,7 +264,7 @@
 
                 <!-- ── TAB 1: GENERAL ── -->
                 <TabItem Header="{DynamicResource TabGeneral}">
-                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="482">
                         <StackPanel Margin="0,4,0,0">
                             <TextBlock Text="{DynamicResource LblLanguage}" Style="{StaticResource LabelStyle}" Margin="0,0,0,2"/>
                             <ComboBox x:Name="CbLanguage" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
@@ -299,7 +299,7 @@
 
                 <!-- ── TAB 2: CONNECTION ── -->
                 <TabItem Header="{DynamicResource TabConnection}">
-                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="351">
                         <StackPanel Margin="0,4,0,0">
                             <TextBlock Text="{DynamicResource LblServerAddress}" Style="{StaticResource LabelStyle}"/>
                             <TextBox x:Name="TxServer" Text="{Binding Config.ServerAddress, UpdateSourceTrigger=PropertyChanged}"
@@ -343,7 +343,7 @@
                 <!-- ── TAB 3: POSITION TRACKING ── -->
                 <TabItem Header="{DynamicResource TabOcr}">
                     <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
-                        <StackPanel Margin="0,4,0,0">
+                        <StackPanel Margin="0,4,0,0" Width="534">
                             <TextBlock Text="{DynamicResource LblPosSource}" Style="{StaticResource LabelStyle}"/>
                             <ComboBox x:Name="CbPosSource" Style="{StaticResource ComboStyle}" Margin="0,0,0,16"
                                       SelectionChanged="CbPosSource_SelectionChanged"/>
@@ -393,7 +393,7 @@
 
                 <!-- ── TAB 4: DEVICES & LEVELS ── -->
                 <TabItem Header="{DynamicResource TabDevices}">
-                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="518">
                         <StackPanel Margin="0,4,0,0">
                             <!-- Input device -->
                             <TextBlock Text="{DynamicResource LblInputDevice}" Style="{StaticResource LabelStyle}"/>
@@ -468,7 +468,7 @@
 
                 <!-- ── TAB 5: COMMS & ACOUSTICS ── -->
                 <TabItem Header="{DynamicResource TabAcoustics}">
-                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="523">
                         <StackPanel Margin="0,4,0,0">
                             <!-- Spatial audio toggle -->
                             <CheckBox Content="{DynamicResource LblEnableSpatialAudio}"
@@ -527,7 +527,7 @@
 
                 <!-- ── TAB 6: VOICE MODULATION ── -->
                 <TabItem Header="{DynamicResource TabModulation}">
-                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="523">
                         <StackPanel Margin="0,4,0,0">
                             <!-- Helmet/Suit modulator toggle -->
                             <CheckBox x:Name="CbEnableHelmetModulator"
@@ -748,8 +748,8 @@
 
                 <!-- ── TAB 8: INTEGRATIONS ── -->
                 <TabItem Header="{DynamicResource TabIntegrations}">
-                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
-                        <StackPanel Margin="0,4,0,0">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="526">
+                        <StackPanel Margin="0,4,5,0">
                             <!-- Companion App -->
                             <CheckBox x:Name="CbEnableCompanionApp"
                                       Content="{DynamicResource LblEnableCompanionApp}"
@@ -849,8 +849,8 @@
 
                 <!-- ── TAB 9: HOTKEYS ── -->
                 <TabItem Header="{DynamicResource TabHotkeys}">
-                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}">
-                        <StackPanel Margin="0,4,0,0">
+                    <ScrollViewer Style="{StaticResource SettingsScrollViewerStyle}" Width="535">
+                        <StackPanel Margin="0,4,5,0">
                             <!-- Voice Commands -->
                             <CheckBox x:Name="CbEnableVoiceCommands"
                                       Content="{DynamicResource LblEnableVoiceCommands}"

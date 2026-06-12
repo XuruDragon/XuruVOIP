@@ -218,6 +218,7 @@
     <sys:String x:Key="LblInitiateHail">Initiate Hail Key</sys:String>
     <sys:String x:Key="LblAcceptHail">Accept Hail Key</sys:String>
     <sys:String x:Key="LblDeclineHail">Decline/End Hail Key</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">Enable Real-Time HUD Translation Subtitles</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">SYSTEM CONSOLE</sys:String>
 

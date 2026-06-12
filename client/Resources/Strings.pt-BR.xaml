@@ -218,6 +218,7 @@
     <sys:String x:Key="LblInitiateHail">Tecla de iniciar chamada</sys:String>
     <sys:String x:Key="LblAcceptHail">Tecla de aceitar chamada</sys:String>
     <sys:String x:Key="LblDeclineHail">Tecla de recusar/encerrar chamada</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">Ativar legendas de tradução do HUD em tempo real</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">CONSOLE DO SISTEMA</sys:String>
 

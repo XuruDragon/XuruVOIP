@@ -218,6 +218,7 @@
     <sys:String x:Key="LblInitiateHail">发起呼叫快捷键</sys:String>
     <sys:String x:Key="LblAcceptHail">接受呼叫快捷键</sys:String>
     <sys:String x:Key="LblDeclineHail">拒绝/结束呼叫快捷键</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">启用实时 HUD 翻译字幕</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">系统控制台</sys:String>
 

@@ -218,6 +218,7 @@
     <sys:String x:Key="LblInitiateHail">Touche d'appel de hailing</sys:String>
     <sys:String x:Key="LblAcceptHail">Touche d'acceptation d'appel</sys:String>
     <sys:String x:Key="LblDeclineHail">Touche de rejet/fin d'appel</sys:String>
+    <sys:String x:Key="LblEnableTranslationSubtitles">Activer la traduction des sous-titres HUD en temps réel</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">CONSOLE SYSTÈME</sys:String>
 
