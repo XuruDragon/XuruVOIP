@@ -219,6 +219,9 @@
     <sys:String x:Key="LblAcceptHail">通話応答キー</sys:String>
     <sys:String x:Key="LblDeclineHail">通話拒否/終了キー</sys:String>
     <sys:String x:Key="LblEnableTranslationSubtitles">リアルタイムHUD翻訳字幕を有効にする</sys:String>
+
+    <sys:String x:Key="HeaderCommHotkeys">通信および一般キー</sys:String>
+    <sys:String x:Key="HeaderMuteHotkeys">ミュート切替キー</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">システムコンソール</sys:String>
 

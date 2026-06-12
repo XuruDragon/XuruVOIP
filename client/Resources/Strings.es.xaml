@@ -219,6 +219,9 @@
     <sys:String x:Key="LblAcceptHail">Tecla de aceptar llamada</sys:String>
     <sys:String x:Key="LblDeclineHail">Tecla de rechazar/terminar llamada</sys:String>
     <sys:String x:Key="LblEnableTranslationSubtitles">Activar subtítulos de traducción HUD en tiempo real</sys:String>
+
+    <sys:String x:Key="HeaderCommHotkeys">Teclas de comunicación y generales</sys:String>
+    <sys:String x:Key="HeaderMuteHotkeys">Teclas de silencio</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">CONSOLA DEL SISTEMA</sys:String>
 

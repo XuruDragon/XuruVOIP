@@ -219,6 +219,9 @@
     <sys:String x:Key="LblAcceptHail">Hailing-Annahmetaste</sys:String>
     <sys:String x:Key="LblDeclineHail">Hailing-Ablehnungs/Endtaste</sys:String>
     <sys:String x:Key="LblEnableTranslationSubtitles">Echtzeit-HUD-Übersetzungsuntertitel aktivieren</sys:String>
+
+    <sys:String x:Key="HeaderCommHotkeys">Kommunikations- &amp; allgemeine Tasten</sys:String>
+    <sys:String x:Key="HeaderMuteHotkeys">Stummschalttasten</sys:String>
     <!-- System Console Panel -->
     <sys:String x:Key="PanelConsoleLog">SYSTEMKONSOLE</sys:String>
 

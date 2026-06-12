@@ -881,175 +881,214 @@
                                         ValueChanged="SlVoiceCommandConfidence_Changed" Margin="0,0,0,12"/>
                             </StackPanel>
 
-                            <!-- PTT Proximity -->
-                            <TextBlock Text="{DynamicResource LblPttProximity}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxPttProximity"
-                                     Text="{Binding Config.PttProximityKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                            <!-- Header: Communication Hotkeys -->
+                            <TextBlock Text="{DynamicResource HeaderCommHotkeys}" Foreground="{StaticResource Accent}" FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                            <!-- PTT Radio -->
-                            <TextBlock Text="{DynamicResource LblPttRadio}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxPttRadio"
-                                     Text="{Binding Config.PttRadioKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                <StackPanel Grid.Column="0">
+                                    <!-- PTT Proximity -->
+                                    <TextBlock Text="{DynamicResource LblPttProximity}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxPttProximity"
+                                             Text="{Binding Config.PttProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
-                            <!-- PTT Profile -->
-                            <TextBlock Text="{DynamicResource LblPttProfile}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxPttProfile"
-                                     Text="{Binding Config.PttProfileKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                    <!-- PTT Radio -->
+                                    <TextBlock Text="{DynamicResource LblPttRadio}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxPttRadio"
+                                             Text="{Binding Config.PttRadioKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
-                            <!-- Helmet Toggle -->
-                            <TextBlock Text="{DynamicResource LblHelmetToggle}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxHelmetToggle"
-                                     Text="{Binding Config.HelmetToggleKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                    <!-- PTT Profile -->
+                                    <TextBlock Text="{DynamicResource LblPttProfile}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxPttProfile"
+                                             Text="{Binding Config.PttProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
-                            <!-- Radio Cycle -->
-                            <TextBlock Text="{DynamicResource LblRadioCycle}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxRadioCycle"
-                                     Text="{Binding Config.RadioCycleKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                    <!-- Voice Command Key (PTT) -->
+                                    <TextBlock Text="{DynamicResource LblVoiceCommandHotkey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceCommandHotkey"
+                                             Text="{Binding Config.VoiceCommandHotkey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
 
-                            <!-- Mute Proximity -->
-                            <TextBlock Text="{DynamicResource LblMuteProximity}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteProximity"
-                                     Text="{Binding Config.MuteProximityKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                <StackPanel Grid.Column="2">
+                                    <!-- Helmet Toggle -->
+                                    <TextBlock Text="{DynamicResource LblHelmetToggle}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxHelmetToggle"
+                                             Text="{Binding Config.HelmetToggleKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
-                            <!-- Mute Radio -->
-                            <TextBlock Text="{DynamicResource LblMuteRadio}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteRadio"
-                                     Text="{Binding Config.MuteRadioKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                    <!-- Radio Cycle -->
+                                    <TextBlock Text="{DynamicResource LblRadioCycle}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxRadioCycle"
+                                             Text="{Binding Config.RadioCycleKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
-                            <!-- Mute Profile -->
-                            <TextBlock Text="{DynamicResource LblMuteProfile}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteProfile"
-                                     Text="{Binding Config.MuteProfileKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                    <!-- Initiate Hail Key -->
+                                    <TextBlock Text="{DynamicResource LblInitiateHail}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxInitiateHail"
+                                             Text="{Binding Config.InitiateHailKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
-                            <!-- Mute Audio Proximity -->
-                            <TextBlock Text="{DynamicResource LblMuteAudioProximity}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteAudioProximity"
-                                     Text="{Binding Config.MuteAudioProximityKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                    <!-- Accept Hail Key -->
+                                    <TextBlock Text="{DynamicResource LblAcceptHail}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxAcceptHail"
+                                             Text="{Binding Config.AcceptHailKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
 
-                            <!-- Mute Audio Radio -->
-                            <TextBlock Text="{DynamicResource LblMuteAudioRadio}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteAudioRadio"
-                                     Text="{Binding Config.MuteAudioRadioKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                    <!-- Decline Hail Key -->
+                                    <TextBlock Text="{DynamicResource LblDeclineHail}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxDeclineHail"
+                                             Text="{Binding Config.DeclineHailKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
+                            </Grid>
 
-                            <!-- Mute Audio Profile -->
-                            <TextBlock Text="{DynamicResource LblMuteAudioProfile}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxMuteAudioProfile"
-                                     Text="{Binding Config.MuteAudioProfileKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                            <!-- Header: Mute Hotkeys -->
+                            <TextBlock Text="{DynamicResource HeaderMuteHotkeys}" Foreground="{StaticResource Accent}" FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                            <!-- Voice Command Key (PTT) -->
-                            <TextBlock Text="{DynamicResource LblVoiceCommandHotkey}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxVoiceCommandHotkey"
-                                     Text="{Binding Config.VoiceCommandHotkey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
+                                <StackPanel Grid.Column="0">
+                                    <!-- Mute Proximity -->
+                                    <TextBlock Text="{DynamicResource LblMuteProximity}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteProximity"
+                                             Text="{Binding Config.MuteProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Mute Radio -->
+                                    <TextBlock Text="{DynamicResource LblMuteRadio}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteRadio"
+                                             Text="{Binding Config.MuteRadioKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Mute Profile -->
+                                    <TextBlock Text="{DynamicResource LblMuteProfile}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteProfile"
+                                             Text="{Binding Config.MuteProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <!-- Mute Audio Proximity -->
+                                    <TextBlock Text="{DynamicResource LblMuteAudioProximity}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteAudioProximity"
+                                             Text="{Binding Config.MuteAudioProximityKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Mute Audio Radio -->
+                                    <TextBlock Text="{DynamicResource LblMuteAudioRadio}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteAudioRadio"
+                                             Text="{Binding Config.MuteAudioRadioKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Mute Audio Profile -->
+                                    <TextBlock Text="{DynamicResource LblMuteAudioProfile}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxMuteAudioProfile"
+                                             Text="{Binding Config.MuteAudioProfileKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
+                            </Grid>
 
                             <!-- Voice-Activated Ship Controls -->
                             <TextBlock Text="{DynamicResource LblVoiceShipControlsHeader}" 
                                        Foreground="{StaticResource Accent}" 
                                        FontWeight="Bold" FontSize="11" Margin="0,8,0,8"/>
-
-                            <!-- Power Key -->
-                            <TextBlock Text="{DynamicResource LblVoicePowerKey}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxVoicePowerKey"
-                                     Text="{Binding Config.VoiceCommandPowerKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Doors Key -->
-                            <TextBlock Text="{DynamicResource LblVoiceDoorsKey}" Style="{StaticResource LabelStyle}"/>
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="TxVoiceDoorsKey" Grid.Column="0"
-                                         Text="{Binding Config.VoiceCommandDoorsKey, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource InputStyle}"
-                                         KeyDown="Hotkey_KeyDown"/>
-                                <ComboBox x:Name="CbVoiceDoorsModifier" Grid.Column="1" Style="{StaticResource ComboStyle}" Margin="8,0,0,0"
-                                          SelectedValue="{Binding Config.VoiceCommandDoorsModifier, UpdateSourceTrigger=PropertyChanged}"
-                                          SelectedValuePath="Content">
-                                    <ComboBoxItem Content="None"/>
-                                    <ComboBoxItem Content="Alt"/>
-                                    <ComboBoxItem Content="Ctrl"/>
-                                    <ComboBoxItem Content="Shift"/>
-                                </ComboBox>
+
+                                <StackPanel Grid.Column="0">
+                                    <!-- Power Key -->
+                                    <TextBlock Text="{DynamicResource LblVoicePowerKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoicePowerKey"
+                                             Text="{Binding Config.VoiceCommandPowerKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+
+                                    <!-- Shields Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceShieldsKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceShieldsKey"
+                                             Text="{Binding Config.VoiceCommandShieldsKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <!-- Doors Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceDoorsKey}" Style="{StaticResource LabelStyle}"/>
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="TxVoiceDoorsKey" Grid.Column="0"
+                                                 Text="{Binding Config.VoiceCommandDoorsKey, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource InputStyle}"
+                                                 KeyDown="Hotkey_KeyDown"/>
+                                        <ComboBox x:Name="CbVoiceDoorsModifier" Grid.Column="1" Style="{StaticResource ComboStyle}" Margin="8,0,0,0"
+                                                  SelectedValue="{Binding Config.VoiceCommandDoorsModifier, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedValuePath="Content">
+                                            <ComboBoxItem Content="None"/>
+                                            <ComboBoxItem Content="Alt"/>
+                                            <ComboBoxItem Content="Ctrl"/>
+                                            <ComboBoxItem Content="Shift"/>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <!-- Landing Gear Key -->
+                                    <TextBlock Text="{DynamicResource LblVoiceLandingGearKey}" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox x:Name="TxVoiceLandingGearKey"
+                                             Text="{Binding Config.VoiceCommandLandingGearKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputStyle}"
+                                             KeyDown="Hotkey_KeyDown"
+                                             Margin="0,0,0,10"/>
+                                </StackPanel>
                             </Grid>
-
-                            <!-- Shields Key -->
-                            <TextBlock Text="{DynamicResource LblVoiceShieldsKey}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxVoiceShieldsKey"
-                                     Text="{Binding Config.VoiceCommandShieldsKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Landing Gear Key -->
-                            <TextBlock Text="{DynamicResource LblVoiceLandingGearKey}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxVoiceLandingGearKey"
-                                     Text="{Binding Config.VoiceCommandLandingGearKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Initiate Hail Key -->
-                            <TextBlock Text="{DynamicResource LblInitiateHail}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxInitiateHail"
-                                     Text="{Binding Config.InitiateHailKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Accept Hail Key -->
-                            <TextBlock Text="{DynamicResource LblAcceptHail}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxAcceptHail"
-                                     Text="{Binding Config.AcceptHailKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
-
-                            <!-- Decline Hail Key -->
-                            <TextBlock Text="{DynamicResource LblDeclineHail}" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="TxDeclineHail"
-                                     Text="{Binding Config.DeclineHailKey, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputStyle}"
-                                     KeyDown="Hotkey_KeyDown"
-                                     Margin="0,0,0,10"/>
 
                             <TextBlock Text="{DynamicResource LblRecordInstructionMulti}"
                                        Foreground="{StaticResource TextSecondary}"
