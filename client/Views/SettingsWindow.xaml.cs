@@ -142,6 +142,26 @@ public partial class SettingsWindow : Window
         VoicePitchLabel.Text = $"{Cfg.VoicePitchFactor:F1}x";
         VoiceChangerControlsPanel.Visibility = Cfg.EnableVoiceChanger ? Visibility.Visible : Visibility.Collapsed;
 
+        // Custom Modulator settings
+        CbEnableCustomModulator.IsChecked = Cfg.EnableCustomModulator;
+        SlCustomPitch.Value = Cfg.CustomPitchShift;
+        CustomPitchLabel.Text = $"{Cfg.CustomPitchShift:F1}x";
+        SlCustomRingFreq.Value = Cfg.CustomRingModFreq;
+        CustomRingFreqLabel.Text = $"{Cfg.CustomRingModFreq:F0} Hz";
+        SlCustomRingMix.Value = Cfg.CustomRingModMix;
+        CustomRingMixLabel.Text = $"{Cfg.CustomRingModMix * 100:F0}%";
+        SlCustomFlangerDepth.Value = Cfg.CustomFlangerDepth;
+        CustomFlangerDepthLabel.Text = $"{Cfg.CustomFlangerDepth * 100:F0}%";
+        SlCustomFlangerRate.Value = Cfg.CustomFlangerRate;
+        CustomFlangerRateLabel.Text = $"{Cfg.CustomFlangerRate:F1} Hz";
+        SlCustomFlangerFeedback.Value = Cfg.CustomFlangerFeedback;
+        CustomFlangerFeedbackLabel.Text = $"{Cfg.CustomFlangerFeedback * 100:F0}%";
+        CbCustomBitcrush.IsChecked = Cfg.CustomBitcrushEnabled;
+        SlCustomBitcrushBits.Value = Cfg.CustomBitcrushBits;
+        CustomBitcrushLabel.Text = $"{Cfg.CustomBitcrushBits} bits";
+        CustomModulatorControlsPanel.Visibility = Cfg.EnableCustomModulator ? Visibility.Visible : Visibility.Collapsed;
+        CustomBitcrushPanel.Visibility = Cfg.CustomBitcrushEnabled ? Visibility.Visible : Visibility.Collapsed;
+
         // Radar settings
         CbEnableRadar.IsChecked = Cfg.EnableRadar;
         SlRadarRange.Value = Cfg.RadarRange;
@@ -414,6 +434,64 @@ public partial class SettingsWindow : Window
     {
         if (VoicePitchLabel != null) VoicePitchLabel.Text = $"{e.NewValue:F1}x";
         if (Cfg != null) Cfg.VoicePitchFactor = (float)e.NewValue;
+    }
+
+    private void CustomModulator_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || CustomModulatorControlsPanel == null) return;
+        bool enabled = CbEnableCustomModulator.IsChecked == true;
+        Cfg.EnableCustomModulator = enabled;
+        CustomModulatorControlsPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void SlCustomPitch_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (CustomPitchLabel != null) CustomPitchLabel.Text = $"{e.NewValue:F1}x";
+        if (Cfg != null) Cfg.CustomPitchShift = (float)e.NewValue;
+    }
+
+    private void SlCustomRingFreq_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (CustomRingFreqLabel != null) CustomRingFreqLabel.Text = $"{e.NewValue:F0} Hz";
+        if (Cfg != null) Cfg.CustomRingModFreq = (float)e.NewValue;
+    }
+
+    private void SlCustomRingMix_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (CustomRingMixLabel != null) CustomRingMixLabel.Text = $"{e.NewValue * 100:F0}%";
+        if (Cfg != null) Cfg.CustomRingModMix = (float)e.NewValue;
+    }
+
+    private void SlCustomFlangerDepth_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (CustomFlangerDepthLabel != null) CustomFlangerDepthLabel.Text = $"{e.NewValue * 100:F0}%";
+        if (Cfg != null) Cfg.CustomFlangerDepth = (float)e.NewValue;
+    }
+
+    private void SlCustomFlangerRate_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (CustomFlangerRateLabel != null) CustomFlangerRateLabel.Text = $"{e.NewValue:F1} Hz";
+        if (Cfg != null) Cfg.CustomFlangerRate = (float)e.NewValue;
+    }
+
+    private void SlCustomFlangerFeedback_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (CustomFlangerFeedbackLabel != null) CustomFlangerFeedbackLabel.Text = $"{e.NewValue * 100:F0}%";
+        if (Cfg != null) Cfg.CustomFlangerFeedback = (float)e.NewValue;
+    }
+
+    private void CustomBitcrush_ToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (Cfg == null || CustomBitcrushPanel == null) return;
+        bool enabled = CbCustomBitcrush.IsChecked == true;
+        Cfg.CustomBitcrushEnabled = enabled;
+        CustomBitcrushPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void SlCustomBitcrushBits_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (CustomBitcrushLabel != null) CustomBitcrushLabel.Text = $"{e.NewValue:F0} bits";
+        if (Cfg != null) Cfg.CustomBitcrushBits = (int)e.NewValue;
     }
 
     private void Radar_ToggleChanged(object sender, RoutedEventArgs e)

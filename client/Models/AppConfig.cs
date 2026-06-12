@@ -65,6 +65,15 @@ public class AppConfig
     public bool EnableVoiceChanger { get; set; } = false;
     public string VoiceChangerType { get; set; } = "None"; // None, Alien, Cyborg, Robotic, PitchShift
     public float VoicePitchFactor { get; set; } = 1.0f;
+    public bool EnableCustomModulator { get; set; } = false;
+    public float CustomPitchShift { get; set; } = 1.0f;
+    public float CustomRingModFreq { get; set; } = 100f;
+    public float CustomRingModMix { get; set; } = 0.0f;
+    public float CustomFlangerDepth { get; set; } = 0.0f;
+    public float CustomFlangerRate { get; set; } = 0.5f;
+    public float CustomFlangerFeedback { get; set; } = 0.0f;
+    public bool CustomBitcrushEnabled { get; set; } = false;
+    public int CustomBitcrushBits { get; set; } = 16;
     public bool EnableAtmosphereSimulation { get; set; } = false;
 
     // --- Borderless Overlay ---
