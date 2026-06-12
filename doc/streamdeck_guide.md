@@ -29,7 +29,7 @@ Getting the plugin installed into your Stream Deck software is very simple.
    * Your Elgato Stream Deck software will open and show a message asking if you want to install it. Click **Install**.
 3. **Verify:**
    * In your Elgato Stream Deck desktop app, look at the list of actions on the right side.
-   * Scroll down until you see a category named **XuruVOIP** containing 19 actions.
+   * Scroll down until you see a category named **XuruVOIP** containing 22 actions.
 
 ---
 
@@ -63,77 +63,93 @@ Now, let's configure the physical buttons on your device.
 
 ## 🎮 Available Actions & Visual Feedback
 
-The plugin features dynamic icons and text that change in real-time based on your settings:
+The plugin features dynamic icons and text that change in real-time based on your settings. Below is the list of all 22 implemented actions and their associated icon states:
 
 ### 🎤 Microphone Mute Keys
-* **Actions:** **Proximity Mute**, **Radio Mute**, and **Profile Mute**.
-* **Visual Feedback:** 
-  * Active/Ready: **Cyan glowing microphone** icon.
-  * Muted: **Red crossed-out microphone** icon.
+Controls microphone mute status for various communication ranges.
+
+| Action | UUID | Icon (Unmuted) | Icon (Muted) | Visual Feedback & Use |
+| :--- | :--- | :---: | :---: | :--- |
+| **Proximity Mute** | `com.xurudragon.xuruvoip.action.proximity-mute` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/proximity_unmuted.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/proximity_mute.svg" width="32" height="32" /> | Toggle local proximity mic. |
+| **Radio Mute** | `com.xurudragon.xuruvoip.action.radio-mute` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/radio_unmuted.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/radio_mute.svg" width="32" height="32" /> | Toggle ship radio mic. |
+| **Profile Mute** | `com.xurudragon.xuruvoip.action.profile-mute` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/profile_unmuted.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/profile_mute.svg" width="32" height="32" /> | Toggle user profile mic. |
 
 ### 🔊 Audio Playback Mute Keys
-* **Actions:** **Audio Proximity Mute**, **Audio Radio Mute**, and **Audio Profile Mute**.
-* **Visual Feedback:** Shows a speaker icon that strikes through in red when muted.
+Controls whether you hear audio from specific communication channels.
+
+| Action | UUID | Icon (Active) | Icon (Muted) | Visual Feedback & Use |
+| :--- | :--- | :---: | :---: | :--- |
+| **Audio Proximity Mute** | `com.xurudragon.xuruvoip.action.audio-proximity-mute` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/audio_proximity_unmuted.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/audio_proximity_mute.svg" width="32" height="32" /> | Toggle hearing proximity voices. |
+| **Audio Radio Mute** | `com.xurudragon.xuruvoip.action.audio-radio-mute` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/audio_radio_unmuted.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/audio_radio_mute.svg" width="32" height="32" /> | Toggle hearing radio voices. |
+| **Audio Profile Mute** | `com.xurudragon.xuruvoip.action.audio-profile-mute` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/audio_profile_unmuted.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/audio_profile_mute.svg" width="32" height="32" /> | Toggle hearing profile voices. |
 
 ### 🪖 Helmet Visor Toggle
-* **Action:** **Toggle Helmet**.
-* **Visual Feedback:** Shows a green visor-down icon when closed, and red visor-up icon when open.
+Controls space suit helmet visor state.
 
-### 🔄 Cycle Radio (Live Channel Display!)
-* **Action:** **Cycle Radio**.
-* **Live Display:** Automatically displays the active channel name (e.g., `General`, `120.5`, or `Intercom`) in clean text directly on the button's LCD screen in real-time.
+| Action | UUID | Icon (Open) | Icon (Closed) | Visual Feedback & Use |
+| :--- | :--- | :---: | :---: | :--- |
+| **Toggle Helmet** | `com.xurudragon.xuruvoip.action.toggle-helmet` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/helmet_up.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/helmet_down.svg" width="32" height="32" /> | Toggle visor open (red icon) or closed (green icon). |
 
-### 📢 PA Broadcast (Push-to-Talk)
-* **Action:** **PA Broadcast**.
-* **Use:** Hold down the key to broadcast on the ship Public Address system. Release to stop.
-* **Visual Feedback:** Megaphone glows active cyan when broadcasting.
+### 🔄 Active Radio Channel
+Manages channel frequencies with real-time feedback.
 
-### 📡 Beacon Mode (Repeater)
-* **Action:** **Beacon Mode**.
-* **Use:** Toggles the client's Radio Repeater / Beacon relay capability.
-* **Visual Feedback:** Shows active cyan waves when broadcasting, and dim grey/red when disabled.
+| Action | UUID | Icon (Ready) | Visual Feedback & Use |
+| :--- | :--- | :---: | :--- |
+| **Cycle Radio** | `com.xurudragon.xuruvoip.action.cycle-radio` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/cycle_radio.svg" width="32" height="32" /> | Cycles active channels. Displays channel name (e.g., `General`, `120.5`) in clean text on the LCD. |
+
+### 📢 PA Broadcast & Beacon Relay
+Ship-wide communications and beacons.
+
+| Action | UUID | Icon (Idle) | Icon (Active) | Visual Feedback & Use |
+| :--- | :--- | :---: | :---: | :--- |
+| **PA Broadcast** | `com.xurudragon.xuruvoip.action.pa-broadcast` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/pa_idle.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/pa_active.svg" width="32" height="32" /> | Hold to broadcast on Ship Public Address (cyan equalizer). |
+| **Beacon Mode** | `com.xurudragon.xuruvoip.action.beacon-repeater` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/repeater_inactive.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/repeater_active.svg" width="32" height="32" /> | Toggles Radio Repeater / Beacon mode (active waves). |
 
 ### 🎙️ Voice Command Macro
-* **Action:** **Voice Command Macro**.
-* **Use:** Executes a custom text-based voice command. Configure the command string in the settings.
-* **Visual Feedback:** Displays a green listening indicator if voice recognition is currently listening.
+Custom voice macro executor.
+
+| Action | UUID | Icon (Ready) | Icon (Listening) | Visual Feedback & Use |
+| :--- | :--- | :---: | :---: | :--- |
+| **Voice Command Macro** | `com.xurudragon.xuruvoip.action.voice-command` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/voice_ready.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/voice_listening.svg" width="32" height="32" /> | Triggers custom voice macros (green listening badge). |
 
 ### 💬 Intercom Status (Multi-State)
-* **Action:** **Intercom Status**.
-* **Use:** Displays the ship's active intercom condition. Pressing it cycles the simulation state.
-* **Visual Feedback:** Displays 4 distinct states:
-  * `NORMAL`: Cyan headset badge.
-  * `SHIELD HIT`: Orange warning shield badge.
-  * `CRIT PWR`: Red warning hazard battery badge.
-  * `QUANTUM`: Purple quantum warp speed lines badge.
+Monitors intercom telemetry simulation states.
 
-### 🗺️ Location Telemetry (MFD Screen)
-* **Action:** **Location Telemetry**.
-* **Use:** A read-only telemetry display.
-* **Live Display:** Displays the current system zone and coordinate vectors $(X, Y, Z)$ directly on the key in real-time. Displays `NO GPS` if coordinates are unavailable.
+| Action | UUID | Icons (State 0 - 3) | Visual Feedback & Use |
+| :--- | :--- | :---: | :--- |
+| **Intercom Status** | `com.xurudragon.xuruvoip.action.intercom-status` | **NORMAL**: <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/intercom_normal.svg" width="28" height="28" /><br>**SHIELD HIT**: <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/intercom_shield.svg" width="28" height="28" /><br>**CRIT PWR**: <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/intercom_power.svg" width="28" height="28" /><br>**QUANTUM**: <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/intercom_quantum.svg" width="28" height="28" /> | Pressing cycles the simulator state. Renders corresponding status icons on the key screen. |
+
+### 🗺️ Location Telemetry
+Live coordinate HUD telemetry.
+
+| Action | UUID | Icon | Visual Feedback & Use |
+| :--- | :--- | :---: | :--- |
+| **Location Telemetry** | `com.xurudragon.xuruvoip.action.location-telemetry` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/telemetry.svg" width="32" height="32" /> | Read-only telemetry displaying active zone and coordinate vectors $(X, Y, Z)$ or `NO GPS`. |
 
 ### 📞 Ship-to-Ship Hailing Actions
-* **Actions:** **Initiate Hail**, **Accept/Answer Hail**, and **Decline/End Hail**.
-* **Use:** Controls the cockpit calling system:
-  * **Initiate Hail:** Triggers a call request to the specified target. Shows dial status.
-  * **Accept/Answer Hail:** Answers an incoming call.
-  * **Decline/End Hail:** Rejects a incoming call or hangs up an active call.
-* **Visual Feedback:** Shows active ringing, dialing, or connected calling graphics.
+Manage cockpits direct-calling linkages.
 
-### 🔤 HUD Translation Subtitles Toggle
-* **Action:** **Toggle Translation**.
-* **Use:** Toggles real-time HUD translation subtitles.
-* **Visual Feedback:** Shows green `ON` icon when enabled, and red crossed-out `OFF` icon when disabled.
+| Action | UUID | Icon | Visual Feedback & Use |
+| :--- | :--- | :---: | :--- |
+| **Initiate Hail** | `com.xurudragon.xuruvoip.action.hail-initiate` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/hail_initiate.svg" width="32" height="32" /> | Triggers private hailing call request to nearest cockpit target. |
+| **Accept Hail** | `com.xurudragon.xuruvoip.action.hail-accept` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/hail_accept.svg" width="32" height="32" /> | Accepts incoming ship-to-ship hailing. |
+| **Decline/End Hail** | `com.xurudragon.xuruvoip.action.hail-decline` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/hail_decline.svg" width="32" height="32" /> | Rejects incoming call or hangs up active call. |
 
-### 🎧 Toggle HRTF Spatial Audio
-* **Action:** **Toggle HRTF**.
-* **Use:** Toggles real-time HRTF spatial audio rendering.
-* **Visual Feedback:** Shows green `ON` icon (cyan ears) when enabled, and red crossed-out `OFF` icon when disabled.
+### 🔤 HUD Translation Subtitles
+Real-time subtitle rendering settings.
 
-### 📊 Toggle Visor Spectrogram
-* **Action:** **Toggle Spectrogram**.
-* **Use:** Toggles real-time visor HUD 3D spectrogram.
-* **Visual Feedback:** Shows green `ON` icon (cyan equalizer bars) when enabled, and red crossed-out `OFF` icon when disabled.
+| Action | UUID | Icon (Disabled) | Icon (Enabled) | Visual Feedback & Use |
+| :--- | :--- | :---: | :---: | :--- |
+| **Toggle Translation** | `com.xurudragon.xuruvoip.action.toggle-translation` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/translation_disabled.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/translation_enabled.svg" width="32" height="32" /> | Toggles foreign audio real-time translation subtitles. |
+
+### 🎧 Spatial Audio & Visor Spectrogram
+HUD immersive rendering controls.
+
+| Action | UUID | Icon (Disabled) | Icon (Enabled) | Visual Feedback & Use |
+| :--- | :--- | :---: | :---: | :--- |
+| **Toggle HRTF** | `com.xurudragon.xuruvoip.action.toggle-hrtf` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/hrtf_off.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/hrtf_on.svg" width="32" height="32" /> | Toggle Binaural HRTF Spatial Audio. |
+| **Toggle Spectrogram** | `com.xurudragon.xuruvoip.action.toggle-spectrogram` | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/spectrogram_off.svg" width="32" height="32" /> | <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/spectrogram_on.svg" width="32" height="32" /> | Toggle 3D spectrogram visualizer. |
+
 
 ---
 
@@ -226,15 +242,18 @@ Combines physical keys with rotary encoders and a touch strip display.
 
 *   **Rotary Encoders (Dials) & Touch Strip:**
     1.  **Dial 1: Radio Channel Dial** (`com.xurudragon.xuruvoip.action.cycle-radio-dial`)
+        *   **Icon:** <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/cycle_radio.svg" width="24" height="24" align="middle" />
         *   *Rotate:* Select active radio frequency/channel.
         *   *Push / Touch Screen Tap:* Toggle radio microphone mute.
         *   *Display:* Active radio channel name (red `[MUTED]` tag appended if muted).
     2.  **Dial 2: Adjust Exertion/G-Force** (`com.xurudragon.xuruvoip.action.adjust-exertion`)
+        *   **Icon:** <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/telemetry.svg" width="24" height="24" align="middle" />
         *   *Rotate:* Adjust Mock G-Force.
         *   *Rotate while pressed:* Adjust Mock Exertion value.
         *   *Push / Touch Screen Tap:* Toggle immersive exertion distortion simulation.
         *   *Display:* G-force amount (G) and Exertion percentage (%) with state status.
     3.  **Dial 3: Voice Changer Dial** (`com.xurudragon.xuruvoip.action.voice-changer-dial`)
+        *   **Icon:** <img src="../streamdeck/com.xurudragon.xuruvoip.sdPlugin/icons/profile_unmuted.svg" width="24" height="24" align="middle" />
         *   *Rotate:* Cycle through active voice changer profiles (None, Alien, Cyborg, Robotic, PitchShift).
         *   *Push / Touch Screen Tap:* Toggle voice changer on/off.
         *   *Display:* Active voice profile name or `Disabled`.

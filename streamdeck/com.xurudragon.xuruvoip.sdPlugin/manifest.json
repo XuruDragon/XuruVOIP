@@ -1,5 +1,5 @@
 {
-  "SDKVersion": 2,
+  "SDKVersion": 3,
   "Author": "XuruDragon",
   "Description": "Control mutes, active channel, and helmet state for XuruVOIP",
   "Name": "XuruVOIP Control",

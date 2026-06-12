@@ -26,7 +26,7 @@ test('Stream Deck Plugin Manifest Validation', async (t) => {
 
     // 3. Validate root fields
     await t.test('manifest has correct metadata', () => {
-        assert.strictEqual(manifest.SDKVersion, 2, 'SDKVersion must be 2');
+        assert.strictEqual(manifest.SDKVersion, 3, 'SDKVersion must be 3');
         assert.strictEqual(manifest.Author, 'XuruDragon', 'Author must be XuruDragon');
         assert.strictEqual(manifest.CodePath, 'bin/plugin.js', 'CodePath must be bin/plugin.js');
         assert.strictEqual(manifest.Category, 'XuruVOIP Control', 'Category must be XuruVOIP Control');
