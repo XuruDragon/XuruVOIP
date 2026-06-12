@@ -1082,6 +1082,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableHrtfBinaural = cfg.EnableHrtf;
         _playback.EnableRadioDegradation = cfg.EnableRadioDegradation;
         _playback.EnablePttChimes = cfg.EnablePttChimes;
+        _playback.PttChimeType = cfg.PttChimeType;
         _playback.EnableEnvironmentalAcoustics = cfg.EnableEnvironmentalAcoustics;
         _playback.EnableAtmosphereSimulation = cfg.EnableAtmosphereSimulation;
         _playback.EnableHelmetModulator = cfg.EnableHelmetModulator;
@@ -1364,6 +1365,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableHrtfBinaural = Config.Config.EnableHrtf;
         _playback.EnableRadioDegradation = Config.Config.EnableRadioDegradation;
         _playback.EnablePttChimes = Config.Config.EnablePttChimes;
+        _playback.PttChimeType = Config.Config.PttChimeType;
         _playback.EnableEnvironmentalAcoustics = Config.Config.EnableEnvironmentalAcoustics;
         _playback.EnableAtmosphereSimulation = Config.Config.EnableAtmosphereSimulation;
         _playback.EnableHelmetModulator = Config.Config.EnableHelmetModulator;

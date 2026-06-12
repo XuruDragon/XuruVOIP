@@ -59,6 +59,8 @@ public class AppConfig
     public bool EnableHrtf { get; set; } = false;
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
+    public string PttChimeType { get; set; } = "Military";
+    public bool EnableAlarmInjection { get; set; } = true;
     public bool EnableEnvironmentalAcoustics { get; set; } = true;
     public bool EnableHelmetModulator { get; set; } = true;
     public bool EnableVoiceChanger { get; set; } = false;
@@ -69,7 +71,12 @@ public class AppConfig
     // --- Borderless Overlay ---
     public bool EnableOverlay { get; set; } = false;
     public string OverlayPosition { get; set; } = "TopLeft";
+    public string HudTheme { get; set; } = "Aegis";
+    public bool HudShowRadar { get; set; } = true;
+    public bool HudShowActiveSpeakers { get; set; } = true;
+    public bool HudShowChannel { get; set; } = true;
     public bool EnableRadar { get; set; } = true;
+
     public double RadarRange { get; set; } = 50.0;
     public bool EnableStt { get; set; } = false;
     public bool EnableVisorSpectrogram { get; set; } = false;
