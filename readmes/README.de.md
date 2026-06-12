@@ -220,8 +220,8 @@ graph TB
 
 ### 5. 📻 Immersive Radiodegradation & Glockenspiele
 * **Bandpassfilterung:** Modelliert Funkfilter mit niedrigen/hohen Grenzwerten bei der Nutzung von Funkkanälen oder bei heruntergeklappten Anzugvisieren.
-* **Verschlechterung des Funksignals:** Schmale Grenzbänder und Mischungen mit bandpassgefiltertem statischem Rauschen, wenn sich die Entfernung zwischen den Spielern der Grenze des Funksenders nähert.
-* **Akustische Funkglockenspiele:** Spielt bei gedrückter Taste ein Tonhöhen-schwingendes Mikrofon-Tasten-Gezwitscher (900 Hz bis 700 Hz) und bei gedrückter Taste eine statische Rauschsperre ab.
+* **Verschlechterung des Funksignals:** Schmale Grenzbänder und Mischungen mit bandpassgefiltertem statischem Rauschen, wenn sich die Grenze des Funksenders nähert.
+* **Akustische Funkglockenspiele:** Spielt mechanische Key-Down- und Key-Up-Glockenspiele beim Senden auf Funkkanälen. Unterstützt vier verschiedene mathematische Profile, die in den Einstellungen oder der Companion App ausgewählt werden können: Militär (Sinusschwankungen), Industrie (mechanisches Klacken), Alien (ringmodulierte Frequenzschwankungen) und Vintage (analoge Relais-Klicks).
 
 ### 6. 💬 Automatisches Schiffs-Gegensprechsystem
 * **Fahrzeug-Intercom-Kanäle:** Durch das Einsteigen in ein Fahrzeug abonnieren Spieler automatisch einen dynamischen „Intercom_<ContainerID>“-Funkkanal.
@@ -231,10 +231,12 @@ graph TB
   * **Kritische Energie (Critical Power):** Niederspannungs-Wechselstrombrummen, Soft-Clipping-Verzerrung und Tonhöhenabfall (Resampling).
   * **Quantenreise (Quantum Travel):** Kammfilter-Flanger/Phaser-Effekt und hochfrequentes Pfeifen.
   * *Alle Untereffekte können in den allgemeinen Einstellungen einzeln ein- oder ausgeschaltet werden und sind standardmäßig deaktiviert.*
+* **Cockpit-Alarm-Mischung:** Wenn die Alarm-Mischung aktiv ist und das Schiff in Warnzustände übergeht (Schildtreffer oder kritische Energie), synthetisiert der Client automatisch Warnalarme mit niedriger Amplitude (<0,01) (eine ansteigende Sirene oder schnelles Doppel-Piepen) und mischt sie direkt in den ausgehenden Mikrofonstrom für ein realistisches akustisches Notfall-Feedback des Cockpits.
 * **Aufräum-Abklingzeit:** Zählt 5 Minuten herunter, nachdem der letzte Spieler das Schiff verlassen hat, bevor der Intercom-Kanal gelöscht wird, um die Serverleistung zu maximieren.
 
 ### 7. 📡 Vulkan-kompatibles HUD-Overlay und taktisches 2D-Radar
 * **Win32 Click-Through-Overlay:** Ein randloses HUD-Overlay, das VoIP-Verbindungen, Frequenzen und Sprechzustände anzeigt. Vulkan- und DirectX-kompatibel (läuft im randlosen Fenstermodus).
+* **Interaktiver HUD-Customizer:** Ermöglicht die Echtzeit-Anpassung von Thema (Aegis, Anvil, Drake, RSI, Origin), Positionierung (Ecken/Mitte) und Sichtbarkeit der Komponenten (Miniradar, Sprecherliste, Verbindungskopf) über die Einstellungen oder die Companion App.
 * **Gegensprech-Statusanzeige:** Zeigt Warnmeldungen wie `⚡ INTERCOM: DEGRADED` (mit Details wie `[Power Loss]`, `[Quantum]` oder `[Static Pop]`) auf dem HUD-Overlay an, wenn die Intercom-Verschlechterung aktiv ist.
 * **Taktisches Mini-Radar:** Verfügt über ein auf den Kurs ausgerichtetes 2D-HUD-Radar, das relativ sprechende Spieler anzeigt und pulsierende Tonringe um sie herum zeichnet.
 * **Speech-to-Text-Untertitel:** Transkribiert eingehende Radio-/Proximity-Audiodaten mithilfe eines Offline-, leichten Whisper-Modells („ggml-tiny.bin“) in lokalisierte HUD-Untertitel.

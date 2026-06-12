@@ -220,8 +220,8 @@ graph TB
 
 ### 5. 📻 Degradação imersiva de rádio e sinos
 * **Filtragem passa-banda:** Modela filtros de rádio com cortes baixos/altos ao usar canais de rádio ou quando os visores do traje estão abaixados.
-* **Degradação do sinal de rádio:** Faixas de corte estreitas e misturas de ruído estático filtrado por passagem de banda conforme a distância entre os jogadores se aproxima do limite do transmissor de rádio.
-* **Acoustic Radio Chimes:** Reproduz um som de mic-key de arrebatamento (900Hz a 700Hz) na tecla pressionada e uma cauda estática de silenciador na tecla levantada.
+* **Degradacão do sinal de rádio:** Faixas de corte estreitas e misturas de ruído estático filtrado por passagem de banda conforme a distância entre os jogadores se aproxima do limite do transmissor de rádio.
+* **Sinos de rádio acústicos:** Toca sinos mecânicos ao pressionar e liberar a tecla de transmissão nos canais de rádio. Suporta quatro perfis matemáticos distintos selecionáveis nas configurações ou no aplicativo Companion: Militar (varreduras senoidais), Industrial (cliques mecânicos pesados), Alienígena (varreduras moduladas em anel) e Vintage (cliques de relé analógico).
 
 ### 6. 💬 Sistema de intercomunicação automática de navio
 * **Canais de intercomunicação de veículos:** Embarcar em um veículo inscreve automaticamente os jogadores em um canal de rádio dinâmico `Intercom_<ContainerID>`.
@@ -231,10 +231,12 @@ graph TB
   * **Energia Crítica (Critical Power):** Zumbido elétrico de corrente alternada de baixa tensão, distorção de saturação (soft-clipping) e queda de tom de voz (resampling).
   * **Viagem Quântica (Quantum Travel):** Varredura de filtro comb (flanger/phaser) e zumbido de alta frequência.
   * *Todos os subefeitos podem ser alternados individualmente nas Configurações Gerais e vêm desativados por padrão.*
+* **Injeção de alarmes de cockpit ambientes:** Quando a injeção de alarmes está ativa e a nave entra em estados de alerta (impacto no escudo ou energia crítica), o cliente sintetiza automaticamente alarmes de alerta de baixa amplitude (<0,01) (loop de sirene de emergência ou loop de bipe duplo rápido) e os mistura diretamente na transmissão de microfone de saída para um feedback de emergência de cockpit realista.
 * **Recarga de limpeza:** Faz uma contagem regressiva de 5 minutos após o último jogador deixar a nave antes de excluir o canal de intercomunicação, maximizando o desempenho do servidor.
 
 ### 7. 📡 Sobreposição de HUD compatível com Vulkan e radar tático 2D
 * **Sobreposição Click-Through do Win32:** Uma sobreposição de HUD sem bordas que mostra conexões VoIP, frequências e estados de fala. Compatível com Vulkan e DirectX (executando em modo de janela sem borda).
+* **Personalizador de HUD interativo:** Permite personalização em tempo real do tema (Aegis, Anvil, Drake, RSI, Origin), posicionamento (cantos/centro) e visibilidade dos componentes (mini-radar, lista de alto-falantes, cabeçalho de conexão) via configurações ou pelo aplicativo Companion.
 * **Indicador de Status do Intercomunicador:** Exibe avisos como `⚡ INTERCOM: DEGRADED` (com detalhes de substatus como `[Power Loss]`, `[Quantum]` ou `[Static Pop]`) na sobreposição do HUD quando a degradação do intercomunicador está ativa.
 * **Mini-Radar Tático:** Apresenta um radar HUD 2D alinhado ao rumo que exibe jogadores que falam relativamente, desenhando anéis sonoros pulsantes ao redor deles.
 * **Legendas de fala para texto:** Transcreve áudio de rádio/proximidade recebido para legendas localizadas do HUD usando um modelo Whisper leve e off-line (`ggml-tiny.bin`).

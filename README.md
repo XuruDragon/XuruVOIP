@@ -224,7 +224,7 @@ graph TB
 ### 5. 📻 Immersive Radio Degradation & Chimes
 * **Bandpass Filtering:** Models radio filters with low/high cutoffs when using radio channels or when suit visors are down.
 * **Radio Signal Degradation:** Narrow cutoff bands and blends in bandpass-filtered static noise as distance between players approaches the radio transmitter limit.
-* **Acoustic Radio Chimes:** Plays a pitch-sweeping mic-key chirp (900Hz to 700Hz) on key-down and a squelch static tail on key-up.
+* **Acoustic Radio Chimes:** Plays mechanical key-down and key-up chimes when transmitting on radio channels. Supports four distinct mathematical profiles selectable in settings or the Companion App: Military (sine sweeps), Industrial (mechanical clanks), Alien (ring-modulated sweeps), and Vintage (analog relay clicks).
 
 ### 6. 💬 Automatic Ship Intercom System
 * **Vehicle Intercom Channels:** Boarding a vehicle automatically subscribes players to a dynamic `Intercom_<ContainerID>` radio channel.
@@ -234,10 +234,12 @@ graph TB
   * **Critical Power:** Low-voltage AC hum, soft-clipping distortion, and pitch-resampling drop.
   * **Quantum Travel:** Comb-filter flanger/phaser sweep and high-frequency whine.
   * *All sub-effects can be toggled individually in the General Settings and are disabled by default.*
+* **Ambient Cockpit Alarm Injection:** When Enable Alarm Injection is active and the ship enters warning states (Shield Hit or Critical Power), the client automatically synthesizes low-amplitude (<0.01) warning alarms (sweeping emergency siren loop or rapid double-beeps warning loop) and mixes them directly into the outgoing microphone stream for realistic cockpit emergency feedback.
 * **Cleanup Cooldown:** Counts down 5 minutes after the last player leaves the ship before deleting the intercom channel, maximizing server performance.
 
 ### 7. 📡 Vulkan-Compatible HUD Overlay & 2D Tactical Radar
 * **Win32 Click-Through Overlay:** A borderless HUD overlay showing VoIP connections, frequencies, and speaking states. Vulkan and DirectX compatible (running in borderless windowed mode).
+* **Interactive HUD Customizer:** Allows real-time theme (Aegis, Anvil, Drake, RSI, Origin), positioning (corners/center), and component visibility (mini-radar, speakers list, connection header) customization via settings or the Companion App.
 * **Intercom Status Indicator:** Displays warnings like `⚡ INTERCOM: DEGRADED` (with sub-status details such as `[Power Loss]`, `[Quantum]`, or `[Static Pop]`) in the overlay when intercom degradation is active.
 * **Tactical Mini-Radar:** Features a heading-aligned 2D HUD radar that displays relative speaking players, drawing pulsating sound rings around them.
 * **Speech-to-Text Subtitles:** Transcribes incoming radio/proximity audio to localized HUD subtitles using an offline, lightweight Whisper model (`ggml-tiny.bin`).

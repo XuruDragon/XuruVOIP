@@ -124,7 +124,11 @@ Simulates analog radio transmissions with bandpass filters, static noise, and me
 ### How It Works
 * **Radio Bandpass:** Incoming radio packets are restricted to a communication frequency band (e.g. 400Hz to 3400Hz) to replicate radio hardware.
 * **Signal Degradation:** Calculates distance between the speaker and listener. As they approach the transmitter's maximum range, the bandpass limits narrow and static white noise is dynamically blended in.
-* **PTT Chimes & Squelch Tail:** Triggers a dual-tone mic-key chime (sweeping from 900Hz to 700Hz) on key-down, and inserts a brief burst of static (squelch tail) when key-up is detected.
+* **PTT Chimes & Squelch Tail:** Triggers mechanical key-down and key-up chimes when transmitting on radio channels. Supports four distinct mathematical profiles selectable in settings or the Companion App:
+  * **Military:** Clean, authentic sine sweeps (900Hz to 700Hz key-down, 3.5ms squelch tail).
+  * **Industrial:** Heavy mechanical clanks (metallic frequency modulations and resonant bandpassed noise).
+  * **Alien:** Harmonic ring-modulated sweeps simulating bio-organic neural link clicks.
+  * **Vintage:** Distorted, low-fidelity analog relay clicks with slow decay.
 
 ### How to Use
 * Set a key for **Radio PTT** in the **Hotkeys** tab and communicate on an active radio channel.
@@ -146,6 +150,10 @@ Automatically groups ship crews into private, localized intercom channels that r
   * **Shield Hits (Static Burst):** Blends in sharp, random voltage spikes and white noise (lasts 2.5 seconds).
   * **Critical Power (Power Loss):** Heavy soft-clipping saturation, pitch resampled down to 0.78x, and a 60Hz AC hum.
   * **Quantum Travel (Quantum Wave):** Flanger/phaser sweep via an LFO and an 1800Hz resonant whine.
+* **Ambient Cockpit Alarm Injection:** When Enable Alarm Injection is active and the ship enters warning states (Shield Hit or Critical Power), the client automatically synthesizes low-amplitude (<0.01) warning alarms:
+  * **Shield Hit State:** A sweeping emergency siren loop (filtered through a 1500Hz LPF).
+  * **Critical Power State:** Rapid double-beeps warning loop.
+  These alarms are mixed directly into the outgoing microphone stream to give remote listeners immediate acoustic feedback of your ship's emergency status.
 * **Cleanup Cooldown:** Unused intercom channels are deleted by the Go server 5 minutes after the last player disembarks.
 
 ### How to Use
@@ -164,6 +172,10 @@ An in-game HUD overlay displaying active channels, speaker states, real-time spe
 
 ### How It Works
 * **Win32 Click-Through Overlay:** A borderless overlay window positioned over the game. It uses low-level Win32 window flags (`WS_EX_TRANSPARENT` and `WS_EX_NOACTIVATE`) to remain clickable-through.
+* **Interactive HUD Customizer:** Allows real-time theme, positioning, and component visibility customization via the client settings or companion app:
+  * **Themes:** Selectable color schemes matching manufacturer aesthetics: Aegis (Cyan), Anvil (Orange), Drake (Green), RSI (Light Blue), and Origin (Magenta).
+  * **Positioning:** Instantly align the HUD panel to any screen corner or center (Top Left, Top Center, Top Right, Bottom Left, Bottom Center, Bottom Right).
+  * **Visibility Toggles:** Independent control to show/hide the mini-radar, active speakers list, or the connection channel header.
 * **Tactical Mini-Radar:** Resolves the player's heading and relative speaker coordinates to render a 2D radar overlay with pulsating rings representing voice activity.
 * **Speech-to-Text Subtitles:** Decoded incoming audio packets are sent to a background thread running a lightweight, offline Whisper model (`ggml-tiny.bin`) to generate real-time HUD subtitles.
 

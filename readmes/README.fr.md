@@ -221,7 +221,7 @@ graph TB
 ### 5. 📻 Dégradation radio immersive et carillons
 * **Filtrage passe-bande :** Modèles de filtres radio avec coupures basse/haute lors de l'utilisation de canaux radio ou lorsque les visières des combinaisons sont baissées.
 * **Dégradation du signal radio :** Bandes de coupure étroites et mélanges de bruit statique filtré passe-bande à mesure que la distance entre les joueurs s'approche de la limite de l'émetteur radio.
-* **Carillons radio acoustiques :** Lit un gazouillis de micro-touche à balayage de tonalité (900 Hz à 700 Hz) lorsque la touche est enfoncée et une queue statique de silencieux lorsque la touche est relevée.
+* **Carillons radio acoustiques :** Joue des bips mécaniques à l'activation et à la désactivation lors de la transmission sur les canaux radio. Prend en charge quatre profils mathématiques distincts sélectionnables dans les paramètres ou l'application compagnon : Militaire (balayages sinusoïdaux), Industriel (cliquetis mécaniques), Extraterrestre (balayages modulés en anneau) et Vintage (cliquetis de relais analogiques).
 
 ### 6. 💬 Système d'interphone automatique pour navire
 * **Canaux d'interphone des véhicules :** Monter à bord d'un véhicule abonne automatiquement les joueurs à un canal radio dynamique « Intercom_<ContainerID> ».
@@ -231,10 +231,12 @@ graph TB
   * **Alimentation critique (Critical Power) :** Bourdonnement électrique basse tension, distorsion de saturation et baisse de hauteur de ton par rééchantillonnage.
   * **Voyage quantique (Quantum Travel) :** Balayage de filtre en peigne (flanger/phaser) et sifflement haute fréquence.
   * *Tous ces sous-effets peuvent être activés/désactivés individuellement dans les paramètres généraux et sont désactivés par défaut.*
+* **Injection d'alarmes de cockpit ambiantes :** Lorsque l'injection d'alarme est active et que le vaisseau entre en état d'alerte (impact de bouclier ou alimentation critique), le client de l'utilisateur synthétise automatiquement des alarmes d'avertissement de faible amplitude (<0,01) (boucle de sirène d'urgence ou boucle d'avertissement de double bip rapide) et les mélange directement au flux du micro sortant pour un retour d'urgence réaliste du cockpit.
 * **Cooldown de nettoyage :** compte à rebours 5 minutes après que le dernier joueur ait quitté le navire avant de supprimer le canal intercom, maximisant ainsi les performances du serveur.
 
 ### 7. 📡 Superposition HUD et radar tactique 2D compatibles Vulkan
 * **Superposition Click-Through Win32 :** Une superposition HUD sans bordure affichant les connexions VoIP, les fréquences et les états de parole. Compatible Vulkan et DirectX (fonctionnant en mode fenêtré sans bordure).
+* **Personnaliseur de HUD interactif :** Permet de personnaliser en temps réel le thème (Aegis, Anvil, Drake, RSI, Origin), le positionnement (coins/centre) et la visibilité des composants (mini-radar, liste des haut-parleurs, en-tête de connexion) via les paramètres ou l'application compagnon.
 * **Indicateur d'état de l'interphone :** Affiche des avertissements tels que `⚡ INTERCOM: DEGRADED` (avec détails du sous-état comme `[Power Loss]`, `[Quantum]` ou `[Static Pop]`) sur l'affichage tête haute (HUD) lorsque la dégradation de l'interphone est active.
 * **Mini-radar tactique :** Comprend un radar HUD 2D aligné sur le cap qui affiche les joueurs parlant de manière relative, dessinant des anneaux sonores pulsés autour d'eux.
 * **Sous-titres parole-texte :** transcrit l'audio de radio/proximité entrant en sous-titres HUD localisés à l'aide d'un modèle Whisper léger et hors ligne (`ggml-tiny.bin`).
