@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Xunit;
+using NAudio.Wave;
 using XuruVoipClient.Services;
 
 namespace XuruVoipClient.Tests;
@@ -58,5 +59,70 @@ public class ChimeProfileTests
         Assert.Equal(3840, vinKu.Length); // 80ms @ 48kHz
         Assert.Contains(vinKd, s => s != 0f);
         Assert.Contains(vinKu, s => s != 0f);
+    }
+
+    [Fact]
+    public void CustomChimes_ShouldLoadResampleAndDownmix()
+    {
+        // GIVEN
+        string appDir = AppDomain.CurrentDomain.BaseDirectory;
+        string resourcesDir = System.IO.Path.Combine(appDir, "Resources");
+        System.IO.Directory.CreateDirectory(resourcesDir);
+
+        string wavDownPath = System.IO.Path.Combine(resourcesDir, "radio_key_down.wav");
+        string wavUpPath = System.IO.Path.Combine(resourcesDir, "radio_key_up.wav");
+
+        // Write a 44100Hz stereo WAV file with a few samples to test downmixing and resampling
+        var format = new WaveFormat(44100, 16, 2); // stereo, 16-bit, 44100Hz
+        using (var writer = new WaveFileWriter(wavDownPath, format))
+        {
+            // Write 441 samples (10ms)
+            for (int i = 0; i < 441; i++)
+            {
+                writer.WriteSample(0.5f);
+                writer.WriteSample(0.5f);
+            }
+        }
+
+        using (var writer = new WaveFileWriter(wavUpPath, format))
+        {
+            // Write 882 samples (20ms)
+            for (int i = 0; i < 882; i++)
+            {
+                writer.WriteSample(0.3f);
+                writer.WriteSample(0.3f);
+            }
+        }
+
+        try
+        {
+            var service = new AudioPlaybackService();
+            service.EnableCustomChimes = true; // triggers RegeneratePttChimes()
+
+            // Retrieve fields
+            var kdField = typeof(AudioPlaybackService).GetField("KeyDownChime", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?? throw new InvalidOperationException("KeyDownChime field not found");
+            var kuField = typeof(AudioPlaybackService).GetField("KeyUpChime", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?? throw new InvalidOperationException("KeyUpChime field not found");
+
+            var customKd = (float[])kdField.GetValue(service)!;
+            var customKu = (float[])kuField.GetValue(service)!;
+
+            // 10ms at 48000Hz = 480 samples. Allow a bit of leeway for resampler padding/flush.
+            Assert.True(customKd.Length >= 470 && customKd.Length <= 500, $"Expected ~480 samples, got {customKd.Length}");
+            // 20ms at 48000Hz = 960 samples.
+            Assert.True(customKu.Length >= 950 && customKu.Length <= 980, $"Expected ~960 samples, got {customKu.Length}");
+
+            // Verify they contain audio
+            Assert.Contains(customKd, s => s != 0f);
+            Assert.Contains(customKu, s => s != 0f);
+        }
+        finally
+        {
+            // Cleanup
+            if (System.IO.File.Exists(wavDownPath)) System.IO.File.Exists(wavDownPath);
+            try { System.IO.File.Delete(wavDownPath); } catch { }
+            try { System.IO.File.Delete(wavUpPath); } catch { }
+        }
     }
 }

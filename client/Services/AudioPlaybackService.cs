@@ -70,6 +70,7 @@ public class AudioPlaybackService : IDisposable
     {
         lock (_lock)
         {
+            // 1. Generate standard chimes based on selected type
             switch (_pttChimeType?.ToLowerInvariant())
             {
                 case "industrial":
@@ -89,6 +90,29 @@ public class AudioPlaybackService : IDisposable
                     KeyDownChime = GenerateKeyDownChime();
                     KeyUpChime = GenerateKeyUpChime();
                     break;
+            }
+
+            // 2. If custom chimes are enabled, override with custom files if they exist
+            if (EnableCustomChimes)
+            {
+                string appDir = AppDomain.CurrentDomain.BaseDirectory;
+                string resourcesDir = System.IO.Path.Combine(appDir, "Resources");
+                
+                string wavDown = System.IO.Path.Combine(resourcesDir, "radio_key_down.wav");
+                string mp3Down = System.IO.Path.Combine(resourcesDir, "radio_key_down.mp3");
+                float[]? customDown = LoadCustomChimeFile(wavDown) ?? LoadCustomChimeFile(mp3Down);
+                if (customDown != null)
+                {
+                    KeyDownChime = customDown;
+                }
+
+                string wavUp = System.IO.Path.Combine(resourcesDir, "radio_key_up.wav");
+                string mp3Up = System.IO.Path.Combine(resourcesDir, "radio_key_up.mp3");
+                float[]? customUp = LoadCustomChimeFile(wavUp) ?? LoadCustomChimeFile(mp3Up);
+                if (customUp != null)
+                {
+                    KeyUpChime = customUp;
+                }
             }
         }
     }
@@ -134,6 +158,19 @@ public class AudioPlaybackService : IDisposable
     public bool IntercomQuantumTravelEnabled { get; set; } = true;
     public IntercomDegradationState CurrentIntercomState { get; set; } = IntercomDegradationState.Normal;
     public bool EnableRadioDelay { get; set; } = false;
+    private bool _enableCustomChimes = false;
+    public bool EnableCustomChimes
+    {
+        get => _enableCustomChimes;
+        set
+        {
+            if (_enableCustomChimes != value)
+            {
+                _enableCustomChimes = value;
+                RegeneratePttChimes();
+            }
+        }
+    }
 
     public event Action<string, float[], byte>? SttAudioChunkReady;
 
@@ -1252,6 +1289,75 @@ public class AudioPlaybackService : IDisposable
             buffer[i] = noise * env * 0.25f;
         }
         return buffer;
+    }
+
+    private float[]? LoadCustomChimeFile(string filePath)
+    {
+        try
+        {
+            if (!System.IO.File.Exists(filePath)) return null;
+
+            using var reader = new AudioFileReader(filePath);
+            var monoProvider = new MonoSampleProvider(reader);
+            
+            ISampleProvider finalProvider = monoProvider;
+            if (reader.WaveFormat.SampleRate != 48000)
+            {
+                finalProvider = new WdlResamplingSampleProvider(monoProvider, 48000);
+            }
+
+            var samples = new List<float>();
+            float[] buffer = new float[1024];
+            int read;
+            while ((read = finalProvider.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                for (int i = 0; i < read; i++)
+                {
+                    samples.Add(buffer[i]);
+                }
+            }
+            return samples.ToArray();
+        }
+        catch (Exception ex)
+        {
+            LogService.Error($"Failed to load custom chime file {filePath}", ex);
+            return null;
+        }
+    }
+
+    private class MonoSampleProvider : ISampleProvider
+    {
+        private readonly ISampleProvider _source;
+        public MonoSampleProvider(ISampleProvider source)
+        {
+            _source = source;
+            WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(source.WaveFormat.SampleRate, 1);
+        }
+
+        public WaveFormat WaveFormat { get; }
+
+        public int Read(float[] buffer, int offset, int count)
+        {
+            int sourceChannels = _source.WaveFormat.Channels;
+            if (sourceChannels == 1)
+            {
+                return _source.Read(buffer, offset, count);
+            }
+
+            float[] temp = new float[count * sourceChannels];
+            int read = _source.Read(temp, 0, count * sourceChannels);
+            int samplesRead = read / sourceChannels;
+            for (int i = 0; i < samplesRead; i++)
+            {
+                float sum = 0;
+                for (int c = 0; c < sourceChannels; c++)
+                {
+                    sum += temp[i * sourceChannels + c];
+                }
+                buffer[offset + i] = sum / sourceChannels;
+            }
+            return samplesRead;
+        }
     }
 }
 

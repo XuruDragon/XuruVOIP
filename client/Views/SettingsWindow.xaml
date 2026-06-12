@@ -500,6 +500,13 @@
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
 
+                            <!-- Custom PTT chimes toggle -->
+                            <CheckBox x:Name="CbEnableCustomChimes"
+                                      Content="Enable Custom PTT Chimes (radio_key_down/up in Resources/)"
+                                      IsChecked="{Binding Config.EnableCustomChimes, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
                             <!-- Environmental acoustics toggle -->
                             <CheckBox Content="{DynamicResource LblEnableEnvironmentalAcoustics}"
                                       IsChecked="{Binding Config.EnableEnvironmentalAcoustics, UpdateSourceTrigger=PropertyChanged}"

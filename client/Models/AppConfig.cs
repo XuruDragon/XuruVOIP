@@ -60,6 +60,7 @@ public class AppConfig
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
     public string PttChimeType { get; set; } = "Military";
+    public bool EnableCustomChimes { get; set; } = false;
     public bool EnableEnvironmentalAcoustics { get; set; } = true;
     public bool EnableHelmetModulator { get; set; } = true;
     public bool EnableVoiceChanger { get; set; } = false;
