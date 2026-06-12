@@ -500,6 +500,13 @@
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
 
+                            <!-- Custom PTT chimes toggle -->
+                            <CheckBox x:Name="CbEnableCustomChimes"
+                                      Content="{DynamicResource LblEnableCustomChimes}"
+                                      IsChecked="{Binding Config.EnableCustomChimes, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
                             <!-- Environmental acoustics toggle -->
                             <CheckBox Content="{DynamicResource LblEnableEnvironmentalAcoustics}"
                                       IsChecked="{Binding Config.EnableEnvironmentalAcoustics, UpdateSourceTrigger=PropertyChanged}"
@@ -509,6 +516,13 @@
                             <!-- Planetary atmosphere simulation toggle -->
                             <CheckBox Content="{DynamicResource LblEnableAtmosphereSimulation}"
                                       IsChecked="{Binding Config.EnableAtmosphereSimulation, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
+
+                            <!-- Distance-based radio delay toggle -->
+                            <CheckBox x:Name="CbEnableRadioDelay"
+                                      Content="{DynamicResource LblEnableRadioDelay}"
+                                      IsChecked="{Binding Config.EnableRadioDelay, UpdateSourceTrigger=PropertyChanged}"
                                       Foreground="{StaticResource TextPrimary}"
                                       VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"/>
 
@@ -541,6 +555,104 @@
                                         TickFrequency="0.1" IsSnapToTickEnabled="True"
                                         Foreground="{StaticResource Accent}"
                                         ValueChanged="SlVoicePitch_Changed" Margin="0,0,0,16"/>
+                            </StackPanel>
+ 
+                            <!-- Custom Vocal Modulator toggle -->
+                            <CheckBox x:Name="CbEnableCustomModulator"
+                                      Content="Enable Custom Vocal Modulator (Overrides presets)"
+                                      IsChecked="{Binding Config.EnableCustomModulator, UpdateSourceTrigger=PropertyChanged}"
+                                      Foreground="{StaticResource TextPrimary}"
+                                      VerticalContentAlignment="Center" FontSize="12" Margin="0,4,0,8"
+                                      Checked="CustomModulator_ToggleChanged" Unchecked="CustomModulator_ToggleChanged"/>
+
+                            <!-- Custom Vocal Modulator Controls -->
+                            <StackPanel x:Name="CustomModulatorControlsPanel" Margin="16,0,0,12" Visibility="Collapsed">
+                                <!-- Pitch Shift -->
+                                <TextBlock Style="{StaticResource LabelStyle}">
+                                    <Run Text="Custom Pitch Shift: "/>
+                                    <Run x:Name="CustomPitchLabel" Text="1.0x"/>
+                                </TextBlock>
+                                <Slider x:Name="SlCustomPitch" Minimum="0.5" Maximum="2.0"
+                                        TickFrequency="0.1" IsSnapToTickEnabled="True"
+                                        Foreground="{StaticResource Accent}"
+                                        ValueChanged="SlCustomPitch_Changed" Margin="0,0,0,8"
+                                        Value="{Binding Config.CustomPitchShift, Mode=TwoWay}"/>
+
+                                <!-- Ring Modulator Freq -->
+                                <TextBlock Style="{StaticResource LabelStyle}">
+                                    <Run Text="Custom Ring Mod Frequency: "/>
+                                    <Run x:Name="CustomRingFreqLabel" Text="100 Hz"/>
+                                </TextBlock>
+                                <Slider x:Name="SlCustomRingFreq" Minimum="20" Maximum="3000"
+                                        TickFrequency="20" IsSnapToTickEnabled="True"
+                                        Foreground="{StaticResource Accent}"
+                                        ValueChanged="SlCustomRingFreq_Changed" Margin="0,0,0,8"
+                                        Value="{Binding Config.CustomRingModFreq, Mode=TwoWay}"/>
+
+                                <!-- Ring Modulator Mix -->
+                                <TextBlock Style="{StaticResource LabelStyle}">
+                                    <Run Text="Custom Ring Mod Mix: "/>
+                                    <Run x:Name="CustomRingMixLabel" Text="0%"/>
+                                </TextBlock>
+                                <Slider x:Name="SlCustomRingMix" Minimum="0.0" Maximum="1.0"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        Foreground="{StaticResource Accent}"
+                                        ValueChanged="SlCustomRingMix_Changed" Margin="0,0,0,8"
+                                        Value="{Binding Config.CustomRingModMix, Mode=TwoWay}"/>
+
+                                <!-- Flanger Depth -->
+                                <TextBlock Style="{StaticResource LabelStyle}">
+                                    <Run Text="Custom Flanger Depth: "/>
+                                    <Run x:Name="CustomFlangerDepthLabel" Text="0%"/>
+                                </TextBlock>
+                                <Slider x:Name="SlCustomFlangerDepth" Minimum="0.0" Maximum="1.0"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        Foreground="{StaticResource Accent}"
+                                        ValueChanged="SlCustomFlangerDepth_Changed" Margin="0,0,0,8"
+                                        Value="{Binding Config.CustomFlangerDepth, Mode=TwoWay}"/>
+
+                                <!-- Flanger Rate -->
+                                <TextBlock Style="{StaticResource LabelStyle}">
+                                    <Run Text="Custom Flanger Rate: "/>
+                                    <Run x:Name="CustomFlangerRateLabel" Text="0.5 Hz"/>
+                                </TextBlock>
+                                <Slider x:Name="SlCustomFlangerRate" Minimum="0.1" Maximum="10.0"
+                                        TickFrequency="0.1" IsSnapToTickEnabled="True"
+                                        Foreground="{StaticResource Accent}"
+                                        ValueChanged="SlCustomFlangerRate_Changed" Margin="0,0,0,8"
+                                        Value="{Binding Config.CustomFlangerRate, Mode=TwoWay}"/>
+
+                                <!-- Flanger Feedback -->
+                                <TextBlock Style="{StaticResource LabelStyle}">
+                                    <Run Text="Custom Flanger Feedback: "/>
+                                    <Run x:Name="CustomFlangerFeedbackLabel" Text="0%"/>
+                                </TextBlock>
+                                <Slider x:Name="SlCustomFlangerFeedback" Minimum="0.0" Maximum="0.95"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        Foreground="{StaticResource Accent}"
+                                        ValueChanged="SlCustomFlangerFeedback_Changed" Margin="0,0,0,8"
+                                        Value="{Binding Config.CustomFlangerFeedback, Mode=TwoWay}"/>
+
+                                <!-- Bitcrush Enable -->
+                                <CheckBox x:Name="CbCustomBitcrush"
+                                          Content="Enable Custom Bitcrusher"
+                                          IsChecked="{Binding Config.CustomBitcrushEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                          Foreground="{StaticResource TextPrimary}"
+                                          VerticalContentAlignment="Center" FontSize="11" Margin="0,4,0,4"
+                                          Checked="CustomBitcrush_ToggleChanged" Unchecked="CustomBitcrush_ToggleChanged"/>
+
+                                <!-- Bitcrush Bits -->
+                                <StackPanel x:Name="CustomBitcrushPanel" Visibility="Collapsed">
+                                    <TextBlock Style="{StaticResource LabelStyle}">
+                                        <Run Text="Custom Bitcrush Resolution: "/>
+                                        <Run x:Name="CustomBitcrushLabel" Text="16 bits"/>
+                                    </TextBlock>
+                                    <Slider x:Name="SlCustomBitcrushBits" Minimum="2" Maximum="16"
+                                            TickFrequency="1" IsSnapToTickEnabled="True"
+                                            Foreground="{StaticResource Accent}"
+                                            ValueChanged="SlCustomBitcrushBits_Changed" Margin="0,0,0,16"
+                                            Value="{Binding Config.CustomBitcrushBits, Mode=TwoWay}"/>
+                                </StackPanel>
                             </StackPanel>
 
                             <!-- Input device -->

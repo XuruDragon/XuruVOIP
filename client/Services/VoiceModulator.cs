@@ -118,6 +118,52 @@ public class VoiceModulator
     private readonly Flanger _flanger = new();
     private readonly Random _random = new();
 
+    public void ProcessCustom(
+        float[] buffer,
+        int count,
+        float pitchFactor,
+        float ringModFreq,
+        float ringModMix,
+        float flangerDepth,
+        float flangerRate,
+        float flangerFeedback,
+        bool bitcrushEnabled,
+        int bitcrushBits)
+    {
+        // 1. Pitch shifting
+        if (Math.Abs(pitchFactor - 1.0f) >= 0.02f)
+        {
+            _pitchShifter.Process(buffer, count, pitchFactor);
+        }
+
+        // 2. Inline Sample Processing
+        for (int i = 0; i < count; i++)
+        {
+            float sample = buffer[i];
+
+            // Ring Modulator
+            if (ringModMix > 0f)
+            {
+                sample = _ringMod.Process(sample, ringModFreq, SampleRate, ringModMix);
+            }
+
+            // Flanger
+            if (flangerDepth > 0f)
+            {
+                sample = _flanger.Process(sample, SampleRate, flangerDepth, flangerRate, flangerFeedback);
+            }
+
+            // Bitcrush
+            if (bitcrushEnabled && bitcrushBits >= 2 && bitcrushBits <= 16)
+            {
+                float maxVal = MathF.Pow(2f, bitcrushBits - 1);
+                sample = MathF.Round(sample * maxVal) / maxVal;
+            }
+
+            buffer[i] = sample;
+        }
+    }
+
     public void Process(float[] buffer, int count, string changerType, float pitchFactor)
     {
         if (string.IsNullOrEmpty(changerType) || changerType.Equals("None", StringComparison.OrdinalIgnoreCase))

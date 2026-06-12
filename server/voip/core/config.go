@@ -19,6 +19,8 @@ var EnableDiscordBridge = true
 var EnableRadioRepeaters = true
 var EnableShipPa = true
 var EnableAarRecording = false
+var DiscordDynamicTracking = false
+var DiscordLeaderUsername = ""
 
 // ParseEnvInt parses an integer from the environment
 func ParseEnvInt(key string, defaultVal int) int {
@@ -195,6 +197,16 @@ func LoadOrCreateConfig() error {
 	}
 	EnableAarRecording = enableAarRecordingStr == "1" || strings.ToLower(enableAarRecordingStr) == "true"
 
+	discordDynamicTrackingStr := os.Getenv("XURUVOIP_DISCORD_DYNAMIC_TRACKING")
+	if discordDynamicTrackingStr == "" {
+		discordDynamicTrackingStr = "0"
+		_ = os.Setenv("XURUVOIP_DISCORD_DYNAMIC_TRACKING", discordDynamicTrackingStr)
+		UpdateEnvFile("XURUVOIP_DISCORD_DYNAMIC_TRACKING", discordDynamicTrackingStr)
+	}
+	DiscordDynamicTracking = discordDynamicTrackingStr == "1" || strings.ToLower(discordDynamicTrackingStr) == "true"
+
+	DiscordLeaderUsername = os.Getenv("XURUVOIP_DISCORD_LEADER_USERNAME")
+
 	// 3. Load Channels
 	chList, err := DBGetChannels()
 	if err != nil {
@@ -332,6 +344,10 @@ XURUVOIP_ENABLE_DISCORD_BRIDGE=1
 XURUVOIP_ENABLE_RADIO_REPEATERS=1
 XURUVOIP_ENABLE_SHIP_PA=1
 XURUVOIP_ENABLE_AAR_RECORDING=0
+
+# Discord Voice Bridge Frequency Tracking (1 = enabled, 0 = disabled)
+XURUVOIP_DISCORD_DYNAMIC_TRACKING=0
+XURUVOIP_DISCORD_LEADER_USERNAME=
 `, serverPassword, adminServerPassword)
 
 	return os.WriteFile(envPath, []byte(content), 0600)

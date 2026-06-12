@@ -30,23 +30,91 @@ public class AudioPlaybackService : IDisposable
     private double _outputGainLinear = 1.0;
     private bool _disposed;
 
-    private static readonly float[] KeyDownChime;
-    private static readonly float[] KeyUpChime;
+    private float[] KeyDownChime = Array.Empty<float>();
+    private float[] KeyUpChime = Array.Empty<float>();
     private static readonly float[] PaKlaxonChime;
     private static readonly float[] OutgoingHailChime;
     private static readonly float[] IncomingHailChime;
     private static readonly float[] HailConnectedChime;
     private static readonly float[] HailDisconnectedChime;
 
+    private string _pttChimeType = "Military";
+    public string PttChimeType
+    {
+        get => _pttChimeType;
+        set
+        {
+            if (_pttChimeType != value)
+            {
+                _pttChimeType = value;
+                RegeneratePttChimes();
+            }
+        }
+    }
+
     static AudioPlaybackService()
     {
-        KeyDownChime = GenerateKeyDownChime();
-        KeyUpChime = GenerateKeyUpChime();
         PaKlaxonChime = GeneratePaKlaxonChime();
         OutgoingHailChime = GenerateOutgoingHailChime();
         IncomingHailChime = GenerateIncomingHailChime();
         HailConnectedChime = GenerateHailConnectedChime();
         HailDisconnectedChime = GenerateHailDisconnectedChime();
+    }
+
+    public AudioPlaybackService()
+    {
+        RegeneratePttChimes();
+    }
+
+    public void RegeneratePttChimes()
+    {
+        lock (_lock)
+        {
+            // 1. Generate standard chimes based on selected type
+            switch (_pttChimeType?.ToLowerInvariant())
+            {
+                case "industrial":
+                    KeyDownChime = GenerateIndustrialKeyDownChime();
+                    KeyUpChime = GenerateIndustrialKeyUpChime();
+                    break;
+                case "alien":
+                    KeyDownChime = GenerateAlienKeyDownChime();
+                    KeyUpChime = GenerateAlienKeyUpChime();
+                    break;
+                case "vintage":
+                    KeyDownChime = GenerateVintageKeyDownChime();
+                    KeyUpChime = GenerateVintageKeyUpChime();
+                    break;
+                case "military":
+                default:
+                    KeyDownChime = GenerateKeyDownChime();
+                    KeyUpChime = GenerateKeyUpChime();
+                    break;
+            }
+
+            // 2. If custom chimes are enabled, override with custom files if they exist
+            if (EnableCustomChimes)
+            {
+                string appDir = AppDomain.CurrentDomain.BaseDirectory;
+                string resourcesDir = System.IO.Path.Combine(appDir, "Resources");
+                
+                string wavDown = System.IO.Path.Combine(resourcesDir, "radio_key_down.wav");
+                string mp3Down = System.IO.Path.Combine(resourcesDir, "radio_key_down.mp3");
+                float[]? customDown = LoadCustomChimeFile(wavDown) ?? LoadCustomChimeFile(mp3Down);
+                if (customDown != null)
+                {
+                    KeyDownChime = customDown;
+                }
+
+                string wavUp = System.IO.Path.Combine(resourcesDir, "radio_key_up.wav");
+                string mp3Up = System.IO.Path.Combine(resourcesDir, "radio_key_up.mp3");
+                float[]? customUp = LoadCustomChimeFile(wavUp) ?? LoadCustomChimeFile(mp3Up);
+                if (customUp != null)
+                {
+                    KeyUpChime = customUp;
+                }
+            }
+        }
     }
 
     public bool ProximityMuted { get; set; } = false;
@@ -89,6 +157,20 @@ public class AudioPlaybackService : IDisposable
     public bool IntercomCriticalPowerEnabled { get; set; } = true;
     public bool IntercomQuantumTravelEnabled { get; set; } = true;
     public IntercomDegradationState CurrentIntercomState { get; set; } = IntercomDegradationState.Normal;
+    public bool EnableRadioDelay { get; set; } = false;
+    private bool _enableCustomChimes = false;
+    public bool EnableCustomChimes
+    {
+        get => _enableCustomChimes;
+        set
+        {
+            if (_enableCustomChimes != value)
+            {
+                _enableCustomChimes = value;
+                RegeneratePttChimes();
+            }
+        }
+    }
 
     public event Action<string, float[], byte>? SttAudioChunkReady;
 
@@ -309,24 +391,33 @@ public class AudioPlaybackService : IDisposable
                 track = CreateTrack(playerName);
                 _tracks[playerName] = track;
             }
+
+            // Track last active time
+            track.LastReceivedTime = DateTime.UtcNow;
+
+            var packet = new AudioPacket
+            {
+                SequenceNumber = seq,
+                AudioType = audioType,
+                OpusData = opusData,
+                ApplyRadioEffect = applyRadioEffect,
+                Metadata = metadata,
+                Distance = distance,
+                SpeakerZone = speakerZone,
+                ListenerZone = listenerZone,
+                IsIntercom = isIntercom
+            };
+
+            if (EnableRadioDelay && distance > 0)
+            {
+                double delayMs = Math.Min(3000.0, distance * 0.0033);
+                track.DelayedPackets.Add((packet, DateTime.UtcNow.AddMilliseconds(delayMs)));
+            }
+            else
+            {
+                track.Jitter.Enqueue(packet);
+            }
         }
-
-        // Track last active time
-        track.LastReceivedTime = DateTime.UtcNow;
-
-        // Enqueue into Jitter Buffer
-        track.Jitter.Enqueue(new AudioPacket
-        {
-            SequenceNumber = seq,
-            AudioType = audioType,
-            OpusData = opusData,
-            ApplyRadioEffect = applyRadioEffect,
-            Metadata = metadata,
-            Distance = distance,
-            SpeakerZone = speakerZone,
-            ListenerZone = listenerZone,
-            IsIntercom = isIntercom
-        });
     }
 
     private async System.Threading.Tasks.Task PlaybackLoopAsync(System.Threading.CancellationToken ct)
@@ -350,6 +441,23 @@ public class AudioPlaybackService : IDisposable
     {
         lock (_lock)
         {
+            // Process delayed packets that are now ready to be enqueued
+            foreach (var kvp in _tracks)
+            {
+                var track = kvp.Value;
+                if (kvp.Key == "__local_chime") continue;
+
+                for (int i = track.DelayedPackets.Count - 1; i >= 0; i--)
+                {
+                    var (packet, playableTime) = track.DelayedPackets[i];
+                    if (DateTime.UtcNow >= playableTime)
+                    {
+                        track.Jitter.Enqueue(packet);
+                        track.DelayedPackets.RemoveAt(i);
+                    }
+                }
+            }
+
             // Pass 1: Dequeue packets and update transmitter/intercom states for each track
             foreach (var kvp in _tracks)
             {
@@ -993,6 +1101,7 @@ public class AudioPlaybackService : IDisposable
         public bool IsTransmitting { get; set; } = false;
         public DateTime LastReceivedTime { get; set; } = DateTime.MinValue;
         public JitterBuffer Jitter { get; } = new();
+        public List<(AudioPacket Packet, DateTime PlayableTime)> DelayedPackets { get; } = new();
         public string LastSpeakerZone { get; set; } = string.Empty;
         public string LastListenerZone { get; set; } = string.Empty;
 
@@ -1043,6 +1152,211 @@ public class AudioPlaybackService : IDisposable
                 }
             }
             catch {}
+        }
+    }
+
+    private float[] GenerateIndustrialKeyDownChime()
+    {
+        int samples = SampleRate * 60 / 1000;
+        float[] buffer = new float[samples];
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / (double)SampleRate;
+            float s1 = (float)Math.Sin(2.0 * Math.PI * 660.0 * t);
+            float s2 = (float)Math.Sin(2.0 * Math.PI * 880.0 * t);
+            float sample = (s1 + s2) * 0.5f;
+
+            float env = 1.0f;
+            if (i < 240) env = i / 240.0f;
+            else if (i > samples - 240) env = (samples - i) / 240.0f;
+
+            buffer[i] = sample * env * 0.12f;
+        }
+        return buffer;
+    }
+
+    private float[] GenerateIndustrialKeyUpChime()
+    {
+        int samples = SampleRate * 120 / 1000;
+        float[] buffer = new float[samples];
+        var rand = new Random();
+        var lp = new BiquadFilter();
+        var hp = new BiquadFilter();
+        lp.SetLpCoefficients(1200, SampleRate);
+        hp.SetHpCoefficients(400, SampleRate);
+
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / (double)SampleRate;
+            float noise = (float)(rand.NextDouble() * 2.0 - 1.0);
+            noise = lp.Process(noise);
+            noise = hp.Process(noise);
+
+            float beep = (float)(Math.Sin(2.0 * Math.PI * 1000.0 * t) * Math.Exp(-t * 35));
+            float sample = noise * 0.7f + beep * 0.3f;
+
+            float env = 1.0f - ((float)i / (float)samples);
+            buffer[i] = sample * env * 0.20f;
+        }
+        return buffer;
+    }
+
+    private float[] GenerateAlienKeyDownChime()
+    {
+        int samples = SampleRate * 80 / 1000;
+        float[] buffer = new float[samples];
+        double phase = 0;
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / (double)SampleRate;
+            double freq = 1500.0 - 1200.0 * Math.Sin(Math.PI * t / (2.0 * 0.08));
+            phase += 2.0 * Math.PI * freq / SampleRate;
+            if (phase > 2.0 * Math.PI) phase -= 2.0 * Math.PI;
+
+            float sample = (float)Math.Sin(phase);
+
+            float env = 1.0f;
+            if (i < 240) env = i / 240.0f;
+            else if (i > samples - 240) env = (samples - i) / 240.0f;
+
+            buffer[i] = sample * env * 0.12f;
+        }
+        return buffer;
+    }
+
+    private float[] GenerateAlienKeyUpChime()
+    {
+        int samples = SampleRate * 100 / 1000;
+        float[] buffer = new float[samples];
+        double phase = 0;
+        var rand = new Random();
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / (double)SampleRate;
+            double freq = 400.0 + 1600.0 * (t / 0.10);
+            phase += 2.0 * Math.PI * freq / SampleRate;
+            if (phase > 2.0 * Math.PI) phase -= 2.0 * Math.PI;
+
+            float noise = (float)(rand.NextDouble() * 2.0 - 1.0);
+            float sample = (float)(Math.Sin(phase) * (0.6 + 0.4 * noise));
+
+            float env = 1.0f - ((float)i / (float)samples);
+            buffer[i] = sample * env * 0.15f;
+        }
+        return buffer;
+    }
+
+    private float[] GenerateVintageKeyDownChime()
+    {
+        int samples = SampleRate * 40 / 1000;
+        float[] buffer = new float[samples];
+        for (int i = 0; i < samples; i++)
+        {
+            double t = (double)i / (double)SampleRate;
+            float sample = (float)(Math.Sin(2.0 * Math.PI * 150.0 * t) * Math.Exp(-t * 80.0));
+
+            float env = 1.0f;
+            if (i < 96) env = i / 96.0f;
+            else if (i > samples - 96) env = (samples - i) / 96.0f;
+
+            buffer[i] = sample * env * 0.3f;
+        }
+        return buffer;
+    }
+
+    private float[] GenerateVintageKeyUpChime()
+    {
+        int samples = SampleRate * 80 / 1000;
+        float[] buffer = new float[samples];
+        var rand = new Random();
+        var lp = new BiquadFilter();
+        var hp = new BiquadFilter();
+        lp.SetLpCoefficients(1200, SampleRate);
+        hp.SetHpCoefficients(800, SampleRate);
+
+        for (int i = 0; i < samples; i++)
+        {
+            float noise = (float)(rand.NextDouble() * 2.0 - 1.0);
+            noise = lp.Process(noise);
+            noise = hp.Process(noise);
+
+            if (rand.NextDouble() < 0.02)
+            {
+                noise += (float)(rand.NextDouble() * 2.0 - 1.0) * 0.5f;
+            }
+
+            float env = 1.0f - ((float)i / (float)samples);
+            buffer[i] = noise * env * 0.25f;
+        }
+        return buffer;
+    }
+
+    private float[]? LoadCustomChimeFile(string filePath)
+    {
+        try
+        {
+            if (!System.IO.File.Exists(filePath)) return null;
+
+            using var reader = new AudioFileReader(filePath);
+            var monoProvider = new MonoSampleProvider(reader);
+            
+            ISampleProvider finalProvider = monoProvider;
+            if (reader.WaveFormat.SampleRate != 48000)
+            {
+                finalProvider = new WdlResamplingSampleProvider(monoProvider, 48000);
+            }
+
+            var samples = new List<float>();
+            float[] buffer = new float[1024];
+            int read;
+            while ((read = finalProvider.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                for (int i = 0; i < read; i++)
+                {
+                    samples.Add(buffer[i]);
+                }
+            }
+            return samples.ToArray();
+        }
+        catch (Exception ex)
+        {
+            LogService.Error($"Failed to load custom chime file {filePath}", ex);
+            return null;
+        }
+    }
+
+    private class MonoSampleProvider : ISampleProvider
+    {
+        private readonly ISampleProvider _source;
+        public MonoSampleProvider(ISampleProvider source)
+        {
+            _source = source;
+            WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(source.WaveFormat.SampleRate, 1);
+        }
+
+        public WaveFormat WaveFormat { get; }
+
+        public int Read(float[] buffer, int offset, int count)
+        {
+            int sourceChannels = _source.WaveFormat.Channels;
+            if (sourceChannels == 1)
+            {
+                return _source.Read(buffer, offset, count);
+            }
+
+            float[] temp = new float[count * sourceChannels];
+            int read = _source.Read(temp, 0, count * sourceChannels);
+            int samplesRead = read / sourceChannels;
+            for (int i = 0; i < samplesRead; i++)
+            {
+                float sum = 0;
+                for (int c = 0; c < sourceChannels; c++)
+                {
+                    sum += temp[i * sourceChannels + c];
+                }
+                buffer[offset + i] = sum / sourceChannels;
+            }
+            return samplesRead;
         }
     }
 }
@@ -1197,5 +1511,4 @@ internal class JitterBuffer
             return CompareSequenceNumbers(x, y);
         }
     }
-
 }

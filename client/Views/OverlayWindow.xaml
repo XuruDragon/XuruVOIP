@@ -27,7 +27,7 @@
 
             <StackPanel Orientation="Vertical">
                 <!-- Header: Connection status -->
-                <Grid Margin="0,0,0,8">
+                <Grid x:Name="ConnectionHeader" Margin="0,0,0,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -58,7 +58,7 @@
                            Margin="0,0,0,6"
                            Visibility="Collapsed"/>
 
-                <Separator Background="#20FFFFFF" Margin="0,0,0,8" Height="1"/>
+                <Separator x:Name="ConnectionSeparator" Background="#20FFFFFF" Margin="0,0,0,8" Height="1"/>
 
                 <!-- Active Speakers List -->
                 <TextBlock x:Name="TxtSpeakersHeader" 
@@ -130,10 +130,10 @@
             </Border.Effect>
             <Grid>
                 <!-- Compass / Orientation ticks -->
-                <Ellipse Width="160" Height="160" Stroke="#203DDB85" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Ellipse Width="80" Height="80" Stroke="#103DDB85" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Line X1="80" Y1="0" X2="80" Y2="160" Stroke="#153DDB85" StrokeThickness="0.5"/>
-                <Line X1="0" Y1="80" X2="160" Y2="80" Stroke="#153DDB85" StrokeThickness="0.5"/>
+                <Ellipse x:Name="RadarRingOuter" Width="160" Height="160" Stroke="#203DDB85" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Ellipse x:Name="RadarRingInner" Width="80" Height="80" Stroke="#103DDB85" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Line x:Name="RadarLineVert" X1="80" Y1="0" X2="80" Y2="160" Stroke="#153DDB85" StrokeThickness="0.5"/>
+                <Line x:Name="RadarLineHoriz" X1="0" Y1="80" X2="160" Y2="80" Stroke="#153DDB85" StrokeThickness="0.5"/>
                 
                 <!-- Range Text indicator -->
                 <TextBlock x:Name="TxtRadarRange" Text="50m" Foreground="#803DDB85" FontSize="9" FontWeight="Bold"

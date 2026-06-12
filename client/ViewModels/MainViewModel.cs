@@ -1082,12 +1082,15 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableHrtfBinaural = cfg.EnableHrtf;
         _playback.EnableRadioDegradation = cfg.EnableRadioDegradation;
         _playback.EnablePttChimes = cfg.EnablePttChimes;
+        _playback.PttChimeType = cfg.PttChimeType;
+        _playback.EnableCustomChimes = cfg.EnableCustomChimes;
         _playback.EnableEnvironmentalAcoustics = cfg.EnableEnvironmentalAcoustics;
         _playback.EnableAtmosphereSimulation = cfg.EnableAtmosphereSimulation;
         _playback.EnableHelmetModulator = cfg.EnableHelmetModulator;
         _playback.EnableStt = cfg.EnableStt;
         _playback.EnableShipPa = cfg.EnableShipPa;
         _playback.EnableVisorSpectrogram = cfg.EnableVisorSpectrogram;
+        _playback.EnableRadioDelay = cfg.EnableRadioDelay;
         _playback.Start(cfg.OutputDeviceIndex, cfg.OutputGainPercent);
         
         // Synchronize mute states
@@ -1364,12 +1367,15 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         _playback.EnableHrtfBinaural = Config.Config.EnableHrtf;
         _playback.EnableRadioDegradation = Config.Config.EnableRadioDegradation;
         _playback.EnablePttChimes = Config.Config.EnablePttChimes;
+        _playback.PttChimeType = Config.Config.PttChimeType;
+        _playback.EnableCustomChimes = Config.Config.EnableCustomChimes;
         _playback.EnableEnvironmentalAcoustics = Config.Config.EnableEnvironmentalAcoustics;
         _playback.EnableAtmosphereSimulation = Config.Config.EnableAtmosphereSimulation;
         _playback.EnableHelmetModulator = Config.Config.EnableHelmetModulator;
         _playback.EnableStt = Config.Config.EnableStt;
         _playback.EnableShipPa = Config.Config.EnableShipPa;
         _playback.EnableVisorSpectrogram = Config.Config.EnableVisorSpectrogram;
+        _playback.EnableRadioDelay = Config.Config.EnableRadioDelay;
         _playback.EnableIntercomDegradation = Config.Config.EnableIntercomDegradation;
         _playback.IntercomShieldHitsEnabled = Config.Config.IntercomShieldHitsEnabled;
         _playback.IntercomCriticalPowerEnabled = Config.Config.IntercomCriticalPowerEnabled;
@@ -1611,7 +1617,12 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         // Find a path from sender (index 0) to local player (index n-1)
         // that minimizes the maximum hop distance along the path.
         double[] maxHopDist = new double[n];
-        for (int i = 0; i < n; i++) maxHopDist[i] = double.MaxValue;
+        int[] parent = new int[n];
+        for (int i = 0; i < n; i++)
+        {
+            maxHopDist[i] = double.MaxValue;
+            parent[i] = -1;
+        }
         maxHopDist[0] = 0;
 
         bool[] visited = new bool[n];
@@ -1652,6 +1663,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                     if (currentMaxHop < maxHopDist[v])
                     {
                         maxHopDist[v] = currentMaxHop;
+                        parent[v] = u;
                     }
                 }
             }
@@ -1667,7 +1679,17 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             return Math.Sqrt(directDx * directDx + directDy * directDy + directDz * directDz);
         }
 
-        return routedMaxHop;
+        // Trace path to count hops
+        int hops = 0;
+        int curr = n - 1;
+        while (curr != 0 && parent[curr] != -1)
+        {
+            hops++;
+            curr = parent[curr];
+        }
+
+        double penalty = hops > 1 ? 650.0 * (hops - 1) : 0.0;
+        return routedMaxHop + penalty;
     }
 
     public void SetMockPttPaState(bool isDown)

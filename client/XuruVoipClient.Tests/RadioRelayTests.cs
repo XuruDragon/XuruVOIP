@@ -87,7 +87,56 @@ public class RadioRelayTests
         remoteRepeaters["RepB"] = true;
 
         double distance = vm.CalculateEffectiveRadioDistance("Sender", senderPos);
-        Assert.Equal(4000.0, distance, 1);
+        Assert.Equal(5300.0, distance, 1);
+    }
+
+    [Fact]
+    public async Task Dijkstra_ShouldApplyHopPenalty_ToMultiHopPaths()
+    {
+        await using var vm = new MainViewModel();
+        
+        vm.Config.Config.EnableRadioRepeaters = true;
+
+        // Local at 0, 0, 0
+        var localPosField = typeof(MainViewModel).GetField("_lastSentPos", BindingFlags.NonPublic | BindingFlags.Instance);
+        localPosField!.SetValue(vm, new PlayerPosition { X = 0, Y = 0, Z = 0, Zone = "Stanton" });
+
+        var remotePositionsField = typeof(MainViewModel).GetField("_remotePositions", BindingFlags.NonPublic | BindingFlags.Instance);
+        var remotePositions = (Dictionary<string, PlayerPosition>)remotePositionsField!.GetValue(vm)!;
+
+        var remoteRepeatersField = typeof(MainViewModel).GetField("_remoteRepeaters", BindingFlags.NonPublic | BindingFlags.Instance);
+        var remoteRepeaters = (Dictionary<string, bool>)remoteRepeatersField!.GetValue(vm)!;
+
+        // Case A: 1 Hop (Direct)
+        // Sender at 4000, 0, 0. Direct distance is 4000m.
+        var senderPos1 = new PlayerPosition { X = 4000, Y = 0, Z = 0, Zone = "Stanton" };
+        double dist1 = vm.CalculateEffectiveRadioDistance("Sender", senderPos1);
+        // Direct, so hops = 1. Penalty = 0.
+        Assert.Equal(4000.0, dist1, 1);
+
+        // Case B: 2 Hops (1 Repeater)
+        // Sender at 6000, 0, 0.
+        // Repeater at 3000, 0, 0.
+        // Hops: Sender -> RepA (3000m) -> Local (3000m). Worst hop: 3000m.
+        // Hops = 2. Penalty = 1 * 650.0 = 650.0m. Total = 3650.0m.
+        var senderPos2 = new PlayerPosition { X = 6000, Y = 0, Z = 0, Zone = "Stanton" };
+        remotePositions["RepA"] = new PlayerPosition { X = 3000, Y = 0, Z = 0, Zone = "Stanton" };
+        remoteRepeaters["RepA"] = true;
+        double dist2 = vm.CalculateEffectiveRadioDistance("Sender", senderPos2);
+        Assert.Equal(3650.0, dist2, 1);
+
+        // Case C: 3 Hops (2 Repeaters)
+        // Sender at 9000, 0, 0.
+        // RepA at 6000, 0, 0.
+        // RepB at 3000, 0, 0.
+        // Hops: Sender -> RepA (3000m) -> RepB (3000m) -> Local (3000m). Worst hop: 3000m.
+        // Hops = 3. Penalty = 2 * 650.0 = 1300.0m. Total = 4300.0m.
+        var senderPos3 = new PlayerPosition { X = 9000, Y = 0, Z = 0, Zone = "Stanton" };
+        remotePositions["RepA"] = new PlayerPosition { X = 6000, Y = 0, Z = 0, Zone = "Stanton" };
+        remotePositions["RepB"] = new PlayerPosition { X = 3000, Y = 0, Z = 0, Zone = "Stanton" };
+        remoteRepeaters["RepB"] = true;
+        double dist3 = vm.CalculateEffectiveRadioDistance("Sender", senderPos3);
+        Assert.Equal(4300.0, dist3, 1);
     }
 
     [Fact]

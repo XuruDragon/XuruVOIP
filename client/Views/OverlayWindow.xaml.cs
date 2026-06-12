@@ -86,6 +86,11 @@ public partial class OverlayWindow : Window
             return;
         }
 
+        // Apply theme colors and layout visibility
+        ApplyThemeColors(cfg.HudTheme);
+        ConnectionHeader.Visibility = cfg.HudShowChannel ? Visibility.Visible : Visibility.Collapsed;
+        ConnectionSeparator.Visibility = cfg.HudShowChannel ? Visibility.Visible : Visibility.Collapsed;
+
         // 2. Track Star Citizen's window position and visibility
         var gameRect = _vm.GameDetector.GetGameClientRectInScreenCoords();
         if (gameRect == null)
@@ -365,7 +370,7 @@ public partial class OverlayWindow : Window
 
     private void UpdateRadar(AppConfig cfg)
     {
-        if (!cfg.EnableRadar)
+        if (!cfg.EnableRadar || !cfg.HudShowRadar)
         {
             if (RadarPanel.Visibility != Visibility.Collapsed)
             {
@@ -467,10 +472,18 @@ public partial class OverlayWindow : Window
             Canvas.SetTop(blip, cy - 3);
             RadarCanvas.Children.Add(blip);
 
-            // Draw player name tag
+            // Draw player name tag with elevation indication if delta is >= 2m
+            double dz = remotePos.Z - localPos.Z;
+            string tagText = remoteName;
+            if (Math.Abs(dz) >= 2.0)
+            {
+                string arrow = dz > 0 ? "▲" : "▼";
+                tagText += $" ({arrow} {Math.Abs(dz):F0}m)";
+            }
+
             var nameText = new TextBlock
             {
-                Text = remoteName,
+                Text = tagText,
                 Foreground = Brushes.White,
                 FontSize = 8.5,
                 FontWeight = FontWeights.SemiBold,
@@ -599,16 +612,47 @@ public partial class OverlayWindow : Window
         // Toggle "No Transmissions" visibility
         if (_speakers.Count > 0)
         {
-            TxtSpeakersHeader.Visibility = Visibility.Visible;
-            LstSpeakers.Visibility = Visibility.Visible;
+            TxtSpeakersHeader.Visibility = cfg.HudShowActiveSpeakers ? Visibility.Visible : Visibility.Collapsed;
+            LstSpeakers.Visibility = cfg.HudShowActiveSpeakers ? Visibility.Visible : Visibility.Collapsed;
             TxtNoSpeakers.Visibility = Visibility.Collapsed;
         }
         else
         {
             TxtSpeakersHeader.Visibility = Visibility.Collapsed;
             LstSpeakers.Visibility = Visibility.Collapsed;
-            TxtNoSpeakers.Visibility = Visibility.Visible;
+            TxtNoSpeakers.Visibility = cfg.HudShowActiveSpeakers ? Visibility.Visible : Visibility.Collapsed;
         }
+    }
+
+    private string _currentAppliedTheme = "";
+    private void ApplyThemeColors(string themeName)
+    {
+        if (_currentAppliedTheme == themeName) return;
+        _currentAppliedTheme = themeName;
+
+        Color themeColor = themeName switch
+        {
+            "Anvil" => Color.FromRgb(0xFF, 0x98, 0x00), // Orange
+            "Drake" => Color.FromRgb(0x3D, 0xDB, 0x85), // Green
+            "RSI" => Color.FromRgb(0x00, 0xE5, 0xFF),   // Cyan / Light Blue
+            "Origin" => Color.FromRgb(0xD8, 0x00, 0x64), // Magenta/Purple
+            _ => Color.FromRgb(0x00, 0xD2, 0xFF)       // Aegis / Default (Cyan)
+        };
+
+        var borderBrush = new SolidColorBrush(Color.FromArgb(0x80, themeColor.R, themeColor.G, themeColor.B));
+        var textBrush = new SolidColorBrush(themeColor);
+        var ringOuterBrush = new SolidColorBrush(Color.FromArgb(0x20, themeColor.R, themeColor.G, themeColor.B));
+        var ringInnerBrush = new SolidColorBrush(Color.FromArgb(0x10, themeColor.R, themeColor.G, themeColor.B));
+        var gridBrush = new SolidColorBrush(Color.FromArgb(0x15, themeColor.R, themeColor.G, themeColor.B));
+
+        HudPanel.BorderBrush = new SolidColorBrush(Color.FromArgb(0x40, themeColor.R, themeColor.G, themeColor.B));
+        RadarPanel.BorderBrush = borderBrush;
+        
+        RadarRingOuter.Stroke = ringOuterBrush;
+        RadarRingInner.Stroke = ringInnerBrush;
+        RadarLineVert.Stroke = gridBrush;
+        RadarLineHoriz.Stroke = gridBrush;
+        TxtRadarRange.Foreground = borderBrush;
     }
 
     public void CloseOverlay()

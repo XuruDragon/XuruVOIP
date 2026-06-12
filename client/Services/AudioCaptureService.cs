@@ -385,9 +385,26 @@ public class AudioCaptureService : IDisposable
             }
 
             // Apply Voice Changer effects if enabled
-            if (config != null && config.EnableVoiceChanger)
+            if (config != null)
             {
-                _voiceModulator.Process(floatBuf, FrameSamples, config.VoiceChangerType, config.VoicePitchFactor);
+                if (config.EnableCustomModulator)
+                {
+                    _voiceModulator.ProcessCustom(
+                        floatBuf,
+                        FrameSamples,
+                        config.CustomPitchShift,
+                        config.CustomRingModFreq,
+                        config.CustomRingModMix,
+                        config.CustomFlangerDepth,
+                        config.CustomFlangerRate,
+                        config.CustomFlangerFeedback,
+                        config.CustomBitcrushEnabled,
+                        config.CustomBitcrushBits);
+                }
+                else if (config.EnableVoiceChanger)
+                {
+                    _voiceModulator.Process(floatBuf, FrameSamples, config.VoiceChangerType, config.VoicePitchFactor);
+                }
             }
 
             // Convert back to PCM

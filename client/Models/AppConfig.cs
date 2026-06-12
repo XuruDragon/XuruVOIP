@@ -59,17 +59,34 @@ public class AppConfig
     public bool EnableHrtf { get; set; } = false;
     public bool EnableRadioDegradation { get; set; } = true;
     public bool EnablePttChimes { get; set; } = true;
+    public string PttChimeType { get; set; } = "Military";
+    public bool EnableCustomChimes { get; set; } = false;
     public bool EnableEnvironmentalAcoustics { get; set; } = true;
     public bool EnableHelmetModulator { get; set; } = true;
     public bool EnableVoiceChanger { get; set; } = false;
     public string VoiceChangerType { get; set; } = "None"; // None, Alien, Cyborg, Robotic, PitchShift
     public float VoicePitchFactor { get; set; } = 1.0f;
+    public bool EnableCustomModulator { get; set; } = false;
+    public float CustomPitchShift { get; set; } = 1.0f;
+    public float CustomRingModFreq { get; set; } = 100f;
+    public float CustomRingModMix { get; set; } = 0.0f;
+    public float CustomFlangerDepth { get; set; } = 0.0f;
+    public float CustomFlangerRate { get; set; } = 0.5f;
+    public float CustomFlangerFeedback { get; set; } = 0.0f;
+    public bool CustomBitcrushEnabled { get; set; } = false;
+    public int CustomBitcrushBits { get; set; } = 16;
     public bool EnableAtmosphereSimulation { get; set; } = false;
+    public bool EnableRadioDelay { get; set; } = false;
 
     // --- Borderless Overlay ---
     public bool EnableOverlay { get; set; } = false;
     public string OverlayPosition { get; set; } = "TopLeft";
+    public string HudTheme { get; set; } = "Aegis";
+    public bool HudShowRadar { get; set; } = true;
+    public bool HudShowActiveSpeakers { get; set; } = true;
+    public bool HudShowChannel { get; set; } = true;
     public bool EnableRadar { get; set; } = true;
+
     public double RadarRange { get; set; } = 50.0;
     public bool EnableStt { get; set; } = false;
     public bool EnableVisorSpectrogram { get; set; } = false;

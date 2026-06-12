@@ -261,7 +261,13 @@ public class CompanionAppService : IDisposable
                     hailPeerName = _viewModel.HailPeerName,
                     enableHrtf = _viewModel.Config.Config.EnableHrtf,
                     enableVisorSpectrogram = _viewModel.Config.Config.EnableVisorSpectrogram,
-                    enableTranslationSubtitles = _viewModel.Config.Config.EnableTranslationSubtitles
+                    enableTranslationSubtitles = _viewModel.Config.Config.EnableTranslationSubtitles,
+                    hudTheme = _viewModel.Config.Config.HudTheme,
+                    overlayPosition = _viewModel.Config.Config.OverlayPosition,
+                    hudShowRadar = _viewModel.Config.Config.HudShowRadar,
+                    hudShowActiveSpeakers = _viewModel.Config.Config.HudShowActiveSpeakers,
+                    hudShowChannel = _viewModel.Config.Config.HudShowChannel,
+                    pttChimeType = _viewModel.Config.Config.PttChimeType
                 };
 
                 string json = JsonSerializer.Serialize(status);
@@ -418,6 +424,45 @@ public class CompanionAppService : IDisposable
                 _viewModel.Config.Config.EnableVisorSpectrogram = !_viewModel.Config.Config.EnableVisorSpectrogram;
                 _viewModel.SaveConfig();
                 _viewModel.ApplySettings();
+                break;
+            case "set_hud_theme":
+                if (root.TryGetProperty("theme", out var themeProp))
+                {
+                    _viewModel.Config.Config.HudTheme = themeProp.GetString() ?? "Aegis";
+                    _viewModel.SaveConfig();
+                    _viewModel.ApplySettings();
+                }
+                break;
+            case "set_hud_position":
+                if (root.TryGetProperty("position", out var posProp))
+                {
+                    _viewModel.Config.Config.OverlayPosition = posProp.GetString() ?? "TopLeft";
+                    _viewModel.SaveConfig();
+                    _viewModel.ApplySettings();
+                }
+                break;
+            case "toggle_hud_radar":
+                _viewModel.Config.Config.HudShowRadar = !_viewModel.Config.Config.HudShowRadar;
+                _viewModel.SaveConfig();
+                _viewModel.ApplySettings();
+                break;
+            case "toggle_hud_speakers":
+                _viewModel.Config.Config.HudShowActiveSpeakers = !_viewModel.Config.Config.HudShowActiveSpeakers;
+                _viewModel.SaveConfig();
+                _viewModel.ApplySettings();
+                break;
+            case "toggle_hud_channel":
+                _viewModel.Config.Config.HudShowChannel = !_viewModel.Config.Config.HudShowChannel;
+                _viewModel.SaveConfig();
+                _viewModel.ApplySettings();
+                break;
+            case "set_chime_type":
+                if (root.TryGetProperty("type", out var chimeProp))
+                {
+                    _viewModel.Config.Config.PttChimeType = chimeProp.GetString() ?? "Military";
+                    _viewModel.SaveConfig();
+                    _viewModel.ApplySettings();
+                }
                 break;
         }
     }
@@ -748,8 +793,9 @@ public class CompanionAppService : IDisposable
         <h1>XuruVOIP Companion</h1>
 
         <!-- Tab Navigation -->
-        <div class="tabs" id="tab-container" style="display: none;">
+        <div class="tabs" id="tab-container">
             <div class="tab active" id="tab-controls" onclick="switchTab('controls')">🎛️ Controls</div>
+            <div class="tab" id="tab-hud" onclick="switchTab('hud')">📺 HUD</div>
             <div class="tab" id="tab-map" onclick="switchTab('map')">🗺️ Tactical Map</div>
         </div>
         
@@ -805,6 +851,16 @@ public class CompanionAppService : IDisposable
                     </select>
                 </div>
                 <div class="control-row" style="margin-top:12px;">
+                    <div class="section-title">Radio Transmit Chime</div>
+                    <select id="sel-chime" onchange="postAction('set_chime_type', { type: this.value })">
+                        <option value="Military">Military</option>
+                        <option value="Industrial">Industrial</option>
+                        <option value="Alien">Alien</option>
+                        <option value="Vintage">Vintage</option>
+                    </select>
+                </div>
+
+                <div class="control-row" style="margin-top:12px;">
                     <div class="section-title">Immersive Distortion</div>
                     <button class="btn" id="btn-exertion-dist" onclick="postAction('toggle_exertion_distortion')" style="width:100%; margin-bottom:12px; flex-direction:row; padding:12px;">
                         <span class="icon">🎚️</span>
@@ -847,6 +903,52 @@ public class CompanionAppService : IDisposable
             <div class="section-title">Active Speakers</div>
             <div class="speakers-card" id="list-speakers">
                 <div class="no-speakers">No active transmissions</div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: HUD CUSTOMIZER -->
+        <div id="view-hud" class="tab-view">
+            <div class="section-title">HUD Layout & Customization</div>
+            <div class="controls-list">
+                <div class="control-row">
+                    <div class="section-title">HUD Theme</div>
+                    <select id="sel-hud-theme" onchange="postAction('set_hud_theme', { theme: this.value })">
+                        <option value="Aegis">Aegis (Cyan)</option>
+                        <option value="Anvil">Anvil (Orange)</option>
+                        <option value="Drake">Drake (Green)</option>
+                        <option value="RSI">RSI (Light Blue)</option>
+                        <option value="Origin">Origin (Magenta)</option>
+                    </select>
+                </div>
+                <div class="control-row" style="margin-top:12px;">
+                    <div class="section-title">HUD Position</div>
+                    <select id="sel-hud-position" onchange="postAction('set_hud_position', { position: this.value })">
+                        <option value="TopLeft">Top Left</option>
+                        <option value="TopCenter">Top Center</option>
+                        <option value="TopRight">Top Right</option>
+                        <option value="BottomLeft">Bottom Left</option>
+                        <option value="BottomCenter">Bottom Center</option>
+                        <option value="BottomRight">Bottom Right</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="section-title" style="margin-top:20px;">Visibility Toggles</div>
+            <div class="grid-toggles">
+                <button class="btn" id="btn-hud-radar" onclick="postAction('toggle_hud_radar')">
+                    <span class="icon">📡</span>
+                    <span>Show Radar</span>
+                </button>
+                <button class="btn" id="btn-hud-speakers" onclick="postAction('toggle_hud_speakers')">
+                    <span class="icon">🔊</span>
+                    <span>Speakers List</span>
+                </button>
+            </div>
+            <div class="grid-toggles">
+                <button class="btn" id="btn-hud-channel" onclick="postAction('toggle_hud_channel')" style="grid-column: span 2;">
+                    <span class="icon">📺</span>
+                    <span>Show Connection Header</span>
+                </button>
             </div>
         </div>
 
@@ -900,6 +1002,9 @@ public class CompanionAppService : IDisposable
             } else if (tabId === 'map') {
                 document.getElementById('tab-map').classList.add('active');
                 document.getElementById('view-map').classList.add('active');
+            } else if (tabId === 'hud') {
+                document.getElementById('tab-hud').classList.add('active');
+                document.getElementById('view-hud').classList.add('active');
             }
         }
 
@@ -960,6 +1065,25 @@ public class CompanionAppService : IDisposable
                 const selVoice = document.getElementById('sel-voice');
                 selVoice.value = data.voiceChangerType || 'None';
 
+                // Update Radio Transmit Chime
+                const selChime = document.getElementById('sel-chime');
+                if (selChime) selChime.value = data.pttChimeType || 'Military';
+
+                // Update Alarm Injection
+                setButtonState('btn-alarm-injection', data.enableAlarmInjection, false);
+
+                // Update HUD Theme & Position
+                const selTheme = document.getElementById('sel-hud-theme');
+                if (selTheme) selTheme.value = data.hudTheme || 'Aegis';
+
+                const selPos = document.getElementById('sel-hud-position');
+                if (selPos) selPos.value = data.overlayPosition || 'TopLeft';
+
+                // Update HUD Toggles
+                setButtonState('btn-hud-radar', data.hudShowRadar, false);
+                setButtonState('btn-hud-speakers', data.hudShowActiveSpeakers, false);
+                setButtonState('btn-hud-channel', data.hudShowChannel, false);
+
                 // Update voice distortion
                 const btnEx = document.getElementById('btn-exertion-dist');
                 if (data.enableExertionDistortion) {
@@ -1019,10 +1143,9 @@ public class CompanionAppService : IDisposable
 
                 // Update tab bar visibility and map data
                 const tabContainer = document.getElementById('tab-container');
-                if (data.enableCompanionMap) {
-                    tabContainer.style.display = 'flex';
-                } else {
-                    tabContainer.style.display = 'none';
+                tabContainer.style.display = 'flex';
+                document.getElementById('tab-map').style.display = data.enableCompanionMap ? 'flex' : 'none';
+                if (!data.enableCompanionMap && document.getElementById('tab-map').classList.contains('active')) {
                     switchTab('controls');
                 }
 

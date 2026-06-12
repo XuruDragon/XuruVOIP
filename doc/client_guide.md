@@ -162,6 +162,33 @@ XuruVOIP includes special features that make voice communication match your game
   2. Go to the **General** tab and check **Enable Voice Commands (Hands-Free PTT)**.
   3. Assign and hold the **Voice Command Key (PTT)** (default: `V`), speak a command (e.g. "open doors"), and release the key.
 
+### 🎛️ 14. Custom Vocal Preset Modulator Editor
+* **What it does:** Allows you to design your own custom sci-fi voice modulators using real-time sliders instead of relying on default presets.
+* **How to configure it:**
+  1. Go to the **Audio** tab in settings and check **Enable Custom Vocal Modulator**.
+  2. Tweak the exposed parameters:
+     * **Pitch Shift:** Transpose your voice from 0.5x (deep alien) up to 2.0x (high-pitched).
+     * **Ring Modulator Frequency & Mix:** Inject metallic, robotic textures.
+     * **Flanger Depth, Rate, & Feedback:** Synthesize floating/phaser sweeps.
+     * **Custom Bitcrush:** Discretize your voice down to low-fidelity bit depths (2 to 16 bits).
+
+### 🪐 15. Planetary Distance-Based Radio Delay
+* **What it does:** Simulates actual radio transmission latency across planetary distances using the speed of light (~3.3ms per kilometer).
+* **How to configure it:**
+  1. Go to the **Audio** tab in settings.
+  2. Check **Enable Planetary Distance-Based Radio Delay**. When transmitting over long distances, you will notice a realistic delay before hearing remote players.
+
+### 📁 16. Custom Radio PTT Chime Uploading
+* **What it does:** Allows you to override the default key-down and key-up radio chimes with your own custom WAV or MP3 files.
+* **How to configure it:**
+  1. Place your custom files in the `Resources/` folder next to the client executable, named `radio_key_down.wav` (or `.mp3`) and `radio_key_up.wav` (or `.mp3`).
+  2. Open client settings, go to the **Audio** tab, and check **Enable Custom PTT Chimes**.
+  3. The application will automatically downmix and resample your custom audio on load.
+
+### 🛸 17. HUD 3D Radar Elevation Indicators
+* **What it does:** Upgrades the tactical mini-radar to show whether speaking players are located above or below your vertical position.
+* **How to configure it:** This works automatically when coordinate tracking is enabled. If a player speaking is 2 meters or more above or below your vertical position, an arrow (`▲` or `▼`) and the height difference in meters will append next to their blip label (e.g. `Bob (▲ 12m)`).
+
 ---
 
 ## 📱 Using the Companion App

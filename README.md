@@ -220,11 +220,14 @@ graph TB
 ### 4. 🎙️ Sci-Fi Voice Changer & Suit Modulators
 * **Real-Time DSP Filters:** Time-domain pitch shifting, flanging, ring modulation, soft-tanh saturation, and 8-bit bitcrushing.
 * **Atmospheric Presets:** Instantly load preset voice profiles including **Alien**, **Cyborg**, **Robotic**, or **Custom Pitch Shift** (0.5x to 2.0x).
+* **Custom Modulator Sliders:** Fine-tune pitch, ring mod frequency/mix, flanger depth/rate/feedback, and bitcrush settings via settings sliders.
 
 ### 5. 📻 Immersive Radio Degradation & Chimes
 * **Bandpass Filtering:** Models radio filters with low/high cutoffs when using radio channels or when suit visors are down.
 * **Radio Signal Degradation:** Narrow cutoff bands and blends in bandpass-filtered static noise as distance between players approaches the radio transmitter limit.
-* **Acoustic Radio Chimes:** Plays a pitch-sweeping mic-key chirp (900Hz to 700Hz) on key-down and a squelch static tail on key-up.
+* **Acoustic Radio Chimes:** Plays mechanical key-down and key-up chimes when transmitting on radio channels. Supports four distinct mathematical profiles selectable in settings or the Companion App: Military (sine sweeps), Industrial (mechanical clanks), Alien (ring-modulated sweeps), and Vintage (analog relay clicks).
+* **Planetary Distance-Based Radio Delay:** Simulates signal propagation delay using the speed of light ($\approx 3.3\text{ ms}$ per kilometer, up to 3000ms max) for realistic communication lag.
+* **Custom PTT Chimes:** Downmixes and resamples custom WAV/MP3 files (`radio_key_down` and `radio_key_up`) from the `Resources/` folder to serve as user-provided chimes.
 
 ### 6. 💬 Automatic Ship Intercom System
 * **Vehicle Intercom Channels:** Boarding a vehicle automatically subscribes players to a dynamic `Intercom_<ContainerID>` radio channel.
@@ -238,8 +241,10 @@ graph TB
 
 ### 7. 📡 Vulkan-Compatible HUD Overlay & 2D Tactical Radar
 * **Win32 Click-Through Overlay:** A borderless HUD overlay showing VoIP connections, frequencies, and speaking states. Vulkan and DirectX compatible (running in borderless windowed mode).
+* **Interactive HUD Customizer:** Allows real-time theme (Aegis, Anvil, Drake, RSI, Origin), positioning (corners/center), and component visibility (mini-radar, speakers list, connection header) customization via settings or the Companion App.
 * **Intercom Status Indicator:** Displays warnings like `⚡ INTERCOM: DEGRADED` (with sub-status details such as `[Power Loss]`, `[Quantum]`, or `[Static Pop]`) in the overlay when intercom degradation is active.
 * **Tactical Mini-Radar:** Features a heading-aligned 2D HUD radar that displays relative speaking players, drawing pulsating sound rings around them.
+* **3D Elevation Indicators:** Appends vertical direction arrows and deck height deltas (e.g. `Bob (▲ 12m)`) next to radar blips when vertical separation exceeds 2 meters.
 * **Speech-to-Text Subtitles:** Transcribes incoming radio/proximity audio to localized HUD subtitles using an offline, lightweight Whisper model (`ggml-tiny.bin`).
 * **Hands-Free PTT Voice Commands:** Holding the dedicated Voice Command key temporarily suppresses outgoing proximity/radio voice feeds and buffers mic audio. On release, the voice is transcribed locally via the Whisper model to trigger ship actions:
   * **Supported Commands:** Visor/Helmet Toggle, Microphone Mute/Unmute (proximity/radio/profile/all), active Radio Channel selection, and Voice Changer presets.
@@ -260,6 +265,7 @@ graph TB
 ### 10. 🔌 Discord Voice Bridge
 * **Bidirectional Audio Relay:** Relays communications between a Go server radio channel and a Discord voice channel.
 * **Nicknames Mapping:** Captures Discord speech and maps SSRC IDs to server nicknames.
+* **Dynamic Frequency Tracking:** Automatically moves the Discord bridge voice connection to follow and mirror the active channel of configured leaders or Command/Leader profiles.
 
 ### 11. 🛡️ Security, Log Rotation, and Admin Canvas Radar
 * **Daily Log Rotation:** Startup log archiver retaining only the 5 most recent logs.
@@ -318,7 +324,8 @@ graph TB
 
 ### 23. 🛰️ Server-Side AAR 3D Playback
 * **Coordinates Logging:** Server logs player coordinates and zones to a `<session_id>_positions.jsonl` file every 500ms.
-* **Synchronized Playback Canvas:** Visualizes the player's path and speaking pulse rings on a web-based HTML5 Canvas map, fully synchronized with the recorded Ogg/Opus audio.
+* **Synchronized WebGL 3D Replay:** Visualizes the player's 3D path and speaking pulse rings on an interactive Three.js WebGL 3D map with mouse panning, zooming, and rotating, fully synchronized with the recorded Ogg/Opus audio.
+
 
 ---
 

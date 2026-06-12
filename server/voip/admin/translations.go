@@ -1285,6 +1285,8 @@ const dashboardHTML = `<!DOCTYPE html>
     <title>XuruVoip - {{index .T "AdminPortal"}}</title>
     <link rel="icon" type="image/png" href="/admin/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -1790,6 +1792,14 @@ const dashboardHTML = `<!DOCTYPE html>
                     window.addEventListener('resize', function() {
                         if (activeTab === 'aar') {
                             drawAarTimeline();
+                        }
+                        if (aarThreeRenderer && aarThreeCamera) {
+                            const canvas = document.getElementById('aar-replay-canvas');
+                            const w = canvas.parentElement.clientWidth;
+                            const h = canvas.parentElement.clientHeight;
+                            aarThreeCamera.aspect = w / h;
+                            aarThreeCamera.updateProjectionMatrix();
+                            aarThreeRenderer.setSize(w, h, false);
                         }
                     });
                 }
@@ -3154,9 +3164,51 @@ const dashboardHTML = `<!DOCTYPE html>
             });
         }
 
-        let replayInterval = null;
         let replayPositions = [];
-        
+        let aarThreeScene = null;
+        let aarThreeCamera = null;
+        let aarThreeRenderer = null;
+        let aarThreeControls = null;
+        let aarThreeAnimationId = null;
+        let aarThreePathLine = null;
+        let aarThreePlayedPathLine = null;
+        let aarThreePlayerMesh = null;
+        let aarThreeVoiceRings = [];
+        let aarThreeCenterOffset = { x: 0, y: 0, z: 0 };
+
+        function cleanThreeJsReplay() {
+            if (aarThreeAnimationId) {
+                cancelAnimationFrame(aarThreeAnimationId);
+                aarThreeAnimationId = null;
+            }
+            if (aarThreeControls) {
+                aarThreeControls.dispose();
+                aarThreeControls = null;
+            }
+            if (aarThreeScene) {
+                aarThreeScene.traverse(obj => {
+                    if (obj.geometry) obj.geometry.dispose();
+                    if (obj.material) {
+                        if (Array.isArray(obj.material)) {
+                            obj.material.forEach(m => m.dispose());
+                        } else {
+                            obj.material.dispose();
+                        }
+                    }
+                });
+                aarThreeScene = null;
+            }
+            if (aarThreeRenderer) {
+                aarThreeRenderer.dispose();
+                aarThreeRenderer = null;
+            }
+            aarThreeCamera = null;
+            aarThreePathLine = null;
+            aarThreePlayedPathLine = null;
+            aarThreePlayerMesh = null;
+            aarThreeVoiceRings = [];
+        }
+
         function playRecording(rec) {
             const modal = document.getElementById('aar-replay-modal');
             const audio = document.getElementById('aar-audio-element');
@@ -3166,10 +3218,7 @@ const dashboardHTML = `<!DOCTYPE html>
             const canvas = document.getElementById('aar-replay-canvas');
             const noData = document.getElementById('aar-replay-no-data');
             
-            if (replayInterval) {
-                clearInterval(replayInterval);
-                replayInterval = null;
-            }
+            cleanThreeJsReplay();
             
             subtitle.innerText = rec.player_name + ' | ' + (rec.audio_type === 1 ? 'Radio: ' + rec.channel : rec.audio_type === 2 ? 'Profile: ' + rec.channel : rec.audio_type === 0 ? 'Proximity' : 'PA');
             audio.src = '/admin/aar/' + rec.file_path.replace(/\\/g, '/');
@@ -3177,11 +3226,32 @@ const dashboardHTML = `<!DOCTYPE html>
             
             replayPositions = [];
             noData.classList.add('hidden');
+
+            const w = canvas.parentElement.clientWidth;
+            const h = canvas.parentElement.clientHeight;
+
+            aarThreeScene = new THREE.Scene();
+            aarThreeScene.background = new THREE.Color(0x05070c);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            aarThreeScene.add(ambientLight);
             
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
-            canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
-            
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(100, 200, 100);
+            aarThreeScene.add(dirLight);
+
+            aarThreeCamera = new THREE.PerspectiveCamera(60, w / h, 0.1, 10000);
+            aarThreeCamera.position.set(0, 150, 250);
+
+            aarThreeRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            aarThreeRenderer.setSize(w, h, false);
+            aarThreeRenderer.setPixelRatio(window.devicePixelRatio);
+
+            aarThreeControls = new THREE.OrbitControls(aarThreeCamera, aarThreeRenderer.domElement);
+            aarThreeControls.enableDamping = true;
+            aarThreeControls.dampingFactor = 0.05;
+            aarThreeControls.maxPolarAngle = Math.PI / 2 - 0.01;
+
             const posUrl = '/admin/aar/' + rec.file_path.replace(/\\/g, '/').replace('.ogg', '_positions.jsonl');
             fetch(posUrl)
                 .then(r => {
@@ -3201,7 +3271,10 @@ const dashboardHTML = `<!DOCTYPE html>
                     });
                     if (replayPositions.length === 0) {
                         noData.classList.remove('hidden');
+                        return;
                     }
+                    
+                    setupThreeJsScene(rec);
                 })
                 .catch(err => {
                     console.warn('Could not load position logs:', err);
@@ -3209,45 +3282,103 @@ const dashboardHTML = `<!DOCTYPE html>
                 });
                 
             audio.play();
-            
-            replayInterval = setInterval(() => {
-                updateReplayUI(rec, audio, canvas, ctx, timeDisplay, zoneDisplay);
-            }, 50);
-        }
-        
-        function playRecordingById(id) {
-            const rec = aarRecordings.find(r => r.id === id);
-            if (rec) playRecording(rec);
-        }
-        
-        function closeAarReplay() {
-            const modal = document.getElementById('aar-replay-modal');
-            const audio = document.getElementById('aar-audio-element');
-            modal.classList.add('hidden');
-            audio.pause();
-            if (replayInterval) {
-                clearInterval(replayInterval);
-                replayInterval = null;
+
+            function animate() {
+                if (!aarThreeScene) return;
+                aarThreeAnimationId = requestAnimationFrame(animate);
+                
+                if (aarThreeControls) aarThreeControls.update();
+                
+                updateReplayThreeJs(rec, audio);
+                
+                if (aarThreeRenderer && aarThreeScene && aarThreeCamera) {
+                    aarThreeRenderer.render(aarThreeScene, aarThreeCamera);
+                }
             }
-        }
-        
-        function formatTime(secs) {
-            if (isNaN(secs)) return '0:00';
-            const m = Math.floor(secs / 60);
-            const s = Math.floor(secs % 60);
-            return m + ':' + (s < 10 ? '0' : '') + s;
+            aarThreeAnimationId = requestAnimationFrame(animate);
         }
 
-        function updateReplayUI(rec, audio, canvas, ctx, timeDisplay, zoneDisplay) {
+        function setupThreeJsScene(rec) {
+            let minX = Infinity, maxX = -Infinity;
+            let minY = Infinity, maxY = -Infinity;
+            let minZ = Infinity, maxZ = -Infinity;
+            
+            replayPositions.forEach(p => {
+                if (p.x < minX) minX = p.x;
+                if (p.x > maxX) maxX = p.x;
+                if (p.y < minY) minY = p.y;
+                if (p.y > maxY) maxY = p.y;
+                if (p.z === undefined) p.z = 0;
+                if (p.z < minZ) minZ = p.z;
+                if (p.z > maxZ) maxZ = p.z;
+            });
+            
+            const centerX = minX + (maxX - minX) / 2;
+            const centerY = minY + (maxY - minY) / 2;
+            const centerZ = minZ + (maxZ - minZ) / 2;
+            
+            aarThreeCenterOffset = { x: centerX, y: centerY, z: centerZ };
+            
+            const dx = maxX - minX;
+            const dy = maxY - minY;
+            const maxSpan = Math.max(dx, dy, 100);
+            
+            const gridHelper = new THREE.GridHelper(maxSpan * 1.8, 40, 0x10b981, 0x1e293b);
+            gridHelper.position.y = -5;
+            aarThreeScene.add(gridHelper);
+            
+            const points = [];
+            replayPositions.forEach(p => {
+                points.push(new THREE.Vector3(p.x - centerX, p.z - centerZ, -p.y + centerY));
+            });
+            
+            const pathGeom = new THREE.BufferGeometry().setFromPoints(points);
+            const pathMat = new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.3 });
+            aarThreePathLine = new THREE.Line(pathGeom, pathMat);
+            aarThreeScene.add(aarThreePathLine);
+            
+            const playedGeom = new THREE.BufferGeometry();
+            const playedMat = new THREE.LineBasicMaterial({ color: 0x38bdf8 });
+            aarThreePlayedPathLine = new THREE.Line(playedGeom, playedMat);
+            aarThreeScene.add(aarThreePlayedPathLine);
+            
+            const playerGeom = new THREE.OctahedronGeometry(6, 0);
+            const playerMat = new THREE.MeshLambertMaterial({
+                color: 0x10b981,
+                wireframe: true,
+                emissive: 0x052211
+            });
+            aarThreePlayerMesh = new THREE.Mesh(playerGeom, playerMat);
+            aarThreeScene.add(aarThreePlayerMesh);
+            
+            aarThreeVoiceRings = [];
+            for (let i = 0; i < 3; i++) {
+                const ringGeom = new THREE.RingGeometry(1, 1.2, 32);
+                ringGeom.rotateX(-Math.PI / 2);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: 0x10b981,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0,
+                    depthWrite: false
+                });
+                const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+                aarThreeScene.add(ringMesh);
+                aarThreeVoiceRings.push(ringMesh);
+            }
+            
+            aarThreeCamera.position.set(0, maxSpan * 0.8, maxSpan * 1.2);
+            aarThreeControls.target.set(0, 0, 0);
+            aarThreeControls.update();
+        }
+
+        function updateReplayThreeJs(rec, audio) {
+            const timeDisplay = document.getElementById('aar-replay-time');
+            const zoneDisplay = document.getElementById('aar-replay-zone');
+            
             const currentMs = audio.currentTime * 1000;
             const durationSec = audio.duration || (rec.duration_ms / 1000);
             timeDisplay.innerText = formatTime(audio.currentTime) + ' / ' + formatTime(durationSec);
-            
-            const w = canvas.width;
-            const h = canvas.height;
-            const dpr = window.devicePixelRatio || 1;
-            
-            ctx.clearRect(0, 0, w, h);
             
             if (replayPositions.length === 0) {
                 zoneDisplay.innerText = 'Zone: N/A';
@@ -3255,10 +3386,13 @@ const dashboardHTML = `<!DOCTYPE html>
             }
             
             let currentPos = null;
+            let playedIndex = 0;
             if (currentMs <= replayPositions[0].t) {
                 currentPos = replayPositions[0];
+                playedIndex = 0;
             } else if (currentMs >= replayPositions[replayPositions.length - 1].t) {
                 currentPos = replayPositions[replayPositions.length - 1];
+                playedIndex = replayPositions.length - 1;
             } else {
                 for (let i = 0; i < replayPositions.length - 1; i++) {
                     if (currentMs >= replayPositions[i].t && currentMs <= replayPositions[i+1].t) {
@@ -3272,6 +3406,7 @@ const dashboardHTML = `<!DOCTYPE html>
                             z: p1.z + ratio * (p2.z - p1.z),
                             zone: p1.zone
                         };
+                        playedIndex = i;
                         break;
                     }
                 }
@@ -3279,139 +3414,75 @@ const dashboardHTML = `<!DOCTYPE html>
             
             if (!currentPos) {
                 currentPos = replayPositions[replayPositions.length - 1];
+                playedIndex = replayPositions.length - 1;
             }
             
             zoneDisplay.innerText = 'Zone: ' + (currentPos.zone || 'N/A');
             
-            let minX = Infinity, maxX = -Infinity;
-            let minY = Infinity, maxY = -Infinity;
-            replayPositions.forEach(p => {
-                if (p.x < minX) minX = p.x;
-                if (p.x > maxX) maxX = p.x;
-                if (p.y < minY) minY = p.y;
-                if (p.y > maxY) maxY = p.y;
-            });
+            const offsetX = currentPos.x - aarThreeCenterOffset.x;
+            const offsetY = currentPos.z - aarThreeCenterOffset.z;
+            const offsetZ = -currentPos.y + aarThreeCenterOffset.y;
             
-            const dx = maxX - minX;
-            const dy = maxY - minY;
-            const centerX = minX + dx / 2;
-            const centerY = minY + dy / 2;
-            
-            const margin = 50 * dpr;
-            const plotW = w - 2 * margin;
-            const plotH = h - 2 * margin;
-            
-            let scale = 1.0;
-            if (dx > 0.1 || dy > 0.1) {
-                scale = Math.min(plotW / (dx || 1), plotH / (dy || 1));
-            } else {
-                scale = 5.0 * dpr;
+            if (aarThreePlayerMesh) {
+                aarThreePlayerMesh.position.set(offsetX, offsetY, offsetZ);
+                aarThreePlayerMesh.rotation.y += 0.01;
+                aarThreePlayerMesh.rotation.x += 0.005;
             }
             
-            function toCanvas(x, y) {
-                return {
-                    x: w / 2 + (x - centerX) * scale,
-                    y: h / 2 - (y - centerY) * scale
-                };
-            }
-            
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
-            ctx.lineWidth = 1 * dpr;
-            const gridStep = 50 * scale;
-            if (gridStep > 5) {
-                for (let gx = w/2 - Math.floor(w/2 / gridStep)*gridStep; gx < w; gx += gridStep) {
-                    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke();
+            if (aarThreePlayedPathLine) {
+                const playedPoints = [];
+                for (let i = 0; i <= playedIndex; i++) {
+                    const p = replayPositions[i];
+                    playedPoints.push(new THREE.Vector3(
+                        p.x - aarThreeCenterOffset.x,
+                        p.z - aarThreeCenterOffset.z,
+                        -p.y + aarThreeCenterOffset.y
+                    ));
                 }
-                for (let gy = h/2 - Math.floor(h/2 / gridStep)*gridStep; gy < h; gy += gridStep) {
-                    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
-                }
+                playedPoints.push(new THREE.Vector3(offsetX, offsetY, offsetZ));
+                
+                aarThreePlayedPathLine.geometry.dispose();
+                aarThreePlayedPathLine.geometry = new THREE.BufferGeometry().setFromPoints(playedPoints);
             }
             
-            ctx.beginPath();
-            let first = true;
-            replayPositions.forEach(p => {
-                const pt = toCanvas(p.x, p.y);
-                if (first) {
-                    ctx.moveTo(pt.x, pt.y);
-                    first = false;
-                } else {
-                    ctx.lineTo(pt.x, pt.y);
-                }
-            });
-            ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)';
-            ctx.lineWidth = 2 * dpr;
-            ctx.stroke();
-            
-            ctx.beginPath();
-            first = true;
-            for (let i = 0; i < replayPositions.length; i++) {
-                const p = replayPositions[i];
-                if (p.t > currentMs) break;
-                const pt = toCanvas(p.x, p.y);
-                if (first) {
-                    ctx.moveTo(pt.x, pt.y);
-                    first = false;
-                } else {
-                    ctx.lineTo(pt.x, pt.y);
-                }
-            }
-            const curPt = toCanvas(currentPos.x, currentPos.y);
-            if (!first) {
-                ctx.lineTo(curPt.x, curPt.y);
-            }
-            ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
-            ctx.lineWidth = 2 * dpr;
-            ctx.stroke();
-            
-            if (!audio.paused && !audio.ended) {
+            const isSpeaking = !audio.paused && !audio.ended;
+            if (aarThreeVoiceRings && aarThreeVoiceRings.length > 0) {
                 const timeSeed = (Date.now() / 1500) % 1.0;
-                for (let r = 0; r < 3; r++) {
-                    const radius = (10 + (35 * ((timeSeed + r / 3.0) % 1.0))) * dpr;
-                    const alpha = 1.0 - ((timeSeed + r / 3.0) % 1.0);
-                    
-                    ctx.beginPath();
-                    ctx.arc(curPt.x, curPt.y, radius, 0, 2 * Math.PI);
-                    ctx.strokeStyle = 'rgba(16, 185, 129, ' + (alpha * 0.4) + ')';
-                    ctx.lineWidth = 1.5 * dpr;
-                    ctx.stroke();
-                }
+                aarThreeVoiceRings.forEach((ring, idx) => {
+                    if (isSpeaking) {
+                        const phase = (timeSeed + idx / 3.0) % 1.0;
+                        const radius = 2 + 40 * phase;
+                        const alpha = 1.0 - phase;
+                        
+                        ring.position.set(offsetX, offsetY, offsetZ);
+                        ring.scale.set(radius, radius, radius);
+                        ring.material.opacity = alpha * 0.5;
+                        ring.visible = true;
+                    } else {
+                        ring.visible = false;
+                    }
+                });
             }
-            
-            ctx.beginPath();
-            ctx.arc(curPt.x, curPt.y, 6 * dpr, 0, 2 * Math.PI);
-            ctx.fillStyle = '#10b981';
-            ctx.fill();
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 1.5 * dpr;
-            ctx.stroke();
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold ' + Math.round(12 * dpr) + 'px Outfit, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(rec.player_name, curPt.x, curPt.y - 12 * dpr);
-            
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = Math.round(9 * dpr) + 'px Outfit, sans-serif';
-            ctx.fillText(currentPos.x.toFixed(1) + ', ' + currentPos.y.toFixed(1), curPt.x, curPt.y + 16 * dpr);
-            
-            const mDistance = 50;
-            const scaleLen = mDistance * scale;
-            const legendX = 20 * dpr;
-            const legendY = h - 20 * dpr;
-            
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.lineWidth = 2 * dpr;
-            ctx.beginPath();
-            ctx.moveTo(legendX, legendY - 5 * dpr);
-            ctx.lineTo(legendX, legendY);
-            ctx.lineTo(legendX + scaleLen, legendY);
-            ctx.lineTo(legendX + scaleLen, legendY - 5 * dpr);
-            ctx.stroke();
-            
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-            ctx.font = Math.round(10 * dpr) + 'px Outfit, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText(mDistance + 'm', legendX + 4 * dpr, legendY - 6 * dpr);
+        }
+
+        function playRecordingById(id) {
+            const rec = aarRecordings.find(r => r.id === id);
+            if (rec) playRecording(rec);
+        }
+        
+        function closeAarReplay() {
+            const modal = document.getElementById('aar-replay-modal');
+            const audio = document.getElementById('aar-audio-element');
+            modal.classList.add('hidden');
+            audio.pause();
+            cleanThreeJsReplay();
+        }
+        
+        function formatTime(secs) {
+            if (isNaN(secs)) return '0:00';
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60);
+            return m + ':' + (s < 10 ? '0' : '') + s;
         }
 
         function drawAarTimeline() {

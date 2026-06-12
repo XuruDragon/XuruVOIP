@@ -79,6 +79,12 @@ public class CompanionAppTests
 
             Assert.Equal("TestPlayer", root.GetProperty("username").GetString());
             Assert.False(root.GetProperty("micProximityMuted").GetBoolean());
+            Assert.Equal("Aegis", root.GetProperty("hudTheme").GetString());
+            Assert.Equal("TopLeft", root.GetProperty("overlayPosition").GetString());
+            Assert.True(root.GetProperty("hudShowRadar").GetBoolean());
+            Assert.True(root.GetProperty("hudShowActiveSpeakers").GetBoolean());
+            Assert.True(root.GetProperty("hudShowChannel").GetBoolean());
+            Assert.Equal("Military", root.GetProperty("pttChimeType").GetString());
             
             // Map telemetry should be null/disabled by default
             Assert.False(root.GetProperty("enableCompanionMap").GetBoolean());
@@ -119,6 +125,60 @@ public class CompanionAppTests
             string statusJson2 = await statusResponse2.Content.ReadAsStringAsync();
             using var doc2 = JsonDocument.Parse(statusJson2);
             Assert.True(doc2.RootElement.GetProperty("micProximityMuted").GetBoolean());
+
+            // 4. Test POST HUD customization actions
+            var themePayload = new { action = "set_hud_theme", theme = "Anvil" };
+            var themeContent = new StringContent(JsonSerializer.Serialize(themePayload), Encoding.UTF8, "application/json");
+            var themeRes = await client.PostAsync("http://localhost:8891/api/action", themeContent);
+            Assert.True(themeRes.IsSuccessStatusCode);
+
+            var posPayload = new { action = "set_hud_position", position = "BottomRight" };
+            var posContent = new StringContent(JsonSerializer.Serialize(posPayload), Encoding.UTF8, "application/json");
+            var posRes = await client.PostAsync("http://localhost:8891/api/action", posContent);
+            Assert.True(posRes.IsSuccessStatusCode);
+
+            var radarPayload = new { action = "toggle_hud_radar" };
+            var radarContent = new StringContent(JsonSerializer.Serialize(radarPayload), Encoding.UTF8, "application/json");
+            var radarRes = await client.PostAsync("http://localhost:8891/api/action", radarContent);
+            Assert.True(radarRes.IsSuccessStatusCode);
+
+            var spkPayload = new { action = "toggle_hud_speakers" };
+            var spkContent = new StringContent(JsonSerializer.Serialize(spkPayload), Encoding.UTF8, "application/json");
+            var spkRes = await client.PostAsync("http://localhost:8891/api/action", spkContent);
+            Assert.True(spkRes.IsSuccessStatusCode);
+
+            var chanPayload = new { action = "toggle_hud_channel" };
+            var chanContent = new StringContent(JsonSerializer.Serialize(chanPayload), Encoding.UTF8, "application/json");
+            var chanRes = await client.PostAsync("http://localhost:8891/api/action", chanContent);
+            Assert.True(chanRes.IsSuccessStatusCode);
+
+            var chimePayload = new { action = "set_chime_type", type = "Industrial" };
+            var chimeContent = new StringContent(JsonSerializer.Serialize(chimePayload), Encoding.UTF8, "application/json");
+            var chimeRes = await client.PostAsync("http://localhost:8891/api/action", chimeContent);
+            Assert.True(chimeRes.IsSuccessStatusCode);
+
+            // Wait a brief moment for dispatcher to update
+
+            // Verify they are updated on ViewModel config
+            Assert.Equal("Anvil", vm.Config.Config.HudTheme);
+            Assert.Equal("BottomRight", vm.Config.Config.OverlayPosition);
+            Assert.False(vm.Config.Config.HudShowRadar);
+            Assert.False(vm.Config.Config.HudShowActiveSpeakers);
+            Assert.False(vm.Config.Config.HudShowChannel);
+            Assert.Equal("Industrial", vm.Config.Config.PttChimeType);
+
+            // 5. Verify status GET reflects the modified settings
+            var statusResponse3 = await client.GetAsync("http://localhost:8891/api/status");
+            Assert.True(statusResponse3.IsSuccessStatusCode);
+            string statusJson3 = await statusResponse3.Content.ReadAsStringAsync();
+            using var doc3 = JsonDocument.Parse(statusJson3);
+            var root3 = doc3.RootElement;
+            Assert.Equal("Anvil", root3.GetProperty("hudTheme").GetString());
+            Assert.Equal("BottomRight", root3.GetProperty("overlayPosition").GetString());
+            Assert.False(root3.GetProperty("hudShowRadar").GetBoolean());
+            Assert.False(root3.GetProperty("hudShowActiveSpeakers").GetBoolean());
+            Assert.False(root3.GetProperty("hudShowChannel").GetBoolean());
+            Assert.Equal("Industrial", root3.GetProperty("pttChimeType").GetString());
         }
         finally
         {

@@ -3,6 +3,7 @@ package audio
 import (
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -15,7 +16,8 @@ var (
 	dgSession          *discordgo.Session
 	voiceConn          *discordgo.VoiceConnection
 	voiceConnMu        sync.RWMutex
-	discordBridgeChan string = "General"
+	discordBridgeChan  string = "General"
+	discordBridgeChanMu sync.RWMutex
 
 	ssrcMu     sync.RWMutex
 	ssrcToName = make(map[uint32]string)
@@ -25,8 +27,38 @@ var (
 	discordSeq uint32
 )
 
+func SetDiscordBridgeChannel(channel string) {
+	discordBridgeChanMu.Lock()
+	defer discordBridgeChanMu.Unlock()
+	discordBridgeChan = channel
+}
+
+func GetDiscordBridgeChannel() string {
+	discordBridgeChanMu.RLock()
+	defer discordBridgeChanMu.RUnlock()
+	return discordBridgeChan
+}
+
 // StartDiscordBridge initializes the Discord session and joins the voice channel
 func StartDiscordBridge() {
+	// Bind dynamic tracking callback
+	core.OnPlayerChannelChanged = func(name string, profile string, newChannel string) {
+		if !core.DiscordDynamicTracking {
+			return
+		}
+		isLeader := (core.DiscordLeaderUsername != "" && strings.EqualFold(name, core.DiscordLeaderUsername)) ||
+			strings.EqualFold(profile, "Command") ||
+			strings.EqualFold(profile, "Leader")
+
+		if isLeader {
+			oldChan := GetDiscordBridgeChannel()
+			if oldChan != newChannel {
+				SetDiscordBridgeChannel(newChannel)
+				core.Log(fmt.Sprintf("Discord Bridge: Dynamically tracking leader %s (%s) channel switch: %s -> %s", name, profile, oldChan, newChannel), core.ColorGreen)
+			}
+		}
+	}
+
 	if !core.EnableDiscordBridge {
 		core.Log("Discord Bridge: Disabled by config", core.ColorOrange)
 		return
@@ -42,10 +74,10 @@ func StartDiscordBridge() {
 	}
 
 	if ch := os.Getenv("XURUVOIP_DISCORD_BRIDGE_CHANNEL"); ch != "" {
-		discordBridgeChan = ch
+		SetDiscordBridgeChannel(ch)
 	}
 
-	core.Log(fmt.Sprintf("Discord Bridge: Starting for guild %s, channel %s, bridge channel %s", guildID, channelID, discordBridgeChan), core.ColorBlue)
+	core.Log(fmt.Sprintf("Discord Bridge: Starting for guild %s, channel %s, bridge channel %s", guildID, channelID, GetDiscordBridgeChannel()), core.ColorBlue)
 
 	var err error
 	dgSession, err = discordgo.New("Bot " + token)
@@ -143,7 +175,7 @@ func connectVoiceLoop(guildID, channelID string) {
 				seq := uint16(atomic.AddUint32(&discordSeq, 1) & 0xFFFF)
 
 				// Inject to Go server clients
-				InjectRadioAudio(name, seq, packet.Opus, discordBridgeChan)
+				InjectRadioAudio(name, seq, packet.Opus, GetDiscordBridgeChannel())
 			}
 		}
 
@@ -157,7 +189,7 @@ func SendToDiscord(senderChannel string, opusData []byte) {
 	if !core.EnableDiscordBridge {
 		return
 	}
-	if senderChannel != discordBridgeChan {
+	if senderChannel != GetDiscordBridgeChannel() {
 		return
 	}
 

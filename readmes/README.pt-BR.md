@@ -214,14 +214,15 @@ graph TB
 * **Sobreposição do respirador da viseira:** Simula a pressão do ar quando a viseira está abaixada. Sintetiza um ruído respiratório de baixa frequência e um zumbido do ventilador de ventilação de dupla frequência (50 Hz + 100 Hz) na alimentação do microfone capturada.
 * **Sincronização automática da viseira:** Lê registros de anexos em `Game.log` para detectar automaticamente quando um capacete é equipado/removido e atualiza o estado da viseira em tempo real.
 
-### 4. 🎙️ Trocador de voz de ficção científica e moduladores de terno
-* **Filtros DSP em tempo real:** Mudança de pitch no domínio do tempo, flangeamento, modulação em anel, saturação soft-tanh e bitcrushing de 8 bits.
-* **Predefinições atmosféricas:** Carregue instantaneamente perfis de voz predefinidos, incluindo **Alien**, **Cyborg**, **Robotic** ou **Custom Pitch Shift** (0,5x a 2,0x).
+### 4. 🎙️ Trocador de voz de ficção científica e moduladores de traje
+* **Filtros DSP em tempo real :** Mudança de tom no domínio do tempo, flanger, modulação em anel, saturação soft-tanh e bitcrushing de 8 bits.
+* **Predefinições atmosféricas :** Carregue instantaneamente perfis de voz predefinidos, incluindo **Alien**, **Cyborg**, **Robotic** ou **Custom Pitch Shift** (0,5x a 2,0x).
+* **Sliders de modulador personalizados :** Ajuste com precisão a mudança de tom, frequência/mixagem do modulador em anel, profundidade/taxa/feedback do flanger e configurações de bitcrush por meio dos sliders de parâmetros.
 
 ### 5. 📻 Degradação imersiva de rádio e sinos
 * **Filtragem passa-banda:** Modela filtros de rádio com cortes baixos/altos ao usar canais de rádio ou quando os visores do traje estão abaixados.
-* **Degradação do sinal de rádio:** Faixas de corte estreitas e misturas de ruído estático filtrado por passagem de banda conforme a distância entre os jogadores se aproxima do limite do transmissor de rádio.
-* **Acoustic Radio Chimes:** Reproduz um som de mic-key de arrebatamento (900Hz a 700Hz) na tecla pressionada e uma cauda estática de silenciador na tecla levantada.
+* **Degradacão do sinal de rádio:** Faixas de corte estreitas e misturas de ruído estático filtrado por passagem de banda conforme a distância entre os jogadores se aproxima do limite do transmissor de rádio.
+* **Sinos de rádio acústicos:** Toca sinos mecânicos ao pressionar e liberar a tecla de transmissão nos canais de rádio. Suporta quatro perfis matemáticos distintos selecionáveis nas configurações ou no aplicativo Companion: Militar (varreduras senoidais), Industrial (cliques mecânicos pesados), Alienígena (varreduras moduladas em anel) e Vintage (cliques de relé analógico).
 
 ### 6. 💬 Sistema de intercomunicação automática de navio
 * **Canais de intercomunicação de veículos:** Embarcar em um veículo inscreve automaticamente os jogadores em um canal de rádio dinâmico `Intercom_<ContainerID>`.
@@ -234,10 +235,12 @@ graph TB
 * **Recarga de limpeza:** Faz uma contagem regressiva de 5 minutos após o último jogador deixar a nave antes de excluir o canal de intercomunicação, maximizando o desempenho do servidor.
 
 ### 7. 📡 Sobreposição de HUD compatível com Vulkan e radar tático 2D
-* **Sobreposição Click-Through do Win32:** Uma sobreposição de HUD sem bordas que mostra conexões VoIP, frequências e estados de fala. Compatível com Vulkan e DirectX (executando em modo de janela sem borda).
-* **Indicador de Status do Intercomunicador:** Exibe avisos como `⚡ INTERCOM: DEGRADED` (com detalhes de substatus como `[Power Loss]`, `[Quantum]` ou `[Static Pop]`) na sobreposição do HUD quando a degradação do intercomunicador está ativa.
-* **Mini-Radar Tático:** Apresenta um radar HUD 2D alinhado ao rumo que exibe jogadores que falam relativamente, desenhando anéis sonoros pulsantes ao redor deles.
-* **Legendas de fala para texto:** Transcreve áudio de rádio/proximidade recebido para legendas localizadas do HUD usando um modelo Whisper leve e off-line (`ggml-tiny.bin`).
+* **Sobreposição de clique com Win32 :** Uma sobreposição de HUD sem bordas que mostra conexões VoIP, frequências e estados de fala. Compatível com Vulkan e DirectX (executado em modo de janela sem bordas).
+* **Customizador de HUD interativo :** Permite a personalização em tempo real do tema (Aegis, Anvil, Drake, RSI, Origin), posicionamento (cantos/centro) e visibilidade dos componentes (mini-radar, lista de alto-falantes, cabeçalho de conexão) por meio de configurações ou do Companion App.
+* **Indicador de Status do Interfone :** Exibe avisos como `⚡ INTERCOM: DEGRADED` (com detalhes de substatus como `[Power Loss]`, `[Quantum]` ou `[Static Pop]`) na sobreposição do HUD quando a degradação do interfone está ativa.
+* **Mini-Radar Tático :** Apresenta um radar HUD 2D alinhado ao rumo que exibe os jogadores que estão falando em relação a você, desenhando anéis sonoros pulsantes ao redor deles.
+* **Indicadores de elevação 3D :** Adiciona setas de direção vertical e deltas de altura do deck (ex: `Bob (▲ 12m)`) ao lado dos ícones do radar quando a separação vertical excede 2 metros.
+* **Legendas de fala para texto :** Transcreve áudio de rádio/proximidade recebido em legendas de HUD localizadas usando um modelo Whisper leve e off-line (`ggml-tiny.bin`).
 * **Comandos de voz PTT viva-voz:** Manter pressionada a tecla dedicada de comando de voz silencia temporariamente as transmissões de voz de proximidade/rádio de saída e armazena o áudio do microfone em buffer. Ao soltá-la, a voz é transcrita localmente via modelo Whisper para acionar ações da nave:
   * **Comandos suportados:** Alternar visor/capacete, silenciar/ativar microfone (proximidade/rádio/perfil/todos), seleção de canal de rádio ativo e predefinições do modulador de voz.
   * **Correspondência de palavras-chave multilíngue:** Suportado em 8 idiomas (inglês, francês, alemão, espanhol, português, japonês e chinês).
@@ -255,8 +258,9 @@ graph TB
 * **Título de frequência ao vivo:** Exibe os nomes dos canais de rádio ativos diretamente nos botões físicos do Stream Deck.
 
 ### 10. 🔌 Ponte de Voz Discord
-* **Retransmissão de áudio bidirecional:** Retransmite as comunicações entre um canal de rádio do servidor Go e um canal de voz do Discord.
-* **Mapeamento de apelidos:** Captura a fala do Discord e mapeia IDs SSRC para apelidos de servidor.
+* **Relé de áudio bidirecional :** Transmite comunicações entre um canal de rádio do servidor Go e um canal de voz do Discord.
+* **Mapeamento de apelidos :** Captura a fala do Discord e mapeia os IDs de SSRC para os apelidos do servidor.
+* **Rastreamento dinâmico de frequência :** Move automaticamente a conexão de voz da ponte do Discord para seguir e espelhar o canal ativo do líder configurado ou dos perfis Command/Leader.
 
 ### 11. 🛡️ Segurança, rotação de log e radar de tela de administração
 * **Rotação diária de logs:** Arquivador de logs de inicialização que retém apenas os 5 logs mais recentes.
@@ -312,7 +316,7 @@ graph TB
 
 ### 23. 🛰️ Reprodução AAR 3D no servidor
 * **Registro de coordenadas:** O servidor registra coordenadas e zonas dos jogadores em um arquivo `<session_id>_positions.jsonl` a cada 500 ms.
-* **Canvas de reprodução sincronizada:** Visualiza a trilha do jogador e os anéis concêntricos de fala em um mapa HTML5 Canvas baseado na web, totalmente sincronizado com o áudio Ogg/Opus gravado.
+* **Reprodução WebGL 3D Sincronizada:** Visualiza a trajetória 3D do jogador e os anéis de fala concêntricos em um mapa interativo Three.js WebGL 3D com rotação, pan e zoom pelo mouse, totalmente sincronizado com o áudio Ogg/Opus gravado.
 
 ---
 
