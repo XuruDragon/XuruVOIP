@@ -218,11 +218,7 @@
     <sys:String x:Key="LblInitiateHail">Tecla de iniciar llamada</sys:String>
     <sys:String x:Key="LblAcceptHail">Tecla de aceptar llamada</sys:String>
     <sys:String x:Key="LblDeclineHail">Tecla de rechazar/terminar llamada</sys:String>
-    <!-- AEGIS Diagnostics Panel -->
-    <sys:String x:Key="PanelAegisSystem">ESTADO DEL SISTEMA AEGIS</sys:String>
-    <sys:String x:Key="LblGForceLoad">Carga de fuerza G</sys:String>
-    <sys:String x:Key="LblPhysicalExertion">Esfuerzo físico</sys:String>
-    <sys:String x:Key="LblVoiceSystems">Sistema de comandos de voz</sys:String>
-    <sys:String x:Key="StatusStandby">EN ESPERA</sys:String>
+    <!-- System Console Panel -->
+    <sys:String x:Key="PanelConsoleLog">CONSOLA DEL SISTEMA</sys:String>
 </ResourceDictionary>
 

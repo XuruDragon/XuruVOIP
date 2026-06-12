@@ -218,12 +218,8 @@
     <sys:String x:Key="LblInitiateHail">Initiate Hail Key</sys:String>
     <sys:String x:Key="LblAcceptHail">Accept Hail Key</sys:String>
     <sys:String x:Key="LblDeclineHail">Decline/End Hail Key</sys:String>
-    <!-- AEGIS Diagnostics Panel -->
-    <sys:String x:Key="PanelAegisSystem">AEGIS SYSTEM STATUS</sys:String>
-    <sys:String x:Key="LblGForceLoad">G-Force Load</sys:String>
-    <sys:String x:Key="LblPhysicalExertion">Physical Exertion</sys:String>
-    <sys:String x:Key="LblVoiceSystems">Voice Command System</sys:String>
-    <sys:String x:Key="StatusStandby">STANDBY</sys:String>
+    <!-- System Console Panel -->
+    <sys:String x:Key="PanelConsoleLog">SYSTEM CONSOLE</sys:String>
 </ResourceDictionary>
 
 

@@ -108,14 +108,79 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
         }
     }
 
+    private readonly System.Collections.ObjectModel.ObservableCollection<string> _eventLogs = new();
+    public System.Collections.ObjectModel.ObservableCollection<string> EventLogs => _eventLogs;
+
+    public void AddEventLog(string category, string message)
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher != null && !dispatcher.HasShutdownStarted)
+        {
+            if (dispatcher.CheckAccess())
+            {
+                InsertEvent(category, message);
+            }
+            else
+            {
+                try
+                {
+                    dispatcher.BeginInvoke(new Action(() => InsertEvent(category, message)));
+                }
+                catch (Exception)
+                {
+                    InsertEvent(category, message);
+                }
+            }
+        }
+        else
+        {
+            InsertEvent(category, message);
+        }
+    }
+
+    private void InsertEvent(string category, string message)
+    {
+        string timeStr = DateTime.Now.ToString("HH:mm:ss");
+        string entry = $"[{timeStr}] {category.ToUpper()}: {message}";
+        _eventLogs.Insert(0, entry);
+        while (_eventLogs.Count > 15)
+        {
+            _eventLogs.RemoveAt(_eventLogs.Count - 1);
+        }
+    }
+
     private string _currentZone = "Waiting for SC...";
-    public string CurrentZone { get => _currentZone; set => Set(ref _currentZone, value); }
+    public string CurrentZone
+    {
+        get => _currentZone;
+        set
+        {
+            string oldVal = _currentZone;
+            if (Set(ref _currentZone, value))
+            {
+                if (!string.IsNullOrEmpty(value) && oldVal != value && value != "Waiting for SC..." && value != "En attente de SC..." && value != "Warten auf SC..." && value != "Esperando SC...")
+                {
+                    AddEventLog("GPS", $"Arrived at {value}");
+                }
+            }
+        }
+    }
 
     private string _currentPos = "";
     public string CurrentPos { get => _currentPos; set => Set(ref _currentPos, value); }
 
     private string _statusMessage = "Disconnected";
-    public string StatusMessage { get => _statusMessage; set => Set(ref _statusMessage, value); }
+    public string StatusMessage
+    {
+        get => _statusMessage;
+        set
+        {
+            if (Set(ref _statusMessage, value) && !string.IsNullOrEmpty(value))
+            {
+                AddEventLog("SYSTEM", value);
+            }
+        }
+    }
 
     private float _inputLevel;
     public float InputLevel { get => _inputLevel; set => Set(ref _inputLevel, value); }
@@ -277,6 +342,7 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
             _currentZone = Application.Current.TryFindResource("OcrWaiting") as string ?? "Waiting for SC...";
             _statusMessage = Application.Current.TryFindResource("StatusDisconnected") as string ?? "Disconnected";
         }
+        AddEventLog("SYSTEM", "XuruVoip client initialized.");
     }
 
     private async void InitializeServicesAsync()
@@ -1794,11 +1860,13 @@ public class MainViewModel : INotifyPropertyChanged, IAsyncDisposable
                 string successFormat = Application.Current?.TryFindResource("TxtVoiceSuccess") as string ?? "✔️ CMD: {0}";
                 VoiceCommandStatusText = string.Format(successFormat, actionLabel);
                 VoiceCommandStatusColor = "Green";
+                AddEventLog("VOICE", $"Executed command: {actionLabel} (transcribed: '{text}')");
             }
             else
             {
                 VoiceCommandStatusText = Application.Current?.TryFindResource("TxtVoiceError") as string ?? "❌ CMD NOT RECOGNIZED";
                 VoiceCommandStatusColor = "Red";
+                AddEventLog("VOICE", $"Command unrecognized: '{text}'");
             }
 
             ShowVoiceCommandPanel = true;
