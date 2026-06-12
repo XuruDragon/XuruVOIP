@@ -251,6 +251,29 @@ graph TB
   * **Multi-Language Keyword Matching:** Supported across 8 languages (English, French, German, Spanish, Portuguese, Japanese, and Chinese).
   * **Confidence Threshold Filter:** A configurable slider filters out low-confidence matches or extraneous speech.
   * *Disabled by default; enabling it downloads the offline Whisper transcription model (~140MB) if not already present.*
+  * **Voice Commands Reference List:**
+    Below is the list of all supported hands-free PTT voice commands, split by XuruVOIP application controls and Star Citizen game key bindings:
+    
+    #### XuruVOIP Application Controls (Exclusive to XuruVOIP)
+    These commands control your helmet/visor state, channel mutes, radio frequency selection, or voice modulations directly inside XuruVOIP:
+    * **Toggle Visor/Helmet Filter:** `visor`, `helmet`, `toggle visor`, `toggle helmet`, `visor toggle`
+    * **Mute Proximity Channel:** `mute proximity`, `silence proximity`, `disable proximity mic`, `proximity mute`
+    * **Unmute Proximity Channel:** `unmute proximity`, `enable proximity mic`, `proximity unmute`
+    * **Mute Radio Channel:** `mute radio`, `silence radio`, `disable radio mic`, `radio mute`
+    * **Unmute Radio Channel:** `unmute radio`, `enable radio mic`, `radio unmute`
+    * **Mute Profile Channel:** `mute profile`, `silence profile`, `disable profile mic`, `profile mute`
+    * **Unmute Profile Channel:** `unmute profile`, `enable profile mic`, `profile unmute`
+    * **Mute Microphone (Global):** `mute all`, `silence all`, `mute microphone`, `mute mic`
+    * **Unmute Microphone (Global):** `unmute all`, `enable microphone`, `unmute mic`
+    * **Switch Radio Channel:** `set channel`, `change channel`, `switch channel`, `channel to`, `channel` followed by the channel name (e.g. *"change channel Alpha"*)
+    * **Set Voice Changer Profile:** `voice changer`, `voice profile`, `voice modifier`, `set voice` followed by a profile: `alien`, `cyborg`, `robotic`, `pitchshift`, `none` (or `off`/`normal`)
+    
+    #### Simulated Ship Controls (Star Citizen Related)
+    These commands trigger simulated physical keystrokes on your PC to trigger Star Citizen controls:
+    * **Toggle Ship Power:** `power`, `toggle power`, `power on`, `power off`, `systems on`, `systems off`
+    * **Toggle Ship Doors/Ramps:** `doors`, `exterior`, `open doors`, `close doors`, `open exterior`, `close exterior`, `toggle doors`, `toggle exterior`
+    * **Divert Shields Forward:** `shields`, `shields front`, `shields forward`, `divert shields`, `shields ahead`
+    * **Toggle Landing Gear:** `landing gear`, `deploy landing gear`, `retract landing gear`, `toggle landing gear`, `gear`
 
 ### 8. 📱 Companion App & REST API
 * **Local HTTP Web Server:** Hosts a local dashboard on a configurable port (default: `8891`, disabled by default).

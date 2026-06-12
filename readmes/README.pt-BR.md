@@ -246,6 +246,29 @@ graph TB
   * **Correspondência de palavras-chave multilíngue:** Suportado em 8 idiomas (inglês, francês, alemão, espanhol, português, japonês e chinês).
   * **Filtro de limite de confiança:** Um controle deslizante configurável filtra correspondências de baixa confiança ou falas irrelevantes.
   * *Desabilitado por padrão; a ativação fará o download em segundo plano do modelo de transcrição off-line Whisper (~140 MB) se ainda não estiver presente.*
+  * **Lista de referência de comandos de voz:**
+    Abaixo está a lista de todos os comandos de voz PTT viva-voz suportados, divididos em controles de aplicativo XuruVOIP e mapeamentos de teclas de Star Citizen:
+    
+    #### Controles do Aplicativo XuruVOIP (Exclusivos do XuruVOIP)
+    Esses comandos controlam o estado do capacete/viseira, silenciamento de canais, frequências de rádio ou modulações de voz diretamente no XuruVOIP:
+    * **Alternar capacete/viseira:** `visera`, `capacete`, `alternar visera`, `alternar capacete`
+    * **Silenciar canal de proximidade:** `silenciar proximidade`, `mutear proximidade`
+    * **Ativar canal de proximidade:** `ativar proximidade`, `desmutear proximidade`
+    * **Silenciar canal de rádio:** `silenciar radio`, `mutear radio`
+    * **Ativar canal de rádio:** `ativar rádio`, `desmutear rádio`
+    * **Silenciar canal de perfil:** `silenciar perfil`, `mutear perfil`
+    * **Ativar canal de perfil:** `ativar perfil`, `desmutear perfil`
+    * **Silenciar microfone (Global):** `silenciar tudo`, `mutear tudo`, `silenciar microfone`, `mutear micro`
+    * **Ativar microfone (Global):** `ativar tudo`, `desmutear tudo`, `ativar microfone`, `desmutear micro`
+    * **Mudar canal de rádio:** `mudar canal`, `canal para`, `definir canal`, `canal` seguido do nome do canal (por exemplo, *"mudar canal Alpha"*)
+    * **Definir perfil do modulador de voz:** `modulador de voz`, `perfil de voz`, `voz` seguido de um perfil: `alien` (ou `alienígena`), `cyborg` (ou `ciborg`), `robotic` (ou `robot`), `pitchshift` (ou `pitch shift`, `tono`, `pitch`), `none` (ou `off`, `normal`, `desativado`)
+    
+    #### Controles simulados da nave (Relacionados ao Star Citizen)
+    Esses comandos simulam pressionamentos de teclas físicas no seu PC para acionar controles de Star Citizen:
+    * **Alternar energia da nave:** `energia`, `alternar energia`, `sistemas ligados`, `sistemas desligados`
+    * **Alternar portas/rampas da nave:** `portas`, `exterior`, `abrir portas`, `fechar portas`, `abrir exterior`, `fechar exterior`
+    * **Desviar escudos para a frente:** `escudos`, `escudos na frente`, `escudos para frente`, `desviar escudos`
+    * **Alternar trem de pouso:** `trem de pouso`, `desdobrar trem`, `recolher trem`
 
 ### 8. 📱 Aplicativo complementar e API REST
 * **Servidor Web HTTP local:** Hospeda um painel local em uma porta configurável (padrão: `8891`, desabilitado por padrão).
